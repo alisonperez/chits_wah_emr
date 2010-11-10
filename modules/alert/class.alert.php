@@ -9,6 +9,8 @@ class alert extends module{
 		$this->module = "alert";
 		
 		$this->mods = array('mc'=>array("Maternal Care"),'sick'=>array("Sick Childre Under 5"),'epi'=>array("Expanded Program for Immunization"),'fp'=>array("Birth Spacing / Family Planning"),'notifiable'=>array("Notifiable Diseases"));
+
+		$this->images = array('mc'=>'mc_alert.png','epi'=>'epi_alert.jpeg','fp'=>'fp_alert.jpeg','notifiable'=>'notifiable_alert.jpeg','sick'=>'sick_alert.jpeg');
 		$this->year = date('Y');
 		$this->morb_wk = $this->get_wk_num();
 	}
@@ -462,9 +464,18 @@ class alert extends module{
 				
 				foreach($this->mods as $program_id=>$program_arr){
 					$arr_prog = $this->get_indicator_instance($program_id,$fam_id);
-					$str = empty($arr_prog)?'test':'mic';
-					echo "<td>";
-					echo $str;
+					
+					echo "<td align='center'>";
+					if(!empty($arr_prog)): 
+						$image = $this->images[$program_id];
+						$ser_arr = serialize($arr_prog);
+						//print_r($arr_prog);
+						echo "<a href='../site/show_hh.php?id=$ser_arr&famid=$fam_id' target='new'>";
+						echo "<img src='../images/$image' width='30' height='30' alt='$program_id'></img>";
+						echo "</a>";
+					else:
+						echo '';
+					endif;
 					//print_r($arr_prog);
 					//print ' '.$program_id;
 					echo "</td>";
@@ -855,7 +866,7 @@ class alert extends module{
 
 				} //end switch for case id's
 				
-				if(!empty($arr_case_id)):	
+				if(!empty($arr_case_id)):
 					array_push($arr_indicator,array($indicator_id=>$arr_case_id));
 				endif;
 
@@ -1273,7 +1284,7 @@ class alert extends module{
 				break;
 
 			case 'HEPB1':			//at birth
-				$min_age = 0;		
+				$min_age = 0;
 				break;
 
 			case 'HEPB2':
