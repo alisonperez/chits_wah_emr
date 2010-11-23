@@ -1049,6 +1049,10 @@ class healthcenter extends module{
                     header("location: ".$_SERVER["PHP_SELF"]."?page=".$get_vars["page"]."&menu_id=".$get_vars["menu_id"]."&consult_id=".$get_vars["consult_id"]."&ptmenu=DETAILS");
                 }
             }
+            
+        }
+        else{
+            	print "&nbsp";
         }
         $sql_ptgroup = "select g.ptgroup_name, g.ptgroup_module, c.ptgroup_timestamp, c.ptgroup_id from m_consult_ptgroup c, m_lib_ptgroup g ".
                        "where g.ptgroup_id = c.ptgroup_id and c.consult_id = '".$get_vars["consult_id"]."'";
@@ -1389,7 +1393,7 @@ class healthcenter extends module{
 
             // insert into consult table if there are no
             //   possible duplicate entries
-
+            
             $sql = "insert into m_consult (patient_id, user_id, healthcenter_id, consult_date) ".
                    "values ('$patient_id', '".$_SESSION["userid"]."', '".$_SESSION["datanode"]["code"]."', sysdate())";
             if ($result = mysql_query($sql)) {

@@ -439,7 +439,7 @@ class alert extends module{
 			echo "<tr><td>".$r_brgy["barangay_name"]."</td>";
 			
 			for($i=0;$i<(count($this->mods));$i++){
-				echo "<td>".count($this->mods)."</td>";
+				echo "<td>&nbsp;</td>";
 			}
 
 			echo "</tr>";
@@ -470,11 +470,14 @@ class alert extends module{
 						$image = $this->images[$program_id];
 						$ser_arr = serialize($arr_prog);
 						//print_r($arr_prog);
-						echo "<a href='../site/show_hh.php?id=$ser_arr&famid=$fam_id' target='new'>";
-						echo "<img src='../images/$image' width='30' height='30' alt='$program_id'></img>";
+						
+						echo "<a href='../site/show_hh.php?id=$ser_arr&famid=$fam_id' target='_blank'>";
+						echo "<img src='../images/$image' width='30' height='30' alt='$program_id' onclick=\"window.open('$_SERVER[PHP_SELF]/site/show_hh.php?id=$ser_arr&famid=$fam_id')\"></img>";
 						echo "</a>";
+
+						
 					else:
-						echo '';
+						echo "&nbsp";
 					endif;
 					//print_r($arr_prog);
 					//print ' '.$program_id;
@@ -1303,7 +1306,6 @@ class alert extends module{
 				
 				break; 
 		}
-
 		return $min_age; 
 	}	
 	
