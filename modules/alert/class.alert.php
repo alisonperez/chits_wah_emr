@@ -449,6 +449,10 @@ class alert extends module{
 
 			while(list($fam_id) = mysql_fetch_array($q_hh)){
 				$arr_prog = array();
+				$arr_res_alert = array();
+				
+				
+
 				$q_lastname = mysql_query("SELECT a.patient_id,a.patient_lastname FROM m_patient a,m_family_members b WHERE a.patient_id=b.patient_id AND b.family_id='$fam_id' AND b.family_role='head'") or die("Cannot query 449 ".mysql_error());
 
 				if(mysql_num_rows($q_lastname)!=0):
@@ -460,21 +464,24 @@ class alert extends module{
 				endif;
 
 				echo "<tr>";
-				echo "<td>&nbsp;&nbsp;&nbsp;&nbsp;$px_lastname</td>";
+
+				if(count($this->determine_alert_hh($fam_id))!=0):
+					echo "<td>&nbsp;&nbsp;&nbsp;&nbsp;$px_lastname</td>";
+			
 				
 				foreach($this->mods as $program_id=>$program_arr){
-					$arr_prog = $this->get_indicator_instance($program_id,$fam_id);
-					
+					$arr_prog = $this->get_indicator_instance($program_id,$fam_id);	
+
 					echo "<td align='center'>";
 					if(!empty($arr_prog)): 
+
 						$image = $this->images[$program_id];
 						$ser_arr = serialize($arr_prog);
 						//print_r($arr_prog);
-						
+
 						echo "<a href='../site/show_hh.php?id=$ser_arr&famid=$fam_id' target='_blank'>";
 						echo "<img src='../images/$image' width='30' height='30' alt='$program_id' onclick=\"window.open('$_SERVER[PHP_SELF]/site/show_hh.php?id=$ser_arr&famid=$fam_id')\"></img>";
 						echo "</a>";
-
 						
 					else:
 						echo "&nbsp";
@@ -482,7 +489,10 @@ class alert extends module{
 					//print_r($arr_prog);
 					//print ' '.$program_id;
 					echo "</td>";
-				}
+				} 
+				
+				endif;
+	
 				echo "</tr>";
 			}
 		}
@@ -1308,6 +1318,26 @@ class alert extends module{
 		}
 		return $min_age; 
 	}	
+
+	function determine_alert_hh(){
+		//function determine_alert_hh
+		if(func_num_args()>0):
+			$arr = func_get_args();
+			$fam_id = $arr[0];
+		endif;
+
+		$arr_alert = array();
+		
+		foreach($this->mods as $program_id=>$program_arr){
+			$arr_prog = array();
+			$arr_prog = $this->get_indicator_instance($program_id,$fam_id);	
+			if(!empty($arr_prog)):
+				array_push($arr_alert,$arr_prog);
+			endif;
+		}
+
+		return $arr_alert;
+	}
 	
 } //end of class
 ?>
