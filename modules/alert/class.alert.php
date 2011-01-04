@@ -471,13 +471,15 @@ class alert extends module{
 				
 				foreach($this->mods as $program_id=>$program_arr){
 					$arr_prog = $this->get_indicator_instance($program_id,$fam_id);	
-
+			
 					echo "<td align='center'>";
 					if(!empty($arr_prog)): 
 
 						$image = $this->images[$program_id];
 						$ser_arr = serialize($arr_prog);
+						
 						//print_r($arr_prog);
+
 
 						echo "<a href='../site/show_hh.php?id=$ser_arr&famid=$fam_id' target='_blank'>";
 						echo "<img src='../images/$image' width='30' height='30' alt='$program_id' onclick=\"window.open('$_SERVER[PHP_SELF]/site/show_hh.php?id=$ser_arr&famid=$fam_id')\"></img>";
@@ -587,9 +589,9 @@ class alert extends module{
 							
 							$trimester = ($reference_date==$tri1)?1:(($reference_date==$tri2)?2:3);
 							//echo $reference_date.'/'.$mc_id.'/'.$trimester;
-
+							
 							if($reference_date):
-								array_push($arr_case_id,$mc_id); //push if the present date is on or before the reference prenatal visit date
+								array_push($arr_case_id,$mc_id,$reference_date); //push if the present date is on or before the reference prenatal visit date
 							endif;
 
 						endif;
@@ -601,7 +603,7 @@ class alert extends module{
 
 						if(mysql_num_rows($q_mc)!=0):
 							list($mc_id,$patient_edc)=mysql_fetch_array($q_mc);
-							array_push($arr_case_id,$mc_id);
+							array_push($arr_case_id,$mc_id,$patient_edc);
 						else: 
 						endif;
 						
@@ -616,7 +618,7 @@ class alert extends module{
 							$q_postpartum = mysql_query("SELECT mc_id FROM m_consult_mc_postpartum WHERE mc_id='$mc_id'") or die("Cannot query 586 ".mysql_error()); //check if the patient has visited during postpartum period
 
 							if(mysql_num_rows($q_postpartum) < 2):  //at least 2 postpartum visits are required. if not satisfied, set 1 to alert flag
-								array_push($arr_case_id,$mc_id);
+								array_push($arr_case_id,$mc_id,$delivery_date);
 							endif;
 						endif;
 
@@ -632,7 +634,7 @@ class alert extends module{
 							$tt_status = mc::get_tt_status($mc_id,$patient_id,$patient_edc);
 							
 							if(eregi('not',$tt_status)): // a not substring means that the tt is not active
-								array_push($arr_case_id,$mc_id);
+								array_push($arr_case_id,$mc_id,$patient_edc);
 							endif;
 						endif;
 
@@ -648,7 +650,7 @@ class alert extends module{
 							list($sum_vita) = mysql_fetch_array($q_vit);
 							
 							if($sum_vita < 200000): //throw to the arr_case_id if the sum is less than 200000 units of vitamin A
-								array_push($arr_case_id,$mc_id);
+								array_push($arr_case_id,$mc_id,$patient_edc);
 							endif;
 						endif;
 
@@ -665,7 +667,7 @@ class alert extends module{
 							list($sum_iron) = mysql_fetch_array($q_iron);
 							
 							if($sum_iron==0): //push the mc_id to the arr_case_id if no ironintake
-								array_push($arr_case_id,$mc_id);
+								array_push($arr_case_id,$mc_id,$patient_edc);
 							endif;
 						endif;
 
@@ -717,11 +719,10 @@ class alert extends module{
 
 			$q_fp_indicators = mysql_query("SELECT alert_indicator_id,sub_indicator FROM m_lib_alert_indicators WHERE main_indicator='$program_id' ORDER by sub_indicator ASC") or die("Cannot query 475: ".mysql_error());
 
-
-			//$arr_case_id = array(); //this will contain the consult_id and enrollment id's		
+			//$arr_case_id = array(); //this will contain the consult_id and enrollment id's
 
 			while(list($indicator_id,$sub_indicator) = mysql_fetch_array($q_fp_indicators)){
-				
+
 				$arr_case_id = array(); //this will contain the consult_id and enrollment id's		
 				
 				$arr_definition = $this->get_alert_definition($indicator_id); //composed of defition id, days before and after. 

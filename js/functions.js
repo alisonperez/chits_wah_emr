@@ -164,7 +164,3 @@ function autoSubmit_alert()
 		formObject.submit();
 	}
 }
-
-function alert(){
-	window.alert("Aho aho");
-}
