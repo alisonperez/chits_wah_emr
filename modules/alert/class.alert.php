@@ -738,10 +738,13 @@ class alert extends module{
 						if(mysql_num_rows($q_fp)!=0):
 							list($fp_px_id,$date_registered) = mysql_fetch_array($q_fp);
 							
-							$fp_service_id= $this->get_fp_pre_reminder($date_today,$fp_px_id,$patient_id,$days_before,'PILLS');
+							$arr_fp_details = $this->get_fp_pre_reminder($date_today,$fp_px_id,$patient_id,$days_before,'PILLS');
+
+							$fp_service_id = $arr_fp_details[0];
+							$fp_next_service_date = $arr_fp_details[1];
 							
 							if($fp_service_id!=0):
-								array_push($arr_case_id,$fp_service_id);
+								array_push($arr_case_id,$fp_service_id,$fp_next_service_date);
 							endif;
 						endif;
 				
@@ -752,10 +755,16 @@ class alert extends module{
 
 						if(mysql_num_rows($q_fp)!=0):
 							list($fp_px_id,$date_registered) = mysql_fetch_array($q_fp);
-							$fp_service_id = $this->get_fp_pre_reminder($date_today,$fp_px_id,$patient_id,$days_before,'CONDOM');
+					
+							$arr_fp_details = $this->get_fp_pre_reminder($date_today,$fp_px_id,$patient_id,$days_before,'CONDOM');
 
+							
+							$fp_service_id = $arr_fp_details[0];
+							$fp_next_service_date = $arr_fp_details[1];
+
+							
 							if($fp_service_id!=0):
-								array_push($arr_case_id,$fp_service_id);
+								array_push($arr_case_id,$fp_service_id,$fp_next_service_date);
 							endif;
 						endif;
 							
@@ -767,8 +776,10 @@ class alert extends module{
 
 						if(mysql_num_rows($q_fp)!=0):
 							list($fp_px_id,$date_registered) = mysql_fetch_array($q_fp);
-												
-							$fp_service_id = $this->get_fp_pre_reminder($date_today,$fp_px_id,$patient_id,$days_before,'IUD');
+							
+							$arr_fp_details = $this->get_fp_pre_reminder($date_today,$fp_px_id,$patient_id,$days_before,'IUD');
+
+							$fp_service_id = $arr_fp_details[0]; 
 							
 							if($fp_service_id!=0):
 								array_push($arr_case_id,$fp_service_id);
@@ -784,7 +795,10 @@ class alert extends module{
 						if(mysql_num_rows($q_fp)!=0):
 							list($fp_px_id,$date_registered) = mysql_fetch_array($q_fp);
 
-							$fp_service_id = $this->get_fp_pre_reminder($date_today,$fp_px_id,$patient_id,$days_before,'DMPA');
+							$arr_fp_details = $this->get_fp_pre_reminder($date_today,$fp_px_id,$patient_id,$days_before,'DMPA');
+
+							$fp_service_id = $arr_fp_details[0];
+							$fp_next_service_date = $arr_fp_details[1];
 							
 							if($fp_service_id!=0):
 								array_push($arr_case_id,$fp_service_id);
@@ -813,6 +827,7 @@ class alert extends module{
 
 						if(mysql_num_rows($q_fp)!=0):
 							list($fp_px_id,$date_registered) = mysql_fetch_array($q_fp);
+							
 							
 							$fp_service_id = $this->get_post_reminder($fp_px_id,$date_registered,$patient_id,'CONDOM');
 							
@@ -1065,13 +1080,14 @@ class alert extends module{
 				$proj_next_service_date = $this->get_proj_service_date($service_date,$method_id,$fp_px_id,$patient_id);
 				//echo $method_id.' '.$proj_next_service_date.' '.$days_before.'<br>';
 
-				$q_fp_method = mysql_query("SELECT fp_service_id,(to_days('$proj_next_service_date')-to_days('$date_today')) as sum_date FROM m_patient_fp_method_service WHERE fp_px_id='$fp_px_id' AND patient_id='$patient_id' AND (to_days('$proj_next_service_date')-to_days('$date_today')) BETWEEN 0 AND '$days_before' ORDER by date_service DESC") or die("Cannot query 714 ".mysql_error());	
-				
+				$q_fp_method = mysql_query("SELECT fp_service_id,(to_days('$proj_next_service_date')-to_days('$date_today')) as sum_date FROM m_patient_fp_method_service WHERE fp_px_id='$fp_px_id' AND patient_id='$patient_id' AND (to_days('$proj_next_service_date')-to_days('$date_today')) BETWEEN 0 AND '$days_before' ORDER by date_service DESC") or die("Cannot query 714 ".mysql_error());
 			endif;
 
 			if(mysql_num_rows($q_fp_method)!=0):
 				list($fp_service_id,$sum_date) = mysql_fetch_array($q_fp_method);
-				return $fp_service_id;
+				array_push($arr_fp_details,$fp_service_id,$proj_next_service_date);
+
+				return $arr_fp_details;
 			else:
 				return 0;
 			endif;
