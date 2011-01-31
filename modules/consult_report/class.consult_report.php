@@ -307,18 +307,18 @@ class consult_report extends module {
         $sql_patient = "select c.patient_id, c.consult_id, ".
 	               "concat(p.patient_lastname, ', ', p.patient_firstname, ' ',p.patient_middle) patient_name, ".
                        "round((to_days(c.consult_date)-to_days(p.patient_dob))/365,2) patient_age, ".
-                       "p.patient_gender,date_format(c.consult_date,'%h:%i %p') as consult_start,date_format(c.consult_end,'%h:%i %p') as consult_end, round((unix_timestamp(c.consult_end)-unix_timestamp(c.consult_date))/60,2) as consult_minutes, elapsed_time ".
+                       "p.patient_gender,date_format(c.consult_date,'%h:%i %p') as consult_start,date_format(c.consult_end,'%h:%i %p') as consult_end, round((unix_timestamp(c.consult_end)-unix_timestamp(c.consult_date))/60,2) as consult_minutes, elapsed_time,date_format(p.patient_dob,'%m/%d/%Y') as px_dob ".
                        "from m_consult c, m_patient p ".
                        "where c.patient_id = p.patient_id ".
                        "and c.consult_date BETWEEN '$report_date' AND '$end_report_date'";
 
         $result_patient = mysql_query($sql_patient) or die("Cannot query: 305 ".mysql_error());
-
+        
 	if ($result_patient) {
 
             if (mysql_num_rows($result_patient)) {
                 while ($patient = mysql_fetch_array($result_patient)) {
-			
+	          	
                     // get family and address
                     if ($family_id = family::get_family_id($patient["patient_id"])) {
                         $patient_address = family::get_family_address($family_id);
@@ -455,6 +455,7 @@ class consult_report extends module {
     }
 
     function display_consults() {
+
         if (func_num_args()>0) {
 	    $arg_list = func_get_args();
 	    $report_date = $arg_list[0];
@@ -468,7 +469,7 @@ class consult_report extends module {
         $sql = "select c.patient_id, c.consult_id, ".
 	               "concat(p.patient_lastname, ', ', p.patient_firstname,' ',p.patient_middle) patient_name, ".
                        "round((to_days(c.consult_date)-to_days(p.patient_dob))/365,1) patient_age, ".
-                       "p.patient_gender,date_format(c.consult_date,'%Y-%m-%d') as consult_date ".
+                       "p.patient_gender,date_format(c.consult_date,'%Y-%m-%d') as consult_date,date_format(p.patient_dob,'%m-%d-%Y') as pxdob ".
                        "from m_consult c, m_patient p ".
                        "where c.patient_id = p.patient_id ".
                        "and c.consult_date BETWEEN '$report_date 00:00:00' AND '$end_report_date 23:59:00' ORDER by c.consult_date ASC";
@@ -477,9 +478,9 @@ class consult_report extends module {
         $result = mysql_query($sql) or die("Cannot query: 456 ".mysql_error());        
         
 	if ($result) {
-	    if (mysql_num_rows($result)) {
-		
-	        $header = array('PATIENT ID','PATIENT NAME / SEX / AGE','CONSULT DATE / ELAPSED TIME','ADDRESS','BRGY','FAMILY ID','PHILHEALTH ID','VITAL SIGNS','COMPLAINTS','DIAGNOSIS','TREATMENT');
+   	    if (mysql_num_rows($result)) {
+               		
+	        $header = array('PATIENT ID','PATIENT NAME/SEX/BDAY/AGE','CONSULT DATE / ELAPSED TIME','ADDRESS','BRGY','FAMILY ID','PHILHEALTH ID','VITAL SIGNS','COMPLAINTS','DIAGNOSIS','TREATMENT');
 	        $contents = array();
 	        
 	        //print "<a href='../chits_query/pdf_reports/dailyservice_report.php'>PRINTER FRIENDLY VERSION</a><br/>"; 
@@ -500,8 +501,8 @@ class consult_report extends module {
 		print "<td class='tinylight' valign='middle' align=center><b>$header[10]</b></td>";
 		print "</tr>";
 
-		while (list($pid,$consult_id,$pname,$age,$sex,$consult_date) = mysql_fetch_array($result)) {
-                
+		while (list($pid,$consult_id,$pname,$age,$sex,$consult_date,$pxdob) = mysql_fetch_array($result)) {
+                    
 		    $inner_record = array();
 		    
                     if ($fid = family::get_family_id($pid)) {
@@ -543,7 +544,7 @@ class consult_report extends module {
 		    $bgcolor=($bgcolor=="#FFFF99"?"white":"#FFFF99");
 		    print "<tr bgcolor='$bgcolor'>";
 		    print "<td class='tinylight' align=center>".$pid."</td>";
-		    print "<td class='tinylight' align=center>".$pname." / ".$sex." / ".$age."</td>";
+		    print "<td class='tinylight' align=center>".$pname." / ".$sex." / ".$pxdob." / ".$age."</td>";
 		    print "<td class='tinylight' align=center>".$elapsed_time."</td>";
 		    print "<td class='tinylight' align=center>".$addr."</td>";                  
 		    //print "<td class='tinylight' align=center>".$resbrgy[barangay_name]."</td>";
@@ -563,10 +564,10 @@ class consult_report extends module {
 		    
 		    $vitals_sign = "BP: ".$bp.", HR: ".$res_vitals[vitals_heartrate].",RR: ".$res_vitals[vitals_resprate].", Wt: ". $res_vitals[vitals_weight]. "kg, Temp: ".$res_vitals[vitals_temp];
 		    
-		    //array_push($inner_record,array($pid,$pname." / ".$sex." / ".$age,$addr,$resbrgy[barangay_name],$brgy,$fid,$phid,'BP: '.$bp.', '.
+		    //array_push($inner_record,array($pid,$pname." / ".$sex." / ".$pxdob.' / "..$age,$addr,$resbrgy[barangay_name],$brgy,$fid,$phid,'BP: '.$bp.', '.
 		    //'HR: '.$res_vitals[vitals_heartrate].', RR: '. $res_vitals[vitals_resprate].', Wt:' $res_vitals[vitals_weight] kg.', Temp:'. $res_vitals[vitals_temp],$cc,$dx,$tx));
 
-		    array_push($inner_record,array($pid,$pname." / ".$sex." / ".$age,$elapsed_time,$addr,$brgy,$fid,$phid,$vitals_sign,$cc,$dx,$tx));
+		    array_push($inner_record,array($pid,$pname." / ".$sex." / ".$pxdob." / ".$age,$elapsed_time,$addr,$brgy,$fid,$phid,$vitals_sign,$cc,$dx,$tx));
 		    array_push($contents,$inner_record);		    		    
 		}
 		print "</table>";
@@ -591,7 +592,7 @@ class consult_report extends module {
 
 	$arr_content = array();
 	$content = array();
-	$header = array("PATIENT ID","PATIENT NAME/AGE/SEX","ADDRESS","BRGY","FAMILY ID","PHILHEALTH ID","VITAL SIGNS","VACCINE/S GIVEN","SERVICE/S GIVEN");
+	$header = array("PATIENT ID","PATIENT NAME/SEX/BDAY/AGE/","ADDRESS","BRGY","FAMILY ID","PHILHEALTH ID","VITAL SIGNS","VACCINE/S GIVEN","SERVICE/S GIVEN");
 
 /*	$sql = "select patient_id, patient_name, patient_gender, patient_age, patient_address, patient_bgy, ".
 	       "family_id, philhealth_id,vaccine_given, service_given ".
@@ -610,7 +611,7 @@ class consult_report extends module {
 		print "<table width='900' cellspacing='0' cellpadding='2' style='border: 1px solid #000000'>";
 		print "<tr bgcolor='#FFCC33'>";
 		print "<td class='tinylight' valign='middle' align=center><b>PATIENT ID</b></td>";
-		print "<td class='tinylight' valign='middle' align=center><b>PATIENT NAME / SEX / AGE</b></td>";
+		print "<td class='tinylight' valign='middle' align=center><b>PATIENT NAME/SEX/AGE</b></td>";
 		print "<td class='tinylight' valign='middle' align=center><b>ADDRESS</b></td>";
 		print "<td class='tinylight' valign='middle' align=center><b>BRGY</b></td>";
 		print "<td class='tinylight' valign='middle' align=center><b>FAMILY ID</b></td>";
@@ -620,7 +621,7 @@ class consult_report extends module {
 		print "<td class='tinylight' valign='middle' align=center><b>SERVICE(S) GIVEN</b></td>";
 		print "</tr>";
 
-		while (list($pid,$pname,$sex,$age,$addr,$bgy,$fid,$phid,$vaccine,$srvc) = mysql_fetch_array($result)) { 
+		while (list($pid,$pname,$sex,$age,$addr,$bgy,$fid,$phid,$vaccine,$srvc,$pxdob) = mysql_fetch_array($result)) { 
 		    $inner_record = array();
 
 		    $selvitals = mysql_query("SELECT vitals_weight,vitals_temp, vitals_resprate, a.consult_id FROM m_consult a, m_consult_vitals b WHERE a.patient_id='$pid' AND a.consult_date BETWEEN '$report_date' AND '$end_date' AND a.consult_id=b.consult_id") or die(mysql_error());
@@ -639,7 +640,7 @@ class consult_report extends module {
 		    $bgcolor=($bgcolor=="#FFFF99"?"white":"#FFFF99");                        
 		    print "<tr bgcolor='$bgcolor'>";                        
 		    print "<td class='tinylight' align=center>".$pid."</td>";                        
-		    print "<td class='tinylight' align=center>".$pname." / ".$sex." / ".$age."</td>";               
+		    print "<td class='tinylight' align=center>".$pname."/".$sex."/".$age."</td>";               
 		    print "<td class='tinylight' align=center>".$addr."</td>";                        
 		    //print "<td class='tinylight' align=center>".$bgy."</td>";                        
 		    //print "<td class='tinylight' align=center>".$resbrgy[barangay_name]."</td>";                        
