@@ -422,7 +422,7 @@ class ccdev extends module {
 		else:
 			echo "<form name='form_ccdev_bfed' action = '".$_SERVER["SELF"]."?page=".$get_vars["page"]."&menu_id=$menu_id&consult_id=".$get_vars["consult_id"]."&ptmenu=".$get_vars["ptmenu"]."&module=".$get_vars["module"]."&ccdev=BFED' method='post'>";
 			echo "<table>";
-			echo "<tr><td><b>".FTITLE_CCDEV_BREASTFEED."</b></td></tr>";
+			echo "<tr><td><b>BREASTFEEDING STATUS</b></td></tr>";
 			echo "<tr><td><span class='tinylight'>Please tick the month if mother exclusively breastfed this	child. To set month 6 date to blank, just delete the contents of the date box.</spans></td></tr>";			
 			for($i=1;$i<7;$i++){
 				
