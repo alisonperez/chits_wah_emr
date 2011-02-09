@@ -174,10 +174,10 @@ class weekly_calendar extends module{
 		echo "<form name='form_calendar' method='POST'>";
 		
 		echo "<table>";
-		echo "<tr><td colspan='2' align='center'><span class='library'>".FTITLE_WEEKLY_FORM."</span></td></tr>";		
+		echo "<tr><td colspan='2' align='center'><span class='library'>MORBIDITY WEEK CALENDAR</span></td></tr>";		
 		$this->show_year();
 		
-		echo "<tr><td class='boxtitle'>".LBL_WEEK."</td>";
+		echo "<tr><td class='boxtitle'>MORBIDITY WEEK</td>";
 		echo "<td><select name='sel_week' value='1'>";
 		
 		for($i=1;$i<53;$i++){
@@ -185,14 +185,14 @@ class weekly_calendar extends module{
 		}
 		echo "</select></td></tr>";		
 		
-		echo "<tr><td class='boxtitle'>".LBL_SDATE."</td>";
+		echo "<tr><td class='boxtitle'>START DATE</td>";
 		echo "<td><input type='text' name='txt_sdate' maxlength='10' size='7'></input>&nbsp;";
 		echo "<a href=\"javascript:show_calendar4('document.form_calendar.txt_sdate', document.form_calendar.txt_sdate.value);\"><img src='../images/cal.gif' width='16' height='16' border='0' alt='Click Here to Pick up the date'></a>";
 		echo "</td>";						
 		echo "</tr>";
 		
 		
-		echo "<tr><td class='boxtitle'>".LBL_EDATE."</td>";
+		echo "<tr><td class='boxtitle'>END DATE</td>";
 		echo "<td><input type='text' name='txt_edate' maxlength='10' size='7'></input>&nbsp;";
 		echo "<a href=\"javascript:show_calendar4('document.form_calendar.txt_edate', document.form_calendar.txt_edate.value);\"><img src='../images/cal.gif' width='16' height='16' border='0' alt='Click Here to Pick up the date'></a>";
 		echo "</td>";
