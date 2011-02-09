@@ -264,7 +264,7 @@ class weekly_calendar extends module{
 		
 						
 		echo "<tr>";
-		echo "<td><span class='boxtitle'>".LBL_YR."</td><td>";
+		echo "<td><span class='boxtitle'>YEAR</td><td>";
 
 		echo "<select name='taon' size='1'>";
 		
