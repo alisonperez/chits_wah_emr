@@ -804,6 +804,8 @@ class ccdev extends module {
             $isadmin = $arg_list[4];
             //print_r($arg_list);
         }
+
+
         switch($post_vars["submitccdev"]) {
         case "Fully Immunized":
             $sql = "update m_patient_ccdev set fully_immunized_date = sysdate() ".
@@ -894,11 +896,14 @@ class ccdev extends module {
 
         case "Update Data":
 
-			list($reg_month,$reg_date,$reg_year) = explode('/',$_POST[ccdev_date_reg]);
-			$ccdev_reg_date = $reg_year.'-'.$reg_month.'-'.$reg_date;			
+		print_r($post_vars);
+
+		list($reg_month,$reg_date,$reg_year) = explode('/',$_POST[ccdev_date_reg]);
+		$ccdev_reg_date = $reg_year.'-'.$reg_month.'-'.$reg_date;			
 
 
             $sql = "update m_patient_ccdev set ".
+		   "mother_name = '$post_vars[mother_name]',".
                    "mother_educ_id = '".$post_vars["mother_educ"]."', ".
                    "mother_occup_id = '".$post_vars["mother_occup"]."', ".
                    "father_name = '".ucwords($post_vars["father_name"])."', ".
@@ -913,10 +918,12 @@ class ccdev extends module {
 			$result = mysql_query($sql) or die(mysql_error());
             
 			if ($result) {
-                header("location: ".$_SERVER["PHP_SELF"]."?page=".$get_vars["page"]."&menu_id=".$get_vars["menu_id"]."&consult_id=".$get_vars["consult_id"]."&ptmenu=".$get_vars["ptmenu"]."&module=".$get_vars["module"]."&ccdev=VISIT1");
+         //       header("location: ".$_SERVER["PHP_SELF"]."?page=".$get_vars["page"]."&menu_id=".$get_vars["menu_id"]."&consult_id=".$get_vars["consult_id"]."&ptmenu=".$get_vars["ptmenu"]."&module=".$get_vars["module"]."&ccdev=VISIT1");
             }
             break;
         case "Save Data":
+
+
             if ($post_vars["mother_name"] && $post_vars["mother_occup"] &&
                 $post_vars["mother_educ"] && $post_vars["delivery_location"] && isset($_POST["ccdev_date_reg"])) {
                 $patient_id = healthcenter::get_patient_id($get_vars["consult_id"]);
@@ -1111,17 +1118,15 @@ class ccdev extends module {
         print "<span class='tinylight'><b>IMPORTANT:</b> ".INSTR_FIRST_VISIT."</span><br/><br/>";
         // MATERNAL DATA
         print "<table bgcolor='#FFCCFF' width='300' cellpadding='3'>";
-		
 
-		
+	print "<tr><td>";
+	print "<span class='boxtitle'>DATE REGISTERED</span><br>";
+	print "<input type='text' size='11' class='textbox' name='ccdev_date_reg' value='$ccdev_reg_date' readonly></input>&nbsp;";
+	echo "<a href=\"javascript:show_calendar4('document.form_consult_ccdev.ccdev_date_reg', document.form_consult_ccdev.ccdev_date_reg.value);\"><img src='../images/cal.gif' width='16' height='16' border='0' alt='Click Here to Pick up the date'></a>";
+	print "</td></tr>";
+	
+	echo "<tr><td>";
 
-		print "<tr><td>";
-		print "<span class='boxtitle'>DATE REGISTERED</span><br>";
-		print "<input type='text' size='11' class='textbox' name='ccdev_date_reg' value='$ccdev_reg_date' readonly></input>&nbsp;";
-		echo "<a href=\"javascript:show_calendar4('document.form_consult_ccdev.ccdev_date_reg', document.form_consult_ccdev.ccdev_date_reg.value);\"><img src='../images/cal.gif' width='16' height='16' border='0' alt='Click Here to Pick up the date'></a>";
-		print "</td></tr>";
-		
-		echo "<tr><td>";
         if (!isset($post_vars["mother_name"])) {
             $post_vars["mother_name"] = healthcenter::get_mothers_name($get_vars["consult_id"]);
         }
@@ -1137,7 +1142,7 @@ class ccdev extends module {
 		echo "</td></tr>";*/
 
 		echo "<tr><td class='boxtitle'>NAME OF PARTNER IN CHITS</td>";
-		echo "<td><input name='spouse_name' type='text' size='20' value='$name_spouse'></input>&nbsp;<input type='button' name='btn_search_spouse' value='Search' onclick='search_patient();' style='border: 1px solid #000000'></input>";
+		echo "<td><input name='mother_px_id' type='hidden' size='20' value='$ccdev[mother_px_id]'></input>&nbsp;<input type='button' name='btn_search_spouse' value='Search' onclick='search_patient(this.form.name,this.form.elements[1].name,this.form.elements[2].name);' style='border: 1px solid #000000'></input>";
 
 		echo "</td></tr>";
 

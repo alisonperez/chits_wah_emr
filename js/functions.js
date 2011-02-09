@@ -94,17 +94,18 @@ function confirm_delete_fp(){
 	form_methods.submit();
 }
 
-function search_patient(form_textbox,form_pxid){
-	sList = window.open("../site/search_patient.php?arg1="+form_textbox+"&arg2="+form_pxid,"searchpx","width=300,height=300");
+function search_patient(form_name,form_textbox,form_pxid){
+	window.alert(form_pxid);
+	sList = window.open("../site/search_patient.php?arg1="+form_name+"&arg2="+form_textbox+"&arg3="+form_pxid,"searchpx","width=300,height=300");
 }
 
-function pick(pxid,pxfirst,pxlast){
+function pick(pxid,pxfirst,pxlast,form_name,form_textbox,form_pxid){
   if (window.opener && !window.opener.closed){
 
-      var ngalan = window.opener.document.forms['form_visit1'].elements['spouse_name'];
-	ngalan.value = pxfirst + pxlast;
+      var ngalan = window.opener.document.forms[form_name].elements[form_textbox];
+	ngalan.value = pxfirst + ' ' + pxlast;
       //window.opener.document.form_visit1.spouse_name.value = pxfirst+' '+pxlast;
-      window.opener.document.form_visit1.spouse_id.value = pxid;
+      window.opener.document.forms[form_name].elements[form_pxid].value = pxid;
   }  
   window.close();
 }
