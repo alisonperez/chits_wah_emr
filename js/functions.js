@@ -94,16 +94,19 @@ function confirm_delete_fp(){
 	form_methods.submit();
 }
 
-function search_patient(){
-	sList = window.open("../site/search_patient.php","searchpx","width=300,height=300");
+function search_patient(form_textbox,form_pxid){
+	sList = window.open("../site/search_patient.php?arg1="+form_textbox+"&arg2="+form_pxid,"searchpx","width=300,height=300");
 }
 
 function pick(pxid,pxfirst,pxlast){
   if (window.opener && !window.opener.closed){
-      window.opener.document.form_visit1.spouse_name.value = pxfirst+' '+pxlast;
+
+      var ngalan = window.opener.document.forms['form_visit1'].elements['spouse_name'];
+	ngalan.value = pxfirst + pxlast;
+      //window.opener.document.form_visit1.spouse_name.value = pxfirst+' '+pxlast;
       window.opener.document.form_visit1.spouse_id.value = pxid;
   }  
-  window.close();        
+  window.close();
 }
 
 function import_sputum(){        

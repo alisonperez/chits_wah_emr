@@ -1130,10 +1130,15 @@ class ccdev extends module {
         print "<input type='text' size='30' class='textbox' ".($_SESSION["isadmin"]||!$get_vars["patient_id"]?"":"disabled")." name='mother_name' value='".($ccdev["mother_name"]?$ccdev["mother_name"]:$post_vars["mother_name"])."' style='border: 1px solid #000000'><br>";
         print "</td></tr>";
 		
-		echo "<tr><td>";
+		/*echo "<tr><td>";
 		print "<span class='boxtitle'>PATIENT NUMBER OF MOTHERS IN CHITS</span>";
 		echo "<input type='text' name='mother_px_id' id='mothers' size='4' value='$ccdev[mother_px_id]'></input>&nbsp;";
 		echo "<input type='button' value='Verify' onclick='verify_mother_id();'></input>.";
+		echo "</td></tr>";*/
+
+		echo "<tr><td class='boxtitle'>NAME OF PARTNER IN CHITS</td>";
+		echo "<td><input name='spouse_name' type='text' size='20' value='$name_spouse'></input>&nbsp;<input type='button' name='btn_search_spouse' value='Search' onclick='search_patient();' style='border: 1px solid #000000'></input>";
+
 		echo "</td></tr>";
 
         print "<tr valign='top'><td>";

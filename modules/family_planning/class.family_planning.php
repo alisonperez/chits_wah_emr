@@ -910,7 +910,7 @@ class family_planning extends module{
 		echo "</td></tr>";
 
 		echo "<tr><td class='boxtitle'>NAME OF PARTNER IN CHITS</td>";
-		echo "<td><input name='spouse_name' type='text' size='20' value='$name_spouse'></input>&nbsp;<input type='button' name='btn_search_spouse' value='Search' onclick='search_patient();' style='border: 1px solid #000000'></input>";
+		echo "<td><input name='spouse_name' type='text' size='20' value='$name_spouse'></input>&nbsp;<input type='button' name='btn_search_spouse' value='Search' onclick='search_patient(this.form.elements[8].name,this.form.elements[1].name);' style='border: 1px solid #000000'></input>";
 
 		echo "</td></tr>";
 		echo "<tr><td class='boxtitle'>HIGHEST EDUCATIONAL ATTAINMENT</td><td>";
