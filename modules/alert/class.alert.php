@@ -8,7 +8,7 @@ class alert extends module{
 		$this->authod = "darth_ali";
 		$this->module = "alert";
 		
-		$this->mods = array('mc'=>array("Maternal Care"),'sick'=>array("Sick Childre Under 5"),'epi'=>array("Expanded Program for Immunization"),'fp'=>array("Birth Spacing / Family Planning"),'notifiable'=>array("Notifiable Diseases"));
+		$this->mods = array('mc'=>array("Maternal Care"),'sick'=>array("Sick Children Under 5"),'epi'=>array("Expanded Program for Immunization"),'fp'=>array("Birth Spacing / Family Planning"),'notifiable'=>array("Notifiable Diseases"));
 
 		$this->images = array('mc'=>'mc_alert.png','epi'=>'epi_alert.jpeg','fp'=>'fp_alert.jpeg','notifiable'=>'notifiable_alert.jpeg','sick'=>'sick_alert.jpeg');
 		$this->year = date('Y');
@@ -272,20 +272,20 @@ class alert extends module{
 	}
 
 	function _alert(){
-		echo "this is the container for the alert and reminder master list";
+		//echo "this is the container for the alert and reminder master list";
 		
 		echo "<form action='$_SERVER[PHP_SELF]?page=$_GET[page]&menu_id=$_GET[menu_id]'>";
-		echo "<table border='1' id='alert_table'>";
-		echo "<tr><td colspan='".(count($this->mods)+1)."'>REMINDER and ALERT MONITORING WINDOW</td></tr>";
+		echo "<table bgcolor='#FFCCFF' id='alert_table'>";
+		echo "<tr class='alert_table_header'><td colspan='".(count($this->mods)+1)."'>REMINDER and ALERT MONITORING WINDOW</td></tr>";
 		echo "<tr>";
-		echo "<td colspan='".(count($this->mods)+1)."'>Year ";
+		echo "<td colspan='".(count($this->mods)+1)."' class='alert_table_row'>Year ";
 		echo $this->show_current_yr();
 		echo "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Week ";
 		echo $this->show_current_wk();
 		echo "</td>";
 		echo "</tr>";
 		
-		echo "<tr>";
+		echo "<tr class='alert_table_row'>";
 		echo "<td>Barangay / Household</td>";
 		$this->show_categories();
 		echo "</tr>";
@@ -463,7 +463,7 @@ class alert extends module{
 					list($pxid,$px_lastname) = mysql_fetch_array($q_lastname);
 				endif;
 
-				echo "<tr>";
+				echo "<tr bgcolor='#FFFFFF'>";
 
 				if(count($this->determine_alert_hh($fam_id))!=0):
 					echo "<td>&nbsp;&nbsp;&nbsp;&nbsp;$px_lastname</td>";

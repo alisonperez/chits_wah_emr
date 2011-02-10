@@ -128,6 +128,8 @@ small { font-family: verdana, sans serif}
 .newstitle { font-family: verdana, arial, sans serif; font-size: 12pt; font-weight: bold; color: #666699; }
 .newsbody { font-family: Georgia, Times New Roman, Serif; font-size: 12pt; font-weight: normal; color: black; }
 .tb_table_header { background-color: #15317E; color: white; text-align: center; }
+.alert_table_header { background-color:#CC1100;color:#FFFF00;font-weight:bold;text-align:center; }
+.alert_table_row { background-color:#FF4444;color:#FFFFFF;font-weight:bold; }
 -->
 </style>
 </head>

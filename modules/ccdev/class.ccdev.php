@@ -1137,15 +1137,13 @@ class ccdev extends module {
 
         print "</td></tr>";
 		
-		/*echo "<tr><td>";
-		print "<span class='boxtitle'>PATIENT NUMBER OF MOTHERS IN CHITS</span>";
-		echo "<input type='text' name='mother_px_id' id='mothers' size='4' value='$ccdev[mother_px_id]'></input>&nbsp;";
-		echo "<input type='button' value='Verify' onclick='verify_mother_id();'></input>.";
-		echo "</td></tr>";*/
+	/*echo "<tr><td>";
+	print "<span class='boxtitle'>PATIENT NUMBER OF MOTHERS IN CHITS</span>";
+	echo "<input type='text' name='mother_px_id' id='mothers' size='4' value='$ccdev[mother_px_id]'></input>&nbsp;";
+	echo "<input type='button' value='Verify' onclick='verify_mother_id();'></input>.";
+	echo "</td></tr>";*/
 
-	
-
-		echo "</td></tr>";
+	echo "</td></tr>";
 
         print "<tr valign='top'><td>";
         print "<span class='boxtitle'>".LBL_MOTHERS_OCCUPATION."</span><br> ";
