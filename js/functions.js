@@ -95,7 +95,6 @@ function confirm_delete_fp(){
 }
 
 function search_patient(form_name,form_textbox,form_pxid){
-	window.alert(form_pxid);
 	sList = window.open("../site/search_patient.php?arg1="+form_name+"&arg2="+form_textbox+"&arg3="+form_pxid,"searchpx","width=300,height=300");
 }
 

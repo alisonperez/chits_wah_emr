@@ -896,11 +896,8 @@ class ccdev extends module {
 
         case "Update Data":
 
-		print_r($post_vars);
-
 		list($reg_month,$reg_date,$reg_year) = explode('/',$_POST[ccdev_date_reg]);
-		$ccdev_reg_date = $reg_year.'-'.$reg_month.'-'.$reg_date;			
-
+		$ccdev_reg_date = $reg_year.'-'.$reg_month.'-'.$reg_date;
 
             $sql = "update m_patient_ccdev set ".
 		   "mother_name = '$post_vars[mother_name]',".
@@ -1108,7 +1105,7 @@ class ccdev extends module {
         
 		
 		print "<a name='visit'>";
-        print "<table width='300'>";
+        print "<table width='400'>";
         print "<form action = '".$_SERVER["SELF"]."?page=".$get_vars["page"]."&menu_id=$menu_id&consult_id=".$get_vars["consult_id"]."&ptmenu=".$get_vars["ptmenu"]."&module=".$get_vars["module"]."&ccdev=VISIT1' name='form_consult_ccdev' method='post'>";
 		
         print "<tr valign='top'><td>";
@@ -1117,7 +1114,7 @@ class ccdev extends module {
         print "<tr valign='top'><td>";
         print "<span class='tinylight'><b>IMPORTANT:</b> ".INSTR_FIRST_VISIT."</span><br/><br/>";
         // MATERNAL DATA
-        print "<table bgcolor='#FFCCFF' width='300' cellpadding='3'>";
+        print "<table bgcolor='#FFCCFF' width='400' cellpadding='3'>";
 
 	print "<tr><td>";
 	print "<span class='boxtitle'>DATE REGISTERED</span><br>";
@@ -1131,8 +1128,13 @@ class ccdev extends module {
             $post_vars["mother_name"] = healthcenter::get_mothers_name($get_vars["consult_id"]);
         }
 
-        print "<span class='boxtitle'>".LBL_MOTHERS_NAME."</span><br> ";
-        print "<input type='text' size='30' class='textbox' ".($_SESSION["isadmin"]||!$get_vars["patient_id"]?"":"disabled")." name='mother_name' value='".($ccdev["mother_name"]?$ccdev["mother_name"]:$post_vars["mother_name"])."' style='border: 1px solid #000000'><br>";
+        print "<span class='boxtitle'>".LBL_MOTHERS_NAME." (Click Search Mother button. The mother should be in the database.)</span><br> ";
+        print "<input type='text' size='20' class='textbox' ".($_SESSION["isadmin"]||!$get_vars["patient_id"]?"":"disabled")." name='mother_name' value='".($ccdev["mother_name"]?$ccdev["mother_name"]:$post_vars["mother_name"])."' style='border: 1px solid #000000' readonly>";
+
+	echo "<input name='mother_px_id' type='hidden' size='20' value='$ccdev[mother_px_id]'></input>";
+
+	echo "&nbsp;<input type='button' name='btn_search_spouse' value='Search Mother' onclick='search_patient(this.form.name,this.form.elements[1].name,this.form.elements[2].name);' style='border: 1px solid #000000'></input>";
+
         print "</td></tr>";
 		
 		/*echo "<tr><td>";
@@ -1141,8 +1143,7 @@ class ccdev extends module {
 		echo "<input type='button' value='Verify' onclick='verify_mother_id();'></input>.";
 		echo "</td></tr>";*/
 
-		echo "<tr><td class='boxtitle'>NAME OF PARTNER IN CHITS</td>";
-		echo "<td><input name='mother_px_id' type='hidden' size='20' value='$ccdev[mother_px_id]'></input>&nbsp;<input type='button' name='btn_search_spouse' value='Search' onclick='search_patient(this.form.name,this.form.elements[1].name,this.form.elements[2].name);' style='border: 1px solid #000000'></input>";
+	
 
 		echo "</td></tr>";
 
@@ -1177,7 +1178,7 @@ class ccdev extends module {
         print "</td></tr>";
         print "<tr valign='top'><td>";
         // PATERNAL DATA
-        print "<table bgcolor='#99CCFF' width='300' cellpadding='3'><tr><td>";
+        print "<table bgcolor='#99CCFF' width='400' cellpadding='3'><tr><td>";
         print "<span class='boxtitle'>".LBL_FATHERS_NAME."</span><br> ";
         print "<input type='text' size='30' class='textbox' ".($_SESSION["isadmin"]||!$get_vars["patient_id"]?"":"disabled")." name='father_name' value='".($ccdev["father_name"]?$ccdev["father_name"]:$post_vars["father_name"])."' style='border: 1px solid #000000'><br>";
         print "</td></tr>";

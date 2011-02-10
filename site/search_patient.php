@@ -20,7 +20,7 @@
     echo "<input type='submit' value='Search Patient' name='search_submit'></input><br><br>";
     
     if($_POST["search_submit"]):
-      print_r($_POST);
+
       $q_px = mysql_query("SELECT patient_id,patient_firstname,patient_lastname FROM m_patient WHERE patient_lastname LIKE '%$_POST[txt_last]%' ORDER by patient_firstname ASC, patient_id ASC") or die("Cannot query: 3");
 
       if(mysql_num_rows($q_px)!=0):
@@ -32,7 +32,7 @@
       endif;
     endif;
     
-      echo "<br><b><br><br>If having a partner is not applicable, click <a href=\"javascript:pick(0,'Others / ','NA','$_GET[arg1]','$_GET[arg2]','$_GET[arg3]')\">OTHERS / NA</a>";
+      echo "<br><b><br><br>If the person you are searching is not in the database, please click <a href=\"javascript:pick(0,'Others / ','NA','$_GET[arg1]','$_GET[arg2]','$_GET[arg3]')\">OTHERS / NA</a> for the meantime. Update this record as soon as you have added the person's profile.";
       
     echo "</form>";
   else:
