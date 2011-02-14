@@ -39,7 +39,6 @@ class ccdev extends module {
         module::set_dep($this->module, "barangay");
         module::set_dep($this->module, "family");
         module::set_dep($this->module, "imci");
-
     }
 
     function init_lang() {
@@ -1215,7 +1214,7 @@ class ccdev extends module {
         print "</td></tr>";
         print "<tr valign='top'><td>";
         print "<span class='boxtitle'>".LBL_DELIVERY_LOCATION."</span><br> ";
-        print ccdev::show_delivery_location($ccdev["delivery_location"]?$ccdev["delivery_location"]:$post_vars["delivery_location"]);
+        print healthcenter::show_delivery_location($ccdev["delivery_location"]?$ccdev["delivery_location"]:$post_vars["delivery_location"]);
         print "</td></tr>";
         print "<tr><td><br/>";
         if ($post_vars["ccdev_id"]) {
@@ -1235,16 +1234,27 @@ class ccdev extends module {
     }
 
     function show_delivery_location() {
+	
         if (func_num_args()>0) {
             $arg_list = func_get_args();
             $location_id = $arg_list[0];
         }
-        $ret_val .= "<select name='delivery_location' class='textbox'>";
+        /*$ret_val .= "<select name='delivery_location' class='textbox'>";
         $ret_val .= "<option value=''>Select Location</option>";
         $ret_val .= "<option value='HOME' ".($location_id=="HOME"?"selected":"").">Home</option>";
         $ret_val .= "<option value='HOSP' ".($location_id=="HOSP"?"selected":"").">Hospital</option>";
         $ret_val .= "<option value='LYIN' ".($location_id=="LYIN"?"selected":"").">Lying-In Clinic</option>";
-        $ret_val .= "</select>";
+        $ret_val .= "</select>";*/
+
+	$q_delivery = mysql_query("SELECT * FROM m_lib_mc_delivery_location") or die(mysql_error());
+	
+	$ret_val = "<select name='delivery_location' class='textbox'>";
+        $ret_val .= "<option value=''>Select Location</option>";
+	while($r_delivery = mysql_fetch_array($q_delivery)){
+		$ret_val .= "<option value='$r_delivery[delivery_id]' ".($location_id=="$r_delivery[delivery_id]"?"selected":"").">$r_delivery[delivery_name]</option>";
+	}
+	$ret_val .= "</select>";
+
         return $ret_val;
     }
 

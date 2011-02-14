@@ -1802,6 +1802,23 @@ function hypertension_code() {
 		return $addr;
 	}
 
+	function show_delivery_location(){
+		if (func_num_args()>0) {
+            		$arg_list = func_get_args();
+            		$location_id = $arg_list[0];
+        	}
+
+		$q_delivery = mysql_query("SELECT * FROM m_lib_mc_delivery_location") or die(mysql_error());
+		$ret_val = "<select name='delivery_location' class='textbox'>";
+        	$ret_val .= "<option value=''>Select Location</option>";
+		
+		while($r_delivery = mysql_fetch_array($q_delivery)){
+			$ret_val .= "<option value='$r_delivery[delivery_id]' ".($location_id=="$r_delivery[delivery_id]"?"selected":"").">$r_delivery[delivery_name]</option>";
+		}
+		$ret_val .= "</select>";
+        	return $ret_val;
+	}
+
 // end of class
 }
 ?>

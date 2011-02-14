@@ -1957,7 +1957,7 @@ class mc extends module {
             print "</td></tr>";
             print "<tr valign='top'><td>";
             print "<span class='boxtitle'>".LBL_DELIVERY_LOCATION."</span><font color='red'> *</font><br> ";
-            print mc::show_delivery_location($mc["delivery_location"]);
+            print healthcenter::show_delivery_location($mc["delivery_location"]);
             print "</td></tr>";
             print "<tr valign='top'><td>";
             print "<span class='boxtitle'>".LBL_BIRTH_ATTENDANT."</span><font color='red'> *</font><br> ";
