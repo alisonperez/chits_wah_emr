@@ -1,9 +1,7 @@
 <?php
 
   class urinalysis extends module{
-  
-  
-  
+
     function urinalysis(){
       $this->author = "darth_ali";
       $this->module = "urinalysis";
@@ -19,8 +17,8 @@
       //$this->albumin = array('---','Negative','Positive','+','++','+++','++++');
       //$this->sugar = array('---','Negative','Positive','+','++','+++','++++');      
 
-      $this->albumin = array('Trace','+','++','+++','++++');
-      $this->sugar = array('Trace','+','++','+++','++++');
+      $this->albumin = array('(-) Trace','+','++','+++','++++');
+      $this->sugar = array('(-) Trace','+','++','+++','++++');
 
       $this->pregnancy = array('---','Negative','Positive','Doubtful');      
     }
@@ -309,8 +307,8 @@
       	} 
       	echo "</select></td></tr>"; */
 
-
-      echo "<input type='text' value='$color' size='15'></input>";
+	
+      echo "<input type='text' name='sel_color' value='$color' size='15'></input>";
       echo "</td></tr>";
       
       echo "<tr><td class='boxtitle'>REACTION</td><td><select name='sel_reaction' value='1'>";      
