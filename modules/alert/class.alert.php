@@ -122,11 +122,11 @@ class alert extends module{
 		echo "<table border='1'>";
 		echo "<tr><td width='65%'>";
 		
-		echo "<table>";
-		echo "<thead colspan='2'>REMINDER & ALERT ADMINISTRATION</thead>";
+		echo "<table bgcolor='#FFCCFF'>";
+		echo "<tr class='alert_table_header'><td colspan='2'>REMINDER & ALERT ADMINISTRATION</td></tr>";
 
 		echo "<tr>";
-		echo "<td>Health Program</td>";
+		echo "<td  class='alert_table_row'>Health Program</td>";
 		echo "<td>";
 		echo "<select name='sel_mods' size='1' onchange=\"autoSubmit_alert();\">";
 		
@@ -150,7 +150,7 @@ class alert extends module{
 		
 		echo "<tr>";
 		
-		echo "<td>Reminder/Alert Event</td>";
+		echo "<td class='alert_table_row'>Reminder/Alert Event</td>";
 		echo "<td>";
 				
 		echo "<select name='sel_alert_indicators' size='1'>";
@@ -174,7 +174,7 @@ class alert extends module{
 		echo "</tr>";
 
 		echo "<tr>";
-		echo "<td valign='top'>Reminder/Alert Message</td>";
+		echo "<td valign='top' class='alert_table_row'>Reminder/Alert Message</td>";
 		echo "<td>";
 		echo "<textarea name='txt_msg' cols='25' rows='3'>$vals_update[alert_message]";
 		echo "</textarea>";
@@ -182,7 +182,7 @@ class alert extends module{
 		echo "</tr>";
 
 		echo "<tr>";
-		echo "<td valign='top'>Recommended Actions</td>";
+		echo "<td valign='top' class='alert_table_row'>Recommended Actions</td>";
 		echo "<td>";
 		echo "<textarea name='txt_action' cols='25' rows='3'>$vals_update[alert_action]";
 		echo "</textarea>";
@@ -190,7 +190,7 @@ class alert extends module{
 		echo "</tr>";
 
 		echo "<tr>";
-		echo "<td valign='top'>No. of Days Reminder is posted before base date</td>";
+		echo "<td valign='top' class='alert_table_row'>No. of Days Reminder is posted before base date</td>";
 		echo "<td>";
 		echo "<select name='sel_days_before' size='1'>";
 		
@@ -207,7 +207,7 @@ class alert extends module{
 		echo "</tr>";
 
 		echo "<tr>";
-		echo "<td>No. of Days Reminder is posted after base date</td>";
+		echo "<td class='alert_table_row'>No. of Days Reminder is posted after base date</td>";
 		echo "<td>";
 		echo "<select name='sel_days_after' size='1'>";
 		
@@ -226,7 +226,7 @@ class alert extends module{
 		echo "<td></td>";
 		echo "</tr>";
 		echo "<tr>";
-		echo "<td>URL for data entry</td>";
+		echo "<td class='alert_table_row'>URL for data entry</td>";
 		echo "<td>";
 		echo "<input type='text' name='txt_url' size='25' value='$vals_update[alert_url_redirect]'></input>";
 		echo "</td>";
@@ -257,8 +257,8 @@ class alert extends module{
 
 		echo "<td valign='top'>";
 		
-		echo "<table border='1'>";
-		echo "<thead colspan='2' valign='top'>LIST of REMINDERS & ALERTS</thead>";
+		echo "<table bgcolor='#FFCCFF'>";
+		echo "<tr valign='top'><td colspan='2' class='alert_table_header'>LIST of REMINDERS & ALERTS</td></tr>";
 		
 		$this->list_alert();
 
@@ -297,14 +297,14 @@ class alert extends module{
 	}
 
 	function list_alert(){
-		echo "<tr><td>Program</td><td>Indicators</td></tr>";
+		echo "<tr class='alert_table_row'><td>Program</td><td>Indicators</td></tr>";
 		foreach($this->mods as $key=>$value){
 			$q_mods = mysql_query("SELECT a.alert_id,a.module_id,a.alert_indicator_id,a.date_pre,a.date_until,a.alert_message,a.alert_action,a.date_basis,a.alert_url_redirect,b.sub_indicator FROM m_lib_alert_type a, m_lib_alert_indicators b WHERE a.module_id='$key' AND a.alert_indicator_id=b.alert_indicator_id ORDER by b.sub_indicator ASC") or die("Cannot query 285 ".mysql_error());
 			
 			$rec_num = mysql_num_rows($q_mods);
 			if(mysql_num_rows($q_mods)!=0):
 				echo "<tr>";
-				echo "<td valign='top'>$value[0]</td>";
+				echo "<td valign='top' class='alert_table_row'>$value[0]</td>";
 				echo "<td>";
 				while($r_ind = mysql_fetch_array($q_mods)){
 					echo "<a href='$_SERVER[PHP_SELF]?page=$_GET[page]&menu_id=$_GET[menu_id]&indicator_id=$r_ind[alert_indicator_id]&action=update#alert'>$r_ind[sub_indicator]</a><br>";
