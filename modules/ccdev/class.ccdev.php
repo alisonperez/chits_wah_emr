@@ -19,7 +19,7 @@ class ccdev extends module {
         //     added age_on_service (weeks) to m_consult_ccdev_services
         // 0.7 added checking for full immunization
         //     added foreign key for ccdev - absent before!
-
+	// refer to the git logs of alisonperez branch for the further updates on this module.
     }
 
     // --------------- STANDARD MODULE FUNCTIONS ------------------
@@ -39,6 +39,7 @@ class ccdev extends module {
         module::set_dep($this->module, "barangay");
         module::set_dep($this->module, "family");
         module::set_dep($this->module, "imci");
+	module::set_dep($this->module, "alert");
     }
 
     function init_lang() {
@@ -80,8 +81,8 @@ class ccdev extends module {
         module::set_lang("INSTR_FIRST_VISIT", "english", "YOU NEED TO FILL THIS UP TO INCLUDE THIS PATIENT IN THE CHILD CARE REGISTRY.", "Y");
         module::set_lang("LBL_NO_REGISTRY_ID", "english", "NO REGISTRY ID FOR THIS PATIENT", "Y");
         module::set_lang("LBL_NO_FAMILY_ID", "english", "NO FAMILY ID FOR THIS PATIENT", "Y");
-		module::set_lang("LBL_CPAB", "english", "CHILD PROTECTED AT BIRTH (CPAB)", "Y");
-		module::set_lang("LBL_LOW_BIRTH_WEIGHT", "english", "LOW BIRTH WEIGHT", "Y");
+	module::set_lang("LBL_CPAB", "english", "CHILD PROTECTED AT BIRTH (CPAB)", "Y");
+	module::set_lang("LBL_LOW_BIRTH_WEIGHT", "english", "LOW BIRTH WEIGHT", "Y");
     }
 
     function init_stats() {
@@ -407,36 +408,40 @@ class ccdev extends module {
 		if(func_num_args()>0):
 			$arg_list = func_get_args();
 			$menu_id = $arg_list[0];
-            $post_vars = $arg_list[1];
-            $get_vars = $arg_list[2];
-            $validuser = $arg_list[3];
-            $isadmin = $arg_list[4];			
+            		$post_vars = $arg_list[1];
+            		$get_vars = $arg_list[2];
+            		$validuser = $arg_list[3];
+            		$isadmin = $arg_list[4];			
 		endif;
 
 		$patient_id = healthcenter::get_patient_id($get_vars["consult_id"]);
-        $ccdev_id = ccdev::registry_record_exists($patient_id);
-
+        	$ccdev_id = ccdev::registry_record_exists($patient_id);
+		$q_dob = mysql_query("SELECT patient_dob FROM m_patient where patient_id='$patient_id'") or die("Cannot query 419 ".mysql_error());
+		list($patient_dob) = mysql_fetch_array($q_dob);
+		
 		if($ccdev_id=='0'):
 			print "<font color='red'>".LBL_NO_REGISTRY_ID."</font><br/>";			
 		else:
 			echo "<form name='form_ccdev_bfed' action = '".$_SERVER["SELF"]."?page=".$get_vars["page"]."&menu_id=$menu_id&consult_id=".$get_vars["consult_id"]."&ptmenu=".$get_vars["ptmenu"]."&module=".$get_vars["module"]."&ccdev=BFED' method='post'>";
-			echo "<table>";
+			echo "<table width='400'>";
 			echo "<tr><td><b>BREASTFEEDING STATUS</b></td></tr>";
-			echo "<tr><td><span class='tinylight'>Please tick the month if mother exclusively breastfed this	child. To set month 6 date to blank, just delete the contents of the date box.</spans></td></tr>";			
-			for($i=1;$i<7;$i++){
-				
-				$field = 'bfed_month'.$i;
+			echo "<tr><td><span class='tinylight'>Please tick the month if mother exclusively breastfed this	child. To set month 6 date to blank, just delete the contents of the date box. Dates at the end of the months are projected as well.</spans></td></tr>";			
 
-				$q_field = mysql_query("SELECT $field, bfed_month6_date FROM m_patient_ccdev WHERE ccdev_id='$ccdev_id'") or die("Cannot query: 427");
+			for($i=1;$i<7;$i++){
+				$field = 'bfed_month'.$i;
+				$buffer_day = $i * 30;
+				$month_date = alert::compute_buffer_date($patient_dob,$buffer_day);
+					
+				$q_field = mysql_query("SELECT $field, bfed_month6_date FROM m_patient_ccdev WHERE ccdev_id='$ccdev_id'") or die("Cannot query: 433");
 				list($bfed_status,$bfed_date) = mysql_fetch_array($q_field);
 
 				echo "<tr><td>";
 				if($bfed_status=='Y'):
-					echo "<input type='checkbox' name='bfed_month[]' value='$i' checked>Month $i</input>";
+					echo "<input type='checkbox' name='bfed_month[]' value='$i' checked>Month $i ($month_date)</input>";
 				else:
-					echo "<input type='checkbox' name='bfed_month[]' value='$i'><font color='red'>Month $i</font></font></input>";
+					echo "<input type='checkbox' name='bfed_month[]' value='$i'><font color='red'>Month $i ($month_date)</font></input>";
 				endif;
-				
+
 				if($i==6):
 					if($bfed_date=='0000-00-00'):
 						$bfed_six_value = '';
@@ -446,6 +451,7 @@ class ccdev extends module {
 					endif;
 
 					echo "&nbsp;&nbsp;&nbsp;<input type='text' name='date_bfed_six' size='7' value='$bfed_six_value'>&nbsp;";
+
 					echo "<a href=\"javascript:show_calendar4('document.form_ccdev_bfed.date_bfed_six', document.form_ccdev_bfed.date_bfed_six.value);\"><img src='../images/cal.gif' width='16' height='16' border='0' alt='Click Here to Pick up the date'></a><br>";
 					echo "</input>";
 				endif;

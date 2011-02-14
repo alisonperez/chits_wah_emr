@@ -4,7 +4,7 @@ class alert extends module{
 
 	function alert(){
 		$this->description = "CHITS Reminder and Alert Module";
-		$this->version = "0.1-".date('Y-m-d');
+		$this->version = "0.2-".date('Y-m-d');
 		$this->authod = "darth_ali";
 		$this->module = "alert";
 		
