@@ -451,8 +451,9 @@
       echo "&nbsp;&nbsp;<input type='text' name='txt_gravindex' size='6' value='$gravindex'></td></tr>";
 
       echo "<tr>";
-      echo "<td class='boxtitle'>OTHERS";
-      echo "&nbsp;&nbsp;<input type='text' name='txt_others' size='20' value='$others'></input>";
+      echo "<td class='boxtitle' colspan='2'>OTHERS<br>";
+      //echo "&nbsp;&nbsp;<input type='text' name='txt_others' size='20' value='$others'></input>";
+      echo "&nbsp;&nbsp;<textarea name='txt_others' cols='50' value='$others'></textarea>";
       echo "</td></tr>";
 
       echo "<tr valign='top'><td colspan='2'>";
