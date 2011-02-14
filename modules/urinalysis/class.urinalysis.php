@@ -297,16 +297,21 @@
       echo "<tr>";
       echo "<td>";
       echo "<table>";      
-      echo "<tr><td class='boxtitle'>COLOR</td><td><select name='sel_color' value='1' class='tinylight'>";
-      
-      foreach($this->color as $key_color=>$value_color){
-        if($value_color==$color):
-          echo "<option value='$value_color' SELECTED>$value_color</option>";      
-        else:
-          echo "<option value='$value_color'>$value_color</option>";
-        endif;
-      }      
-      echo "</select></td></tr>";
+      echo "<tr><td class='boxtitle'>COLOR </td><td>";
+
+        //echo "<select name='sel_color' value='1' class='tinylight'>";
+      	/*foreach($this->color as $key_color=>$value_color){
+        	if($value_color==$color):
+          	echo "<option value='$value_color' SELECTED>$value_color</option>";      
+        	else:
+          	echo "<option value='$value_color'>$value_color</option>";
+        	endif;
+      	} 
+      	echo "</select></td></tr>"; */
+
+
+      echo "<input type='text' value='$color' size='15'></input>";
+      echo "</td></tr>";
       
       echo "<tr><td class='boxtitle'>REACTION</td><td><select name='sel_reaction' value='1'>";      
       foreach($this->reaction as $key_reaction=>$value_reaction){
