@@ -109,7 +109,7 @@ small { font-family: verdana, sans serif}
 .newsbody { font-family: Georgia, Times New Roman, Serif; font-size: 12pt; font-weight: normal; color: black; }
 .tb_table_header { background-color: #15317E; color: white; text-align: center; }
 .alert_table_header { background-color:#CC1100;color:#FFFF00;font-weight:bold;text-align:center; }
-.alert_table_row { background-color:#FF4444;color:#FFFFFF;font-weight:bold;text-align:center; }
+.alert_table_row { background-color:#FF4444;color:#FFFFFF;font-weight:normal;text-align:center; }
 -->
 </style>
 </head>

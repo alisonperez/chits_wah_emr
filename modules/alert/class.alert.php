@@ -91,7 +91,7 @@ class alert extends module{
 	// custom-built functions
 	
 	function _alert_type(){
-		echo "this is the container for the alert and reminder adminstration interface.";
+		echo "<p align='justify'>The Alert and Reminder administration page will allow the end-user to set necessary messages for the various indicators listed. It also always the user to set the number of days the message will be posted in advance and its duration.</p>";
 		
 		if($_POST[submit_alert]=='Save Reminder/Alert'):		
 			$this->verify_form($_POST);
@@ -104,7 +104,7 @@ class alert extends module{
 		endif;
 		
 		$vals_update = $this->set_vals_update($_GET);
-		print_r($vals_update);
+		
 		
 		$main_indicator = (!empty($_POST[sel_mods]))?($_POST[sel_mods]):($vals_update["module_id"]);
 		
@@ -330,7 +330,7 @@ class alert extends module{
 	}
 
 	function verify_form($post_arr){
-		print_r($post_arr);
+
 		$q_alert = mysql_query("SELECT alert_id,alert_indicator_id FROM m_lib_alert_type WHERE alert_indicator_id='$post_arr[sel_alert_indicators]'") or die("Cannot query 74 ".mysql_error());
 			
 			if(mysql_num_rows($q_alert)!=0 && $post_arr[submit_alert]=='Save Reminder/Alert'):				
@@ -357,7 +357,7 @@ class alert extends module{
 				if(empty($post_arr[txt_msg]) || empty($post_arr[txt_action])):
 					
 					echo "<script language='javascript'>";
-					echo "window.alert('Please supply entriend for reminder / alert message or actions.')";
+					echo "window.alert('Please supply entry for reminder / alert message or actions.')";
 					echo "</script>";
 					
 				else:
