@@ -1802,6 +1802,24 @@ function hypertension_code() {
 		return $addr;
 	}
 
+	function get_patient_name(){
+		if(func_num_args()>0){
+			$arg_list = func_get_args();
+			$pxid = $arg_list[0];
+		}
+
+		$q_px = mysql_query("SELECT patient_lastname,patient_firstname FROM m_patient WHERE patient_id='$pxid'") or die("Cannot query 1811");
+
+		if(mysql_num_rows($q_px)!=0):
+			list($lname,$fname) = mysql_fetch_array($q_px);
+			$ngalan = $fname.' '.$lname;
+			return $ngalan;			
+		else:
+			return ;
+		endif;
+
+	}
+
 	function show_delivery_location(){
 		if (func_num_args()>0) {
             		$arg_list = func_get_args();

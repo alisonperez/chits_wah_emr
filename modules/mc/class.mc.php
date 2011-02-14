@@ -24,6 +24,7 @@ class mc extends module {
 
 		// 0.93-0.95 (08/31/2008) allowed dynamic entry of data. removed HBMR checkbox. auto-ordering of visit details
 	 	// 0.96       removed visit_sequence as primary key in m_consult_mc_prenatal. added prenatal_id and assigned it as a primary				  key
+	//tons of other modifications from 2009-2011: just look at the git logs. -- darth_ali
     }
 
     // --------------- STANDARD MODULE FUNCTIONS ------------------
@@ -79,7 +80,7 @@ class mc extends module {
         module::set_lang("FTITLE_MC_POSTPARTUM_FORM", "english", "POSTPARTUM VISIT FORM", "Y");
         module::set_lang("LBL_DELIVERY_DATE", "english", "DELIVERY DATE", "Y");
         module::set_lang("LBL_CHILD_PATIENT_ID", "english", "PATIENT ID OF CHILD", "Y");
-        module::set_lang("INSTR_CHILD_PATIENT_ID", "english", "If patient\'s child has been registered, type in the patient ID here.", "Y");
+        module::set_lang("INSTR_CHILD_PATIENT_ID", "english", "If patient\'s child has been registered, click the Search Child button. Otherwise, please registered the child.", "Y");
         module::set_lang("LBL_PREGNANCY_OUTCOME", "english", "PREGNANCY OUTCOME", "Y");
         module::set_lang("LBL_BABY_WEIGHT", "english", "BABY\'S WEIGHT", "Y");
         module::set_lang("LBL_BREASTFEEDING_FLAG", "english", "WAS BABY BREASTFED ASAP", "Y");
@@ -1907,16 +1908,17 @@ class mc extends module {
                 if (mysql_num_rows($result)) {
                     $mc = mysql_fetch_array($result);
 					
-					if($mc["date_breastfed"]!='0000-00-00'):
-						list($byr,$bmonth,$bdate) = explode('-',$mc["date_breastfed"]);
-						$bfeed_date = $bmonth.'/'.$bdate.'/'.$byr;
-					endif;
+		if($mc["date_breastfed"]!='0000-00-00'):
+			list($byr,$bmonth,$bdate) = explode('-',$mc["date_breastfed"]);
+			$bfeed_date = $bmonth.'/'.$bdate.'/'.$byr;
+		endif;
                 }
             }
         }
         // get most recent pregnancy id
         $patient_id = healthcenter::get_patient_id($get_vars["consult_id"]);
         $mc_id = mc::registry_record_exists($patient_id);
+
         if ($mc_id) {
             // edit prenatal data
             print "<a name='visit1form'>";
@@ -1950,12 +1952,27 @@ class mc extends module {
             print "G/P <input type='text' class='tinylight' size='7' maxlength='7' name='obscore_gp' value='".($mc["obscore_gp"]?$mc["obscore_gp"]:$post_vars["obscore_gp"])."' style='border: 1px solid #000000'> ";
             print "FPAL <input type='text' class='tinylight' size='7' maxlength='7' name='obscore_fpal' value='".($mc["obscore_fpal"]?$mc["obscore_fpal"]:$post_vars["obscore_fpal"])."' style='border: 1px solid #000000'><br>";
             print "</td></tr>";
-            print "<tr valign='top'><td>";
+
+	    /*print "<tr valign='top'><td>";
             print "<span class='boxtitle'>".LBL_CHILD_PATIENT_ID."</span><br> ";
             print "<input type='text' class='tinylight' size='5' maxlength='5' name='child_patient_id' value='".($mc["child_patient_id"]?$mc["child_patient_id"]:$post_vars["child_patient_id"])."' style='border: 1px solid #000000'/><br/> ";
             print "<small>".INSTR_CHILD_PATIENT_ID."</small><br>";
+            print "</td></tr>";*/
+
+	    $child_px_id = $mc["child_patient_id"]?$mc["child_patient_id"]:$post_vars["child_patient_id"];
+	    $child_name = healthcenter::get_patient_name($child_px_id);
+
+	    print "<tr valign='top'><td>";
+            print "<span class='boxtitle'>NAME OF CHILD</span><br> ";
+            print "<input type='text' class='tinylight' size='20' name='child_name' value='$child_name' style='border: 1px solid #000000'/ readonly>";
+
+	    print "<input type='hidden' name='child_patient_id'></input>";
+
+	    echo "&nbsp;<input type='button' name='btn_search_spouse' value='Search Child' onclick='search_patient(this.form.name,this.form.elements[3].name,this.form.elements[4].name);' style='border: 1px solid #000000'></input><br>";
+	    echo "<small>If patient's child has been registered, click the Search Child button. Otherwise, please registered the child.</small><br>";
             print "</td></tr>";
-            print "<tr valign='top'><td>";
+
+	    print "<tr valign='top'><td>";
             print "<span class='boxtitle'>".LBL_DELIVERY_LOCATION."</span><font color='red'> *</font><br> ";
             print healthcenter::show_delivery_location($mc["delivery_location"]);
             print "</td></tr>";
@@ -1978,11 +1995,11 @@ class mc extends module {
 
             print "</td></tr>";
 			
-			echo "<tr><td>";
-			print "<span class='boxtitle'>DATE OF BREASTFEEDING</span>&nbsp;";
-			echo "<input type='text' name='date_breastfed' id='bfeed' size='10'  value='$bfeed_date' maxlength='10' value='$mc[date_breastfed]' style='border: 1px solid #000000' readonly></input>&nbsp;";
-			print "<a href=\"javascript:show_calendar4('document.form_mc_postpartum.date_breastfed', document.form_mc_postpartum.date_breastfed.value);\"><img src='../images/cal.gif' width='16' height='16' border='0' alt='Click Here to Pick up the date'></a>";
-			echo "</td></tr>";
+		echo "<tr><td>";
+		print "<span class='boxtitle'>DATE OF BREASTFEEDING</span>&nbsp;";
+		echo "<input type='text' name='date_breastfed' id='bfeed' size='6'  value='$bfeed_date' maxlength='10' value='$mc[date_breastfed]' style='border: 1px solid #000000' readonly></input>&nbsp;";
+		print "<a href=\"javascript:show_calendar4('document.form_mc_postpartum.date_breastfed', document.form_mc_postpartum.date_breastfed.value);\"><img src='../images/cal.gif' width='16' height='16' border='0' alt='Click Here to Pick up the date'></a>";
+		echo "</td></tr>";
 
             print "<tr valign='top'><td>";
             print "<span class='boxtitle'>".LBL_HEALTHY_BABY_FLAG."?</span><br>";
@@ -2309,7 +2326,7 @@ class mc extends module {
                 $mc = mysql_fetch_array($result);
                 if ($get_vars["mc_id"]==$mc["mc_id"]) {
                     print "<form method='post' action='".$_SERVER["PHP_SELF"]."?page=".$get_vars["page"]."&menu_id=".$get_vars["menu_id"]."&consult_id=".$get_vars["consult_id"]."&ptmenu=DETAILS&module=mc&mc=".$get_vars["mc"]."&mc_id=".$get_vars["mc_id"]."#visit1form'>";
-                    print "<table width='280' style='border: 1px dotted black'><tr><td>";
+                    print "<table width='300' style='border: 1px dotted black'><tr><td>";
                     print "<span class='tinylight'>";
                     print "REGISTRY ID: <font color='red'>".module::pad_zero($mc["mc_id"], 7)."</font><br/>";
                     print "PATIENT NAME: ".patient::get_name($patient_id)."<br/>";
