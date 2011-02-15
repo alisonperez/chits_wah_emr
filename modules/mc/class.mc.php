@@ -1160,10 +1160,30 @@ class mc extends module {
 						echo "<script language='Javascript'>";
 						echo "window.alert('Record not saved. Please complete REQUIRED fields.')";
 						echo "</script>";
-				
-				
+
 				}
                 break;
+
+		case "Delete Postpartum Data Form":
+
+		if (module::confirm_delete($menu_id, $post_vars, $get_vars)):
+			//this would remove the initial postpartum data (i.e. dob,location, attendant)that has been encoded
+			echo "<script language='javascript'>";
+			echo "window.alert('Deleting the initial postpartum data will also clear out the details of the postpartum visits. Please think twice before doing so.')";
+			echo "</script>";
+
+                    if ($this->clear_postpartum_data($_GET["mc_id"],$patient_id)):
+                        header("location: ".$_SERVER["PHP_SELF"]."?page=".$get_vars["page"]."&menu_id=".$get_vars["menu_id"]."&consult_id=".$get_vars["consult_id"]."&ptmenu=DETAILS&module=mc&mc=POSTP&mc_id=".$get_vars["mc_id"]);
+                    else:
+                	    if ($post_vars["confirm_delete"]=="No"):
+                        	header("location: ".$_SERVER["PHP_SELF"]."?page=".$get_vars["page"]."&menu_id=".$get_vars["menu_id"]."&consult_id=".$get_vars["consult_id"]."&ptmenu=DETAILS&module=mc&mc=POSTP&mc_id=".$get_vars["mc_id"]);
+			    endif;
+                    endif;
+                endif;
+                	break;
+		default:
+
+			break;
             }
         }
     }
@@ -2403,10 +2423,12 @@ class mc extends module {
                         if ($mc["end_pregnancy_flag"]=="N") {
                             // prevent editing of closed registry record
                             print "<input type='submit' name='submitmc' value='Update Visit 1' class='tinylight' style='border: 1px solid black'/> ";
-                            print "<input type='submit' name='submitmc' value='Update Postpartum Data Form' class='tinylight' style='border: 1px solid black'/> ";
+                            print "<input type='submit' name='submitmc' value='Update Postpartum Data Form' class='tinylight' style='border: 1px solid black'/><br><br>";
+			    print "<input type='submit' name='submitmc' value='Delete Postpartum Data Form' class='tinylight' style='border: 1px solid black'/><br><br>";
                         }
                         print "<input type='hidden' name='mc_id' value='".$mc["mc_id"]."'/>";
                     }
+		    print "<input type='submit' name='submitmc' value='Terminate This Pregnancy' class='tinylight' style='border: 1px solid black'/> ";
                     print "</span>";
                     print "</td></tr></table>";
                     print "</form>";
@@ -4243,6 +4265,32 @@ class mc extends module {
 			else:
 				return 'N';
 			endif;
+	}
+
+	function clear_postpartum_data(){
+
+		//this method will clear out initial postpartum regisration details including the succeeding visit. useful when terminating a pregnancy record (i.e. abortion) or simply removing the postpartum record in case a wrong data has been encoded
+		
+		if(func_num_args()>0):
+			$arg_list = func_get_args();
+			$mc_id = $arg_list[0];
+			$patient_id = $arg_list[1];
+			
+			//echo $mc_id.' / '.$patient_id;	
+		
+			$q_update_mc_post = mysql_query("UPDATE m_patient_mc SET delivery_date='',delivery_type='',delivery_location='',obscore_gp='',obscore_fpal='',outcome_id='',birthweight='',birthmode='',child_patient_id='',breastfeeding_asap='',date_breastfed='',postpartum_remarks='',healthy_baby='' WHERE mc_id='$mc_id' AND patient_id='$patient_id'") or die("Cannot query 4279 ".mysql_error());
+
+			$q_update_mc_post_visit = mysql_query("DELETE FROM m_consult_mc_postpartum WHERE mc_id='$mc_id' AND patient_id='$patient_id'") or die("Cannot query 4281".mysql_error());
+
+			if($q_update_mc_post_visit && $q_update_mc_post):
+				echo "<script language='javascript'>";
+				echo "window.alert('The postpartum data for this maternity case was cleared. You may record new postpartum details')";
+				echo "</script>";
+			
+			endif;
+			
+		endif;
+
 	}
 
 // end of class
