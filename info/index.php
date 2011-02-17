@@ -110,6 +110,7 @@ small { font-family: verdana, sans serif}
 .tb_table_header { background-color: #15317E; color: white; text-align: center; }
 .alert_table_header { background-color:#CC1100;color:#FFFF00;font-weight:bold;text-align:center; }
 .alert_table_row { background-color:#FF4444;color:#FFFFFF;font-weight:normal;text-align:center; }
+.button_design {  border: 1px solid #000000; }
 -->
 </style>
 </head>

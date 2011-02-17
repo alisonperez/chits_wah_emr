@@ -1181,6 +1181,32 @@ class mc extends module {
                     endif;
                 endif;
                 	break;
+
+		case "Terminate Pregnancy":
+			
+			if(isset($_POST["cause_termination"])):
+
+				/*echo "<script language='javascript'>";
+				echo "window.alert('Once a pregnancy is terminated, the record will be closed. Please ensure that the details of the pregnancy termination is correct.')";
+				echo "<script>";*/
+				echo "<script language='javascript'>";
+				echo "window.alert('Once a pregnancy is terminated, the record will be closed. Please ensure that the details of the pregnancy termination is correct.')";
+				echo "</script>";
+				
+				echo "You are terminating this pregnancy due to: <b>".$_POST["cause_termination"]."</b>";
+
+				if(module::confirm_delete($menu_id, $post_vars, $get_vars)):
+					$close_record = mysql_query("UPDATE m_patient_mc SET ") or die("Cannot query 1199 ".mysql_error());
+				else:
+
+				endif;
+			else:
+				echo "<script language='javascript'>";
+				echo "window.alert('Please fill in the cause of the termination of this pregnancy!')";
+				echo "</script>";
+			endif;
+			break;
+			
 		default:
 
 			break;
@@ -2430,7 +2456,30 @@ class mc extends module {
                     }
 		    print "<input type='submit' name='submitmc' value='Terminate This Pregnancy' class='tinylight' style='border: 1px solid black'/> ";
                     print "</span>";
-                    print "</td></tr></table>";
+                    print "</td></tr>";
+		
+		    echo "<tr><td>";
+			switch($_POST["submitmc"]){
+
+			case "Terminate This Pregnancy":
+				if(mc::check_postpartum($_GET["mc_id"],$patient_id)):
+					echo "<script language='javascript'>";
+					echo "window.alert('This patient has record for postpartum (i.e. date of delivery). Termination of pregnancy should occur during the prenatal period and before the actual delivey due to certain causes like miscarriage and abortion. If the you wish to terminate this pregnancy, Delete the Postpartum Data first to clear out the postpartum data.')";
+					echo "</script>";
+				else:
+				//before terminating the pregnancy, make sure that cause is being captured 
+					mc::display_terminate_cause();
+				endif;
+
+				break;
+			
+
+			default:
+
+				break;
+			}
+		   echo "</td></tr>";
+		    echo "</table>";
                     print "</form>";
                 }
             }
@@ -4267,6 +4316,24 @@ class mc extends module {
 			endif;
 	}
 
+
+	function check_postpartum(){
+		// this method will be checking out if the patient already has some postpartum data. returns T or F
+		if(func_num_args()>0):
+			$arg_list = func_get_args();
+			$mc_id = $arg_list[0];
+			$patient_id = $arg_list[1];
+		endif;
+
+		$q_postpartum = mysql_query("SELECT mc_id FROM m_patient_mc WHERE delivery_date!='0000-00-00' AND delivery_location!='' AND mc_id='$mc_id' AND patient_id='$patient_id'") or die("Cannot query 4285 ".mysql_error());
+
+		if(mysql_num_rows($q_postpartum)!=0):
+			return true;
+		else:	
+			return false;
+		endif;
+	}
+
 	function clear_postpartum_data(){
 
 		//this method will clear out initial postpartum regisration details including the succeeding visit. useful when terminating a pregnancy record (i.e. abortion) or simply removing the postpartum record in case a wrong data has been encoded
@@ -4290,8 +4357,27 @@ class mc extends module {
 			endif;
 			
 		endif;
-
 	}
+
+	function display_terminate_cause(){
+		echo "<table>";
+		echo "<tr><td class='tinylight'><b>CAUSE OF PREGNANCY TERMINATION</b><br>";
+		echo "NOTE: Please describe the exact cause of the termination (i.e. abortion due to diabetis).";
+		echo "</td></tr>";
+
+		echo "<tr><td>";
+		echo "<textarea name='cause_termination' cols='40'>";
+		echo "</textarea>";
+		echo "</td></tr>";
+		
+		echo "<tr align='center'><td>";
+		echo "<input type='submit' name='submitmc' value='Terminate Pregnancy' class='button_design'></input>&nbsp;";
+		echo "<input type='button' name='cancel_termination' value='Cancel' class='button_design' onclick='history.back(-1)'></input>";
+		echo "</td></tr>";
+
+		echo "</table>";
+	}
+
 
 // end of class
 }
