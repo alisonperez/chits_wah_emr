@@ -1184,7 +1184,7 @@ class mc extends module {
 
 		case "Terminate Pregnancy":
 			
-			if(isset($_POST["cause_termination"])):
+			if(!empty($_POST["cause_termination"])):
 
 				/*echo "<script language='javascript'>";
 				echo "window.alert('Once a pregnancy is terminated, the record will be closed. Please ensure that the details of the pregnancy termination is correct.')";
@@ -1193,18 +1193,32 @@ class mc extends module {
 				echo "window.alert('Once a pregnancy is terminated, the record will be closed. Please ensure that the details of the pregnancy termination is correct.')";
 				echo "</script>";
 				
-				echo "You are terminating this pregnancy due to: <b>".$_POST["cause_termination"]."</b>";
+				echo "You are terminating this pregnancy due to: <b>".$_POST["cause_termination"]."</b><br>";
 
 				if(module::confirm_delete($menu_id, $post_vars, $get_vars)):
-					$close_record = mysql_query("UPDATE m_patient_mc SET ") or die("Cannot query 1199 ".mysql_error());
-				else:
+					$close_record = mysql_query("UPDATE m_patient_mc SET end_pregnancy_flag='Y', pregnancy_termination_cause='$_POST[cause_termination]' WHERE mc_id='$_GET[mc_id]' AND patient_id='$patient_id'") or die("Cannot query 1199 ".mysql_error());
+					
+					if($close_record):
+					//redirect to the first visit page for the 
+				
+					header("location: ".$_SERVER["PHP_SELF"]."?page=".$get_vars["page"]."&menu_id=".$get_vars["menu_id"]."&consult_id=".$get_vars["consult_id"]."&ptmenu=DETAILS&module=mc&mc=VISIT1&mc_id=".$get_vars["mc_id"]);
+					echo "</script>";
 
+					
+					endif;
+				else:
+					if ($post_vars["confirm_delete"]=="No"):
+                        			header("location: ".$_SERVER["PHP_SELF"]."?page=".$get_vars["page"]."&menu_id=".$get_vars["menu_id"]."&consult_id=".$get_vars["consult_id"]."&ptmenu=DETAILS&module=mc&mc=VISIT1&mc_id=".$get_vars["mc_id"]);
+			    		endif;					
+					
 				endif;
 			else:
 				echo "<script language='javascript'>";
 				echo "window.alert('Please fill in the cause of the termination of this pregnancy!')";
 				echo "</script>";
 			endif;
+
+				
 			break;
 			
 		default:
@@ -2365,7 +2379,7 @@ class mc extends module {
                "to_days(trimester2_date) days_trim2, to_days(trimester3_date) days_trim3, ".
                "to_days(postpartum_date) days_pp, to_days(mc_consult_date) days_today, obscore_gp, obscore_fpal, user_id, ".
                "blood_type, patient_age, patient_height, delivery_date, ".
-               "outcome_id, birthweight, end_pregnancy_flag ".
+               "outcome_id, birthweight, end_pregnancy_flag,pregnancy_termination_cause ".
                "from m_patient_mc where patient_id = '$patient_id' and mc_id = '".$get_vars["mc_id"]."'";
         if ($result = mysql_query($sql)) {
             if (mysql_num_rows($result)) {
@@ -2435,6 +2449,7 @@ class mc extends module {
                             }
                         }
                     }
+		    
                     if ($mc["delivery_date"]<>"0000-00-00") {
                         // if registry record closed display the rest
                         print "<hr size='1'/>";
@@ -2445,16 +2460,30 @@ class mc extends module {
                         print "</td></tr></table>";
                     }
                     print "<br/>";
+
+		    if(!empty($mc["pregnancy_termination_cause"]) && $mc[end_pregnancy_flag]=='Y'):
+			echo "<hr size='1'>";
+			echo "CAUSE OF TERMINATION: ";
+			echo $mc["pregnancy_termination_cause"]."<br/>";
+			
+			echo "</hr>";
+		    endif;
+
                     if ($_SESSION["priv_add"]) {
                         if ($mc["end_pregnancy_flag"]=="N") {
                             // prevent editing of closed registry record
-                            print "<input type='submit' name='submitmc' value='Update Visit 1' class='tinylight' style='border: 1px solid black'/> ";
+			    echo "<hr size='1'>";
+			    print "<p align='center'>";
+                            print "<input type='submit' name='submitmc' value='Update Visit 1' class='tinylight' style='border: 1px solid black'/><br><br>";
                             print "<input type='submit' name='submitmc' value='Update Postpartum Data Form' class='tinylight' style='border: 1px solid black'/><br><br>";
 			    print "<input type='submit' name='submitmc' value='Delete Postpartum Data Form' class='tinylight' style='border: 1px solid black'/><br><br>";
+			    print "<input type='submit' name='submitmc' value='Terminate This Pregnancy' class='tinylight' style='border: 1px solid black'/> ";
+			    print "</span>";
+			    echo "</hr>";
                         }
                         print "<input type='hidden' name='mc_id' value='".$mc["mc_id"]."'/>";
                     }
-		    print "<input type='submit' name='submitmc' value='Terminate This Pregnancy' class='tinylight' style='border: 1px solid black'/> ";
+		    
                     print "</span>";
                     print "</td></tr>";
 		
@@ -2472,13 +2501,11 @@ class mc extends module {
 				endif;
 
 				break;
-			
-
 			default:
 
 				break;
 			}
-		   echo "</td></tr>";
+		    echo "</td></tr>";
 		    echo "</table>";
                     print "</form>";
                 }
@@ -2970,11 +2997,11 @@ class mc extends module {
 				{
 				
                 print "<a name='detail'>";
-                print "<table width='250' cellpadding='3' style='border:1px dashed black'><tr><td>";
+                print "<table cellpadding='3' style='border:1px dashed black;'><tr><td>";
                 print "<form name='form_service_detail' method='post' action='".$_SERVER["PHP_SELF"]."?page=".$get_vars["page"]."&menu_id=".$get_vars["menu_id"]."&consult_id=".$get_vars["consult_id"]."&ptmenu=".$get_vars["ptmenu"]."&module=".$get_vars["module"]."&mc=".$get_vars["mc"]."&mc_id=".$get_vars["mc_id"]."&sts=".$get_vars["sts"]."&service_id=".$get_vars["service_id"].'#detail'."'>";
                 print "<span class='tinylight'>";
 				
-				print "REGISTRY ID: <font color='red'>".module::pad_zero($cdid,7)."</font><br/>";
+		print "REGISTRY ID: <font color='red'>".module::pad_zero($cdid,7)."</font><br/>";
                 print "SERVICE: ".mc::get_service_name($sid)."<br/>";
                 print "VISIT TYPE: $vtype<br/>";
                 print "REPORT DATE: $sdate<br/>";
