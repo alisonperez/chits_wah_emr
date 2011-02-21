@@ -543,11 +543,11 @@ class mc extends module {
             header("location: ".$_SERVER["PHP_SELF"]."?page=".$get_vars["page"]."&menu_id=".$get_vars["menu_id"]."&consult_id=".$get_vars["consult_id"]."&ptmenu=".$get_vars["ptmenu"]."&module=".$get_vars["module"]."&mc=VISIT1");
         }
         print "<table cellpadding='1' cellspacing='1' width='300' bgcolor='#9999FF' style='border: 1px solid black'><tr valign='top'><td nowrap>";
-        print "<a href='".$_SERVER["PHP_SELF"]."?page=".$get_vars["page"]."&menu_id=".$get_vars["menu_id"]."&consult_id=".$get_vars["consult_id"]."&ptmenu=".$get_vars["ptmenu"]."&module=".$get_vars["module"]."&mc=VISIT1".($get_vars["mc_id"]?"&mc_id=".$get_vars["mc_id"]:"")."' class='groupmenu'>".strtoupper(($get_vars["mc"]=="VISIT1"?"<b>VISIT1</b>":"VISIT1"))."</a>";
-        print "<a href='".$_SERVER["PHP_SELF"]."?page=".$get_vars["page"]."&menu_id=".$get_vars["menu_id"]."&consult_id=".$get_vars["consult_id"]."&ptmenu=".$get_vars["ptmenu"]."&module=".$get_vars["module"]."&mc=PREN".($get_vars["mc_id"]?"&mc_id=".$get_vars["mc_id"]:"")."' class='groupmenu'>".strtoupper(($get_vars["mc"]=="PREN"?"<b>PRENATAL</b>":"PRENATAL"))."</a>";
-        print "<a href='".$_SERVER["PHP_SELF"]."?page=".$get_vars["page"]."&menu_id=".$get_vars["menu_id"]."&consult_id=".$get_vars["consult_id"]."&ptmenu=".$get_vars["ptmenu"]."&module=".$get_vars["module"]."&mc=POSTP".($get_vars["mc_id"]?"&mc_id=".$get_vars["mc_id"]:"")."' class='groupmenu'>".strtoupper(($get_vars["mc"]=="POSTP"?"<b>POSTPARTUM</b>":"POSTPARTUM"))."</a>";
-        print "<a href='".$_SERVER["PHP_SELF"]."?page=".$get_vars["page"]."&menu_id=".$get_vars["menu_id"]."&consult_id=".$get_vars["consult_id"]."&ptmenu=".$get_vars["ptmenu"]."&module=".$get_vars["module"]."&mc=SVC".($get_vars["mc_id"]?"&mc_id=".$get_vars["mc_id"]:"")."' class='groupmenu'>".strtoupper(($get_vars["mc"]=="SVC"?"<b>SERVICES</b>":"SERVICES"))."</a>";
-        print "<a href='".$_SERVER["PHP_SELF"]."?page=".$get_vars["page"]."&menu_id=".$get_vars["menu_id"]."&consult_id=".$get_vars["consult_id"]."&ptmenu=".$get_vars["ptmenu"]."&module=".$get_vars["module"]."&mc=RF".($get_vars["mc_id"]?"&mc_id=".$get_vars["mc_id"]:"")."' class='groupmenu'>".strtoupper(($get_vars["mc"]=="RF"?"<b>RISK FACTORS</b>":"RISK FACTORS"))."</a>";
+        print "<a href='".$_SERVER["PHP_SELF"]."?page=".$get_vars["page"]."&menu_id=".$get_vars["menu_id"]."&consult_id=".$get_vars["consult_id"]."&ptmenu=".$get_vars["ptmenu"]."&module=".$get_vars["module"]."&mc=VISIT1".($get_vars["mc_id"]?"&mc_id=".$get_vars["mc_id"]:"")."#visit1form' class='groupmenu'>".strtoupper(($get_vars["mc"]=="VISIT1"?"<b>VISIT1</b>":"VISIT1"))."</a>";
+        print "<a href='".$_SERVER["PHP_SELF"]."?page=".$get_vars["page"]."&menu_id=".$get_vars["menu_id"]."&consult_id=".$get_vars["consult_id"]."&ptmenu=".$get_vars["ptmenu"]."&module=".$get_vars["module"]."&mc=PREN".($get_vars["mc_id"]?"&mc_id=".$get_vars["mc_id"]:"")."#prenatal' class='groupmenu'>".strtoupper(($get_vars["mc"]=="PREN"?"<b>PRENATAL</b>":"PRENATAL"))."</a>";
+        print "<a href='".$_SERVER["PHP_SELF"]."?page=".$get_vars["page"]."&menu_id=".$get_vars["menu_id"]."&consult_id=".$get_vars["consult_id"]."&ptmenu=".$get_vars["ptmenu"]."&module=".$get_vars["module"]."&mc=POSTP".($get_vars["mc_id"]?"&mc_id=".$get_vars["mc_id"]:"")."#postpartum' class='groupmenu'>".strtoupper(($get_vars["mc"]=="POSTP"?"<b>POSTPARTUM</b>":"POSTPARTUM"))."</a>";
+        print "<a href='".$_SERVER["PHP_SELF"]."?page=".$get_vars["page"]."&menu_id=".$get_vars["menu_id"]."&consult_id=".$get_vars["consult_id"]."&ptmenu=".$get_vars["ptmenu"]."&module=".$get_vars["module"]."&mc=SVC".($get_vars["mc_id"]?"&mc_id=".$get_vars["mc_id"]:"")."#services' class='groupmenu'>".strtoupper(($get_vars["mc"]=="SVC"?"<b>SERVICES</b>":"SERVICES"))."</a>";
+        print "<a href='".$_SERVER["PHP_SELF"]."?page=".$get_vars["page"]."&menu_id=".$get_vars["menu_id"]."&consult_id=".$get_vars["consult_id"]."&ptmenu=".$get_vars["ptmenu"]."&module=".$get_vars["module"]."&mc=RF".($get_vars["mc_id"]?"&mc_id=".$get_vars["mc_id"]:"")."#risk_factors' class='groupmenu'>".strtoupper(($get_vars["mc"]=="RF"?"<b>RISK FACTORS</b>":"RISK FACTORS"))."</a>";
 
         print "</td></tr></table><br/>";
     }
@@ -668,7 +668,8 @@ class mc extends module {
                 if ($post_vars["visit_date"] && $post_vars["visit_type"] &&
                     $post_vars["patient_systolic"] && $post_vars["patient_diastolic"]) {
 		
-		    print_r($post_vars);
+		    //print_r($post_vars);
+
 		    $wk_count = mc::get_pp_week($post_vars["mc_id"],$post_vars["visit_date"]);		    
 
 		    if($wk_count>0):
@@ -869,9 +870,9 @@ class mc extends module {
 
 						}*/
 
-						$date_ngayon = date('Y-m-d');
-                        foreach($post_vars["risk"] as $key=>$value) {
+				$date_ngayon = date('Y-m-d');
 
+                        foreach($post_vars["risk"] as $key=>$value) {
                             $sql_risk = "insert into m_consult_mc_visit_risk (consult_id , ".
                                         "patient_id, mc_id, visit_risk_id, risk_timestamp,date_detected ".
                                         "user_id) values ('".$get_vars["consult_id"]."', ".
@@ -879,6 +880,7 @@ class mc extends module {
                                         "sysdate(),$date_ngayon '".$_SESSION["userid"]."')";
                             $result_risk = mysql_query($sql_risk);
                         }
+
                         header("location: ".$_SERVER["PHP_SELF"]."?page=".$get_vars["page"]."&menu_id=".$get_vars["menu_id"]."&consult_id=".$get_vars["consult_id"]."&ptmenu=DETAILS&module=mc&mc=VISIT1&mc_id=$insert_id");
                     }
                 } else {
@@ -1016,7 +1018,7 @@ class mc extends module {
 		*/
 
 		if($post_vars["visit_date"]){
-				
+
 			list($month, $day, $year) = explode("/", $post_vars["visit_date"]);								
 			$visit_date = "$year-".str_pad($month,2,"0",STR_PAD_LEFT)."-".str_pad($day,2,"0",STR_PAD_LEFT);					
 			$trimester = mc::get_trimester($post_vars["mc_id"], $visit_date);	
@@ -1359,10 +1361,11 @@ class mc extends module {
 
 		$query_risk_code = mysql_query("SELECT risk_id,risk_name,monitor_flag FROM m_lib_mc_risk_factors ORDER by risk_name ASC") or die("Cannot query: 1073");
 		
+		echo "<a name='risk_factors'>";
+		echo "<table width='300' bgcolor>";
+
 		if(mysql_num_rows($query_risk_code)!=0):
 			echo "<form method='POST' name='form_riskcode'>";
-
-			echo "<table width='300' bgcolor>";
 			echo "<tr><td style='font-size: 13px; font-weight: bold;'>List of Risk Factors&nbsp;&nbsp;(* - for monitoring)";	
 			echo "<select name=\"risk_code\" size='1' style='font-size:10;'>";
 
@@ -1476,7 +1479,11 @@ class mc extends module {
         // get most recent pregnancy id
         $patient_id = healthcenter::get_patient_id($get_vars["consult_id"]);
         $mc_id = mc::registry_record_exists($patient_id);
-        if ($mc_id) {
+
+
+
+	if ($mc_id) {
+	    print "<a name='services'>";
             print "<table width='300'>";
             print "<form action = '".$_SERVER["SELF"]."?page=".$get_vars["page"]."&menu_id=$menu_id&consult_id=".$get_vars["consult_id"]."&ptmenu=".$get_vars["ptmenu"]."&module=".$get_vars["module"]."&mc=SVC' name='form_mc_services' method='post'>";
             print "<tr valign='top'><td>";
@@ -1521,7 +1528,8 @@ class mc extends module {
             print "</form>";
             print "</table><br>";
         } else {
-            print "<font color='red'>No valid Registry ID. Please create a new one.</font>";
+	    print "<a name='services'>";
+            print "<font color='red'>No valid Registry ID. Please create a new one.</font><br>";
         }
 
     }
@@ -1809,6 +1817,7 @@ class mc extends module {
 
 
         } else {
+	    print "<a name='prenatal'>";
             print "<font color='red'>No valid Registry ID. Please create a new one.</font>";
         }
     }
@@ -1983,10 +1992,10 @@ class mc extends module {
         $patient_id = healthcenter::get_patient_id($get_vars["consult_id"]);
         $mc_id = mc::registry_record_exists($patient_id);
 
-        if ($mc_id) {
-            // edit prenatal data
-            print "<a name='visit1form'>";
+	    print "<a name='postpartum'>";
             print "<table width='300'>";
+        if ($mc_id) {
+
             print "<form action = '".$_SERVER["SELF"]."?page=".$get_vars["page"]."&menu_id=".$get_vars["menu_id"]."&consult_id=".$get_vars["consult_id"]."&ptmenu=".$get_vars["ptmenu"]."&module=mc&mc=POSTP&mc_id=".$get_vars["mc_id"]."' name='form_mc_postpartum' method='post'>";
             print "<tr valign='top'><td>";
             print "<b>".FTITLE_MC_POSTPARTUM_DATA_FORM."</b><br/><br/>";
@@ -2112,13 +2121,13 @@ class mc extends module {
 				echo "<tr><td><input type='submit' name='update_postpartum' value='Update Postpartum Remarks' style='border: 1px solid #000000'></input></td></tr>";
 			endif;
 
-
-			echo "</table>";
-			echo "</form>";
+		echo "</form>";
 
         } else {
             print "<font color='red'>No valid Registry ID. Please create a new one.</font>";
         }
+
+	echo "</table>";
     }
 
     function show_bloodtype() {
