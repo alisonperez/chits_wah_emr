@@ -934,11 +934,13 @@ class mc extends module {
                 }
                 break;
             case "Save Prenatal Data":
-				$exists = mc::check_visit_date($post_vars["visit_date"],$post_vars[mc_id]);
+			$exists = mc::check_visit_date($post_vars["visit_date"],$post_vars[mc_id]);
 
-                if ($post_vars["patient_systolic"] && $post_vars["patient_diastolic"] &&
-                    $post_vars["patient_weight"] && $post_vars["visit_date"] && $exists!=1) {
-								
+                //if ($post_vars["patient_systolic"] && $post_vars["patient_diastolic"] &&
+                //    $post_vars["patient_weight"] && $post_vars["visit_date"] && $exists!=1) {
+
+
+		if($post_vars["visit_date"]){    //allow the entry of the prenatal visit minus the other vital signs
                     //if ($post_vars["data_import_flag"]) {
                         list($month, $day, $year) = explode("/", $post_vars["visit_date"]);
                         $visit_date = "$year-".str_pad($month,2,"0",STR_PAD_LEFT)."-".str_pad($day,2,"0",STR_PAD_LEFT);
@@ -1005,17 +1007,19 @@ class mc extends module {
                 }
                 break;
             case "Update Prenatal":
-				//print_r($post_vars);
-				$exists = mc::check_visit_date($post_vars["visit_date"],$post_vars[mc_id]);
+		//print_r($post_vars);
+		$exists = mc::check_visit_date($post_vars["visit_date"],$post_vars[mc_id]);
 				
-                if ($post_vars["patient_systolic"] && $post_vars["patient_diastolic"] &&
+                /*if ($post_vars["patient_systolic"] && $post_vars["patient_diastolic"] &&
                     $post_vars["patient_weight"] && $post_vars["fundic_height"] && $post_vars["fhr"] &&
                     $post_vars["fhr_location"] && $post_vars["presentation"] && $post_vars["visit_date"]) {
-					
-					list($month, $day, $year) = explode("/", $post_vars["visit_date"]);									
-					$visit_date = "$year-".str_pad($month,2,"0",STR_PAD_LEFT)."-".str_pad($day,2,"0",STR_PAD_LEFT);					
-					$trimester = mc::get_trimester($post_vars["mc_id"], $visit_date);
-										
+		*/
+
+		if($post_vars["visit_date"]){
+				
+			list($month, $day, $year) = explode("/", $post_vars["visit_date"]);								
+			$visit_date = "$year-".str_pad($month,2,"0",STR_PAD_LEFT)."-".str_pad($day,2,"0",STR_PAD_LEFT);					
+			$trimester = mc::get_trimester($post_vars["mc_id"], $visit_date);	
 
                     $sql = "update m_consult_mc_prenatal set ".
                            "fundic_height = '".$post_vars["fundic_height"]."', ".
