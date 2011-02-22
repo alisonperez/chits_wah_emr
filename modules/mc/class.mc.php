@@ -80,7 +80,7 @@ class mc extends module {
         module::set_lang("FTITLE_MC_POSTPARTUM_FORM", "english", "POSTPARTUM VISIT FORM", "Y");
         module::set_lang("LBL_DELIVERY_DATE", "english", "DELIVERY DATE", "Y");
         module::set_lang("LBL_CHILD_PATIENT_ID", "english", "PATIENT ID OF CHILD", "Y");
-        module::set_lang("INSTR_CHILD_PATIENT_ID", "english", "If patient\'s child has been registered, click the Search Child button. Otherwise, please registered the child.", "Y");
+        module::set_lang("INSTR_CHILD_PATIENT_ID", "english", "If patient\'s child has been registered, click the Search Child button. Otherwise, please register the child.", "Y");
         module::set_lang("LBL_PREGNANCY_OUTCOME", "english", "PREGNANCY OUTCOME", "Y");
         module::set_lang("LBL_BABY_WEIGHT", "english", "BABY\'S WEIGHT", "Y");
         module::set_lang("LBL_BREASTFEEDING_FLAG", "english", "WAS BABY BREASTFED ASAP", "Y");
@@ -908,7 +908,8 @@ class mc extends module {
                                       "where consult_id = '".$get_vars["consult_id"]."' and mc_id = '".$post_vars["mc_id"]."'";
                         $result_delete = mysql_query($sql_delete);
                         // ...then update from form
-						$date_ngayon = date('Y-m-d');
+			$date_ngayon = date('Y-m-d');
+
                         foreach($post_vars["risk"] as $key=>$value) {
                             $sql_risk = "insert into m_consult_mc_visit_risk (consult_id , ".
                                         "patient_id, mc_id, visit_risk_id, risk_timestamp,date_detected,".
@@ -1091,45 +1092,57 @@ class mc extends module {
             case "Save Postpartum Data":
                 if ($post_vars["delivery_date"] && $post_vars["delivery_location"] &&
                     $post_vars["outcome"] && $post_vars["birth_weight"] && $post_vars["attendant"]) {
-					
 
-					if(isset($_POST[breastfeeding_flag])): //naka-check
+				if(isset($_POST[breastfeeding_flag])): //naka-check
 							
-						if(empty($_POST[date_breastfed])): //no date but checked
+					if(empty($_POST[date_breastfed])): //no date but checked
 							$datebreastfeed = 'n';
-						elseif($this->get_day_diff($_POST[date_breastfed],$post_vars["delivery_date"]) < 0): //check if date of breastfeeding occurs after the delivery date
+					elseif($this->get_day_diff($_POST[date_breastfed],$post_vars["delivery_date"]) < 0): //check if date of breastfeeding occurs after the delivery date
 							$datebreastfeed = 'w';
-						else:
-							$datebreastfeed = 'y'; //set to yes is date_breastfed is not empty and not exceeding delivery date
-						endif;
-
 					else:
-						$datebreastfeed = 'y'; //not checked, no need to check for date
+						$datebreastfeed = 'y'; //set to yes is date_breastfed is not empty and not exceeding delivery date
 					endif;
 
+				else:
+					$datebreastfeed = 'y'; //not checked, no need to check for date
+				endif;
 
 
-					if($datebreastfeed=='y'){
-						list($month, $day, $year) = explode("/", $post_vars["delivery_date"]);
-						list($bmonth,$bday,$byr) = explode("/",$_POST["date_breastfed"]);
 
-						$delivery_date = "$year-".str_pad($month,2,"0",STR_PAD_LEFT)."-".str_pad($day,2,"0",STR_PAD_LEFT);
+				if($datebreastfeed=='y'){
+					list($month, $day, $year) = explode("/", $post_vars["delivery_date"]);
+					list($bmonth,$bday,$byr) = explode("/",$_POST["date_breastfed"]);
+
+					$delivery_date = "$year-".str_pad($month,2,"0",STR_PAD_LEFT)."-".str_pad($day,2,"0",STR_PAD_LEFT);
 						
-						echo $delivery_date;
+					echo $delivery_date;
 
-						if(isset($_POST[breastfeeding_flag])):
-							$bfeed_date = "$byr-".str_pad($bmonth,2,"0",STR_PAD_LEFT)."-".str_pad($bday,2,"0",STR_PAD_LEFT);
-						else:
-							$bfeed_date = '';
-						endif;
+					if(isset($_POST[breastfeeding_flag])):
+						$bfeed_date = "$byr-".str_pad($bmonth,2,"0",STR_PAD_LEFT)."-".str_pad($bday,2,"0",STR_PAD_LEFT);
+					else:
+						$bfeed_date = '';
+					endif;
 
+					
+					$healthy_baby = ($post_vars["healthy_baby_flag"]?"Y":"N");
+					$breastfeeding = ($post_vars["breastfeeding_flag"]?"Y":"N");
+					$end_pregnancy = ($post_vars["end_pregnancy_flag"]?"Y":"N");
+				
+
+					// NOTE: update postpartum date from delivery date
+					if(empty($get_vars["mc_id"])):
 						
-						$healthy_baby = ($post_vars["healthy_baby_flag"]?"Y":"N");
-						$breastfeeding = ($post_vars["breastfeeding_flag"]?"Y":"N");
-						$end_pregnancy = ($post_vars["end_pregnancy_flag"]?"Y":"N");
-						
+						$patient_id = healthcenter::get_patient_id($_GET[consult_id]);
+						$sql = "insert into m_patient_mc SET patient_id='$patient_id',consult_id='$_GET[consult_id]',patient_lmp=from_days(to_days('$delivery_date')-280),trimester1_date=from_days(to_days('$delivery_date')-186.7),trimester2_date=from_days(to_days('$delivery_date')-93.3),trimester3_date=from_days(to_days('$delivery_date')),mc_timestamp=sysdate(),mc_consult_date=sysdate(),delivery_date='$delivery_date',postpartum_date=from_days(to_days('$delivery_date')+42),obscore_gp='$post_vars[obscore_gp]',obscore_fpal='$post_vars[obscore_fpal]',birthweight='$post_vars[birth_weight]',child_patient_id='$post_vars[child_patient_id]',delivery_location='$post_vars[delivery_location]',outcome_id='$post_vars[outcome]',healthy_baby='$health_baby',end_pregnancy_flag='$end_pregnancy',breastfeeding_asap='$breastfeeding',date_breastfed='$bfeed_date',birthmode='$post_vars[attendant]'";
 
-						// NOTE: update postpartum date from delivery date
+						//echo "<script language='Javascript'>";
+						//echo "window.alert('The last menstrual period (LMP) was automatically been computed. If the patient knows her LMP, please modified the computer-generated LMP.')";
+
+						echo "</script>";
+
+
+					else:
+
 						$sql = "update m_patient_mc set ".
 							   "delivery_date = '$delivery_date', ".
 							   "postpartum_date = from_days(to_days('$delivery_date')+42), ".
@@ -1146,7 +1159,9 @@ class mc extends module {
 							   "birthmode = '".$post_vars["attendant"]."' ".
 							   "where mc_id = '".$get_vars["mc_id"]."'"; 
 
-						$result = mysql_query($sql) or die("Cannot query: 1068");
+					endif;
+
+						$result = mysql_query($sql) or die("Cannot query: 1068 ".mysql_error());
 
 						if ($result) {
 							header("location: ".$_SERVER["PHP_SELF"]."?page=".$get_vars["page"]."&menu_id=".$get_vars["menu_id"]."&consult_id=".$get_vars["consult_id"]."&ptmenu=DETAILS&module=mc&mc=POSTP&mc_id=".$get_vars["mc_id"]);
@@ -1248,7 +1263,7 @@ class mc extends module {
 	}
 
     function reorder_prenatal_visits(){
-		
+
 	//reorders the visit sequence in the prenatal table
 	if(func_num_args()>0):
 	   $arg_list = func_get_args();
@@ -1992,10 +2007,10 @@ class mc extends module {
         $patient_id = healthcenter::get_patient_id($get_vars["consult_id"]);
         $mc_id = mc::registry_record_exists($patient_id);
 
-	    print "<a name='postpartum'>";
-            print "<table width='300'>";
-        if ($mc_id) {
-
+	print "<a name='postpartum'>";
+        print "<table width='300'>";
+	
+        if ($patient_id) {
             print "<form action = '".$_SERVER["SELF"]."?page=".$get_vars["page"]."&menu_id=".$get_vars["menu_id"]."&consult_id=".$get_vars["consult_id"]."&ptmenu=".$get_vars["ptmenu"]."&module=mc&mc=POSTP&mc_id=".$get_vars["mc_id"]."' name='form_mc_postpartum' method='post'>";
             print "<tr valign='top'><td>";
             print "<b>".FTITLE_MC_POSTPARTUM_DATA_FORM."</b><br/><br/>";
@@ -2042,7 +2057,7 @@ class mc extends module {
 	    print "<input type='hidden' name='child_patient_id'></input>";
 
 	    echo "&nbsp;<input type='button' name='btn_search_spouse' value='Search Child' onclick='search_patient(this.form.name,this.form.elements[3].name,this.form.elements[4].name);' style='border: 1px solid #000000'></input><br>";
-	    echo "<small>If patient's child has been registered, click the Search Child button. Otherwise, please registered the child.</small><br>";
+	    echo "<small>If patient's child has been registered, click the Search Child button. Otherwise, please register the child.</small><br>";
             print "</td></tr>";
 
 	    print "<tr valign='top'><td>";
@@ -2085,11 +2100,11 @@ class mc extends module {
             print "</table>";
             print "</td></tr>";
             print "<tr><td>";
-            if ($mc_id || $post_vars["mc_id"]) {
+            //if ($mc_id || $post_vars["mc_id"]) {
                 if ($_SESSION["priv_add"] || $_SESSION["isadmin"]) {
                     print "<br><input type='submit' value = 'Save Postpartum Data' class='textbox' name='submitmc' style='border: 1px solid #000000'><br>";
                 }
-            }
+            //}
             print "</td></tr>";
 
             print "</form>";
