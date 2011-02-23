@@ -962,7 +962,7 @@ class mc extends module {
                     $sql = "insert into m_consult_mc_prenatal (mc_id, consult_id, patient_id, prenatal_timestamp, ".
                            "prenatal_date, user_id, aog_weeks, trimester, visit_sequence, patient_weight, ".
                            "blood_pressure_systolic, blood_pressure_diastolic, fhr, fhr_location, ".
-                           "fundic_height, presentation, data_type) values ('".$post_vars["mc_id"]."', ".
+                           "fundic_height, presentation, data_type, flag_private) values ('".$post_vars["mc_id"]."', ".
                            "'".$get_vars["consult_id"]."', '$patient_id', '$visit_date', ".
                            "'$visit_date', '".$_SESSION["userid"]."', '$aog_total', ".
                            "'$trimester', '".$post_vars["visit_sequence"]."', ".
