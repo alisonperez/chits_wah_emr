@@ -163,12 +163,14 @@ function show_fp1(){ //this method shall extract the FP records on page 1 of the
         list($dreg,$reg_days,$client_code) = mysql_fetch_array($q_date_reg);        
                 
         if($_SESSION[brgy]=='all'):
-            $q_px_info = mysql_query("SELECT a.patient_lastname,a.patient_firstname,b.address,c.barangay_name,TO_DAYS(patient_dob) as dob_days,b.family_id FROM m_patient a,m_family_address b,m_lib_barangay c,m_family_members d WHERE a.patient_id='$r_px_id[$i]' AND a.patient_id=d.patient_id AND d.family_id=b.family_id AND b.barangay_id=c.barangay_id") or die("Cannot query(166): mysql_error()");        
+		echo $r_px_id.'<br>';
+            //$q_px_info = mysql_query("SELECT a.patient_lastname,a.patient_firstname,b.address,c.barangay_name,TO_DAYS(patient_dob) as dob_days,b.family_id FROM m_patient a,m_family_address b,m_lib_barangay c,m_family_members d WHERE a.patient_id='$r_px_id[$i]' AND a.patient_id=d.patient_id AND d.family_id=b.family_id AND b.barangay_id=c.barangay_id") or die("Cannot query(166): mysql_error()");
+
         else:
-            $q_px_info = mysql_query("SELECT a.patient_lastname,a.patient_firstname,b.address,c.barangay_name,TO_DAYS(patient_dob),b.family_id as dob_days FROM m_patient a,m_family_address b,m_lib_barangay c,m_family_members d WHERE a.patient_id='$r_px_id[$i]' AND a.patient_id=d.patient_id AND d.family_id=b.family_id AND b.barangay_id='$_SESSION[brgy]' AND b.barangay_id=c.barangay_id") or die("Cannot query(168): mysql_error()");
+            $q_px_info = mysql_query("SELECT a.patient_id, a.patient_lastname,a.patient_firstname,b.address,c.barangay_name,TO_DAYS(patient_dob),b.family_id as dob_days FROM m_patient a,m_family_address b,m_lib_barangay c,m_family_members d WHERE a.patient_id='$r_px_id[$i]' AND a.patient_id=d.patient_id AND d.family_id=b.family_id AND b.barangay_id='$_SESSION[brgy]' AND b.barangay_id=c.barangay_id") or die("Cannot query(168): mysql_error()");
         endif;
-        
-        list($lname,$fname,$address,$brgy,$dob_days,$family_id) = mysql_fetch_array($q_px_info);                
+
+        list($pxid,$lname,$fname,$address,$brgy,$dob_days,$family_id) = mysql_fetch_array($q_px_info);                
         $edad = floor(($reg_days - $dob_days)/365);
     
         $q_prev_method = mysql_query("SELECT a.method_id,b.method_name FROM m_patient_fp_method a, m_lib_fp_methods b WHERE a.patient_id='$r_px_id[$i]' AND a.method_id=b.method_id AND '$_SESSION[sdate2]' > a.date_registered ORDER by a.date_registered DESC LIMIT 1") or die("Cannot query(174): ".mysql_error());

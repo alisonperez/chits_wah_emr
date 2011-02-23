@@ -4,9 +4,12 @@ class querydb{
 
     function querydb(){
       $this->app = "CHITS Query Browser";
-      $this->version = "0.1";
-      $this->author = "Alison Perez";    
+      $this->version = "0.2";
+      $this->author = "Alison Perez";
     }
+
+	//0.1. Capiz circa 2007. Form structure for filters
+	//0.2 August 2009 --
     
     function querycrit($dbname,$dbname2,$sdate,$edate,$brgy,$misc){   
 	  
@@ -834,10 +837,10 @@ class querydb{
 				array_push($r_fp_px,$pxid);
 				array_push($r_fp_id,$fpid);
 			}
-			
+			print_r($r_fp_px);
 			$_SESSION[fp_px] = $r_fp_px;
 			$_SESSION[fp_method_id] = $r_fp_id;
-			
+
 			echo "Show Family Planning TCL:&nbsp;<a href='./pdf_reports/fp_tcl.php?page=1'>Page 1</a>&nbsp;&nbsp;<a href='./pdf_reports/fp_tcl.php?page=2'>Page 2</a>";			
 		else:
 			echo "<font color='red'>No result/s found.</font>";

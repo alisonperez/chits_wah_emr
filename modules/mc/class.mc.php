@@ -2079,7 +2079,7 @@ class mc extends module {
             print healthcenter::show_delivery_location($mc["delivery_location"]);
             print "</td></tr>";
             print "<tr valign='top'><td>";
-            print "<span class='boxtitle'>".LBL_BIRTH_ATTENDANT."</span><font color='red'> *</font><br> ";
+            print "<span class='boxtitle'>".LBL_BIRTH_ATTENDANT." (SBA - Physician, nurse, midwife)</span><font color='red'> *</font><br> ";
             print mc::show_attendant($mc["birthmode"]);
 
             print "</td></tr>";
