@@ -951,6 +951,8 @@ class mc extends module {
                         list($aog_weeks, $days) = mc::get_aog($post_vars["mc_id"], $visit_date);
                         $aog_total = $aog_weeks + ($days/7);
                         $data_type = "EXT";
+			$private = (isset($post_vars["check_private"]))?'Y':'';
+
                     //} else {
                     /*    $visit_date = healthcenter::get_consult_date($get_vars["consult_id"]);
                         $trimester = mc::get_trimester($post_vars["mc_id"], $visit_date);
@@ -959,6 +961,7 @@ class mc extends module {
                         $data_type = "INT";
 				     */
                     //}
+
                     $sql = "insert into m_consult_mc_prenatal (mc_id, consult_id, patient_id, prenatal_timestamp, ".
                            "prenatal_date, user_id, aog_weeks, trimester, visit_sequence, patient_weight, ".
                            "blood_pressure_systolic, blood_pressure_diastolic, fhr, fhr_location, ".
@@ -969,9 +972,9 @@ class mc extends module {
                            "'".$post_vars["patient_weight"]."', '".$post_vars["patient_systolic"]."', ".
                            "'".$post_vars["patient_diastolic"]."', '".$post_vars["fhr"]."', ".
                            "'".$post_vars["fhr_location"]."', '".$post_vars["fundic_height"]."', ".
-                           "'".$post_vars["presentation"]."', '$data_type')";					
+                           "'".$post_vars["presentation"]."', '$data_type', '$private')";					
 		
-		    $result = mysql_query($sql) or die("Cannot query: 840");
+		    $result = mysql_query($sql) or die("Cannot query: 840".mysql_error());
 		    mc::reorder_prenatal_visits($post_vars["mc_id"]);
                     if ($result) {		
 
@@ -1020,25 +1023,27 @@ class mc extends module {
 
 		if($post_vars["visit_date"]){
 
-			list($month, $day, $year) = explode("/", $post_vars["visit_date"]);								
+			list($month, $day, $year) = explode("/", $post_vars["visit_date"]);
+			$flag_private = (isset($post_vars["check_private"]))?'Y':'';
 			$visit_date = "$year-".str_pad($month,2,"0",STR_PAD_LEFT)."-".str_pad($day,2,"0",STR_PAD_LEFT);					
 			$trimester = mc::get_trimester($post_vars["mc_id"], $visit_date);	
 
                     $sql = "update m_consult_mc_prenatal set ".
                            "fundic_height = '".$post_vars["fundic_height"]."', ".
                            "fhr = '".$post_vars["fhr"]."', ".
-						   "prenatal_date = '".$visit_date."', ".
+			    "prenatal_date = '".$visit_date."', ".
                            "fhr_location = '".$post_vars["fhr_location"]."', ".
-						   "trimester = '".$trimester."', ".
+			   "trimester = '".$trimester."', ".
                            "presentation = '".$post_vars["presentation"]."', ".
-						   "patient_weight = '".$post_vars["patient_weight"]."', ".
-						   "blood_pressure_systolic = '".$post_vars["patient_systolic"]."', ".
-						   "blood_pressure_diastolic = '".$post_vars["patient_diastolic"]."' ".
+			   "patient_weight = '".$post_vars["patient_weight"]."', ".
+			   "blood_pressure_systolic = '".$post_vars["patient_systolic"]."', ".
+			   "blood_pressure_diastolic = '".$post_vars["patient_diastolic"]."', ".
+			   "flag_private = '".$flag_private."' ".
                            "where mc_id = '".$post_vars["mc_id"]."' and visit_sequence = '".$post_vars["visit_sequence"]."'";
 
-					$result = mysql_query($sql) or die("Cannot update: 855");
-                    
-					if ($result) {
+			    $result = mysql_query($sql) or die("Cannot update: 855");
+
+		if ($result) {
 
                         // do not update for visit 1
                         if ($post_vars["visit_sequence"]>1) {
@@ -1640,7 +1645,7 @@ class mc extends module {
         if ($post_vars["prenatal_id"] && $post_vars["submitmc"] && $post_vars["visit_sequence"]) {
             $sql = "select mc_id, patient_id, consult_id, patient_weight, prenatal_date, ".
                    "blood_pressure_systolic, blood_pressure_diastolic, fundic_height, ".
-                   "presentation, fhr, fhr_location, trimester, visit_sequence, data_type ".
+                   "presentation, fhr, fhr_location, trimester, visit_sequence, data_type, flag_private ".
                    "from m_consult_mc_prenatal ".
                    "where mc_id = '".$post_vars["prenatal_id"]."' and visit_sequence = '".$post_vars["visit_sequence"]."'";
 
@@ -1655,6 +1660,8 @@ class mc extends module {
         // get most recent pregnancy id
         $patient_id = healthcenter::get_patient_id($get_vars["consult_id"]);
         $mc_id = mc::registry_record_exists($patient_id);
+	$value_private = ($mc["flag_private"])?'checked':'';
+	
         if ($mc_id) {
             // edit prenatal data
             if ($post_vars["prenatal_id"]) {
@@ -1774,7 +1781,7 @@ class mc extends module {
 
 	    echo "<tr>";
 	    echo "<td><span class='tinylight'>";
-	    echo "<input type='checkbox' name='check_private'>";
+	    echo "<input type='checkbox' name='check_private' $value_private>";
 	    echo "<b>SEEN OUTSIDE OF THE RHU? (i.e. private clinic)</b>";
 	    echo "</input>";
 	    echo "</span></td>";
@@ -2632,7 +2639,7 @@ class mc extends module {
         $sql = "select mc_id, patient_id, consult_id, date_format(prenatal_date, '%a %d %b %Y, %h:%i%p') visit_date, prenatal_date, ".
                "user_id, aog_weeks, trimester, visit_sequence, patient_weight, date_format(prenatal_timestamp, '%a %d %b %Y, %h:%i%p') prenatal_timestamp, ".
                "blood_pressure_systolic, blood_pressure_diastolic, fundic_height, ".
-               "presentation, fhr, fhr_location, data_type ".
+               "presentation, fhr, fhr_location, data_type, flag_private ".
                "from m_consult_mc_prenatal where patient_id = '$patient_id' and ".
                "mc_id = '".$get_vars["mc_id"]."' and visit_sequence = '".$get_vars["visitseq"]."'";
         if ($result = mysql_query($sql)) {
@@ -2686,14 +2693,27 @@ class mc extends module {
                             }
                         }
                     }
-                    print "<br/>";
+
+
+		    print "<hr size='1'>";
+		    echo "<span>";
+		    print "SEEN OUTSIDE OF THE RHU? ";
+		    echo ($mc["flag_private"]=='Y')?'Yes':'No';
+		    print "</span>";
+		    print "</hr>";
+
+		    print "<hr size='1'>";
+
                     if ($_SESSION["priv_update"]) {
                         print "<input type='submit' name='submitmc' value='Update Record' class='tinylight' style='border: 1px solid black'/>";
                         print "<input type='hidden' name='prenatal_id' value='".$mc["mc_id"]."'/>";
                         print "<input type='hidden' name='visit_sequence' value='".$mc["visit_sequence"]."'/>";
                     }
-                    print "</span>";
-                    print "</td></tr></table>";
+
+                    print "</td></tr>";
+		    print "</span>";
+
+		    print "</table>";
                     print "</form>";
                 }
             }
