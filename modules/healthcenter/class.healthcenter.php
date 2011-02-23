@@ -402,6 +402,7 @@ class healthcenter extends module{
                            "elapsed_time = (unix_timestamp()-unix_timestamp(consult_timestamp))/3600, ".
                            "consult_end = now() ".
                            "where consult_id = '".$post_vars["consult_id"]."'";
+
                     if ($result = mysql_query($sql)) {
                         header("location: ".$_SERVER["PHP_SELF"]."?page=".$get_vars["page"]."&menu_id=".$get_vars["menu_id"]);
                     }

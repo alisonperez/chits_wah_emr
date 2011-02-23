@@ -832,13 +832,13 @@ class mc extends module {
                            "mc_timestamp, mc_consult_date, patient_lmp, patient_edc, ".
                            "trimester1_date, trimester2_date, trimester3_date, postpartum_date, ".
                            "obscore_gp, obscore_fpal, ".
-                           "user_id, blood_type, patient_age, patient_height) ".
+                           "user_id, blood_type, patient_age, patient_height, flag_private) ".
                            "values ('$patient_id', '".$get_vars["consult_id"]."', ".
                            "sysdate(), sysdate(), '$lmp_date', from_days(to_days('$lmp_date')+280), ".
                            "from_days(to_days('$lmp_date')+93.3), from_days(to_days('$lmp_date')+186.67), from_days(to_days('$lmp_date')+280), from_days(to_days('$lmp_date')+322), ".
                            "'".$post_vars["obscore_gp"]."', '".$post_vars["obscore_fpal"]."', '".$_SESSION["userid"]."', ".
                            "'".$post_vars["bloodtype"]."', '$patient_age', ".
-                           "'".$post_vars["patient_height"]."')";
+                           "'".$post_vars["patient_height"]."',$post_vars[check_private])";
 
                     if ($result = mysql_query($sql)) {
                         $insert_id = mysql_insert_id();
@@ -1131,15 +1131,12 @@ class mc extends module {
 
 					// NOTE: update postpartum date from delivery date
 					if(empty($get_vars["mc_id"])):
-						
+
 						$patient_id = healthcenter::get_patient_id($_GET[consult_id]);
-						$sql = "insert into m_patient_mc SET patient_id='$patient_id',consult_id='$_GET[consult_id]',patient_lmp=from_days(to_days('$delivery_date')-280),trimester1_date=from_days(to_days('$delivery_date')-186.7),trimester2_date=from_days(to_days('$delivery_date')-93.3),trimester3_date=from_days(to_days('$delivery_date')),mc_timestamp=sysdate(),mc_consult_date=sysdate(),delivery_date='$delivery_date',postpartum_date=from_days(to_days('$delivery_date')+42),obscore_gp='$post_vars[obscore_gp]',obscore_fpal='$post_vars[obscore_fpal]',birthweight='$post_vars[birth_weight]',child_patient_id='$post_vars[child_patient_id]',delivery_location='$post_vars[delivery_location]',outcome_id='$post_vars[outcome]',healthy_baby='$health_baby',end_pregnancy_flag='$end_pregnancy',breastfeeding_asap='$breastfeeding',date_breastfed='$bfeed_date',birthmode='$post_vars[attendant]'";
 
-						//echo "<script language='Javascript'>";
-						//echo "window.alert('The last menstrual period (LMP) was automatically been computed. If the patient knows her LMP, please modified the computer-generated LMP.')";
-
-						echo "</script>";
-
+						$sql = "insert into m_patient_mc SET patient_id='$patient_id',consult_id='$_GET[consult_id]',patient_lmp=from_days(to_days('$delivery_date')-280),trimester1_date=from_days(to_days('$delivery_date')-186.7),trimester2_date=from_days(to_days('$delivery_date')-93.3),trimester3_date=from_days(to_days('$delivery_date')),mc_timestamp=sysdate(),mc_consult_date=sysdate(),patient_edc='$delivery_date',delivery_date='$delivery_date',postpartum_date=from_days(to_days('$delivery_date')+42),obscore_gp='$post_vars[obscore_gp]',obscore_fpal='$post_vars[obscore_fpal]',birthweight='$post_vars[birth_weight]',child_patient_id='$post_vars[child_patient_id]',delivery_location='$post_vars[delivery_location]',outcome_id='$post_vars[outcome]',healthy_baby='$health_baby',end_pregnancy_flag='$end_pregnancy',breastfeeding_asap='$breastfeeding',date_breastfed='$bfeed_date',birthmode='$post_vars[attendant]'";
+						
+						//$sql = "insert into m_patient_mc SET patient_id='$patient_id',consult_id='$_GET[consult_id]',patient_lmp=from_days(to_days('$delivery_date')-280),trimester1_date=from_days(to_days('$delivery_date')-186.7),trimester2_date=from_days(to_days('$delivery_date')-93.3),trimester3_date=from_days(to_days('$delivery_date')),mc_timestamp=sysdate(),mc_consult_date=sysdate(),delivery_date='$delivery_date',patient_edc='$date_delivery',postpartum_date=from_days(to_days('$delivery_date')+42),obscore_gp='$post_vars[obscore_gp]',obscore_fpal='$post_vars[obscore_fpal]',birthweight='$post_vars[birth_weight]',child_patient_id='$post_vars[child_patient_id]',delivery_location='$post_vars[delivery_location]',outcome_id='$post_vars[outcome]',healthy_baby='$health_baby',end_pregnancy_flag='$end_pregnancy',breastfeeding_asap='$breastfeeding',date_breastfed='$bfeed_date',birthmode='$post_vars[attendant]'";
 
 					else:
 
@@ -1668,9 +1665,9 @@ class mc extends module {
 				$visit_sequence = $post_vars["visit_sequence"];
             } else {
                 // new prenatal data headers
-				$sql_count = mysql_query("SELECT count(mc_id) FROM m_consult_mc_prenatal WHERE mc_id='$mc_id'") or die("cannot query: 1236");
-				$prenatal_seq = mysql_fetch_array($sql_count);		
-				$seq = $prenatal_seq[0] + 1;
+		$sql_count = mysql_query("SELECT count(mc_id) FROM m_consult_mc_prenatal WHERE mc_id='$mc_id'") or die("cannot query: 1236");
+		$prenatal_seq = mysql_fetch_array($sql_count);		
+		$seq = $prenatal_seq[0] + 1;
 
                 list($aog_weeks,$aog_days) = mc::get_aog($mc_id, $get_vars["consult_id"]);
                 $aog = ($aog_weeks + ($aog_days/7));
@@ -1774,7 +1771,17 @@ class mc extends module {
             }
             print "</td></tr>";
             */
-			print "</table>";
+
+	    echo "<tr>";
+	    echo "<td><span class='tinylight'>";
+	    echo "<input type='checkbox' name='check_private'>";
+	    echo "<b>SEEN OUTSIDE OF THE RHU? (i.e. private clinic)</b>";
+	    echo "</input>";
+	    echo "</span></td>";
+	    echo "</tr>";
+
+
+  	    print "</table>";
             print "</td></tr>";
             print "<tr><td><br/>";
             if ($post_vars["prenatal_id"]) {
@@ -2457,10 +2464,10 @@ class mc extends module {
                     print "End of 3rd trimester: ".($mc["days_today"]>=$mc["days_trim3"]?"<font color='red'>".$mc["trimester3_date"]."</font>":$mc["trimester3_date"])."<br/>";
                     print "End of postpartum period: ".($mc["days_today"]>=$mc["days_pp"]?"<font color='red'>".$mc["postpartum_date"]."</font>":$mc["postpartum_date"])."<br/>";
 
-					echo "<hr size='1'>";
-					echo "Tetanus Toxoid Status: ";
-					echo "<font color='red'><b>".mc::get_tt_status($mc["mc_id"],$patient_id,$mc["patient_edc"])."</b></font>";
-					echo "</hr>";
+		    echo "<hr size='1'>";
+		    echo "Tetanus Toxoid Status: ";
+		    echo "<font color='red'><b>".mc::get_tt_status($mc["mc_id"],$patient_id,$mc["patient_edc"])."</b></font>";
+		    echo "</hr>";
 
                     print "<hr size='1'/>";
 
