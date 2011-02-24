@@ -12,6 +12,8 @@ class mc extends module {
         $this->version = "0.96-".date("Y-m-d");
         $this->module = "mc";
         $this->description = "CHITS Library - Maternal Care";
+
+
         // 0.4: debugged
         // 0.5 added prenatal import
         // 0.6 added end_pregnancy_flag to m_patient_mc
@@ -1216,15 +1218,16 @@ class mc extends module {
 				echo "window.alert('Once a pregnancy is terminated, the record will be closed. Please ensure that the details of the pregnancy termination is correct.')";
 				echo "</script>";
 				
-				echo "You are terminating this pregnancy due to: <b>".$_POST["cause_termination"]."</b><br>";
+				echo "You are terminating this pregnancy due to: <b>".$_POST["cause_termination"]."</b> on ".$_POST["txt_date_termination"]."<br>";
 
 				if(module::confirm_delete($menu_id, $post_vars, $get_vars)):
-					$close_record = mysql_query("UPDATE m_patient_mc SET end_pregnancy_flag='Y', pregnancy_termination_cause='$_POST[cause_termination]' WHERE mc_id='$_GET[mc_id]' AND patient_id='$patient_id'") or die("Cannot query 1199 ".mysql_error());
+					list($m,$d,$y) = explode('/',$_POST["txt_date_termination"]);
+					$date_term = $y.'/'.$m.'/'.$d;
+
+					$close_record = mysql_query("UPDATE m_patient_mc SET end_pregnancy_flag='Y',date_terminated_abortion='$date_term',termination_code='$_POST[sel_cause_term]', pregnancy_termination_cause='$_POST[cause_termination]' WHERE mc_id='$_GET[mc_id]' AND patient_id='$patient_id'") or die("Cannot query 1199 ".mysql_error());
 					
 					if($close_record):
-					//redirect to the first visit page for the 
-				
-					header("location: ".$_SERVER["PHP_SELF"]."?page=".$get_vars["page"]."&menu_id=".$get_vars["menu_id"]."&consult_id=".$get_vars["consult_id"]."&ptmenu=DETAILS&module=mc&mc=VISIT1&mc_id=".$get_vars["mc_id"]);
+						header("location: ".$_SERVER["PHP_SELF"]."?page=".$get_vars["page"]."&menu_id=".$get_vars["menu_id"]."&consult_id=".$get_vars["consult_id"]."&ptmenu=DETAILS&module=mc&mc=VISIT1&mc_id=".$get_vars["mc_id"]);
 					echo "</script>";
 
 					
@@ -2414,6 +2417,8 @@ class mc extends module {
             //print_r($arg_list);
         }
         $patient_id = healthcenter::get_patient_id($get_vars["consult_id"]);
+	$arr_cause = array('SPON'=>'Spontaneous Abortion / Miscarriage','IND'=>'Induced Abortion', 'UNK'=>'Unknown');
+
         $sql = "select mc_id, patient_id, consult_id, date_format(mc_timestamp, '%a %d %b %Y, %h:%i%p') mc_timestamp, ".
                "patient_lmp, patient_edc, trimester1_date, trimester2_date, round((to_days(mc_consult_date)-to_days(patient_lmp))/7,0) patient_aog, ".
                "MOD((to_days(mc_consult_date)-to_days(patient_lmp)),7) remainder, ".
@@ -2421,14 +2426,15 @@ class mc extends module {
                "to_days(trimester2_date) days_trim2, to_days(trimester3_date) days_trim3, ".
                "to_days(postpartum_date) days_pp, to_days(mc_consult_date) days_today, obscore_gp, obscore_fpal, user_id, ".
                "blood_type, patient_age, patient_height, delivery_date, ".
-               "outcome_id, birthweight, end_pregnancy_flag,pregnancy_termination_cause ".
+               "outcome_id, birthweight, end_pregnancy_flag,pregnancy_termination_cause,date_terminated_abortion,termination_code ".
                "from m_patient_mc where patient_id = '$patient_id' and mc_id = '".$get_vars["mc_id"]."'";
+
         if ($result = mysql_query($sql)) {
             if (mysql_num_rows($result)) {
                 $mc = mysql_fetch_array($result);
                 if ($get_vars["mc_id"]==$mc["mc_id"]) {
-                    print "<form method='post' action='".$_SERVER["PHP_SELF"]."?page=".$get_vars["page"]."&menu_id=".$get_vars["menu_id"]."&consult_id=".$get_vars["consult_id"]."&ptmenu=DETAILS&module=mc&mc=".$get_vars["mc"]."&mc_id=".$get_vars["mc_id"]."#visit1form'>";
-                    print "<table width='300' style='border: 1px dotted black'><tr><td>";
+                    print "<form method='post' action='".$_SERVER["PHP_SELF"]."?page=".$get_vars["page"]."&menu_id=".$get_vars["menu_id"]."&consult_id=".$get_vars["consult_id"]."&ptmenu=DETAILS&module=mc&mc=".$get_vars["mc"]."&mc_id=".$get_vars["mc_id"]."#visit1form' name='display_reg_detail'>";
+                    print "<table width='350' style='border: 1px dotted black'><tr><td>";
                     print "<span class='tinylight'>";
                     print "REGISTRY ID: <font color='red'>".module::pad_zero($mc["mc_id"], 7)."</font><br/>";
                     print "PATIENT NAME: ".patient::get_name($patient_id)."<br/>";
@@ -2450,8 +2456,8 @@ class mc extends module {
                     list($aog_wks, $aog_days) = mc::get_aog($mc["mc_id"], (mc::get_delivery_date($mc["mc_id"])=="0000-00-00"?healthcenter::get_consult_date($get_vars["consult_id"]):mc::get_delivery_date($mc["mc_id"])));
                     print "AOG: ".$aog_wks." WKS ".$aog_days." DAYS<br/>";
                     print "</span>";
-                    print "</td><td>";
-                    // column 2
+                    print "</td><td>";  
+                    // column 2 
                     print "<span class='tinylight'>";
                     print "&nbsp;BLOOD TYPE: ".($mc["blood_type"]=="AB"?"<font color='red'><b>".$mc["blood_type"]."</b></font>":$mc["blood_type"])."<br/>";
                     print "&nbsp;HEIGHT (cm): ".(!mc::is_normal_height($mc["patient_height"])?"<font color='red'><b>".$mc["patient_height"]."</b></font>":$mc["patient_height"])."<br/>";
@@ -2505,9 +2511,12 @@ class mc extends module {
 
 		    if(!empty($mc["pregnancy_termination_cause"]) && $mc[end_pregnancy_flag]=='Y'):
 			echo "<hr size='1'>";
-			echo "CAUSE OF TERMINATION: ";
+			echo "DETAILS OF TERMINATION: ";
 			echo $mc["pregnancy_termination_cause"]."<br/>";
-			
+			echo "CAUSE OF TERMINATION: ";
+			echo (empty($mc["termination_code"]))?' ':$arr_cause[$mc["termination_code"]].'</br>';
+			echo "DATE OF PREGNANCY TERMINATION: ";
+			echo $mc["date_terminated_abortion"];
 			echo "</hr>";
 		    endif;
 
@@ -4424,8 +4433,6 @@ class mc extends module {
 			$arg_list = func_get_args();
 			$mc_id = $arg_list[0];
 			$patient_id = $arg_list[1];
-			
-			//echo $mc_id.' / '.$patient_id;	
 		
 			$q_update_mc_post = mysql_query("UPDATE m_patient_mc SET delivery_date='',delivery_type='',delivery_location='',obscore_gp='',obscore_fpal='',outcome_id='',birthweight='',birthmode='',child_patient_id='',breastfeeding_asap='',date_breastfed='',postpartum_remarks='',healthy_baby='' WHERE mc_id='$mc_id' AND patient_id='$patient_id'") or die("Cannot query 4279 ".mysql_error());
 
@@ -4442,8 +4449,30 @@ class mc extends module {
 	}
 
 	function display_terminate_cause(){
+
+		$arr_cause = array('SPON'=>'Spontaneous Abortion / Miscarriage','IND'=>'Induced Abortion', 'UNK'=>'Unknown');
+
 		echo "<table>";
-		echo "<tr><td class='tinylight'><b>CAUSE OF PREGNANCY TERMINATION</b><br>";
+		
+		echo "<tr><td class='tinylight'><b>DATE OF PREGNANCY TERMINATION</b>";
+		echo "<input type='textbox' name='txt_date_termination' size='9' value='".date('m/d/Y')."'></input>&nbsp;";
+
+		echo "<a href=\"javascript:show_calendar4('document.display_reg_detail.txt_date_termination', document.display_reg_detail.txt_date_termination.value);\"><img src='../images/cal.gif' width='16' height='16' border='0' alt='Click Here to Pick up the date'></a>";
+		echo "</td></tr><br>";
+
+		echo "<tr><td class='tinylight'><b>CAUSE OF TERMINATION</b>";
+		echo "<select name='sel_cause_term' value='1' class='textbox'>";
+		echo "<option value=''>---Select Cause of Termination---</option>";
+		foreach($arr_cause as $key=>$value){
+			echo "<option value='$key'>$value</option>";
+		}
+		echo "</select>";
+		echo "</select>";
+		echo "</td></tr>";
+
+		echo "</tr>";
+
+		echo "<tr><td class='tinylight'><b>DETAILS OF PREGNANCY TERMINATION</b><br>";
 		echo "NOTE: Please describe the exact cause of the termination (i.e. abortion due to diabetis).";
 		echo "</td></tr>";
 
