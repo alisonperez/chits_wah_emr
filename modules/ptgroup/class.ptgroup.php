@@ -192,7 +192,7 @@ class ptgroup extends module {
             $age = $arg_list[0];
             $gender = $arg_list[1];
         }     
-	echo $age.'<br>';
+	
         $sql = "select ptgroup_id, ptgroup_name, ptgroup_condition ".
                "from m_lib_ptgroup order by ptgroup_name";
 
