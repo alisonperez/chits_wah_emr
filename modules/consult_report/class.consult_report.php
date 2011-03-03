@@ -13,8 +13,11 @@ class consult_report extends module {
         $this->module = "consult_report";
         $this->description = "CHITS Module - Consult Report";
 
+	//darth_ali notes:
 	//0.3 added printer-friendly PDF versions
 	//0.4 added maternal care and child care PDF files
+	//0.5 adjusted the columns to expand treatment 
+
     }
 
     // --------------- STANDARD MODULE FUNCTIONS ------------------

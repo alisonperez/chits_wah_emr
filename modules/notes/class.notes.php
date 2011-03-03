@@ -1018,6 +1018,8 @@ class notes extends module {
         if ($result = mysql_query($sql)) {
             if (mysql_num_rows($result)) {
                 list($plan) = mysql_fetch_array($result);
+		$plan = str_replace("\n",",",$plan);
+
                 return $plan;
             }
         }
