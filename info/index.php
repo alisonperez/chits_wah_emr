@@ -73,7 +73,7 @@ include "../modules/_modules.php";
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=<?=$HTTP_SESSION_VARS["myencoding"]?>">
-<title>a<?=strtoupper($_SESSION["datanode"]["name"])?> Info Desktop</title>
+<title><?=strtoupper($_SESSION["datanode"]["name"])?> Info Desktop</title>
 <style type="text/css">
 <!--
 td { font-size: 10pt; font-family: verdana, sans-serif }
