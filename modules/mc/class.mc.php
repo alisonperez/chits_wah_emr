@@ -2331,10 +2331,13 @@ class mc extends module {
         }
         print "<b>".FTITLE_PRENATAL_RECORDS."</b><br/>";
         $patient_id = healthcenter::get_patient_id($get_vars["consult_id"]);
-        $sql = "select mc_id, patient_id, consult_id, date_format(prenatal_date, '%a %d %b %Y, %h:%i%p') prenatal_date, ".
-               "round(aog_weeks,2), trimester, visit_sequence ".
-               "from m_consult_mc_prenatal where patient_id = '$patient_id' and mc_id = '".$get_vars["mc_id"]."'";
-        if ($result = mysql_query($sql)) {
+        $sql = "select mc_id, patient_id, consult_id, date_format(prenatal_date, '%a %d %b %Y, %h:%i%p') new_prenatal_date, ".
+               "round(aog_weeks,2), trimester, visit_sequence,prenatal_date ".
+               "from m_consult_mc_prenatal where patient_id = '$patient_id' and mc_id = '".$get_vars["mc_id"]."' ORDER by prenatal_date ASC ";
+
+        $result = mysql_query($sql) or die("Cannot query 2337 ".mysql_error());
+
+        if ($result) {
             if (mysql_num_rows($result)) {
 		$visit_counter = 1;
                 while ($mc = mysql_fetch_array($result)) {
@@ -2344,7 +2347,7 @@ class mc extends module {
                     }
                     //print "VISIT ".$mc["visit_sequence"]." ";
 		    print "VISIT ".$visit_counter." ";
-                    print "<a href='".$_SERVER["PHP_SELF"]."?page=".$get_vars["page"]."&menu_id=".$get_vars["menu_id"]."&consult_id=".$get_vars["consult_id"]."&ptmenu=DETAILS&module=mc&mc=PREN&mc_id=".$mc["mc_id"]."&visitseq=".$mc["visit_sequence"]."#prenatal_detail'>".$mc["prenatal_date"]."</a><br/>";
+                    print "<a href='".$_SERVER["PHP_SELF"]."?page=".$get_vars["page"]."&menu_id=".$get_vars["menu_id"]."&consult_id=".$get_vars["consult_id"]."&ptmenu=DETAILS&module=mc&mc=PREN&mc_id=".$mc["mc_id"]."&visitseq=".$mc["visit_sequence"]."#prenatal_detail'>".$mc["new_prenatal_date"]."</a><br/>";
                     print "</span>";
                     $prev_trim = $mc["trimester"];
                     if ($get_vars["visitseq"]==$mc["visit_sequence"]) {

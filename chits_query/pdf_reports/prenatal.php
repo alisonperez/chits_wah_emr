@@ -199,10 +199,10 @@ function show_records()
 					$first.= $d."\n";
 					break;
 				case 2:
-					$second = $d."\n";
+					$second.= $d."\n";
 					break;
 				case 3:
-					$third = $d."\n";
+					$third.= $d."\n";
 					break;
 				default:			
 			}
