@@ -49,7 +49,7 @@ class alert extends module{
 		module::set_detail($this->description,$this->version,$this->author,$this->module);
 	
 	}
-	
+
 	function init_sql(){
 		
 		//create m_lib_alert_table. this table will contain user-defined alerts and reminders
@@ -112,11 +112,9 @@ class alert extends module{
 		$q_indicator = mysql_query("SELECT alert_indicator_id,main_indicator,sub_indicator FROM m_lib_alert_indicators WHERE main_indicator='$main_indicator' ORDER by sub_indicator ASC") or die("Cannot query: 94 ".mysql_error());
 		
 		echo "<form name='form_alert_lib' method='POST' action='$_SERVER[PHP_SELF]?page=$_GET[page]&menu_id=$_GET[menu_id]#alert'>";
-		
-		
+
 		echo "<input type='hidden' name='confirm_delete' value='0'>";
 
-		
 		echo "<a name='alert'></a>";
 		
 		echo "<table border='1'>";
@@ -278,7 +276,9 @@ class alert extends module{
 		echo "<table bgcolor='#FFCCFF' id='alert_table'>";
 		echo "<tr class='alert_table_header'><td colspan='".(count($this->mods)+1)."'>REMINDER and ALERT MONITORING WINDOW</td></tr>";
 		echo "<tr>";
-		echo "<td colspan='".(count($this->mods)+1)."' class='alert_table_row'>Year ";
+		echo "<td colspan='".(count($this->mods)+1)."' class='alert_table_row'>";
+		echo $this->show_barangay();
+		echo "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Year";
 		echo $this->show_current_yr();
 		echo "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Week ";
 		echo $this->show_current_wk();
@@ -417,6 +417,19 @@ class alert extends module{
 		echo "</select>";
 	}
 
+	function show_barangay(){
+		echo "Select Barangay ";
+		$q_brgy = mysql_query("SELECT barangay_id, barangay_name FROM m_lib_barangay ORDER by barangay_name ASC") or die("Cannot query 422".mysql_error());
+
+		if(mysql_num_rows($q_brgy)!=0):
+			while($r_brgy = mysql_fetch_array($q_brgy)){
+				echo "<option type=''></option>";
+
+			}
+		endif;
+
+	}
+
 	function show_categories(){
 		foreach($this->mods as $key=>$value){
 			echo "<td>$value[0]</td>";
@@ -433,7 +446,7 @@ class alert extends module{
 		//	print_r($r_brgy_hh).'<br>';
 		//}
 
-		$q_brgy = mysql_query("SELECT a.barangay_id,a.barangay_name FROM m_lib_barangay a ORDER by a.barangay_name ASC") or die("Cannot query 435 ".mysql_query());
+		$q_brgy = mysql_query("SELECT a.barangay_id,a.barangay_name FROM m_lib_barangay a ORDER by a.barangay_name ASC ") or die("Cannot query 435 ".mysql_query());
 		
 		while($r_brgy = mysql_fetch_array($q_brgy)){
 			echo "<tr><td>".$r_brgy["barangay_name"]."</td>";
@@ -450,37 +463,34 @@ class alert extends module{
 			while(list($fam_id) = mysql_fetch_array($q_hh)){
 				$arr_prog = array();
 				$arr_res_alert = array();
-				
-				
+				$pxid = $px_lastname = '';
 
 				$q_lastname = mysql_query("SELECT a.patient_id,a.patient_lastname FROM m_patient a,m_family_members b WHERE a.patient_id=b.patient_id AND b.family_id='$fam_id' AND b.family_role='head'") or die("Cannot query 449 ".mysql_error());
 
 				if(mysql_num_rows($q_lastname)!=0):
 					list($pxid,$px_lastname) = mysql_fetch_array($q_lastname);
 				else:
-					$q_lastname = mysql_query("SELECT a.patient_id,a.patient_lastname FROM m_patient a,m_family_members b WHERE a.patient_id=b.patient_id AND b.family_id='$fam_id' ORDER by a.patient_lastname ASC LIMIT 1") or die("Cannot query 449 ".mysql_error());		
-					
+					$q_lastname = mysql_query("SELECT a.patient_id,a.patient_lastname FROM m_patient a,m_family_members b WHERE a.patient_id=b.patient_id AND b.family_id='$fam_id' ORDER by a.patient_lastname ASC LIMIT 1") or die("Cannot query 449 ".mysql_error());
+
 					list($pxid,$px_lastname) = mysql_fetch_array($q_lastname);
 				endif;
 
+				if(!empty($pxid)):
+				
 				echo "<tr bgcolor='#FFFFFF'>";
 
 				if(count($this->determine_alert_hh($fam_id))!=0):
-					echo "<td>&nbsp;&nbsp;&nbsp;&nbsp;$px_lastname</td>";
-			
 				
+					echo "<td>&nbsp;&nbsp;&nbsp;&nbsp;$px_lastname </td>";
+
 				foreach($this->mods as $program_id=>$program_arr){
 					$arr_prog = $this->get_indicator_instance($program_id,$fam_id);	
 			
 					echo "<td align='center'>";
 					if(!empty($arr_prog)): 
-
 						$image = $this->images[$program_id];
 						$ser_arr = serialize($arr_prog);
-						
 						//print_r($arr_prog);
-
-
 						echo "<a href='../site/show_hh.php?id=$ser_arr&famid=$fam_id' target='_blank'>";
 						echo "<img src='../images/$image' width='30' height='30' alt='$program_id' onclick=\"window.open('$_SERVER[PHP_SELF]/site/show_hh.php?id=$ser_arr&famid=$fam_id')\"></img>";
 						echo "</a>";
@@ -494,8 +504,8 @@ class alert extends module{
 				} 
 				
 				endif;
-	
-				echo "</tr>";
+
+				endif;
 			}
 		}
 
