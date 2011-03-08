@@ -272,7 +272,8 @@ class alert extends module{
 	function _alert(){
 		//echo "this is the container for the alert and reminder master list";
 		
-		echo "<form action='$_SERVER[PHP_SELF]?page=$_GET[page]&menu_id=$_GET[menu_id]'>";
+		echo "<form action='$_SERVER[PHP_SELF]?page=$_GET[page]&menu_id=$_GET[menu_id]#reminder' method='POST'>";
+		echo "<a name='reminder'></a>";
 		echo "<table bgcolor='#FFCCFF' id='alert_table'>";
 		echo "<tr class='alert_table_header'><td colspan='".(count($this->mods)+1)."'>REMINDER and ALERT MONITORING WINDOW</td></tr>";
 		echo "<tr>";
@@ -417,15 +418,23 @@ class alert extends module{
 		echo "</select>";
 	}
 
-	function show_barangay(){
-		echo "Select Barangay ";
+	function show_barangay(){		
+		echo "Barangay ";
 		$q_brgy = mysql_query("SELECT barangay_id, barangay_name FROM m_lib_barangay ORDER by barangay_name ASC") or die("Cannot query 422".mysql_error());
 
 		if(mysql_num_rows($q_brgy)!=0):
+			echo "<select size='1' name='sel_brgy'>";
+			echo "<option value='-'>Select Barangay</option>";
 			while($r_brgy = mysql_fetch_array($q_brgy)){
-				echo "<option type=''></option>";
+				if($_POST["sel_brgy"]==$r_brgy["barangay_id"]):
+					echo "<option value='$r_brgy[barangay_id]' SELECTED>$r_brgy[barangay_name]</option>";
+				else:
+					echo "<option value='$r_brgy[barangay_id]'>$r_brgy[barangay_name]</option>";
+				endif;
 
 			}
+			echo "</select>&nbsp;";
+			echo "<input type='submit' name='submit_brgy' value='GO'></input>";
 		endif;
 
 	}
@@ -437,6 +446,7 @@ class alert extends module{
 	}
 
 	function show_brgy_hh(){
+
 		//$q_brgy_hh = mysql_query("SELECT a.barangay_id,a.barangay_name,b.family_id,b.patient_id,c.address,d.patient_lastname FROM m_lib_barangay a, m_family_members b, m_family_address c, m_patient d WHERE a.barangay_id=c.barangay_id AND b.family_id=c.family_id AND b.patient_id=d.patient_id GROUP BY a.barangay_name ORDER by a.barangay_name ASC, d.patient_lastname ASC") or die("Cannot query: 426 ".mysql_error()); //select barangay id, household's, houhsehold name
 
 		//$q_brgy_hh = mysql_query("SELECT a.barangay_id,a.barangay_name,b.family_id,b.patient_id,c.address,d.patient_lastname FROM m_lib_barangay a, m_family_members b, m_family_address c, m_patient d WHERE a.barangay_id=c.barangay_id AND b.family_id=c.family_id AND b.patient_id=d.patient_id ORDER by a.barangay_name ASC, d.patient_lastname ASC") or die("Cannot query: 426 ".mysql_error()); //select barangay id, household's, houhsehold name
@@ -446,7 +456,7 @@ class alert extends module{
 		//	print_r($r_brgy_hh).'<br>';
 		//}
 
-		$q_brgy = mysql_query("SELECT a.barangay_id,a.barangay_name FROM m_lib_barangay a ORDER by a.barangay_name ASC ") or die("Cannot query 435 ".mysql_query());
+		$q_brgy = mysql_query("SELECT a.barangay_id,a.barangay_name FROM m_lib_barangay a WHERE a.barangay_id='$_POST[sel_brgy]'") or die("Cannot query 460 ".mysql_query());
 		
 		while($r_brgy = mysql_fetch_array($q_brgy)){
 			echo "<tr><td>".$r_brgy["barangay_name"]."</td>";
