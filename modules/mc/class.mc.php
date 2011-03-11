@@ -830,17 +830,6 @@ class mc extends module {
                 break;
             case "Save Data":
                 if ($post_vars["lmp_date"] && $post_vars["obscore_gp"] && $post_vars["obscore_fpal"] && $post_vars["patient_height"]) {
-                    /*$sql = "insert into m_patient_mc (patient_id, consult_id, ".
-                           "mc_timestamp, mc_consult_date, patient_lmp, patient_edc, ".
-                           "trimester1_date, trimester2_date, trimester3_date, postpartum_date, ".
-                           "obscore_gp, obscore_fpal, ".
-                           "user_id, blood_type, patient_age, patient_height, flag_private) ".
-                           "values ('$patient_id', '".$get_vars["consult_id"]."', ".
-                           "sysdate(), sysdate(), '$lmp_date', from_days(to_days('$lmp_date')+280), ".
-                           "from_days(to_days('$lmp_date')+93.3), from_days(to_days('$lmp_date')+186.67), from_days(to_days('$lmp_date')+280), from_days(to_days('$lmp_date')+322), ".
-                           "'".$post_vars["obscore_gp"]."', '".$post_vars["obscore_fpal"]."', '".$_SESSION["userid"]."', ".
-                           "'".$post_vars["bloodtype"]."', '$patient_age', ".
-                           "'".$post_vars["patient_height"].",'$post_vars[check_private].)"; */
 
 		$sql = "INSERT INTO m_patient_mc SET patient_id='$patient_id',consult_id='$get_vars[consult_id]',mc_timestamp=sysdate(),mc_consult_date=sysdate(),patient_lmp='$lmp_date',patient_edc=from_days(to_days('$lmp_date')+280),trimester1_date=from_days(to_days('$lmp_date')+93.3),trimester2_date=from_days(to_days('$lmp_date')+186.67),trimester3_date=from_days(to_days('$lmp_date')+280),postpartum_date=from_days(to_days('$lmp_date')+322),obscore_gp='$post_vars[obscore_gp]',obscore_fpal='$post_vars[obscore_fpal]',user_id='$_SESSION[userid]',blood_type='$post_vars[bloodtype]',patient_age='$patient_age',patient_height='$post_vars[patient_height]'";
 
