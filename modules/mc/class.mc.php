@@ -1732,7 +1732,7 @@ class mc extends module {
             print "<tr valign='top'><td>";
             print "<span class='boxtitle'>".LBL_PRENATAL_VISIT_SEQUENCE."<br>";
 
-	    print "THIS IS YOUR PRENATAL VISIT: ".$visit_sequence."</span>";
+	    print "THIS IS YOUR PRENATAL VISIT:  ".$visit_sequence."</span>";
 
 	     //print "<input type='text' size='5' maxlength='5' class='textbox' name='visit_sequence' value='$visit_sequence' style='border: 1px solid #000000' readonly> ";
 
