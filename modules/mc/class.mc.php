@@ -1239,7 +1239,16 @@ class mc extends module {
 
 				
 			break;
-			
+		
+		case 'Open Pregnancy Record':
+			echo "<script>";
+			echo "window.alert('Opening this pregnancy record will allow you to edit its existing contents.')";
+			echo "</script>";
+
+
+			$update_mc = mysql_query("UPDATE m_patient_mc SET end_pregnancy_flag='N' WHERE mc_id='$_GET[mc_id]'") or die("Cannot query 1249: ".mysql_error());
+			break;
+
 		default:
 
 			break;
@@ -1638,12 +1647,20 @@ class mc extends module {
             //print_r($arg_list);
 
         }
-        if ($post_vars["prenatal_id"] && $post_vars["submitmc"] && $post_vars["visit_sequence"]) {
-            $sql = "select mc_id, patient_id, consult_id, patient_weight, prenatal_date, ".
+        //if ($post_vars["prenatal_id"] && $post_vars["submitmc"] && $post_vars["visit_sequence"]) {
+	if ($post_vars["prenatal_id"] && $post_vars["submitmc"]) {
+            /*$sql = "select mc_id, patient_id, consult_id, patient_weight, prenatal_date, ".
                    "blood_pressure_systolic, blood_pressure_diastolic, fundic_height, ".
                    "presentation, fhr, fhr_location, trimester, visit_sequence, data_type, flag_private ".
                    "from m_consult_mc_prenatal ".
                    "where mc_id = '".$post_vars["prenatal_id"]."' and visit_sequence = '".$post_vars["visit_sequence"]."'";
+	    */ 
+
+	    $sql = "select mc_id, patient_id, consult_id, patient_weight, prenatal_date, ".
+                   "blood_pressure_systolic, blood_pressure_diastolic, fundic_height, ".
+                   "presentation, fhr, fhr_location, trimester, visit_sequence, data_type, flag_private ".
+                   "from m_consult_mc_prenatal ".
+                   "where mc_id = '".$post_vars["prenatal_id"]."'";
 
             if ($result = mysql_query($sql)) {
                 if (mysql_num_rows($result)) {
@@ -1661,22 +1678,24 @@ class mc extends module {
         if ($mc_id) {
             // edit prenatal data
             if ($post_vars["prenatal_id"]) {
-                list($aog_weeks,$aog_days) = mc::get_aog($mc_id, healthcenter::get_consult_date($mc["consult_id"]));
+                list($aog_weeks,$aog_days) = mc::get_aog($_GET["mc_id"], healthcenter::get_consult_date($mc["consult_id"]));
                 $aog = ($aog_weeks + ($aog_days/7));
                 $trimester = $mc["trimester"];
                 //$visit_sequence = $mc["visit_sequence"];
-				$visit_sequence = $post_vars["visit_sequence"];
+		$visit_sequence = $post_vars["visit_sequence"];
             } else {
                 // new prenatal data headers
-		$sql_count = mysql_query("SELECT count(mc_id) FROM m_consult_mc_prenatal WHERE mc_id='$mc_id'") or die("cannot query: 1236");
-		$prenatal_seq = mysql_fetch_array($sql_count);		
+		$sql_count = mysql_query("SELECT count(mc_id) FROM m_consult_mc_prenatal WHERE mc_id='$_GET[mc_id]'") or die("cannot query: 1236");
+
+		$prenatal_seq = mysql_fetch_array($sql_count);
+
 		$seq = $prenatal_seq[0] + 1;
 
                 list($aog_weeks,$aog_days) = mc::get_aog($mc_id, $get_vars["consult_id"]);
                 $aog = ($aog_weeks + ($aog_days/7));
                 $trimester = mc::get_trimester($mc_id, healthcenter::get_consult_date($get_vars["consult_id"]));
                 //$visit_sequence = mc::get_visit_sequence($mc_id, $get_vars["consult_id"]);
-				$visit_sequence = $seq;
+		$visit_sequence = $seq;
             }
             print "<a name='prenatal'>";
             print "<table width='300'>";
@@ -1691,10 +1710,9 @@ class mc extends module {
             print "</td></tr>";
             print "<tr valign='top'><td>";
             print "<a name='prevtx'>";
-            //print "<span class='boxtitle'>".LBL_IMPORT_EXTERNAL_DATA."?</span><br> ";
-            //print "<input type='checkbox' name='data_import_flag' onchange='this.form.submit();' ".(($mc["data_type"]?$mc["data_type"]=="EXT":$post_vars["data_import_flag"])?"checked":"")." value='1'/> Check if external HBMR<br />";
+
             print "</td></tr>";
-            //if ($mc["data_type"]=="EXT" || $post_vars["data_import_flag"]) {
+
                 if ($mc["prenatal_date"]) {
                     list($date, $time) = explode(" ", $mc["prenatal_date"]);
                     list($year, $month, $day) = explode("-", $date);
@@ -1706,28 +1724,20 @@ class mc extends module {
                 print "<a href=\"javascript:show_calendar4('document.form_mc_prenatal.visit_date', document.form_mc_prenatal.visit_date.value);\"><img src='../images/cal.gif' width='16' height='16' border='0' alt='Click Here to Pick up the date'></a><br>";
                 print "<small>Click on the calendar icon to select date. Otherwise use MM/DD/YYYY format.</small><br>";
                 print "</td></tr>";
-            //}
+
             print "<tr valign='top'><td>";
             print "<table bgcolor='#FFCCFF' width='300' cellpadding='3'>";
             //if ($post_vars["data_import_flag"]) {
-                print "<tr valign='top'><td>";
-                print "<span class='boxtitle'>".LBL_PRENATAL_VISIT_SEQUENCE."</span><br>";
-            //  print "<input type='text' size='5' maxlength='5' class='textbox' name='visit_sequence' value='".($mc["visit_sequence"]?$mc["visit_sequence"]:$post_vars["visit_sequence"])."' style='border: 1px solid #000000'> ";
-		
-		print "<input type='text' size='5' maxlength='5' class='textbox' name='visit_sequence' value='$visit_sequence' style='border: 1px solid #000000' readonly> ";
-                print "</td></tr>";
-            //} else {
-            /*    print "<tr valign='top'><td>";
-                print "<span class='boxtitle'>REGISTRY INFORMATION</span><br/>";
-                print "<span class='tinylight'>";
-                print "REGISTRY ID: <font color='red'>".module::pad_zero($mc_id, 7)."</font><br/>";
-                print "AOG THIS VISIT: $aog_weeks WKS $aog_days DAYS<br/>";
-                print "PATIENT TRIMESTER: $trimester<br/>";
-                print "VISIT SEQUENCE: $visit_sequence<br/>";
-                print "</span>";
-                print "</td></tr>";
-   	    */
-            //}
+
+            print "<tr valign='top'><td>";
+            print "<span class='boxtitle'>".LBL_PRENATAL_VISIT_SEQUENCE."<br>";
+
+	    print "THIS IS YOUR PRENATAL VISIT: ".$visit_sequence."</span>";
+
+	     //print "<input type='text' size='5' maxlength='5' class='textbox' name='visit_sequence' value='$visit_sequence' style='border: 1px solid #000000' readonly> ";
+
+	     print "</td></tr>";
+
             print "<tr valign='top'><td>";
             if ($post_vars["prenatal_id"]) {
                 $systolic = $mc["blood_pressure_systolic"];
@@ -2501,8 +2511,14 @@ class mc extends module {
                         print "DELIVERY DATE: ".$mc["delivery_date"]."<br/>";
                         print "OUTCOME: ".mc::get_pregnancy_outcome($mc["outcome_id"])."<br/>";
                         print "BIRTH WT (KG): ".$mc["birthweight"]."<br/>";
-                        print "</td></tr></table>";
+                        print "</td></tr>";
+			echo "</table>";
                     }
+
+		    if($mc["end_pregnancy_flag"]=='Y'):
+		    	echo "<p align='center'><input type='submit' value='Open Pregnancy Record' name='submitmc' class='tinylight' style='border: 1px solid black'></input></p>";
+		    endif;
+
                     print "<br/>";
 
 		    if(!empty($mc["pregnancy_termination_cause"]) && $mc[end_pregnancy_flag]=='Y'):
@@ -2613,6 +2629,7 @@ class mc extends module {
 			$antigen = 'TT'.$highest_tt;
 
 			$q_diff = mysql_query("SELECT consult_id FROM m_consult_mc_vaccine WHERE patient_id='$pxid' AND vaccine_id='$antigen' AND (TO_DAYS('$pxedc')-TO_DAYS(actual_vaccine_date)) <= '$tt_duration[$highest_tt]'") or die("Cannot query: 2399");
+
 			
 			if(mysql_num_rows($q_diff)!=0):
 					$protected = 1;
