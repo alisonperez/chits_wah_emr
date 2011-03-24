@@ -1736,7 +1736,7 @@ class mc extends module {
 
 	     //print "<input type='text' size='5' maxlength='5' class='textbox' name='visit_sequence' value='$visit_sequence' style='border: 1px solid #000000' readonly> ";
 
-	     print "</td></tr>";
+	    print "</td></tr>";
 
             print "<tr valign='top'><td>";
             if ($post_vars["prenatal_id"]) {

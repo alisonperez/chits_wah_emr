@@ -445,7 +445,8 @@ class philhealth {
         }
         switch ($post_vars["submitcard"]) {
         case "Add Card":
-            if ($post_vars["philhealth_id"] && $post_vars["expiry_date"] && $post_vars["patient_id"]) {
+            //if ($post_vars["philhealth_id"] && $post_vars["expiry_date"] && $post_vars["patient_id"]) {
+	    if ($post_vars["philhealth_id"] && $post_vars["patient_id"]) {
                 list($month,$day,$year) = explode("/", $post_vars["expiry_date"]);
                 $expiry_date = $year."-".str_pad($month, 2, "0", STR_PAD_LEFT)."-".str_pad($day, 2, "0", STR_PAD_LEFT);
                 $sql = "insert into m_patient_philhealth (philhealth_id, healthcenter_id, patient_id, philhealth_timestamp, expiry_date) ".

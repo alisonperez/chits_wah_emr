@@ -359,9 +359,7 @@ function compute_indicator($crit){
 
 			break;
 			
-		case 2: //pregnant women given 2 doses of TT or TT2 plus protected women
-			//committed a long standing wrong assumption, but has been corrected
-			//report the same pregnant woman every month until EDC as long as she is protected by TT 
+		case 2: 
 			if(in_array('all',$_SESSION[brgy])):
 				$q_px_tt = mysql_query("SELECT patient_id,actual_vaccine_date FROM m_consult_mc_vaccine WHERE vaccine_id='TT1'") or die(mysql_error());
 			else:
@@ -370,17 +368,29 @@ function compute_indicator($crit){
 			
 
 			while(list($pxid,$vacc_date)=mysql_fetch_array($q_px_tt)){			
+				//condition 1: prenatal is the base date
 				//$q_t2 = mysql_query("SELECT a.patient_id,a.actual_vaccine_date FROM m_consult_mc_vaccine a,m_consult_mc_prenatal b WHERE a.vaccine_id='TT2' AND a.patient_id='$pxid' AND a.patient_id=b.patient_id AND b.prenatal_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' AND b.visit_sequence='1'") or die(mysql_error());
 				
-				$q_t2 = mysql_query("SELECT DISTINCT a.patient_id,a.actual_vaccine_date,c.patient_edc FROM m_consult_mc_vaccine a,m_consult_mc_prenatal b,m_patient_mc c WHERE a.vaccine_id='TT2' AND a.patient_id='$pxid' AND a.patient_id=c.patient_id AND (TO_DAYS(c.patient_edc)-TO_DAYS(a.actual_vaccine_date)) <= 1095 AND c.end_pregnancy_flag='N' AND c.delivery_date='0000-00-00' AND a.actual_vaccine_date <= '$_SESSION[edate2]'") or die(mysql_error());
+
+				//condition 2: pregnant women given 2 doses of TT or TT2 plus protected women
+				//committed a long standing wrong assumption, but has been corrected
+				//report the same pregnant woman every month until EDC as long as she is protected by TT
+ 
+				//$q_t2 = mysql_query("SELECT DISTINCT a.patient_id,a.actual_vaccine_date,c.patient_edc FROM m_consult_mc_vaccine a,m_consult_mc_prenatal b,m_patient_mc c WHERE a.vaccine_id='TT2' AND a.patient_id='$pxid' AND a.patient_id=c.patient_id AND (TO_DAYS(c.patient_edc)-TO_DAYS(a.actual_vaccine_date)) <= 1095 AND c.end_pregnancy_flag='N' AND c.delivery_date='0000-00-00' AND a.actual_vaccine_date <= '$_SESSION[edate2]'") or die(mysql_error());
+				
+				//condition 3: 1). patient is pregnant, 2). patient was injected with TT2 between the start and end date  3). distance between vaccine date and patient EDC is less than 1095 days
+				$q_t2 = mysql_query("SELECT a.patient_id,a.actual_vaccine_date,c.patient_edc FROM m_consult_mc_vaccine a,m_consult_mc_prenatal b,m_patient_mc c WHERE a.vaccine_id='TT2' AND a.patient_id='$pxid' AND a.patient_id=c.patient_id AND (TO_DAYS(c.patient_edc)-TO_DAYS(a.actual_vaccine_date)) <= 1095 AND c.end_pregnancy_flag='N' AND c.delivery_date='0000-00-00' AND a.actual_vaccine_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' ORDER by a.actual_vaccine_date DESC LIMIT 1") or die(mysql_error());
 
 				if(mysql_num_rows($q_t2)!=0):
 					while(list($pxid,$vacc_date,$edc)=mysql_fetch_array($q_t2)){
-						for($i=$_SESSION[smonth];$i<=$this->get_max_month($edc);$i++){
+						//condition 2 for statement
+						/*for($i=$_SESSION[smonth];$i<=$this->get_max_month($edc);$i++){ 
 							//echo $vacc_date.' '.$pxid.' '.$edc.'<br>';
 							//$month_stat[$this->get_max_month($vacc_date)]+=1;
 							$month_stat[$i]+=1;
-						}
+						}*/
+
+						$month_stat[$this->get_max_month($vacc_date)]+=1;
 					}
 				endif;
 			}
