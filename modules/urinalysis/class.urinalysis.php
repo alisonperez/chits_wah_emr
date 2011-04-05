@@ -17,8 +17,8 @@
       //$this->albumin = array('---','Negative','Positive','+','++','+++','++++');
       //$this->sugar = array('---','Negative','Positive','+','++','+++','++++');      
 
-      $this->albumin = array('(-) Trace','+','++','+++','++++');
-      $this->sugar = array('(-) Trace','+','++','+++','++++');
+      $this->albumin = array('Negative','Trace','+','++','+++','++++');
+      $this->sugar = array('Negative','Trace','+','++','+++','++++');
 
       $this->pregnancy = array('---','Negative','Positive','Doubtful');      
     }
