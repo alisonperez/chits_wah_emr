@@ -566,7 +566,7 @@ function compute_indicator($crit){
 				while(list($mcid,$pxid)=mysql_fetch_array($get_vita)){
 					$vit_total = 0;
 					$target_reach = 0;
-						$q_mc = mysql_query("SELECT a.service_qty, a.actual_service_date FROM m_consult_mc_services a,m_patient_mc b WHERE a.mc_id=b.mc_id AND a.mc_id='$mcid' AND a.service_id='VITA' AND a.actual_service_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' AND a.actual_service_date BETWEEN b.patient_edc AND b.postpartum_date ORDER by a.actual_service_date ASC") or die("Cannot query; 277");
+						$q_mc = mysql_query("SELECT a.service_qty, a.actual_service_date FROM m_consult_mc_services a,m_patient_mc b WHERE a.mc_id=b.mc_id AND a.mc_id='$mcid' AND a.service_id='VITA' AND a.actual_service_date BETWEEN b.delivery_date AND '$_SESSION[edate2]' AND (TO_DAYS(a.actual_service_date)-TO_DAYS(b.delivery_date))<=28 AND b.delivery_date!='0000-00-00' ORDER by a.actual_service_date ASC") or die("Cannot query; 277 ".mysql_error());
 
 					while(list($qty,$serv_date)=mysql_fetch_array($q_mc)){						
 						$vita_total+=$qty;
@@ -590,10 +590,10 @@ function compute_indicator($crit){
 			endif;
 
 			if(mysql_num_rows($get_post_bfeed)!=0):
-				while(list($mcid,$deldate)=mysql_fetch_array($get_post_bfeed)){
+				while(list($mcid,$deldate)=mysql_fetch_array($get_post_bfeed)){ //echo $deldate;
 					$month_stat[$this->get_max_month($deldate)]+=1;
 				}
-
+			
 			endif;
 
 			break;
