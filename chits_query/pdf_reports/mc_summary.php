@@ -379,7 +379,7 @@ function compute_indicator($crit){
 				//$q_t2 = mysql_query("SELECT DISTINCT a.patient_id,a.actual_vaccine_date,c.patient_edc FROM m_consult_mc_vaccine a,m_consult_mc_prenatal b,m_patient_mc c WHERE a.vaccine_id='TT2' AND a.patient_id='$pxid' AND a.patient_id=c.patient_id AND (TO_DAYS(c.patient_edc)-TO_DAYS(a.actual_vaccine_date)) <= 1095 AND c.end_pregnancy_flag='N' AND c.delivery_date='0000-00-00' AND a.actual_vaccine_date <= '$_SESSION[edate2]'") or die(mysql_error());
 				
 				//condition 3: 1). patient is pregnant, 2). patient was injected with TT2 between the start and end date  3). distance between vaccine date and patient EDC is less than 1095 days
-				$q_t2 = mysql_query("SELECT a.patient_id,a.actual_vaccine_date,c.patient_edc FROM m_consult_mc_vaccine a,m_consult_mc_prenatal b,m_patient_mc c WHERE a.vaccine_id='TT2' AND a.patient_id='$pxid' AND a.patient_id=c.patient_id AND (TO_DAYS(c.patient_edc)-TO_DAYS(a.actual_vaccine_date)) <= 1095 AND c.end_pregnancy_flag='N' AND c.delivery_date='0000-00-00' AND a.actual_vaccine_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' ORDER by a.actual_vaccine_date DESC LIMIT 1") or die(mysql_error());
+				$q_t2 = mysql_query("SELECT a.patient_id,a.actual_vaccine_date,c.patient_edc FROM m_consult_mc_vaccine a,m_consult_mc_prenatal b,m_patient_mc c WHERE a.vaccine_id='TT2' AND a.patient_id='$pxid' AND a.patient_id=c.patient_id AND (TO_DAYS(c.patient_edc)-TO_DAYS(a.actual_vaccine_date)) <= 1095 AND a.actual_vaccine_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' ORDER by a.actual_vaccine_date DESC LIMIT 1") or die(mysql_error());
 
 				if(mysql_num_rows($q_t2)!=0):
 					while(list($pxid,$vacc_date,$edc)=mysql_fetch_array($q_t2)){
@@ -401,11 +401,13 @@ function compute_indicator($crit){
 			$arr_tt = array(1=>0,2=>0,3=>0,4=>0,5=>0);
 			
 			$vacc = array('TT1','TT2','TT3','TT4','TT5');
+			
 
 			$tt_duration = array(1=>0,2=>1095,3=>1825,4=>3650,5=>10000); //number of days of effectiveness
 			$highest_tt = 0;
 			$protected = 0;
 			
+
 			if(in_array('all',$_SESSION[brgy])):
 				$get_px_tt = mysql_query("SELECT distinct patient_id, max(vaccine_id), actual_vaccine_date FROM m_consult_mc_vaccine WHERE vaccine_id IN ('TT1','TT2','TT3','TT4','TT5') GROUP by patient_id") or die(mysql_error());
 
@@ -413,7 +415,9 @@ function compute_indicator($crit){
 				$get_px_tt = mysql_query("SELECT distinct a.patient_id, max(a.vaccine_id), a.actual_vaccine_date FROM m_consult_mc_vaccine a, m_family_members b, m_family_address c WHERE a.vaccine_id IN ('TT1','TT2','TT3','TT4','TT5') AND a.patient_id=b.patient_id AND b.family_id=c.family_id AND c.barangay_id IN ($brgy_array) GROUP by a.patient_id") or die(mysql_error());
 			endif;
 			
+				
 			while(list($pxid,$vacc_id,$vacc_date)=mysql_fetch_array($get_px_tt)){ 
+			
 				//check if the patient is in the active maternal cases for the time span
 				//echo $pxid.'/'.$vacc_id.'/'.$vacc_date.'<br>';
 				
@@ -422,8 +426,12 @@ function compute_indicator($crit){
 				list($ttbuffer,$tt_num) = explode('TT',$vacc_id);
 
 				//$q_check_mc = mysql_query("SELECT a.mc_id,b.prenatal_date FROM m_patient_mc a,m_consult_mc_prenatal b WHERE a.patient_id='$pxid' AND a.mc_id=b.mc_id AND b.visit_sequence=1 AND b.prenatal_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' AND (TO_DAYS(a.patient_edc)-TO_DAYS('$vacc_date'))<='$tt_duration[$tt_num]'") or die("Cannot query : 297"); //killer SQL code
-				$q_check_mc = mysql_query("SELECT a.patient_id,a.actual_vaccine_date,c.patient_edc FROM m_consult_mc_vaccine a,m_consult_mc_prenatal b,m_patient_mc c WHERE a.vaccine_id='TT5' AND a.patient_id='$pxid' AND a.patient_id=c.patient_id AND (TO_DAYS(c.patient_edc)-TO_DAYS(a.actual_vaccine_date)) <= 10000 AND c.end_pregnancy_flag='N' AND c.delivery_date='0000-00-00' AND a.actual_vaccine_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' ORDER by a.actual_vaccine_date DESC LIMIT 1") or die(mysql_error());
 
+				//echo $ttbuffer.' '.$ttnum.' '.$vacc_id.' '.$pxid.' '.$vacc_date.'<br>'; 
+
+				if($this->check_all_antigen($pxid,$vacc)):
+			
+				$q_check_mc = mysql_query("SELECT a.patient_id,a.actual_vaccine_date,c.patient_edc FROM m_consult_mc_vaccine a,m_consult_mc_prenatal b,m_patient_mc c WHERE a.vaccine_id='TT5' AND a.patient_id='$pxid' AND a.patient_id=c.patient_id AND (TO_DAYS(c.patient_edc)-TO_DAYS(a.actual_vaccine_date)) <= 10000 AND a.actual_vaccine_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' ORDER by a.actual_vaccine_date DESC LIMIT 1") or die(mysql_error());
 
 
 				if(mysql_num_rows($q_check_mc)!=0):
@@ -431,11 +439,13 @@ function compute_indicator($crit){
 					$month_stat[$this->get_max_month($vdate)]+=1;
 				endif;
 
-				endif;				
+				endif;
+
+				endif;
 			}
 
-
-
+			
+			
 			break;
 
 		case 4:	//pregnant women who have taken 180 tablets of iron with folic acid throughout the prenancy duration
@@ -696,8 +706,6 @@ function get_brgy(){
                                                                           
     return $str_brgy;
 }
-                                                                                                                                                                                                        
-                                                                                                                                                                                                    
 
 function compute_mc_rate($target,$actual){
         if($target==0):
@@ -707,6 +715,26 @@ function compute_mc_rate($target,$actual){
         endif;
 }
 
+function check_all_antigen($pxid,$vacc){
+
+	$arr_vacc = array();
+
+	for($i=0;$i<count($vacc);$i++){
+		$q_vacc = mysql_query("SELECT vaccine_id FROM m_consult_mc_vaccine WHERE patient_id='$pxid' AND vaccine_id='$vacc[$i]'") or die("Cannot query 718 ".mysql_error());
+
+		if(mysql_num_rows($q_vacc)!=0):
+			list($vaccine_id) = mysql_fetch_array($q_vacc);
+			array_push($arr_vacc,$vaccine_id);
+		endif;
+	}
+
+	if(count($arr_vacc)==5):
+		return true;
+	else:
+		return false;
+	endif;
+
+}
 
 function Footer(){
     $this->SetY(-15);
