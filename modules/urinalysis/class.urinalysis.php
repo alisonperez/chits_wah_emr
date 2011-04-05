@@ -188,8 +188,8 @@
       echo "<tr><td valign='top'>";
       
       echo "<table>";
-      echo "<tr><td class='boxtitle'>RED BLOOD CELLS:</td><td class='tinylight'>$rbc</td></tr>";
       echo "<tr><td class='boxtitle'>PUS CELLS:</td><td class='tinylight'>$pus</td></tr>";
+      echo "<tr><td class='boxtitle'>RED BLOOD CELLS:</td><td class='tinylight'>$rbc</td></tr>";
       echo "<tr><td class='boxtitle'>EPHITHELIAL CELLS:</td><td class='tinylight'>$epithelial</td></tr>";      
       echo "<tr><td class='boxtitle'>AMORPHOUS URATES:</td><td class='tinylight'>$urates</td></tr>";            
       echo "<tr><td class='boxtitle'>CALCIUM OXALATES:</td><td class='tinylight'>$calcium</td></tr>";
@@ -404,8 +404,8 @@
       
       echo "<tr><td valign='top'>";
       echo "<table>";
-      echo "<tr><td class='boxtitle'>RED BLOOD CELLS</td><td><input type='text' name='txt_red' size='5' value='$rbc' class='tinylight'></input></td></tr>";
       echo "<tr><td class='boxtitle'>PUS CELLS</td><td><input type='text' name='txt_pus' size='5' value='$pus' class='tinylight'></input></td></tr>";
+      echo "<tr><td class='boxtitle'>RED BLOOD CELLS</td><td><input type='text' name='txt_red' size='5' value='$rbc' class='tinylight'></input></td></tr>";
       echo "<tr><td class='boxtitle'>EPHITHELIAL CELLS</td><td><input type='text' name='txt_epithelial' size='5' value='$epithelial' class='tinylight'></input></td></tr>";      
       echo "<tr><td class='boxtitle'>AMORPHOUS URATES</td><td><input type='text' name='txt_amorphous' size='5' value='$urates' class='tinylight'></input></td></tr>";            
       echo "<tr><td class='boxtitle'>CALCIUM OXELATES</td><td><input type='text' name='txt_calcium_oxelates' size='5' value='$calcium' class='tinylight'></input></td></tr>";
