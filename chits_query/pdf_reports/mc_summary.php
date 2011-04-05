@@ -413,18 +413,21 @@ function compute_indicator($crit){
 				$get_px_tt = mysql_query("SELECT distinct a.patient_id, max(a.vaccine_id), a.actual_vaccine_date FROM m_consult_mc_vaccine a, m_family_members b, m_family_address c WHERE a.vaccine_id IN ('TT1','TT2','TT3','TT4','TT5') AND a.patient_id=b.patient_id AND b.family_id=c.family_id AND c.barangay_id IN ($brgy_array) GROUP by a.patient_id") or die(mysql_error());
 			endif;
 			
-			while(list($pxid,$vacc_id,$vacc_date)=mysql_fetch_array($get_px_tt)){
+			while(list($pxid,$vacc_id,$vacc_date)=mysql_fetch_array($get_px_tt)){ 
 				//check if the patient is in the active maternal cases for the time span
 				//echo $pxid.'/'.$vacc_id.'/'.$vacc_date.'<br>';
 				
 				if($vacc_id!='TT1'):
 				
 				list($ttbuffer,$tt_num) = explode('TT',$vacc_id);
-			
-				$q_check_mc = mysql_query("SELECT a.mc_id,b.prenatal_date FROM m_patient_mc a,m_consult_mc_prenatal b WHERE a.patient_id='$pxid' AND a.mc_id=b.mc_id AND b.visit_sequence=1 AND b.prenatal_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' AND (TO_DAYS(a.patient_edc)-TO_DAYS('$vacc_date'))<='$tt_duration[$tt_num]'") or die("Cannot query : 297"); //killer SQL code 
+
+				//$q_check_mc = mysql_query("SELECT a.mc_id,b.prenatal_date FROM m_patient_mc a,m_consult_mc_prenatal b WHERE a.patient_id='$pxid' AND a.mc_id=b.mc_id AND b.visit_sequence=1 AND b.prenatal_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' AND (TO_DAYS(a.patient_edc)-TO_DAYS('$vacc_date'))<='$tt_duration[$tt_num]'") or die("Cannot query : 297"); //killer SQL code
+				$q_check_mc = mysql_query("SELECT a.patient_id,a.actual_vaccine_date,c.patient_edc FROM m_consult_mc_vaccine a,m_consult_mc_prenatal b,m_patient_mc c WHERE a.vaccine_id='TT5' AND a.patient_id='$pxid' AND a.patient_id=c.patient_id AND (TO_DAYS(c.patient_edc)-TO_DAYS(a.actual_vaccine_date)) <= 10000 AND c.end_pregnancy_flag='N' AND c.delivery_date='0000-00-00' AND a.actual_vaccine_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' ORDER by a.actual_vaccine_date DESC LIMIT 1") or die(mysql_error());
+
+
 
 				if(mysql_num_rows($q_check_mc)!=0):
-					list($mcid,$vdate) = mysql_fetch_array($q_check_mc);
+					list($mcid,$vdate,$px_edc) = mysql_fetch_array($q_check_mc);
 					$month_stat[$this->get_max_month($vdate)]+=1;
 				endif;
 
@@ -448,13 +451,13 @@ function compute_indicator($crit){
 					$iron_total = 0;
 					$target_reach = 0; //reset the flag target reach for every mc_id
 
-					$q_mc = mysql_query("SELECT a.service_qty, a.actual_service_date FROM m_consult_mc_services a,m_patient_mc b WHERE a.mc_id=b.mc_id AND a.mc_id='$mcid' AND a.service_id='IRON' AND a.actual_service_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' AND a.actual_service_date<=b.patient_edc ORDER by a.actual_service_date ASC") or die("Cannot query; 277");
+					$q_mc = mysql_query("SELECT a.service_qty, a.actual_service_date FROM m_consult_mc_services a,m_patient_mc b WHERE a.mc_id=b.mc_id AND a.mc_id='$mcid' AND a.service_id='IRON' AND a.actual_service_date BETWEEN b.patient_lmp AND '$_SESSION[edate2]' AND a.actual_service_date<=b.patient_edc ORDER by a.actual_service_date ASC") or die("Cannot query; 277");
 
 
 					while(list($qty,$serv_date)=mysql_fetch_array($q_mc)){
 						//echo $mcid.'/'.$qty.'/'.$serv_date.'<br>';
 						$iron_total+=$qty;
-						if($iron_total >= 180 && $target_reach==0):							
+						if($iron_total >= 180 && $target_reach==0):
 							$target_reach = 1;
 							list($taon,$buwan,$araw) = explode('-',$serv_date);
 							$max_date = date("n",mktime(0,0,0,$buwan,$araw,$taon)); //get the unix timestamp then return month without trailing 0
@@ -495,7 +498,7 @@ function compute_indicator($crit){
 			endif;
 
 			break;
-		case 6:
+		case 6:    //postpartum women given at with 2PPV
 			
 			if(in_array('all',$_SESSION[brgy])):
 				$q_post = mysql_query("SELECT a.mc_id,a.postpartum_date,b.delivery_date,a.patient_id FROM m_consult_mc_postpartum a, m_patient_mc b WHERE a.mc_id=b.mc_id AND (TO_DAYS(a.postpartum_date)-TO_DAYS(b.delivery_date))<=1") or die("Cannot query: 297"); // get mc_id of patients who visited 24 hours after giving birth			
@@ -522,9 +525,9 @@ function compute_indicator($crit){
 
 		case 7://postpartum mothers wih complete iron w/ folic acid intake
 			if(in_array('all',$_SESSION[brgy])):
-				$get_iron_mc = mysql_query("SELECT distinct mc_id,patient_id FROM m_consult_mc_services WHERE service_id='IRON' ORDER by mc_id ASC, actual_service_date ASC") or die("Cannot query: 316");
+				$get_iron_mc = mysql_query("SELECT distinct a.mc_id,a.patient_id FROM m_consult_mc_services a, m_patient_mc b WHERE a.service_id='IRON' AND b.postpartum_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' ORDER by a.mc_id ASC, a.actual_service_date ASC") or die("Cannot query: 525 ".mysql_error());
 			else:
-				$get_iron_mc = mysql_query("SELECT distinct a.mc_id,a.patient_id FROM m_consult_mc_services a,m_family_members b,m_family_address c WHERE a.service_id='IRON' AND a.patient_id=b.patient_id AND b.family_id=c.family_id AND c.barangay_id IN ($brgy_array) ORDER by a.mc_id ASC, a.actual_service_date ASC") or die("Cannot query: 316");
+				$get_iron_mc = mysql_query("SELECT distinct a.mc_id,a.patient_id FROM m_consult_mc_services a,m_family_members b,m_family_address c,m_patient_mc d WHERE a.service_id='IRON' AND a.patient_id=b.patient_id AND b.family_id=c.family_id AND c.barangay_id IN ($brgy_array) AND d.postpartum_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' ORDER by a.mc_id ASC, a.actual_service_date ASC") or die("Cannot query: 527".mysql_error());
 			endif;
 
 
@@ -553,9 +556,9 @@ function compute_indicator($crit){
 
 		case 8: // postpartum women given vitamin A supplementation
 			if(in_array('all',$_SESSION[brgy])):
-				$get_vita = mysql_query("SELECT distinct mc_id,patient_id FROM m_consult_mc_services WHERE service_id='VITA' ORDER by mc_id ASC, actual_service_date ASC") or die("Cannot query: 358");
+				$get_vita = mysql_query("SELECT distinct a.mc_id,a.patient_id FROM m_consult_mc_services a, m_patient_mc b WHERE a.service_id='VITA' AND b.postpartum_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' ORDER by a.mc_id ASC, a.actual_service_date ASC") or die("Cannot query: 358".mysql_error());
 			else:
-				$get_vita = mysql_query("SELECT distinct a.mc_id,a.patient_id FROM m_consult_mc_services a,m_family_members b,m_family_address c WHERE a.service_id='VITA' AND a.patient_id=b.patient_id AND b.family_id=c.family_id AND c.barangay_id IN ($brgy_array) ORDER by a.mc_id ASC, a.actual_service_date ASC") or die("Cannot query: 358");	
+				$get_vita = mysql_query("SELECT distinct a.mc_id,a.patient_id FROM m_consult_mc_services a,m_family_members b,m_family_address c,m_patient_mc d WHERE a.service_id='VITA' AND a.patient_id=b.patient_id AND b.family_id=c.family_id AND c.barangay_id IN ($brgy_array) AND d.postpartum_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' ORDER by a.mc_id ASC, a.actual_service_date ASC") or die("Cannot query: 558".mysql_error());
 			endif;
 
 			if(mysql_num_rows($get_vita)!=0):
@@ -580,9 +583,9 @@ function compute_indicator($crit){
 
 		case 9: //postpartum women initiated breadstfeeding after giving birth
 			if(in_array('all',$_SESSION[brgy])):
-				$get_post_bfeed = mysql_query("SELECT mc_id, delivery_date, patient_id FROM m_patient_mc WHERE breastfeeding_asap='Y' AND delivery_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' ORDER by delivery_date") or die("cannot query: 350");
+				$get_post_bfeed = mysql_query("SELECT mc_id, delivery_date, patient_id FROM m_patient_mc WHERE breastfeeding_asap='Y' AND delivery_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' AND delivery_date=date_breastfed ORDER by delivery_date") or die("cannot query: 350");
 			else:
-				$get_post_bfeed = mysql_query("SELECT a.mc_id, a.delivery_date, a.patient_id FROM m_patient_mc a,m_family_members b, m_family_address c WHERE a.breastfeeding_asap='Y' AND  a.patient_id=b.patient_id AND b.family_id=c.family_id AND c.barangay_id IN ($brgy_array) AND a.delivery_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' ORDER by a.delivery_date") or die(mysql_error());			
+				$get_post_bfeed = mysql_query("SELECT a.mc_id, a.delivery_date, a.patient_id FROM m_patient_mc a,m_family_members b, m_family_address c WHERE a.breastfeeding_asap='Y' AND  a.patient_id=b.patient_id AND b.family_id=c.family_id AND c.barangay_id IN ($brgy_array) AND a.delivery_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' AND a.delivery_date=a.date_breastfed ORDER by a.delivery_date") or die(mysql_error());			
 			endif;
 
 			if(mysql_num_rows($get_post_bfeed)!=0):

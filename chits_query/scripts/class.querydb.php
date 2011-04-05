@@ -640,10 +640,15 @@ class querydb{
 
 	function process_postpartum(){
 		if($_SESSION[brgy]=='all'):
-			$q_postpartum = mysql_query("SELECT a.postpartum_date, a.mc_id, a.patient_id,b.delivery_date,b.breastfeeding_asap,	b.date_breastfed FROM m_consult_mc_postpartum a, m_patient_mc b WHERE a.postpartum_date BETWEEN '$_SESSION[sdate]' and '$_SESSION[edate]' AND a.mc_id=b.mc_id AND a.visit_sequence='1' ORDER by b.delivery_date ASC") or die(mysql_error());
+			//$q_postpartum = mysql_query("SELECT a.postpartum_date, a.mc_id, a.patient_id,b.delivery_date,b.breastfeeding_asap,	b.date_breastfed FROM m_consult_mc_postpartum a, m_patient_mc b WHERE a.postpartum_date BETWEEN '$_SESSION[sdate]' and '$_SESSION[edate]' AND a.mc_id=b.mc_id AND a.visit_sequence='1' ORDER by b.delivery_date ASC") or die(mysql_error());
+
+			$q_postpartum = mysql_query("SELECT a.postpartum_date, a.mc_id, a.patient_id,b.delivery_date,b.breastfeeding_asap,b.date_breastfed FROM m_consult_mc_postpartum a, m_patient_mc b WHERE b.delivery_date BETWEEN '$_SESSION[sdate]' and '$_SESSION[edate]' AND a.mc_id=b.mc_id AND a.visit_sequence='1' ORDER by b.delivery_date ASC") or die(mysql_error());
 
 		else:		
-			$q_postpartum = mysql_query("SELECT a.postpartum_date, a.mc_id, a.patient_id,b.delivery_date,b.breastfeeding_asap,	b.date_breastfed FROM m_consult_mc_postpartum a, m_patient_mc b, m_family_members c,m_family_address d WHERE a.postpartum_date BETWEEN '$_SESSION[sdate]' and '$_SESSION[edate]' AND a.mc_id=b.mc_id AND a.visit_sequence='1' AND a.patient_id=c.patient_id AND c.family_id=d.family_id AND d.barangay_id='$_SESSION[brgy]' ORDER by b.delivery_date ASC") or die(mysql_error());
+			//$q_postpartum = mysql_query("SELECT a.postpartum_date, a.mc_id, a.patient_id,b.delivery_date,b.breastfeeding_asap,	b.date_breastfed FROM m_consult_mc_postpartum a, m_patient_mc b, m_family_members c,m_family_address d WHERE a.postpartum_date BETWEEN '$_SESSION[sdate]' and '$_SESSION[edate]' AND a.mc_id=b.mc_id AND a.visit_sequence='1' AND a.patient_id=c.patient_id AND c.family_id=d.family_id AND d.barangay_id='$_SESSION[brgy]' ORDER by b.delivery_date ASC") or die(mysql_error());
+
+			$q_postpartum = mysql_query("SELECT a.postpartum_date, a.mc_id, a.patient_id,b.delivery_date,b.breastfeeding_asap,	b.date_breastfed FROM m_consult_mc_postpartum a, m_patient_mc b, m_family_members c,m_family_address d WHERE b.delivery_date BETWEEN '$_SESSION[sdate]' and '$_SESSION[edate]' AND a.mc_id=b.mc_id AND a.visit_sequence='1' AND a.patient_id=c.patient_id AND c.family_id=d.family_id AND d.barangay_id='$_SESSION[brgy]' ORDER by b.delivery_date ASC") or die(mysql_error());
+
 
 		endif;
 		
