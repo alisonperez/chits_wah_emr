@@ -483,9 +483,9 @@ function compute_indicator($crit){
 				while(list($mcid,$pxid)=mysql_fetch_array($get_vita)){
 					$vit_total = 0;
 					$target_reach = 0;
-						$q_mc = mysql_query("SELECT a.service_qty, a.actual_service_date FROM m_consult_mc_services a,m_patient_mc b WHERE a.mc_id=b.mc_id AND a.mc_id='$mcid' AND a.service_id='VITA' AND a.actual_service_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' AND a.actual_service_date <= b.patient_edc ORDER by a.actual_service_date ASC") or die("Cannot query; 277");
+						$q_mc = mysql_query("SELECT a.service_qty, a.actual_service_date FROM m_consult_mc_services a,m_patient_mc b WHERE a.mc_id=b.mc_id AND a.mc_id='$mcid' AND a.service_id='VITA' AND a.actual_service_date BETWEEN b.patient_lmp AND '$_SESSION[edate2]' AND a.actual_service_date <= b.patient_edc ORDER by a.actual_service_date ASC") or die("Cannot query; 277");
 
-					while(list($qty,$serv_date)=mysql_fetch_array($q_mc)){						
+					while(list($qty,$serv_date)=mysql_fetch_array($q_mc)){	//echo $qty.' '.$serv_date.'<br>';
 						$vita_total+=$qty;
 
 						if($vita_total >= 200000 && $target_reach==0):							
