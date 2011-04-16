@@ -66,21 +66,25 @@ if($_SESSION["userid"]!=""):
 
       echo "<tr valign=\"top\"><td rowspan=\"2\">";
       //container of questions
-
+      echo "<td>";
       $widconn->query_class($dbname2,$_SESSION[cat],$_SESSION[ques]);
       echo "</td>";
-      
-      
-      echo "<td valign=\"top\">";
-	  if(isset($_SESSION[ques]) || $_POST[q_submit]):
-	      $widconn->query_cat($dbname,$dbname2,$_POST[sdate],$_POST[edate],$_POST[sel_brgy]);
-	   endif;
-
-      echo "</tr>";
             
+      //echo "<td valign=\"top\">";
+	  /*if(isset($_SESSION[ques]) || $_POST[q_submit]):
+	      $widconn->query_cat($dbname,$dbname2,$_POST[sdate],$_POST[edate],$_POST[sel_brgy]);
+	   endif; */
+      echo "</tr>";
+
+      echo "<tr><td>";
+	if(isset($_SESSION[ques]) || $_POST[q_submit]):
+	      $widconn->query_cat($dbname,$dbname2,$_POST[sdate],$_POST[edate],$_POST[sel_brgy]);
+	endif;
+      echo "</td></tr>";
+
       echo "</table>";        
 
-	  echo "<br><br>";
+      echo "<br><br>";
 	  
 	  //upon setting filters, set the necessary sessions here
 	  
