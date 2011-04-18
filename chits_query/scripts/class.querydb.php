@@ -1000,7 +1000,7 @@ class querydb{
 		echo "<td><a href='' alt='Save/Open in PDF' title='Save/Open as PDF'><img src='../images/pdf_icon.jpg' width='50px' height='50px' /></href></td>";
 		echo "<td><a href='' alt='Save/Open in PDF' title='Save/Open as CSV (Excel & E-FHSIS compliant)'><img src='../images/doc_csv_icon.png' width='50px' height='50px' /></href></td>";
 		echo "<td><a href='' alt='Save/Open in PDF' title='Send to Email'><img src='../images/email_icon.png' width='50px' height='50px' /></href></td>";
-		echo "<td><a href='' alt='Save/Open in PDF' title='Save/Open as XML'>XML</href></td>";
+		echo "<td><a href='' alt='Save/Open in PDF' title='Save/Open as XML'><img src='../images/xml_icon.jpeg' width='50px' height='50px' /></href></td>";
 		echo "</tr>";
 		
   		echo "</table>";
