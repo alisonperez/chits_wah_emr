@@ -986,9 +986,24 @@ class querydb{
 			$_SESSION["px_id"] = $arr_px;
 			
 			echo "<a href='./pdf_reports/philhealth.php'>Show PhilHealth Enrollment Masterlist</a>";
+			$this->display_icons();
 		else:
 			echo "<font color='red'>No result/s found.</font>";
 		endif;
+	}
+
+
+	function display_icons(){
+
+		echo "<table>";
+		echo "<tr>";
+		echo "<td><a href='' alt='Save/Open in PDF' title='Save/Open as PDF'><img src='../images/pdf_icon.jpg' width='50px' height='50px' /></href></td>";
+		echo "<td><a href='' alt='Save/Open in PDF' title='Save/Open as CSV (Excel & E-FHSIS compliant)'><img src='../images/doc_csv_icon.png' width='50px' height='50px' /></href></td>";
+		echo "<td><a href='' alt='Save/Open in PDF' title='Send to Email'><img src='../images/email_icon.png' width='50px' height='50px' /></href></td>";
+		echo "<td><a href='' alt='Save/Open in PDF' title='Save/Open as XML'>XML</href></td>";
+		echo "</tr>";
+		
+  		echo "</table>";
 	}
 }
 ?>

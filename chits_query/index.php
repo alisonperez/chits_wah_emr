@@ -57,35 +57,34 @@ if($_SESSION["userid"]!=""):
       $db_conn = mysql_connect(localhost,$_SESSION["dbuser"],$_SESSION["dbpass"]) or mysql_error();
       mysql_select_db($_SESSION["dbname"],$db_conn) or mysql_error();
 
+
       echo "<table style=\"font-family: arial\">";
 
-      echo "<tr valign='top' align='center' style=\"background-color: #666666;color: #FFFF66;text-align: center;font-weight: bold;font-size:16pt;\"><td colspan='2'>CHITS Query Browser</td></tr>";
+      echo "<tr valign='top' align='center' style=\"background-color: #666666;color: #FFFF66;text-align: center;font-weight: bold;font-size:16pt;\"><td colspan='3'>CHITS Query Browser</td></tr>";
 
-      echo "<tr valign='top' align='center' style=\"background-color: #666666;color: #FFFF66;text-align: left;font-weight: bold;font-size:13px;\"><td colspan='2'>DIRECTIONS:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1. Select Classification&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2. Select Queries&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3. Set the Filters&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;4. Click SUBMIT and download the REPORT</td></tr>";
+      echo "<tr valign='top' align='center' style=\"background-color: #666666;color: #FFFF66;text-align: left;font-weight: bold;font-size:13px;\"><td colspan='3'>DIRECTIONS:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1. Select Classification&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2. Select Queries&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3. Set the Filters&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;4. Click SUBMIT and download the REPORT</td></tr>";
 	
 
       echo "<tr valign=\"top\"><td rowspan=\"2\">";
       //container of questions
       echo "<td>";
       $widconn->query_class($dbname2,$_SESSION[cat],$_SESSION[ques]);
-      echo "</td>";
-            
-      //echo "<td valign=\"top\">";
-	  /*if(isset($_SESSION[ques]) || $_POST[q_submit]):
-	      $widconn->query_cat($dbname,$dbname2,$_POST[sdate],$_POST[edate],$_POST[sel_brgy]);
-	   endif; */
-      echo "</tr>";
 
-      echo "<tr><td>";
+      echo "<br><br>";
+
 	if(isset($_SESSION[ques]) || $_POST[q_submit]):
 	      $widconn->query_cat($dbname,$dbname2,$_POST[sdate],$_POST[edate],$_POST[sel_brgy]);
 	endif;
-      echo "</td></tr>";
 
-      echo "</table>";        
+      echo "</td>";
+            
+      //echo "<td valign=\"top\">";
+      /*if(isset($_SESSION[ques]) || $_POST[q_submit]):
+	 $widconn->query_cat($dbname,$dbname2,$_POST[sdate],$_POST[edate],$_POST[sel_brgy]);
+      endif; */
 
-      echo "<br><br>";
-	  
+      echo "<td>";
+
 	  //upon setting filters, set the necessary sessions here
 	  
 	  if($_POST[q_submit]):	  	  	                    
@@ -147,6 +146,11 @@ if($_SESSION["userid"]!=""):
                 
 		endif;
 	  endif;
+
+
+      echo "</td></tr>";
+      echo "</table>";        
+      
 
 else:  
   echo "<font color=\"red\">Access restricted. Please log your account in the CHITS main page.</font><br>";
