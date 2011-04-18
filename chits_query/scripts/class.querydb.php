@@ -1,5 +1,7 @@
 <?
+
 session_start();
+
 class querydb{
 
     function querydb(){
@@ -987,6 +989,8 @@ class querydb{
 			
 			echo "<a href='./pdf_reports/philhealth.php'>Show PhilHealth Enrollment Masterlist</a>";
 			$this->display_icons();
+
+			echo "<iframe src='./pdf_reports/philhealth.php?type=html' width='600' height='300'></iframe>";
 		else:
 			echo "<font color='red'>No result/s found.</font>";
 		endif;

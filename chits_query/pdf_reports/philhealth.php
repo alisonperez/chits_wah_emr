@@ -3,7 +3,6 @@ session_start();
 ob_start();
 require('./fpdf/fpdf.php');
 
-
 $db_conn = mysql_connect("localhost","$_SESSION[dbuser]","$_SESSION[dbpass]");
 mysql_select_db($_SESSION[dbname]);
 
@@ -137,7 +136,7 @@ function Header()
         $this->Row($header);
 }
 
-
+ 
 function show_philhealth_list(){ 
 	//print_r($_SESSION["philhealth_id"]);
 	$arr_px =  $_SESSION["px_id"];
@@ -188,6 +187,12 @@ $pdf->AddPage();
 
 $pdf->show_philhealth_list();
 
-$pdf->Output();
+
+
+if($_GET["type"]=='html'):
+	echo "<font color='red'>alisonalisonalisonalisonalisonalisonalisonalisonalisonalisonalisonalisonalison";
+else:
+	$pdf->Output();
+endif;
 
 ?>
