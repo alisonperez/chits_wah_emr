@@ -16,7 +16,6 @@
 	if($_POST[sel_ques]!=0):	      
 		$_SESSION[ques] = $_POST[sel_ques];
 	endif;	
-	
 ?>
 
 
@@ -86,8 +85,8 @@ if($_SESSION["userid"]!=""):
       echo "<td>";
 
 	  //upon setting filters, set the necessary sessions here
-	  
-	  if($_POST[q_submit]):	  	  	                    
+
+	  if($_POST[q_submit]):
 	        // set the session for start date and end date
 		if($_SESSION[filter]==1):
 			$queryconn->querycrit($dbname,$dbname2,$_POST[sdate],$_POST[edate],$_POST[sel_brgy],$_POST[sel_fp_method]);
@@ -134,14 +133,14 @@ if($_SESSION["userid"]!=""):
                         else:
                           echo "<font color='red'>Start and end date for the week selected is not yet set (LIBRARIES --> WEEKLY CALENDAR).</font>";
                         endif;
-                
+
                 elseif($_SESSION[filter]==6): //annual reports
                     $_SESSION[year] = $_POST[year];
                     $sdate = date('m/d/Y',mktime(0,0,0,1,1,$_POST[year]));
-                    $edate = date('m/d/Y',mktime(0,0,0,12,31,$_POST[year]));                    
-                    
+                    $edate = date('m/d/Y',mktime(0,0,0,12,31,$_POST[year]));
+
                     $queryconn->querycrit($dbname,$dbname2,$sdate,$edate,$_POST[brgy],0);
-                    
+
                 else:	
                 
 		endif;
@@ -149,8 +148,8 @@ if($_SESSION["userid"]!=""):
 
 
       echo "</td></tr>";
-      echo "</table>";        
-      
+      echo "</table>";
+
 
 else:  
   echo "<font color=\"red\">Access restricted. Please log your account in the CHITS main page.</font><br>";

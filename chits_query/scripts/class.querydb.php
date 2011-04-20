@@ -127,7 +127,7 @@ class querydb{
 			if($_SESSION[brgy]=="all"):
 			
 				$query = mysql_query("SELECT distinct e.consult_id FROM m_patient a, m_family_members b, m_family_address c, m_lib_barangay d,m_consult_disease_notifiable e, m_lib_disease_notifiable f, m_consult g WHERE a.patient_id = b.patient_id AND b.family_id = c.family_id AND c.barangay_id = d.barangay_id AND a.patient_id=e.patient_id AND e.consult_id=g.consult_id AND e.disease_id='$disId' AND round((to_days(now())-to_days(a.patient_dob))/365 , 1) $agerange AND a.patient_gender='$sex' AND e.disease_timestamp BETWEEN '$_SESSION[sdate]' AND '$_SESSION[edate]'") or die("Cannot query: 77");
-			
+
 			else:
 				$query = mysql_query("SELECT distinct e.consult_id FROM m_patient a, m_family_members b, m_family_address c, m_lib_barangay d,m_consult_disease_notifiable e, m_lib_disease_notifiable f, m_consult g WHERE a.patient_id = b.patient_id AND b.family_id = c.family_id AND c.barangay_id = d.barangay_id AND a.patient_id=e.patient_id AND e.consult_id=g.consult_id AND e.disease_id='$disId' AND round((to_days(now())-to_days(a.patient_dob))/365 , 1) $agerange AND a.patient_gender='$sex' AND e.disease_timestamp BETWEEN '$_SESSION[sdate]' AND '$_SESSION[edate]' AND d.barangay_id='$_SESSION[brgy]'") or die("Cannot query: 77");
 			endif;
@@ -297,13 +297,19 @@ class querydb{
 		elseif($quesno==100):
 			$this->process_demographic($quesno);	
 		elseif($quesno==110):
-			$this->process_philhealth_list($quesno);
+			$ret_file = $this->process_philhealth_list($quesno);
 		else:
 			echo "No available query for this indicator.";
 		endif;
 		
 		if(!empty($x) && !empty($y)):
 			$this->table_creator($x,$y,$rowtotal,$coltotal,$gentotal);
+		endif;
+
+
+		if(isset($ret_file)):
+			$this->display_icons($ret_file);
+			echo "<iframe src='./pdf_reports/$ret_file?type=html' width='600' height='300'></iframe>";
 		endif;
 	}
 
@@ -987,26 +993,25 @@ class querydb{
 			
 			$_SESSION["px_id"] = $arr_px;
 			
-			echo "<a href='./pdf_reports/philhealth.php'>Show PhilHealth Enrollment Masterlist</a>";
-			$this->display_icons();
-
-			echo "<iframe src='./pdf_reports/philhealth.php?type=html' width='600' height='300'></iframe>";
+			//echo "<a href='./pdf_reports/philhealth.php'>Show PhilHealth Enrollment Masterlist</a>";
+			//$this->display_icons();
+			return 'philhealth.php';
+			//echo "<iframe src='./pdf_reports/philhealth.php?type=html' width='600' height='300'></iframe>";
 		else:
 			echo "<font color='red'>No result/s found.</font>";
 		endif;
 	}
 
 
-	function display_icons(){
+	function display_icons($file_to_call){
 
 		echo "<table>";
 		echo "<tr>";
-		echo "<td><a href='' alt='Save/Open in PDF' title='Save/Open as PDF'><img src='../images/pdf_icon.jpg' width='50px' height='50px' /></href></td>";
-		echo "<td><a href='' alt='Save/Open in PDF' title='Save/Open as CSV (Excel & E-FHSIS compliant)'><img src='../images/doc_csv_icon.png' width='50px' height='50px' /></href></td>";
-		echo "<td><a href='' alt='Save/Open in PDF' title='Send to Email'><img src='../images/email_icon.png' width='50px' height='50px' /></href></td>";
-		echo "<td><a href='' alt='Save/Open in PDF' title='Save/Open as XML'><img src='../images/xml_icon.jpeg' width='50px' height='50px' /></href></td>";
+		echo "<td><a href='./pdf_reports/$file_to_call?type=pdf' alt='Save/Open in PDF' title='Save/Open as PDF'><img src='../images/pdf_icon.jpg' width='50px' height='50px' /></href></td>";
+		echo "<td><a href='./pdf_reports/$file_to_call?type=csv' alt='Save/Open in PDF' title='Save/Open as CSV (Excel & E-FHSIS compliant)'><img src='../images/doc_csv_icon.png' width='50px' height='50px' /></href></td>";
+		echo "<td><a href='./pdf_reports/$file_to_call?type=email' alt='Save/Open in PDF' title='Send to Email'><img src='../images/email_icon.png' width='50px' height='50px' /></href></td>";
+		echo "<td><a href='./pdf_reports/$file_to_call?type=html' alt='Save/Open in PDF' title='Save/Open as XML'><img src='../images/xml_icon.jpeg' width='50px' height='50px' /></href></td>";
 		echo "</tr>";
-		
   		echo "</table>";
 	}
 }

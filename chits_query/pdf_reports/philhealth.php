@@ -2,10 +2,12 @@
 session_start();
 ob_start();
 require('./fpdf/fpdf.php');
+require('../layout/class.html_builder.php');
 
 $db_conn = mysql_connect("localhost","$_SESSION[dbuser]","$_SESSION[dbpass]");
 mysql_select_db($_SESSION[dbname]);
 
+$html_tab = new html_builder();
 
 class PDF extends FPDF{
 
@@ -128,8 +130,8 @@ function Header()
 
 	$this->Cell(0,5,$brgy_label,0,1,'C');	
 
-	$w = array(48,48,48,48,48,48,48); //340
-	$header = array('NAME OF MEMBER','STREET,PUROK/SITIO','BARANGAY','DATE OF BIRTH','PHILHEALTH ID','DATE OF EXPIRATION','HOUSEHOLD MEMBERS');
+	$_SESSION["w"] = $w = array(48,48,48,48,48,48,48); //340
+	$_SESSION["header"] = $header = array('NAME OF MEMBER','STREET,PUROK/SITIO','BARANGAY','DATE OF BIRTH','PHILHEALTH ID','DATE OF EXPIRATION','HOUSEHOLD MEMBERS');
 
 
         $this->SetWidths($w);
@@ -140,9 +142,12 @@ function Header()
 function show_philhealth_list(){ 
 	//print_r($_SESSION["philhealth_id"]);
 	$arr_px =  $_SESSION["px_id"];
+	$arr_philhealth_record = array();
 	//print_r($arr_px);
 	
 	for($i=0;$i<count($arr_px);$i++){
+		$arr_philhealth = array();
+
 		$q_px = mysql_query("SELECT patient_lastname, patient_firstname, patient_middle, date_format(patient_dob,'%m-%d-%Y') as patient_dob FROM m_patient WHERE patient_id='$arr_px[$i]'") or die("Cannot query 147 ".mysql_error("Cannot query 147" .mysql_error()));
 
 		list($px_lastname,$px_firstname,$px_middle,$px_dob) = mysql_fetch_array($q_px);
@@ -164,8 +169,15 @@ function show_philhealth_list(){
 		$q_philhealth = mysql_query("SELECT philhealth_id,date_format(expiry_date,'%m-%d-%Y') as expiration_date FROM m_patient_philhealth WHERE patient_id='$arr_px[$i]' ORDER by expiry_date ASC") or die("Cannot query 165". mysql_error());
 		list($philhealth_id,$expiration) = mysql_fetch_array($q_philhealth);
 		
-		$this->Row(array($px_lastname.', '.$px_firstname.'  '.$px_middle,$address,$brgy_name,$px_dob,$philhealth_id,$expiration,$relatives));
+		$arr_philhealth = array($px_lastname.', '.$px_firstname.'  '.$px_middle,$address,$brgy_name,$px_dob,$philhealth_id,$expiration,$relatives);
+	
+		$this->Row($arr_philhealth);
+
+		array_push($arr_philhealth_record,$arr_philhealth);
+			
 	}
+
+	return $arr_philhealth_record;
 }
     
 function Footer(){
@@ -185,12 +197,13 @@ $pdf->AliasNbPages();
 $pdf->SetFont('Arial','',10);
 $pdf->AddPage();
 
-$pdf->show_philhealth_list();
+$philhealth_records = $pdf->show_philhealth_list();
 
 
 
 if($_GET["type"]=='html'):
-	echo "<font color='red'>alisonalisonalisonalisonalisonalisonalisonalisonalisonalisonalisonalisonalison";
+	//echo "<font color='red'>alisonalisonalisonalisonalisonalisonalisonalisonalisonalisonalisonalisonalison";
+	$html_tab->create_table($_SESSION["w"],$_SESSION["header"],$philhealth_records);
 else:
 	$pdf->Output();
 endif;
