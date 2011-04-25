@@ -296,6 +296,8 @@ class querydb{
 			$this->process_demographic($quesno);	
 		elseif($quesno==110):
 			$this->process_philhealth_list($quesno);
+		elseif($quesno==111):
+			$this->process_philhealth_consult($quesno);
 		else:
 			echo "No available query for this indicator.";
 		endif;
@@ -989,6 +991,10 @@ class querydb{
 		else:
 			echo "<font color='red'>No result/s found.</font>";
 		endif;
+	}
+	
+	function process_philhealth_consult(){ // a pre-curson of the OPB Patient Treatment summary
+		echo "<a href='./pdf_reports/philhealth.php?type=consult'>Philhealth Consultations Report</a>";	
 	}
 }
 ?>

@@ -442,6 +442,7 @@ class consult_report extends module {
 	print "REPORT DATE : <b>".$post_vars["report_date"]." to ".$post_vars["end_report_date"]."</b><br/><br/>";
 	
 	print "PRINTER FRIENDLY VERSION: <a href='../chits_query/pdf_reports/dailyservice_report.php?arr=consult' target='new'>CONSULTS</a>&nbsp;&nbsp;&nbsp;";
+	print "<a href='../chits_query/pdf_reports/philhealth.php?type=consult' target='new'>PHILHEALTH CONSULTS</a>&nbsp;&nbsp;&nbsp;";
 	print "<a href='../chits_query/pdf_reports/dailyservice_report.php?arr=ccdev' target='new'>CHILD CARE</a>&nbsp;&nbsp;&nbsp;";
 	print "<a href='../chits_query/pdf_reports/dailyservice_report.php?arr=mc' target='new'>MATERNAL CARE</a><br />";
 
