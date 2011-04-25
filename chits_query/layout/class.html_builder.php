@@ -10,8 +10,6 @@ class html_builder{
 	function create_table($width,$header,$cell_contents){
 		echo "<table border='1'>";
 		$this->display_col_header($header);
-
-
 		echo "</table>";
 
 		print_r($width);
@@ -34,6 +32,13 @@ class html_builder{
 			echo "</td>";
 		}
 		echo "</tr>";
+
+	}
+
+	function display_cell_content($cell_contents){
+		foreach($cell_contents as ){
+
+		}
 
 	}
 }
