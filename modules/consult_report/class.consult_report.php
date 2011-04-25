@@ -476,7 +476,7 @@ class consult_report extends module {
                        "p.patient_gender,date_format(c.consult_date,'%Y-%m-%d') as consult_date,date_format(p.patient_dob,'%m-%d-%Y') as pxdob ".
                        "from m_consult c, m_patient p ".
                        "where c.patient_id = p.patient_id ".
-                       "and c.consult_date BETWEEN '$report_date 00:00:00' AND '$end_report_date 23:59:00' ORDER by c.consult_date ASC";
+                       "and c.consult_date BETWEEN '$report_date 00:00:00' AND '$end_report_date 23:59:00' ORDER by c.consult_date ASC";                               
         
         	                        
         $result = mysql_query($sql) or die("Cannot query: 456 ".mysql_error());        

@@ -128,7 +128,7 @@ function Header()
 	    
     	    $this->Cell(0,5,'PhilHealth Consultations Report - '.$_SESSION[datanode][name],0,1,'C');
     	    $this->SetFont('Arial','',10);
-    	    $this->Cell(0,5,$brgy_label,0,1,'C');	
+    	    $this->Cell(0,5,$brgy_label .' ('.$_SESSION[sdate2]. ' to '. $_SESSION[edate2].') ',0,1,'C');	
     	    
     	    $w = array(18,34,34,29,22,19,29,34,32,30,60);    	        	    
     	    $header = $arr_consults[0];
@@ -187,6 +187,7 @@ function show_philhealth_consults(){
     
     foreach($arr_consults[1] as $key=>$value){
         foreach($value as $key2=>$value2){
+            $philhealth_id='';
             $mem_type = $this->get_member_type($value2[0]);   //determine if the patient is a philhealth member, dependent or none of the two
             
             if($mem_type=='M'):	//member
@@ -202,10 +203,19 @@ function show_philhealth_consults(){
             endif;
             
             //print_r($value2);
-            $this->Row(array($value2[0],$value2[1],$value2[2],$value2[3],$value2[4],$value2[5],$philhealth_id,$value2[7],$value2[8],$value2[9],$value2[10],$value2[11]));
+            if(!empty($philhealth_id)):
+                $this->Row(array($value2[0],$value2[1],$value2[2],$value2[3],$value2[4],$value2[5],$philhealth_id,$value2[7],$value2[8],$value2[9],$value2[10],$value2[11]));
+            endif;                
+            
         }                    
     }
-    //echo $member.'/'.$dependent.'<br>';
+    $total = $member + $dependent;
+    $this->Ln();
+    $this->SetFont('Arial','B',12);
+    $this->Cell(0,5,'Members: '. $member,0,1,'L');	
+    $this->Cell(0,5,'Dependents: '. $dependent,0,1,'L');	
+    $this->Cell(0,5,'Total: '. $total ,0,1,'L');	
+    
 }
 
 
