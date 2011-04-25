@@ -130,7 +130,7 @@ function Header()
 	$this->Cell(0,5,$brgy_label,0,1,'C');	
 
 	$w = array(48,48,48,48,48,48,48); //340
-	$header = array('NAME OF MEMBER','STREET,PUROK/SITIO','BARANGAY','DATE OF BIRTH','PHILHEALTH ID','DATE OF EXPIRATION','HOUSEHOLD MEMBERS');
+	$header = array('NAME OF MEMBER','STREET,PUROK/SITIO','BARANGAY','DATE OF BIRTH','PHILHEALTH ID','DATE OF EXPIRATION','HOUSEHOLD MEMBERS'."\n".'(* - Potential Dependents)');
 
 
         $this->SetWidths($w);
@@ -144,6 +144,8 @@ function show_philhealth_list(){
 	//print_r($arr_px);
 	
 	for($i=0;$i<count($arr_px);$i++){
+	        $relatives = '';
+	                        
 		$q_px = mysql_query("SELECT patient_lastname, patient_firstname, patient_middle, date_format(patient_dob,'%m-%d-%Y') as patient_dob FROM m_patient WHERE patient_id='$arr_px[$i]'") or die("Cannot query 147 ".mysql_error("Cannot query 147" .mysql_error()));
 
 		list($px_lastname,$px_firstname,$px_middle,$px_dob) = mysql_fetch_array($q_px);
@@ -159,7 +161,8 @@ function show_philhealth_list(){
 		$q_hh = mysql_query("SELECT a.patient_id,b.patient_lastname,b.patient_firstname,round((to_days(now())-to_days(b.patient_dob))/365 , 1) computed_age FROM m_family_members a, m_patient b WHERE a.patient_id!='$arr_px[$i]' AND a.patient_id=b.patient_id AND a.family_id='$family_id'") or die("Cannot query 159 ".mysql_error());
 
 		while(list($pxid,$px_lname,$px_fname,$age) = mysql_fetch_array($q_hh)){
-			$relatives = $px_fname.' '.$px_lname.','.$age;
+		        $marked = ($age>=60 || $age <= 18)?'*':'';		        
+			$relatives .= $px_fname.' '.$px_lname.' ('.$age.')'.$marked.', ';
 		}
 
 		$q_philhealth = mysql_query("SELECT philhealth_id,date_format(expiry_date,'%m-%d-%Y') as expiration_date FROM m_patient_philhealth WHERE patient_id='$arr_px[$i]' ORDER by expiry_date ASC") or die("Cannot query 165". mysql_error());
