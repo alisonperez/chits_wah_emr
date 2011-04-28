@@ -295,7 +295,7 @@ class querydb{
 		elseif($quesno>=90 && $quesno<=99):
 			$this->process_tb($quesno);	
 		elseif($quesno==100):
-			$this->process_demographic($quesno);	
+			$ret_file = $this->process_demographic($quesno);	
 		elseif($quesno==110):
 			$ret_file = $this->process_philhealth_list($quesno);
 		else:
@@ -309,7 +309,7 @@ class querydb{
 
 		if(isset($ret_file)):
 			$this->display_icons($ret_file);
-			echo "<iframe src='./pdf_reports/$ret_file?type=html' width='600' height='300'></iframe>";
+			echo "<iframe src='./pdf_reports/$ret_file?type=html' width='800' height='400'></iframe>";
 		endif;
 	}
 
@@ -961,7 +961,8 @@ class querydb{
 		$q_demographic = mysql_query("SELECT demographic_id FROM m_lib_demographic_profile WHERE year='$_POST[year]'") or die("Cannot query 899 ".mysql_error());
 		
 		if(mysql_num_rows($q_demographic)!=0):
-			echo "<a href='./pdf_reports/demographic_profile.php'>Show Demographic Profile Report (A1-RHU)</a>";
+			return 'demographic_profile.php';
+			//echo "<a href='./pdf_reports/demographic_profile.php'>Show Demographic Profile Report (A1-RHU)</a>";
 		else:
 			echo "<font color='red'>No result/s found.</font>";
 		endif;		

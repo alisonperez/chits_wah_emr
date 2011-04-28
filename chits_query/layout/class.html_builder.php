@@ -10,9 +10,10 @@ class html_builder{
 	function create_table($width,$header,$cell_contents){
 		echo "<table border='1'>";
 		$this->display_col_header($header);
+		$this->display_cell_content($cell_contents);
 		echo "</table>";
 
-		print_r($width);
+		/*print_r($width);
 		print_r($header);
 		print_r($cell_contents);
 		print_r($width);
@@ -20,7 +21,7 @@ class html_builder{
 		print_r($cell_contents);
 		print_r($width);
 		print_r($header);
-		print_r($cell_contents);
+		print_r($cell_contents);*/
 		echo 'alison perez';
 	}
 
@@ -36,8 +37,17 @@ class html_builder{
 	}
 
 	function display_cell_content($cell_contents){
-		foreach($cell_contents as ){
+		
+		foreach($cell_contents as $key=>$value){
+			echo "<tr>";
 
+			foreach($value as $key2=>$value2){
+				echo "<td>";
+				echo $value2;
+				echo "</td>";
+			}
+
+			echo "</td>";
 		}
 
 	}
