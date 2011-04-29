@@ -1,14 +1,13 @@
 <?php
-
 session_start();
-
 ob_start();
-
 require('./fpdf/fpdf.php');
-
+require('../layout/class.html_builder.php');
 
 $db_conn = mysql_connect("localhost","$_SESSION[dbuser]","$_SESSION[dbpass]");
 mysql_select_db($_SESSION[dbname]);
+
+$html_tab = new html_builder();
 
 class PDF extends FPDF
 {
@@ -130,9 +129,9 @@ function Header()
     $this->Cell(340,10,'D E M O G R A P H I C    P R O F I L E (A1 RHU)',1,1,C);
     
     $this->SetFont('Arial','B','12');
-    $w = array(100,30,30,30,30,60,60);
+    $_SESSION["w"] = $w = array(100,30,30,30,30,60,60);
     $this->SetWidths($w);
-    $label = array('Indicators','Male','Female','Total','Ratio to Population','Interpretation','Recommendation/Action Taken');
+    $_SESSION["header"] = $label = array('Indicators','Male','Female','Total','Ratio to Population','Interpretation','Recommendation/Action Taken');
     $this->Row($label);
 }
 
@@ -145,7 +144,8 @@ function q_report_header($population){
 
 
 function show_demographic_profile(){
-    
+    $arr_demog = array();
+
     $q_demographic = mysql_query("SELECT barangay,bhs,doctors_male,doctors_female,dentist_male,dentist_female,nurse_male,nurse_female,midwife_male,midwife_female,nutritionist_male,nutritionist_female,medtech_male,medtech_female,se_male,se_female,si_male,si_female,bhw_male,bhw_female FROM m_lib_demographic_profile WHERE year='$_SESSION[year]'") or die("Cannot query 149 ".mysql_error());
     list($brgy,$bhs,$md_m,$md_f,$dentist_m,$dentist_f,$nurse_m,$nurse_f,$midwife_m,$midwife_f,$nutritionist_m,$nutritionist_f,$medtech_m,$medtech_f,$se_m,$se_f,$si_m,$si_f,$bhw_m,$bhw_f) = mysql_fetch_array($q_demographic);
 
@@ -159,11 +159,12 @@ function show_demographic_profile(){
     for($i=0;$i<count($arr_indicators);$i++){
         for($x=0;$x<count($arr_indicators[$i]);$x++){
             //echo $arr_indicators[$i][$x].'<br>';
-            $this->Cell($w[$x],6,$arr_indicators[$i][$x],'1',0,'L');            
+            $this->Cell($w[$x],6,$arr_indicators[$i][$x],'1',0,'L');
         }
         $this->Ln();
     }
-    
+
+    return $arr_indicators;
     //print_r($arr_indicators);
     
     
@@ -206,10 +207,15 @@ $pdf->SetFont('Arial','',10);
 
 $pdf->AddPage();
 
-$pdf->show_demographic_profile();
+$demog_records = $pdf->show_demographic_profile();
 
 //$pdf->AddPage();
 //$pdf->show_fp_summary();
-$pdf->Output();
+
+if($_GET["type"]=='html'):
+	$html_tab->create_table($_SESSION["w"],$_SESSION["header"],$demog_records);	
+else:
+	$pdf->Output();
+endif;
 
 ?>
