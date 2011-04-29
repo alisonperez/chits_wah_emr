@@ -123,6 +123,7 @@ function Header()
 	endif;
 	
 	$this->SetFont('Arial','B',12);
+<<<<<<< HEAD:chits_query/pdf_reports/philhealth.php
 	$this->Cell(0,5,'PhilHealth Enrollees Masterlist - '.$_SESSION[datanode][name],0,1,'C');
 
 
@@ -132,7 +133,27 @@ function Header()
 
 	$_SESSION["w"] = $w = array(48,48,48,48,48,48,48); //340
 	$_SESSION["header"] = $header = array('NAME OF MEMBER','STREET,PUROK/SITIO','BARANGAY','DATE OF BIRTH','PHILHEALTH ID','DATE OF EXPIRATION','HOUSEHOLD MEMBERS');
+=======
+	if($_GET["type"]=='consult'):
+	    
+	    $arr_consults = $_SESSION[arr_consult];
+	    
+    	    $this->Cell(0,5,'PhilHealth Consultations Report - '.$_SESSION[datanode][name],0,1,'C');
+    	    $this->SetFont('Arial','',10);
+    	    $this->Cell(0,5,$brgy_label .' ('.$_SESSION[sdate2]. ' to '. $_SESSION[edate2].') ',0,1,'C');	
+    	    
+    	    $w = array(18,34,34,29,22,19,29,34,32,30,60);    	        	    
+    	    $header = $arr_consults[0];
+    	        	    
+	else:
+    	    $this->Cell(0,5,'PhilHealth Enrollees Masterlist - '.$_SESSION[datanode][name],0,1,'C');
+    	    $this->SetFont('Arial','',10);
+    	    $this->Cell(0,5,$brgy_label,0,1,'C');	
+>>>>>>> dev:chits_query/pdf_reports/philhealth.php
 
+	    $w = array(48,48,48,48,48,48,48); //340
+	    $header = array('NAME OF MEMBER','STREET,PUROK/SITIO','BARANGAY','DATE OF BIRTH','PHILHEALTH ID','DATE OF EXPIRATION','HOUSEHOLD MEMBERS'."\n".'(* - Potential Dependents)');    	    
+        endif;
 
         $this->SetWidths($w);
         $this->Row($header);
@@ -146,8 +167,13 @@ function show_philhealth_list(){
 	//print_r($arr_px);
 	
 	for($i=0;$i<count($arr_px);$i++){
+<<<<<<< HEAD:chits_query/pdf_reports/philhealth.php
 		$arr_philhealth = array();
 
+=======
+	        $relatives = '';
+	                        
+>>>>>>> dev:chits_query/pdf_reports/philhealth.php
 		$q_px = mysql_query("SELECT patient_lastname, patient_firstname, patient_middle, date_format(patient_dob,'%m-%d-%Y') as patient_dob FROM m_patient WHERE patient_id='$arr_px[$i]'") or die("Cannot query 147 ".mysql_error("Cannot query 147" .mysql_error()));
 
 		list($px_lastname,$px_firstname,$px_middle,$px_dob) = mysql_fetch_array($q_px);
@@ -163,7 +189,8 @@ function show_philhealth_list(){
 		$q_hh = mysql_query("SELECT a.patient_id,b.patient_lastname,b.patient_firstname,round((to_days(now())-to_days(b.patient_dob))/365 , 1) computed_age FROM m_family_members a, m_patient b WHERE a.patient_id!='$arr_px[$i]' AND a.patient_id=b.patient_id AND a.family_id='$family_id'") or die("Cannot query 159 ".mysql_error());
 
 		while(list($pxid,$px_lname,$px_fname,$age) = mysql_fetch_array($q_hh)){
-			$relatives = $px_fname.' '.$px_lname.','.$age;
+		        $marked = ($age>=60 || $age <= 21)?'*':'';		        
+			$relatives .= $px_fname.' '.$px_lname.' ('.$age.')'.$marked.', ';
 		}
 
 		$q_philhealth = mysql_query("SELECT philhealth_id,date_format(expiry_date,'%m-%d-%Y') as expiration_date FROM m_patient_philhealth WHERE patient_id='$arr_px[$i]' ORDER by expiry_date ASC") or die("Cannot query 165". mysql_error());
@@ -179,6 +206,68 @@ function show_philhealth_list(){
 
 	return $arr_philhealth_record;
 }
+
+function show_philhealth_consults(){
+    $arr_consults = $_SESSION[arr_consult];
+    //print_r($arr_consults);
+    
+    foreach($arr_consults[1] as $key=>$value){
+        foreach($value as $key2=>$value2){
+            $philhealth_id='';
+            $mem_type = $this->get_member_type($value2[0]);   //determine if the patient is a philhealth member, dependent or none of the two
+            
+            if($mem_type=='M'):	//member
+                $member += 1;
+                $philhealth_id = $value2[6].' / M';
+            else:
+                if($mem_type!=''): //dependent
+                    $dependent += 1;
+                    $philhealth_id = $mem_type.' / D';
+                else:		// not a member or dependent. therefore, do not display the record
+                
+                endif;
+            endif;
+            
+            //print_r($value2);
+            if(!empty($philhealth_id)):
+                $this->Row(array($value2[0],$value2[1],$value2[2],$value2[3],$value2[4],$value2[5],$philhealth_id,$value2[7],$value2[8],$value2[9],$value2[10],$value2[11]));
+            endif;                
+            
+        }                    
+    }
+    $total = $member + $dependent;
+    $this->Ln();
+    $this->SetFont('Arial','B',12);
+    $this->Cell(0,5,'Members: '. $member,0,1,'L');	
+    $this->Cell(0,5,'Dependents: '. $dependent,0,1,'L');	
+    $this->Cell(0,5,'Total: '. $total ,0,1,'L');	
+    
+}
+
+
+function get_member_type($pxid){
+    $q_philhealth = mysql_query("SELECT DISTINCT(a.patient_id) FROM m_patient_philhealth a, m_family_address b, m_family_members c,m_lib_barangay d, m_patient e WHERE a.patient_id='$pxid' AND a.patient_id=c.patient_id AND c.family_id=b.family_id AND b.barangay_id=d.barangay_id AND a.patient_id=e.patient_id") or die("Cannot query 199 ".mysql_error());                
+    if(mysql_num_rows($q_philhealth)!=0):
+        
+        return 'M';    //return M for member
+    else:
+        //check if there a co-member that is a philhealth member
+        $q_demo = mysql_query("SELECT a.barangay_name,b.address,b.family_id FROM m_lib_barangay a, m_family_address b,m_family_members c WHERE c.patient_id='$pxid' AND a.barangay_id=b.barangay_id AND b.family_id=c.family_id") or die("Cannot query 204 ".mysql_error());
+        list($brgy_name,$address,$family_id) = mysql_fetch_array($q_demo);                
+        $q_philhealth_family_member = mysql_query("SELECT a.philhealth_id,date_format(a.expiry_date,'%m-%d-%Y'),a.patient_id as expiration_date FROM m_patient_philhealth a, m_family_members b WHERE b.family_id='$family_id' AND b.patient_id=a.patient_id AND a.patient_id!='$pxid' ORDER by expiry_date ASC") or die("Cannot query 208 ".mysql_error());
+        
+        if(mysql_num_rows($q_philhealth_family_member)!=0):
+            list($philhealth_id,$expiration_date,$patient_id) = mysql_fetch_array($q_philhealth_family_member);
+            return $philhealth_id;                  // return the philhealth id of the co-member with Philhealth
+        else:
+            return '';				
+        endif;
+        
+        
+    endif;
+}
+
+
     
 function Footer(){
     //Position at 1.5 cm from bottom
@@ -197,8 +286,17 @@ $pdf->AliasNbPages();
 $pdf->SetFont('Arial','',10);
 $pdf->AddPage();
 
+<<<<<<< HEAD:chits_query/pdf_reports/philhealth.php
 $philhealth_records = $pdf->show_philhealth_list();
 
+=======
+
+if($_GET["type"]=='consult'):
+    $pdf->show_philhealth_consults();
+else:
+    $pdf->show_philhealth_list();
+endif;
+>>>>>>> dev:chits_query/pdf_reports/philhealth.php
 
 
 if($_GET["type"]=='html'):

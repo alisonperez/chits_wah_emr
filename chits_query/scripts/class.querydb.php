@@ -297,7 +297,13 @@ class querydb{
 		elseif($quesno==100):
 			$ret_file = $this->process_demographic($quesno);	
 		elseif($quesno==110):
+<<<<<<< HEAD:chits_query/scripts/class.querydb.php
 			$ret_file = $this->process_philhealth_list($quesno);
+=======
+			$this->process_philhealth_list($quesno);
+		elseif($quesno==111):
+			$this->process_philhealth_consult($quesno);
+>>>>>>> dev:chits_query/scripts/class.querydb.php
 		else:
 			echo "No available query for this indicator.";
 		endif;
@@ -1002,6 +1008,7 @@ class querydb{
 			echo "<font color='red'>No result/s found.</font>";
 		endif;
 	}
+<<<<<<< HEAD:chits_query/scripts/class.querydb.php
 
 
 	function display_icons($file_to_call){
@@ -1014,6 +1021,11 @@ class querydb{
 		echo "<td><a href='./pdf_reports/$file_to_call?type=html' alt='Save/Open in PDF' title='Save/Open as XML'><img src='../images/xml_icon.jpeg' width='50px' height='50px' /></href></td>";
 		echo "</tr>";
   		echo "</table>";
+=======
+	
+	function process_philhealth_consult(){ // a pre-curson of the OPB Patient Treatment summary
+		echo "<a href='./pdf_reports/philhealth.php?type=consult'>Philhealth Consultations Report</a>";	
+>>>>>>> dev:chits_query/scripts/class.querydb.php
 	}
 }
 ?>
