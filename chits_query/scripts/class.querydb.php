@@ -263,7 +263,7 @@ class querydb{
 			$this->process_postpartum();
 
 		elseif($quesno==36 || $quesno==80 || $quesno==81):
-			$this->process_mc_indicators();
+			$ret_file = $this->process_mc_indicators();
 
 		elseif($quesno==37):
 			$this->process_underone();
@@ -683,7 +683,10 @@ class querydb{
 	}
 
 	function process_mc_indicators(){
-		switch($_SESSION[ques]){
+
+		return 'mc_summary.php';
+
+		/*switch($_SESSION[ques]){
 			
 			case 36:
 				$report_name = 'Maternal Care Summary Table';
@@ -714,7 +717,7 @@ class querydb{
 
 		endif;
 
-		echo "</center>";
+		echo "</center>"; */
 		
 	}
 

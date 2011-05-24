@@ -5,9 +5,13 @@ session_start();
 ob_start();
 
 require('./fpdf/fpdf.php');
+require('../layout/class.html_builder.php');
+
 
 $db_conn = mysql_connect("localhost","$_SESSION[dbuser]","$_SESSION[dbpass]");
 mysql_select_db($_SESSION[dbname]);
+
+$html_tab = new html_builder();
 
 class PDF extends FPDF
 {
@@ -153,8 +157,8 @@ function Header()
 
 	$this->SetFont('Arial','',10);	
 	$this->Cell(0,5,$brgy_label,0,1,'C');		
-	$w = array(30,18,18,18,18,15,18,18,18,15,18,18,18,15,18,18,18,15,18); //340
-	$header = array('INDICATORS','Target','JAN','FEB','MAR','1st Q','APR','MAY','JUNE','2nd Q','JULY','AUG','SEPT','3rd Q','OCT','NOV','DEC','4th Q','TOTAL');
+	$_SESSION["w"] = $w = array(30,18,18,18,18,15,18,18,18,15,18,18,18,15,18,18,18,15,18); //340
+	$_SESSION["header"] = $header = array('INDICATORS','Target','JAN','FEB','MAR','1st Q','APR','MAY','JUNE','2nd Q','JULY','AUG','SEPT','3rd Q','OCT','NOV','DEC','4th Q','TOTAL');
 	
 	elseif($_SESSION[ques]==80 || $_SESSION[ques]==81): //maternal care monthly and quarterly report respectively
 	    $q_pop = mysql_query("SELECT SUM(population) FROM m_lib_population WHERE population_year='$_SESSION[year]'") or die("CAnnot query: 164");
@@ -168,12 +172,12 @@ function Header()
             if($_SESSION[ques]==80):
                 $this->Cell(0,5,'FHSIS REPORT FOR THE MONTH: '.date('F',mktime(0,0,0,$_SESSION[smonth],1,0)).'          YEAR: '.$_SESSION[year],0,1,L);
                 $this->Cell(0,5,'NAME OF BHS: '.$this->get_brgy(),0,1,L); 
-                $w = array(200,40);                
-                $header = array('MATERNAL CARE', 'No.');
+                $_SESSION["w"] = $w = array(200,40);                
+                $_SESSION["header"] = $header = array('MATERNAL CARE', 'No.');
                 
             elseif($_SESSION[ques]==81):
-                $w = array(161,30,25,25,50,45);
-                $header = array('Indicators', 'Eligible Population','No.','% / Rate','Interpretation','Recommendation/Action Taken');            
+                $_SESSION["w"] = $w = array(161,30,25,25,50,45);
+                $_SESSION["header"] = $header = array('Indicators', 'Eligible Population','No.','% / Rate','Interpretation','Recommendation/Action Taken');            
                 $this->Cell(0,5,'FHSIS REPORT FOR THE QUARTER: '.$_SESSION[quarter].'          YEAR: '.$_SESSION[year],0,1,L);            
             else:
             
@@ -196,6 +200,7 @@ function Header()
 function show_mc_summary(){
 	
 	$arr_csv = array();
+	$arr_consolidate = array();
 	
 	$criteria = array('Pregnant Women with 4 or more prenatal visits','Pregnant Women given 2 doses of TT','Pregnant Women given TT2 plus','Pregnant given complete iron with folic acid','Pregnant given Vit. A','Postpartum women with at least 2 PPV','Postpartum women given complete iron','Postpartum women given Vit. A','Postpartum women initiated breastfeeding');			
     	
@@ -234,7 +239,12 @@ function show_mc_summary(){
                 if($_SESSION[ques]==36):
                     $w = array(30,18,18,18,18,15,18,18,18,15,18,18,18,15,18,18,18,15,18); //340
                     $this->SetWidths($w);                		
+
+		    array_push($arr_consolidate,array($criteria[$i],$target,$mstat[1],$mstat[2],$mstat[3],$q_array[1],$mstat[4],$mstat[5],$mstat[6],$q_array[2],$mstat[7],$mstat[8],$mstat[9],$q_array[3],$mstat[10],$mstat[11],$mstat[12],$q_array[4],$gt));
+
                     $this->Row(array($criteria[$i],$target,$mstat[1],$mstat[2],$mstat[3],$q_array[1],$mstat[4],$mstat[5],$mstat[6],$q_array[2],$mstat[7],$mstat[8],$mstat[9],$q_array[3],$mstat[10],$mstat[11],$mstat[12],$q_array[4],$gt));
+
+		
                 elseif($_SESSION[ques]==80):
                     $w = array(200,40); //340 //monthly report
                     $this->SetWidths($w);
@@ -242,7 +252,9 @@ function show_mc_summary(){
                     $this->SetFont('Arial','',13);
                     array_push($arr_disp,$criteria[$i],$mstat[$_SESSION[smonth]]);
 
-                    for($x=0;$x<count($arr_disp);$x++){
+		    array_push($arr_consolidate,$arr_disp);
+
+		    for($x=0;$x<count($arr_disp);$x++){
                         if($x==0):
                             $this->Cell($w[$x],6,($i+1).'. '.$arr_disp[$x],'1',0,'1');
                         else:
@@ -259,6 +271,8 @@ function show_mc_summary(){
                     $this->SetFont('Arial','',13);
 
                     array_push($arr_disp,$criteria[$i],$target,$q_array[$_SESSION[quarter]],$this->compute_mc_rate($target,$q_array[$_SESSION[quarter]]).'%',' ',' ');
+		    
+		    array_push($arr_consolidate,$arr_disp);
 
                     for($x=0;$x<count($arr_disp);$x++){
                         if($x==0):
@@ -277,7 +291,8 @@ function show_mc_summary(){
 
 	}
 
-	return $arr_csv;
+	//return $arr_csv;
+	return $arr_consolidate;
  }
 
 function compute_indicator($crit){
@@ -753,7 +768,7 @@ $pdf->AliasNbPages();
 $pdf->SetFont('Arial','',10);
 $pdf->AddPage();
 
-ini_set("include_path", "/var/www/html/chits/site/Csv/");
+/*ini_set("include_path", "/var/www/html/chits/site/Csv/");
 
 
 $arr_csv = $pdf->show_mc_summary();
@@ -794,7 +809,7 @@ if($_GET["form"]=='csv' || $_GET["form"]=='email'):
 	
 	if($_GET["form"]=='csv'):
 		header("location: ".$filename);
-	else:
+	else: */
 		/*$subj = $_SESSION["lgu"].' Maternal Care Quarterly Report'.' - '.$_SESSION["quarter"].'Q '.$_SESSION["year"];
 		$headers = "From: moncadarhu1@gmail.com\r\nReply-To: moncadarhu1@gmail.com";
 		$attachment = chunk_split(base64_encode(file_get_contents($filename)));
@@ -813,13 +828,24 @@ if($_GET["form"]=='csv' || $_GET["form"]=='email'):
 
 		
 		
-	endif;
+/*	endif;
 	
 //	print_r($_SESSION);
 	
 
 else:
 	$pdf->Output();
+endif; */
+
+
+
+$mc_content = $pdf->show_mc_summary();
+
+if($_GET["type"]=='html'): 
+	$html_tab->create_table($_SESSION["w"],$_SESSION["header"],$mc_content);
+else:
+	$pdf->Output();
 endif;
+
 
 ?>
