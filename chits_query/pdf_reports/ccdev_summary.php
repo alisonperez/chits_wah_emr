@@ -344,6 +344,7 @@ function show_ccdev_summary(){
 
                                 endif;
 				
+				array_push($ccdev_rec,$disp_arr);	
 			}
 			
 
@@ -1326,7 +1327,7 @@ $pdf->AddPage();
 
 $ccdev_rec = $pdf->show_ccdev_summary();
 
-if($_GET["type"]=='html'):
+if($_GET["type"]=='html'): 
 	$html_tab->create_table($_SESSION["w"],$_SESSION["header"],$ccdev_rec,$_SESSION["w2"],$_SESSION["subheader"]);
 else:
 	$pdf->Output();

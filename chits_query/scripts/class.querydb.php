@@ -299,7 +299,7 @@ class querydb{
 		elseif($quesno==110):
 			$ret_file = $this->process_philhealth_list($quesno);
 		elseif($quesno==111):
-			$this->process_philhealth_consult($quesno);
+			$ret_file = $this->process_philhealth_consult($quesno);
 
 		else:
 			echo "No available query for this indicator.";
@@ -1024,6 +1024,9 @@ class querydb{
 	}
 	
 	function process_philhealth_consult(){ // a pre-curson of the OPB Patient Treatment summary
+
+		return 'philhealth.php';
+
 		echo "<a href='./pdf_reports/philhealth.php?type=consult'>Philhealth Consultations Report</a>";
 	}
 }

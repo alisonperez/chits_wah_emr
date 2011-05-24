@@ -277,13 +277,12 @@ $pdf->AliasNbPages();
 $pdf->SetFont('Arial','',10);
 $pdf->AddPage();
 
-$philhealth_records = $pdf->show_philhealth_list();
-
-
 
 if($_GET["type"]=='consult'):
+    $philhealth_records = $pdf->show_philhealth_list();
     $pdf->show_philhealth_consults();
 else:
+    $philhealth_records = $pdf->show_philhealth_list();
     $pdf->show_philhealth_list();
 endif;
 
