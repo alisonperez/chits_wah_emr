@@ -30,7 +30,6 @@ class html_builder{
 		endif;
 
 		echo "<table border='1'>";
-		print_r($_SESSION);
 		$this->display_col_header($header,$width);
 		$this->display_subheader($subheader,$subwidth);
 		$this->display_cell_content($cell_contents,$subwidth);
@@ -51,7 +50,12 @@ class html_builder{
 	function display_col_header($header,$width){
 		echo "<tr>";
 		for($i=0;$i<count($header);$i++){
-			echo "<td width='$width[$i]' colspan='2'>";
+			if($this->lookup_ques_for_colspan() && $i>=$this->where_to_colspan()):
+				echo "<td width='$width[$i]' colspan='2'>";
+			else:
+				echo "<td width='$width[$i]'>";
+			endif; 
+
 			echo $header[$i];
 			echo "</td>";
 		}
@@ -61,11 +65,11 @@ class html_builder{
 	function display_subheader($subheader,$subwidth){
 		echo "<tr>";
 		for($i=0;$i<count($subheader);$i++){
-			if($this->lookup_ques_for_colspan() && $i<$this->where_to_colspan()):
-				echo "<td width='$subwidth[$i]' colspan='2'>";
-			else:
+			//if($this->lookup_ques_for_colspan() && $i>$this->where_to_colspan()):
+			//	echo "<td width='$subwidth[$i]' colspan='2'>";
+			//else:
 				echo "<td width='$subwidth[$i]'>";
-			endif;
+			//endif;
 
 			echo $subheader[$i];
 			echo "</td>";
@@ -79,11 +83,11 @@ class html_builder{
 			echo "<tr>";
 
 			for($i=0;$i<count($value);$i++){
-				if($this->lookup_ques_for_colspan() && $i<$this->where_to_colspan()):
-					echo "<td colspan='2'>";
-				else:
+				//if($this->lookup_ques_for_colspan() && $i<$this->where_to_colspan()):
+				//	echo "<td colspan='2'>";
+				//else:
 					echo "<td>";
-				endif;
+				//endif;
 
 				echo $value[$i];
 				echo "</td>";
@@ -103,7 +107,6 @@ class html_builder{
 	function where_to_colspan(){
 		$arr_where_colspan = array('39'=>'2');
 		return $arr_where_colspan[$_SESSION["ques"]];
-
 	}
 }
 

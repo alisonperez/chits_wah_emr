@@ -132,8 +132,8 @@ function Header()
     	    $this->SetFont('Arial','',10);
     	    $this->Cell(0,5,$brgy_label .' ('.$_SESSION["sdate2"]. ' to '. $_SESSION["edate2"].') ',0,1,'C');	
     	    
-    	    $w = array(18,34,34,29,22,19,29,34,32,30,60);    	        	    
-    	    $header = $arr_consults[0];
+    	    $_SESSION["w"] = $w = array(18,34,34,29,22,19,29,34,32,30,60);    	        	    
+    	    $_SESSION["header"] = $header = $arr_consults[0];
     	        	    
 	else:
     	    $this->Cell(0,5,'PhilHealth Enrollees Masterlist - '.$_SESSION[datanode][name],0,1,'C');
@@ -141,8 +141,8 @@ function Header()
     	    $this->Cell(0,5,$brgy_label,0,1,'C');	
 
 
-	    $w = array(48,48,48,48,48,48,48); //340
-	    $header = array('NAME OF MEMBER','STREET,PUROK/SITIO','BARANGAY','DATE OF BIRTH','PHILHEALTH ID','DATE OF EXPIRATION','HOUSEHOLD MEMBERS'."\n".'(* - Potential Dependents)');    	    
+	    $_SESSION["w"] = $w = array(48,48,48,48,48,48,48); //340
+	    $_SESSION["header"] = $header = array('NAME OF MEMBER','STREET,PUROK/SITIO','BARANGAY','DATE OF BIRTH','PHILHEALTH ID','DATE OF EXPIRATION','HOUSEHOLD MEMBERS'."\n".'(* - Potential Dependents)');    	    
         endif;
 
         $this->SetWidths($w);
