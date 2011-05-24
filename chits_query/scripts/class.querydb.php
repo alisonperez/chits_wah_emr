@@ -271,7 +271,7 @@ class querydb{
 		elseif($quesno==38):
 			$this->process_sickchild();
 		elseif($quesno==39 || $quesno==50 || $quesno==51):
-			$this->process_ccdev_summary();
+			$ret_file = $this->process_ccdev_summary();
 		elseif($quesno==40): //FP TCL
 			$this->process_fp_tcl();
 		elseif($quesno==41): //FP summary table
@@ -297,10 +297,7 @@ class querydb{
 		elseif($quesno==100):
 			$ret_file = $this->process_demographic($quesno);	
 		elseif($quesno==110):
-
 			$ret_file = $this->process_philhealth_list($quesno);
-
-			$this->process_philhealth_list($quesno);
 		elseif($quesno==111):
 			$this->process_philhealth_consult($quesno);
 
@@ -815,11 +812,12 @@ class querydb{
 				break;		
 		}
 		
-		echo "<td><a href='./pdf_reports/ccdev_summary.php'><img src='../images/pdf_icon.jpg' width='80' height='80'>";
+		/*echo "<td><a href='./pdf_reports/ccdev_summary.php'><img src='../images/pdf_icon.jpg' width='80' height='80'>";
 		echo "</img></a><br>&nbsp;&nbsp;Export ".$link_label."<br> as PDF&nbsp;&nbsp;";
 		echo "</td>";
+		*/
 
-		if($_SESSION["ques"]=='51'): //for quarterly child care reports, generate csv and email
+		/*if($_SESSION["ques"]=='51'): //for quarterly child care reports, generate csv and email
 		
 			echo "<td><a href='./pdf_reports/ccdev_summary.php?form=csv'><img src='../images/doc_csv_icon.png' width='80' height='80'>";
 			echo "</img></a><br>&nbsp;&nbsp;Export ".$link_label."<br> as CSV&nbsp;&nbsp;";
@@ -827,7 +825,9 @@ class querydb{
 			
 			echo "<td><a href='mailto: alison_perez@yahoo.com' target='new'><img src='../images/email_icon.png' width='80' height='80'></img></a><br>&nbsp;&nbsp;Generate and Email <br>".$link_label."&nbsp;&nbsp;</td>";
 		endif;
-		
+		*/
+
+		return 'ccdev_summary.php';
 
 		echo "</tr>";
 		echo "</table>";

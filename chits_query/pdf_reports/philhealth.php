@@ -124,16 +124,6 @@ function Header()
 	
 	$this->SetFont('Arial','B',12);
 
-	$this->Cell(0,5,'PhilHealth Enrollees Masterlist - '.$_SESSION[datanode][name],0,1,'C');
-
-
-	$this->SetFont('Arial','',10);
-
-	$this->Cell(0,5,$brgy_label,0,1,'C');	
-
-	$_SESSION["w"] = $w = array(48,48,48,48,48,48,48); //340
-	$_SESSION["header"] = $header = array('NAME OF MEMBER','STREET,PUROK/SITIO','BARANGAY','DATE OF BIRTH','PHILHEALTH ID','DATE OF EXPIRATION','HOUSEHOLD MEMBERS');
-
 	if($_GET["type"]=='consult'):
 	    
 	    $arr_consults = $_SESSION[arr_consult];
@@ -213,6 +203,7 @@ function show_philhealth_consults(){
     
     foreach($arr_consults[1] as $key=>$value){
         foreach($value as $key2=>$value2){
+		echo $value2[0].'<br>';
             $philhealth_id='';
             $mem_type = $this->get_member_type($value2[0]);   //determine if the patient is a philhealth member, dependent or none of the two
             

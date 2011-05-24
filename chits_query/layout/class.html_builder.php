@@ -19,9 +19,21 @@ class html_builder{
 	}
 
 	function create_table($width,$header,$cell_contents){
+
+		if(func_num_args()>0):
+			$args = func_get_args();
+			$width = $args[0];
+			$header = $args[1];
+			$cell_contents = $args[2];
+			$subwidth = $args[3];
+			$subheader = $args[4];
+		endif;
+
 		echo "<table border='1'>";
-		$this->display_col_header($header);
-		$this->display_cell_content($cell_contents);
+		print_r($_SESSION);
+		$this->display_col_header($header,$width);
+		$this->display_subheader($subheader,$subwidth);
+		$this->display_cell_content($cell_contents,$subwidth);
 		echo "</table>";
 
 		/*print_r($width);
@@ -36,30 +48,61 @@ class html_builder{
 
 	}
 
-	function display_col_header($header){
+	function display_col_header($header,$width){
 		echo "<tr>";
-		foreach($header as $key=>$header_label){
-			echo "<td>";
-			echo $header_label;
+		for($i=0;$i<count($header);$i++){
+			echo "<td width='$width[$i]' colspan='2'>";
+			echo $header[$i];
 			echo "</td>";
 		}
 		echo "</tr>";
-
 	}
 
-	function display_cell_content($cell_contents){
+	function display_subheader($subheader,$subwidth){
+		echo "<tr>";
+		for($i=0;$i<count($subheader);$i++){
+			if($this->lookup_ques_for_colspan() && $i<$this->where_to_colspan()):
+				echo "<td width='$subwidth[$i]' colspan='2'>";
+			else:
+				echo "<td width='$subwidth[$i]'>";
+			endif;
+
+			echo $subheader[$i];
+			echo "</td>";
+		}
+		echo "</tr>";
+	}
+
+	function display_cell_content($cell_contents,$width){
 		
 		foreach($cell_contents as $key=>$value){
 			echo "<tr>";
 
-			foreach($value as $key2=>$value2){
-				echo "<td>";
-				echo $value2;
+			for($i=0;$i<count($value);$i++){
+				if($this->lookup_ques_for_colspan() && $i<$this->where_to_colspan()):
+					echo "<td colspan='2'>";
+				else:
+					echo "<td>";
+				endif;
+
+				echo $value[$i];
 				echo "</td>";
 			}
 
-			echo "</td>";
+			echo "</tr>";
+
 		}
+
+	}
+
+	function lookup_ques_for_colspan(){
+		$arr_with_colspan = array('39');
+		return in_array($_SESSION["ques"],$arr_with_colspan);
+	}
+
+	function where_to_colspan(){
+		$arr_where_colspan = array('39'=>'2');
+		return $arr_where_colspan[$_SESSION["ques"]];
 
 	}
 }

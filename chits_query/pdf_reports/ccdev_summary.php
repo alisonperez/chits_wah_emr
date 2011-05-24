@@ -5,9 +5,12 @@ session_start();
 ob_start();
 
 require('./fpdf/fpdf.php');
+require('../layout/class.html_builder.php');
 
 $db_conn = mysql_connect("localhost","$_SESSION[dbuser]","$_SESSION[dbpass]");
 mysql_select_db($_SESSION[dbname]);
+
+$html_tab = new html_builder();
 
 class PDF extends FPDF
 {
@@ -146,7 +149,7 @@ function Header()
 			else:
 				$brgy_label.= $brgyname.')';
 			endif;
-			
+
 		}
 	endif;
 
@@ -170,22 +173,18 @@ function Header()
                                                     
             if(mysql_num_rows($q_pop)!=0):
                 list($population) = mysql_fetch_row($q_pop);
-                                            
             else:
                 $population = 0;
             endif;
-                                                                            
-                                                                            
-        
+
 	if($_SESSION[ques]==50):  //monthly report
 		$this->Cell(0,5,'FHSIS REPORT FOR THE MONTH: '.date('F',mktime(0,0,0,$_SESSION[smonth],1,0)).'          YEAR: '.$_SESSION[year],0,1,L);
                 
-		$this->Cell(0,5,'NAME OF BHS: '.$this->get_brgy(),0,1,L);                                 
-		$w = array(200,40,40);                
-		
+		$this->Cell(0,5,'NAME OF BHS: '.$this->get_brgy(),0,1,L);
+		$w = array(200,40,40);
+
 		$header = array('CHILD CARE', 'Male', 'Female');
-		
-		
+
 	
 	elseif($_SESSION[ques]==51):  //quarterly report
                 $w = array(120,30,60,20,50,55);
@@ -197,6 +196,7 @@ function Header()
 	else:
 
 	endif;	
+
 	    $this->Cell(0,5,'MUNICIPALITY/CITY OF: '.$_SESSION[lgu],0,1,L);
             $this->Cell(0,5,'PROVINCE: '.$_SESSION[province].'          PROJECTED POPULATION OF THE YEAR: '.$population,0,1,L);
             $this->Ln(15);    
@@ -204,7 +204,10 @@ function Header()
 	else:
 	
 	endif;
-		
+	$_SESSION["w"] = $w;
+	$_SESSION["w2"] = $w2;
+	$_SESSION["header"] = $header;
+	$_SESSION["subheader"] = $subheader;
 		
 	$this->SetWidths($w);
 	$this->Row($header);	
@@ -222,6 +225,8 @@ function Footer(){
 }
 
 function show_ccdev_summary(){
+	$ccdev_rec = array();
+
 	$arr_indicators = array(array('Immunization Given < 1 yr'=>array('BCG'=>'BCG','DPT1'=>'DPT1','DPT2'=>'DPT2','DPT3'=>'DPT3','OPV1'=>'OPV1','OPV2'=>'OPV2','OPV3'=>'OPV3','HEPB1<24'=>'Hepa B1 w/ in 24 hrs','HEPB1>24'=>'Hepa B1 > 24 hours','HEPB2'=>'Hepatitis B2','HEPB3'=>'Hepatitis B3','MSL'=>'Measles')),'Fully Immunized Child','Completely Immunized Child (12-23 mos)','Child Protected at Birth','Infant age 6 mo seen','Infant exclusively breastfed until 6 mo','Infant 0-11 mos referred for NBS',array('Diarrhea (0-59 mos)'=>array('num_case'=>'No. of Cases','ort'=>'Given ORT','ors'=>'Given ORS','orswz'=>'Given ORS w/ Zinc')),array('Pneumonia (0-59 mos)'=>array('num_cases'=>'No. of cases','pneumonia_tx'=>'Given Treatment')),array('Sick Children Seen'=>array('6*11'=>'6-11 mos','12*59'=>'12-59 mos','60*71'=>'60-71 mos')),array('Sick Children Given Vit A'=>array('6*11'=>'6-11 mos','12*59'=>'12-59 mos','60*71'=>'60-71 mos')),'Infant 2-6 mos w/ LBW seen','Infant 2-6 mos w/ LBW given iron','Anemic Children 2-59 mos seen','Anemic Children 2-59 mos given iron');
 	$m_index = array('1'=>array('2','3'),'2'=>array('4','5'),'3'=>array('6','7'),'4'=>array('10','11'),'5'=>array('12','13'),'6'=>array('14','15'),'7'=>array('18','19'),'8'=>array('20','21'),'9'=>array('22','23'),'10'=>array('26','27'),'11'=>array('28','29'),'12'=>array('30','31'));
 	$q_index = array('1'=>array('8','9'),'2'=>array('16','17'),'3'=>array('24','25'),'4'=>array('32','33'));
@@ -244,7 +249,7 @@ function show_ccdev_summary(){
 		$target = round(($brgy_pop * $target_perc)); //get the population target
 		
 		$disp_arr = array();
-
+		
 		if(is_array($arr_indicators[$i])):
 
 			$sub_arr = array_keys($arr_indicators[$i]); //this will return the header title if the content is an array			
@@ -287,16 +292,16 @@ function show_ccdev_summary(){
                                                    
                                 //print_r($disp_arr);
                                 
-				$this->SetWidths($header);			        
+				$this->SetWidths($header);
 				
 				//$this->Row($disp_arr);
 			        
-				if($_SESSION[ques]==39):				    
-				    $this->Row($disp_arr);				    
+				if($_SESSION[ques]==39):
+				    $this->Row($disp_arr);
                                 elseif($_SESSION[ques]==50):
-                                    
+
                                     $m_arr = array('     '.$disp_arr[0],$disp_arr[$m_index[$_SESSION[smonth]][0]],$disp_arr[$m_index[$_SESSION[smonth]][1]]);
-                                    
+
                                     for($x=0;$x<count($m_arr);$x++){
                                         if($counter==0):
                                             $this->Cell($header[0],6,$sub_arr[0],'1',0,'L');
@@ -334,11 +339,13 @@ function show_ccdev_summary(){
                                     }
                                  
                                     $this->Ln();
-                                                                                                       
+
                                 else:
-                                
+
                                 endif;
+				
 			}
+			
 
 		else:
 			$load = 0;
@@ -364,23 +371,23 @@ function show_ccdev_summary(){
 			$this->SetWidths($header);
 			
 			//$this->Row($disp_arr);
-                        
+
                         if($_SESSION[ques]==39):
                             $this->Row($disp_arr);
                         elseif($_SESSION[ques]==50):
                             $m_arr = array($disp_arr[0],$disp_arr[$m_index[$_SESSION[smonth]][0]],$disp_arr[$m_index[$_SESSION[smonth]][1]]);
-                                    
+
                             for($x=0;$x<count($m_arr);$x++){                                                                
                                 $this->Cell($header[$x],6,$m_arr[$x],'1',0,'L');
                             }
-                            
-                            $this->Ln();                        
+
+                            $this->Ln();
                             //$this->Row(array($disp_arr[0],$disp_arr[$m_index[$_SESSION[smonth]][0]],$disp_arr[$m_index[$_SESSION[smonth]][1]]));
                         elseif($_SESSION[ques]==51):
                             $total_q = $disp_arr[$q_index[$_SESSION[quarter]][0]] + $disp_arr[$q_index[$_SESSION[quarter]][1]];
-                            
-                            $q_arr = array($disp_arr[0],$target,$disp_arr[$q_index[$_SESSION[quarter]][0]],$disp_arr[$q_index[$_SESSION[quarter]][1]],$total_q,$this->compute_ccdev_rate($target,$total_q),'','');
 
+                            $q_arr = array($disp_arr[0],$target,$disp_arr[$q_index[$_SESSION[quarter]][0]],$disp_arr[$q_index[$_SESSION[quarter]][1]],$total_q,$this->compute_ccdev_rate($target,$total_q),'','');
+			
                             for($x=0;$x<count($q_arr);$x++){
                                 $this->Cell($header[$x],6,$q_arr[$x],'1',0,'L');
                             }
@@ -398,7 +405,11 @@ function show_ccdev_summary(){
 		else:
 
 		endif;
+
+		array_push($ccdev_rec,$disp_arr);
 	}
+
+	return $ccdev_rec;
 }
 
 function compute_indicators(){
@@ -1285,14 +1296,14 @@ function get_brgy(){
 	for($x=0;$x<count($arr_brgy);$x++){
 	
         $q_brgy = mysql_query("SELECT barangay_name FROM m_lib_barangay WHERE barangay_id = '$arr_brgy[$x]' ORDER by barangay_id ASC") or die("Cannot query 252". mysql_error());        
-        
+
 	while(list($brgy) = mysql_fetch_array($q_brgy)){
 		$str_brgy = $str_brgy.'  '.$brgy;
-	}	        
+	}
 
-	}                
-    endif;                                                                         
-                                                                          
+	}
+    endif;
+
     return $str_brgy;
 }
 
@@ -1313,8 +1324,11 @@ $pdf->AliasNbPages();
 $pdf->SetFont('Arial','',10);
 $pdf->AddPage();
 
-$pdf->show_ccdev_summary();
+$ccdev_rec = $pdf->show_ccdev_summary();
 
-$pdf->Output();
-
+if($_GET["type"]=='html'):
+	$html_tab->create_table($_SESSION["w"],$_SESSION["header"],$ccdev_rec,$_SESSION["w2"],$_SESSION["subheader"]);
+else:
+	$pdf->Output();
+endif;
 ?>

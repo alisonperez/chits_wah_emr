@@ -72,7 +72,7 @@
     }  
 
 
-	function query_cat($dbname,$dbname2,$psdate,$pedate,$pbrgy){      	  
+	function query_cat($dbname,$dbname2,$psdate,$pedate,$pbrgy){
 
 	  mysql_select_db($dbname2);
 	  $query_cat = mysql_query("SELECT cat_label FROM ques_cat WHERE cat_id='$_SESSION[cat]'") or die("Cannot query: 77");
