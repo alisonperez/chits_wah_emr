@@ -226,6 +226,7 @@ function Footer(){
 
 function show_ccdev_summary(){
 	$ccdev_rec = array();
+	$arr_consolidate = array();
 
 	$arr_indicators = array(array('Immunization Given < 1 yr'=>array('BCG'=>'BCG','DPT1'=>'DPT1','DPT2'=>'DPT2','DPT3'=>'DPT3','OPV1'=>'OPV1','OPV2'=>'OPV2','OPV3'=>'OPV3','HEPB1<24'=>'Hepa B1 w/ in 24 hrs','HEPB1>24'=>'Hepa B1 > 24 hours','HEPB2'=>'Hepatitis B2','HEPB3'=>'Hepatitis B3','MSL'=>'Measles')),'Fully Immunized Child','Completely Immunized Child (12-23 mos)','Child Protected at Birth','Infant age 6 mo seen','Infant exclusively breastfed until 6 mo','Infant 0-11 mos referred for NBS',array('Diarrhea (0-59 mos)'=>array('num_case'=>'No. of Cases','ort'=>'Given ORT','ors'=>'Given ORS','orswz'=>'Given ORS w/ Zinc')),array('Pneumonia (0-59 mos)'=>array('num_cases'=>'No. of cases','pneumonia_tx'=>'Given Treatment')),array('Sick Children Seen'=>array('6*11'=>'6-11 mos','12*59'=>'12-59 mos','60*71'=>'60-71 mos')),array('Sick Children Given Vit A'=>array('6*11'=>'6-11 mos','12*59'=>'12-59 mos','60*71'=>'60-71 mos')),'Infant 2-6 mos w/ LBW seen','Infant 2-6 mos w/ LBW given iron','Anemic Children 2-59 mos seen','Anemic Children 2-59 mos given iron');
 	$m_index = array('1'=>array('2','3'),'2'=>array('4','5'),'3'=>array('6','7'),'4'=>array('10','11'),'5'=>array('12','13'),'6'=>array('14','15'),'7'=>array('18','19'),'8'=>array('20','21'),'9'=>array('22','23'),'10'=>array('26','27'),'11'=>array('28','29'),'12'=>array('30','31'));
@@ -297,10 +298,14 @@ function show_ccdev_summary(){
 				//$this->Row($disp_arr);
 			        
 				if($_SESSION[ques]==39):
+
+				    array_push($arr_consolidate,$disp_arr);
 				    $this->Row($disp_arr);
                                 elseif($_SESSION[ques]==50):
 
                                     $m_arr = array('     '.$disp_arr[0],$disp_arr[$m_index[$_SESSION[smonth]][0]],$disp_arr[$m_index[$_SESSION[smonth]][1]]);
+
+				    array_push($arr_consolidate,$m_arr);
 
                                     for($x=0;$x<count($m_arr);$x++){
                                         if($counter==0):
@@ -312,14 +317,15 @@ function show_ccdev_summary(){
                                         endif;
                                         $this->Cell($header[$x],6,$m_arr[$x],'1',0,'L');
                                     }
-                                    
+
                                     $this->Ln();                                    
                                     //$this->Row(array($disp_arr[0],$disp_arr[$m_index[$_SESSION[smonth]][0]],$disp_arr[$m_index[$_SESSION[smonth]][1]]));                                
                                 elseif($_SESSION[ques]==51):
                                     $total_q = $disp_arr[$q_index[$_SESSION[quarter]][0]] + $disp_arr[$q_index[$_SESSION[quarter]][1]];
-                                                
+
                                     $q_arr = array('     '.$disp_arr[0],$target,$disp_arr[$q_index[$_SESSION[quarter]][0]],$disp_arr[$q_index[$_SESSION[quarter]][1]],$total_q,$this->compute_ccdev_rate($target,$total_q),' ',' ');
-                                    
+
+				    array_push($arr_consolidate,$q_arr);
                                     
                                     for($x=0;$x<count($q_arr);$x++){
                                         if($counter==0):
@@ -344,7 +350,6 @@ function show_ccdev_summary(){
 
                                 endif;
 				
-				array_push($ccdev_rec,$disp_arr);	
 			}
 			
 
@@ -374,9 +379,12 @@ function show_ccdev_summary(){
 			//$this->Row($disp_arr);
 
                         if($_SESSION[ques]==39):
+			    array_push($arr_consolidate,$disp_arr);
                             $this->Row($disp_arr);
                         elseif($_SESSION[ques]==50):
                             $m_arr = array($disp_arr[0],$disp_arr[$m_index[$_SESSION[smonth]][0]],$disp_arr[$m_index[$_SESSION[smonth]][1]]);
+
+			    array_push($arr_consolidate,$m_arr);
 
                             for($x=0;$x<count($m_arr);$x++){                                                                
                                 $this->Cell($header[$x],6,$m_arr[$x],'1',0,'L');
@@ -388,7 +396,9 @@ function show_ccdev_summary(){
                             $total_q = $disp_arr[$q_index[$_SESSION[quarter]][0]] + $disp_arr[$q_index[$_SESSION[quarter]][1]];
 
                             $q_arr = array($disp_arr[0],$target,$disp_arr[$q_index[$_SESSION[quarter]][0]],$disp_arr[$q_index[$_SESSION[quarter]][1]],$total_q,$this->compute_ccdev_rate($target,$total_q),'','');
-			
+
+			    array_push($arr_consolidate,$q_arr);
+
                             for($x=0;$x<count($q_arr);$x++){
                                 $this->Cell($header[$x],6,$q_arr[$x],'1',0,'L');
                             }
@@ -406,11 +416,9 @@ function show_ccdev_summary(){
 		else:
 
 		endif;
-
-		array_push($ccdev_rec,$disp_arr);
 	}
-
-	return $ccdev_rec;
+	
+	return $arr_consolidate;
 }
 
 function compute_indicators(){

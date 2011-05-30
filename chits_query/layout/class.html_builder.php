@@ -14,8 +14,9 @@
 class html_builder{
 
 	function html_builder(){
-
-
+      		$this->appName="HTML Builder";
+      		$this->appVersion="0.13";
+      		$this->appAuthor="Alison Perez";
 	}
 
 	function create_table($width,$header,$cell_contents){
@@ -51,7 +52,8 @@ class html_builder{
 		echo "<tr>";
 		for($i=0;$i<count($header);$i++){
 			if($this->lookup_ques_for_colspan() && $i>=$this->where_to_colspan()):
-				echo "<td width='$width[$i]' colspan='2'>";
+				$cols = $this->get_colspan();
+				echo "<td width='$width[$i]' colspan='$cols'>";
 			else:
 				echo "<td width='$width[$i]'>";
 			endif; 
@@ -100,13 +102,25 @@ class html_builder{
 	}
 
 	function lookup_ques_for_colspan(){
-		$arr_with_colspan = array('39');
+		$arr_with_colspan = array('39','51');
 		return in_array($_SESSION["ques"],$arr_with_colspan);
 	}
 
 	function where_to_colspan(){
-		$arr_where_colspan = array('39'=>'2');
+		#question_number => rows where colspan would start
+		$arr_where_colspan = array('39'=>'2','51'=>'2');
 		return $arr_where_colspan[$_SESSION["ques"]];
+	}
+
+	function get_colspan(){
+		switch($_SESSION["ques"]){
+			case '51':
+				return '3';
+				break;
+			default:
+				return '2';
+				break;
+		}
 	}
 }
 
