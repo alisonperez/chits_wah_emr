@@ -5,10 +5,13 @@ session_start();
 ob_start();
 
 require('./fpdf/fpdf.php');
+require('../layout/class.html_builder.php');
 
 
 $db_conn = mysql_connect("localhost","$_SESSION[dbuser]","$_SESSION[dbpass]");
 mysql_select_db($_SESSION[dbname]);
+
+$html_tab = new html_builder();
 
 class PDF extends FPDF
 {
@@ -130,9 +133,9 @@ function Header()
     $this->Cell(340,10,'F A M I L Y   P L A N N I N G',1,1,C);
     
     $this->SetFont('Arial','B','12');
-    $w = array(75,28,28,26,28,28,28,47,52);
+    $_SESSION["w"] = $w = array(75,28,28,26,28,28,28,47,52);
     $this->SetWidths($w);
-    $label = array('Indicators','Current User (Begin Qtr)','New Acceptors','Others','Dropout','Current User (End Qtr)','CPR'."\n".'(CU/TP) x 14.5% x 85%','Interpretation','Recommendation/Action Taken');
+    $_SESSION["header"] = $label = array('Indicators','Current User (Begin Qtr)','New Acceptors','Others','Dropout','Current User (End Qtr)','CPR'."\n".'(CU/TP) x 14.5% x 85%','Interpretation','Recommendation/Action Taken');
     $this->Row($label);
 }
 
@@ -146,6 +149,10 @@ function q_report_header($population){
 
 function show_fp_quarterly(){
     $arr_method = array('a'=>'FSTRBTL','b'=>'MSV','c'=>'PILLS','d'=>'IUD','e'=>'DMPA','f'=>'NFPCM','g'=>'NFPBBT','h'=>'NFPLAM','i'=>'NFPSDM','j'=>'NFPSTM','k'=>'CONDOM');
+
+    $arr_consolidate = array();
+
+
     $w = array(75,28,28,26,28,28,28,47,52);    
     //$w = array(75,28,28,26,26,28,28,47,52);
     $str_brgy = $this->get_brgy();    
@@ -164,7 +171,7 @@ function show_fp_quarterly(){
         $cpr = $this->get_cpr($cu_pres);
                 
         $fp_contents = array($col_code.'. '.$method_name,$cu_prev,$na_pres,$other_pres,$dropout_pres,$cu_pres,$cpr,'','');
-        
+        array_push($arr_consolidate,$fp_contents);
         
         for($x=0;$x<count($fp_contents);$x++){
             $this->Cell($w[$x],6,$fp_contents[$x],'1',0,'L');
@@ -172,8 +179,9 @@ function show_fp_quarterly(){
         $this->Ln();                
 
 //        $this->Row($fp_contents);
-        
     }
+
+	return $arr_consolidate;
 }
 
 function get_brgy(){  //returns the barangay is CSV format. to be used in WHERE clause for determining barangay residence of patient
@@ -349,10 +357,15 @@ $pdf->SetFont('Arial','',10);
 
 $pdf->AddPage();
 
-$pdf->show_fp_quarterly();
+$fp_rec = $pdf->show_fp_quarterly();
 
 //$pdf->AddPage();
 //$pdf->show_fp_summary();
-$pdf->Output();
+
+if($_GET["type"]=='html'):
+	$html_tab->create_table($_SESSION["w"],$_SESSION["header"],$fp_rec);	
+else:
+	$pdf->Output();
+endif;
 
 ?>

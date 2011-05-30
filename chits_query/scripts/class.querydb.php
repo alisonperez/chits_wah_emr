@@ -277,7 +277,7 @@ class querydb{
 		elseif($quesno==41): //FP summary table
 			$ret_file = $this->process_fp_summary();
 		elseif($quesno==42):
-			$this->process_fp_quarterly();
+			$ret_file = $this->process_fp_quarterly();
 		elseif($quesno==43):
 			$this->process_fp_monthly();
 		elseif($quesno==60):
@@ -875,7 +875,8 @@ class querydb{
 	}
 	
 	function process_fp_quarterly(){
-		echo "<a href='./pdf_reports/fp_quarterly.php'>Show Family Planning Quarterly Report</a>";		
+		return 'fp_quarterly.php';
+		//echo "<a href='./pdf_reports/fp_quarterly.php'>Show Family Planning Quarterly Report</a>";		
 	}
 	
 	function process_fp_monthly(){

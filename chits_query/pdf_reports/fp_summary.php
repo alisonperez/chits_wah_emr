@@ -231,7 +231,6 @@ function show_fp_summary(){
 		}
 
 	}	
-
 	return $arr_consolidate;
 }
 
