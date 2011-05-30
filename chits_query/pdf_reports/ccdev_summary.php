@@ -289,16 +289,14 @@ function show_ccdev_summary(){
 				}
 				
 				array_push($disp_arr,array_sum($male_quarterly),array_sum($female_quarterly));
-                                
-                                                   
+
                                 //print_r($disp_arr);
-                                
+
 				$this->SetWidths($header);
 				
 				//$this->Row($disp_arr);
-			        
-				if($_SESSION[ques]==39):
 
+				if($_SESSION[ques]==39):
 				    array_push($arr_consolidate,$disp_arr);
 				    $this->Row($disp_arr);
                                 elseif($_SESSION[ques]==50):

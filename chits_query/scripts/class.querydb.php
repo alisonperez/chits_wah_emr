@@ -275,7 +275,7 @@ class querydb{
 		elseif($quesno==40): //FP TCL
 			$this->process_fp_tcl();
 		elseif($quesno==41): //FP summary table
-			$this->process_fp_summary();
+			$ret_file = $this->process_fp_summary();
 		elseif($quesno==42):
 			$this->process_fp_quarterly();
 		elseif($quesno==43):
@@ -870,7 +870,8 @@ class querydb{
 	}
 	
 	function process_fp_summary(){
-		echo "<a href='./pdf_reports/fp_summary.php'>Show Family Planning Summary Table</a>";
+		return 'fp_summary.php';
+		//echo "<a href='./pdf_reports/fp_summary.php'>Show Family Planning Summary Table</a>";
 	}
 	
 	function process_fp_quarterly(){

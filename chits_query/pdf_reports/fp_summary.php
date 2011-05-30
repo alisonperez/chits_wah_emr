@@ -5,10 +5,12 @@ session_start();
 ob_start();
 
 require('./fpdf/fpdf.php');
-
+require('../layout/class.html_builder.php');
 
 $db_conn = mysql_connect("localhost","$_SESSION[dbuser]","$_SESSION[dbpass]");
 mysql_select_db($_SESSION[dbname]);
+
+$html_tab = new html_builder();
 
 class PDF extends FPDF
 {
@@ -160,8 +162,8 @@ function Header()
 	$this->Cell(0,5,$brgy_label,0,1,'C');		
 	$this->Ln(10);
 	//$w = array(30,18,18,18,18,15,18,18,18,15,18,18,18,15,18,18,18,15,18); //340
-	$w = array(66,18,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15); //340
-	$header = array('INDICATORS','Target','JAN','FEB','MAR','1st Q','APR','MAY','JUNE','2nd Q','JULY','AUG','SEPT','3rd Q','OCT','NOV','DEC','4th Q','TOTAL');	
+	$_SESSION["w"] = $w = array(66,18,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15); //340
+	$_SESSION["header"] = $header = array('INDICATORS','Target','JAN','FEB','MAR','1st Q','APR','MAY','JUNE','2nd Q','JULY','AUG','SEPT','3rd Q','OCT','NOV','DEC','4th Q','TOTAL');	
 		
 	$this->SetWidths($w);
 	$this->Row($header);		
@@ -170,7 +172,7 @@ function Header()
 
 function show_fp_summary(){
 	$arr_methods = array();
-
+	$arr_consolidate = array();
 	
 	$brgy_pop = $this->get_brgy_pop();    //compute for the brgy population: ALL or specific brgys only
         $target_pop = $this->get_target($brgy_pop); //compute for the target of FP        
@@ -187,29 +189,28 @@ function show_fp_summary(){
 	
 	$arr_indicators = array('NA'=>array('Total New Acceptors',$arr_methods),'OTHER'=>array('Other Acceptors',$arr_methods),'DROPOUT'=>array('Total Drop Out',$arr_methods),'CU'=>array('Total Current Users',$arr_methods));
 	
-	
-	
 	foreach($arr_indicators as $client_type=>$methods){				
 	        
     	        foreach($methods as $key=>$value){
                 
                 $arr_row = array();
                 $arr_label = array();
-                
-                                
+
 	        if(is_array($value)):  //this is the second index of the main array. this is the array of methods
 	            foreach($value as $method_key=>$method_value){
 	                //echo $methods.'/'.$value.'/'.$method_key.'/'.$method_value.'<br>';
 	                $arr_method_label = array(); //clean up the label array for each iteration in the method
-	                array_push($arr_method_label,$method_value,''); //push the label for method and a '' for blank target	                
+	                array_push($arr_method_label,$method_value,''); //push the label for method and a '' for blank target	               	 
                         $arr_row = $this->compute_indicator($client_type,$method_key);
                         $arr_total_quarter = $this->create_qt_gt($arr_row);
-                        
-                        //print_r($arr_method_label);
+
+			array_push($arr_consolidate,array_merge($arr_method_label,$arr_total_quarter));
+
                         $this->Row(array_merge($arr_method_label,$arr_total_quarter));
+			
                     }
                     $this->Row($this->return_blank(19));   //this will print a row with 19 blank cells
-                    
+
 	        else: //this is the first index, just a text/header but will contain the total of all methods
 	            $this->Row($this->return_blank(19));
 	            $i += 1;
@@ -217,16 +218,21 @@ function show_fp_summary(){
                     $arr_row = $this->compute_indicator($client_type,'all');
                     array_push($arr_label,$target_pop);
                     $arr_total_quarter = $this->create_qt_gt($arr_row);
-                    $this->Row(array_merge($arr_label,$arr_total_quarter));
+
+		    $this->Row(array_merge($arr_label,$arr_total_quarter));
+
+		    array_push($arr_consolidate,array_merge($arr_label,$arr_total_quarter));
+
                     $this->Row($this->return_blank(19));
 	        endif;	        
 	        
 		//array_push($arr_rows,$arr_indicators[$client_type][0]);
 					
 		}
-			
-						
+
 	}	
+
+	return $arr_consolidate;
 }
 
 
@@ -542,9 +548,18 @@ $pdf->SetFont('Arial','',10);
 
 $pdf->AddPage();
 
+$fp_rec = $pdf->show_fp_summary();
+
+
 
 //$pdf->AddPage();
-$pdf->show_fp_summary();
-$pdf->Output();
+
+if($_GET["type"]=='html'):
+	$html_tab->create_table($_SESSION["w"],$_SESSION["header"],$fp_rec);
+else:
+	//$pdf->show_fp_summary();
+	$pdf->Output();
+endif;
+
 
 ?>
