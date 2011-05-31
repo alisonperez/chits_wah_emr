@@ -5,10 +5,12 @@ session_start();
 ob_start();
 
 require('./fpdf/fpdf.php');
-
+require('../layout/class.html_builder.php');
 
 $db_conn = mysql_connect("localhost","$_SESSION[dbuser]","$_SESSION[dbpass]");
 mysql_select_db($_SESSION[dbname]);
+
+$html_tab = new html_builder();
 
 class PDF extends FPDF
 {
@@ -128,17 +130,21 @@ function Header()
     $this->Cell(340,8,'M O R B I D I T Y   D I S E A S E   R E P O R T',1,1,C);
     
     $this->SetFont('Arial','','8');
-    $w = array(60,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,24);    
+    $_SESSION["w"] = $w = array(60,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,24);    
+    
     $this->SetWidths($w);
-    $label = array('DISEASE','ICD CODE','Under 1','1-4','5-9','10-14','15-19','20-24','25-29','30-34','35-39','40-44','45-49','50-54','55-59','60-64','65&above','TOTAL');
+    
+    $_SESSION["header"] = $label = array('DISEASE','ICD CODE','Under 1','1-4','5-9','10-14','15-19','20-24','25-29','30-34','35-39','40-44','45-49','50-54','55-59','60-64','65&above','TOTAL');
     $this->Row($label);
     
-    $w = array(60,16,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,12,12);        
+    $_SESSION["w2"] = $w = array(60,16,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,12,12);        
     array_push($arr_gender,' ',' ');
     
     for($i=0;$i<16;$i++){
         array_push($arr_gender,'M','F');
     }
+
+    $_SESSION["subheader"] = $arr_gender;
     $this->SetWidths($w);
     $this->Row($arr_gender);
     
@@ -208,7 +214,9 @@ function show_header_province(){
 
 
 function show_morbidity(){
-    
+
+    $arr_consolidate = array();
+
     $w = array(60,16,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,12,12);
     
     $arr_gender = array('M','F');
@@ -428,15 +436,20 @@ function show_morbidity(){
      foreach($final_arr2 as $key_final=>$value_final){         
           $this->SetWidths($w);          
           $this->Row($value_final);          
+	
+	array_push($arr_consolidate,$value_final);
      }
           
 
-    else:
+    else: 
           $this->SetWidths(array('340'));
           $this->SetFont('Arial','','10');     
           $this->Row(array('No recorded morbidity and notifiable disease for this period'));
-    endif;                   
-            
+
+	  array_push($arr_consolidate,array('No recorded morbidity and notifiable disease for this period'));
+    endif;
+
+    return $arr_consolidate;
 }
 
 function sort_icd($arr){
@@ -558,10 +571,14 @@ $pdf->SetFont('Arial','',10);
 
 $pdf->AddPage();
 
-$pdf->show_morbidity();
+$morb_rec = $pdf->show_morbidity();
 
 //$pdf->AddPage();
 //$pdf->show_fp_summary();
-$pdf->Output();
+if($_GET["type"]=='html'):
+	$html_tab->create_table($_SESSION["w"],$_SESSION["header"],$morb_rec,$_SESSION["w2"],$_SESSION["subheader"]);
+else:
+	$pdf->Output();
+endif;
 
 ?>

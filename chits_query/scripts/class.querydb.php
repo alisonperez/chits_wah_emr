@@ -279,7 +279,7 @@ class querydb{
 		elseif($quesno==42):
 			$ret_file = $this->process_fp_quarterly();
 		elseif($quesno==43):
-			$this->process_fp_monthly();
+			$ret_file = $this->process_fp_monthly();
 		elseif($quesno==60):
 			$this->process_dhc_quarterly();
 		elseif($quesno==61):
@@ -291,7 +291,7 @@ class querydb{
 		elseif($quesno>=66 && $quesno<70):		
 			$this->process_leprosy($quesno);		
 		elseif($quesno>=70 && $quesno<=73):			
-			$this->process_morbidity($quesno);
+			$ret_file = $this->process_morbidity($quesno);
 		elseif($quesno>=90 && $quesno<=99):
 			$this->process_tb($quesno);	
 		elseif($quesno==100):
@@ -880,7 +880,8 @@ class querydb{
 	}
 	
 	function process_fp_monthly(){
-		echo "<a href='./pdf_reports/fp_monthly.php'>Show Family Planning Monthly Report</a>";
+		return 'fp_monthly.php';
+		//echo "<a href='./pdf_reports/fp_monthly.php'>Show Family Planning Monthly Report</a>";
 	}
 	
 	function process_dhc_pho(){
@@ -902,11 +903,12 @@ class querydb{
 	
 	
 	function process_morbidity($quesno){		
-		$q_morb = mysql_query("SELECT ques_label FROM question WHERE ques_id=$quesno");
+		/*$q_morb = mysql_query("SELECT ques_label FROM question WHERE ques_id=$quesno");
 		if(mysql_num_rows($q_morb)!=0):
 			list($ques_label) = mysql_fetch_array($q_morb);
 			echo "<a href='./pdf_reports/morbidity_report.php'>Show $ques_label</a>";
-		endif;
+		endif;*/
+		return 'morbidity_report.php';
 	}
 	
 	function process_tb($quesno){			

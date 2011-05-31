@@ -102,13 +102,13 @@ class html_builder{
 	}
 
 	function lookup_ques_for_colspan(){
-		$arr_with_colspan = array('39','51');
+		$arr_with_colspan = array('39','51','70','71','72','73');
 		return in_array($_SESSION["ques"],$arr_with_colspan);
 	}
 
 	function where_to_colspan(){
 		#question_number => rows where colspan would start
-		$arr_where_colspan = array('39'=>'2','51'=>'2');
+		$arr_where_colspan = array('39'=>'2','51'=>'2','70'=>'2','71'=>'2','72'=>'2','73'=>'2',);
 		return $arr_where_colspan[$_SESSION["ques"]];
 	}
 
