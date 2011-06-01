@@ -18,7 +18,7 @@
 	endif;	
 ?>
 
-
+<link rel=StyleSheet href="design.css" type="text/css">
 <html>
 <head>
 <title>CHITS QUERY BROWSER</title>

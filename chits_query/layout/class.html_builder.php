@@ -30,7 +30,7 @@ class html_builder{
 			$subheader = $args[4];
 		endif;
 
-		echo "<table border='1'>";
+		echo "<table style='font-family: arial; width: 100%; background-color: #CCCCCC'>";
 		$this->display_col_header($header,$width);
 		$this->display_subheader($subheader,$subwidth);
 		$this->display_cell_content($cell_contents,$subwidth);
@@ -49,9 +49,9 @@ class html_builder{
 	}
 
 	function display_col_header($header,$width){
-		echo "<tr>";
+		echo "<tr style='background-color: #000000;  color: white; border: 0px; margin: 0px; font-family: Verdana, Geneva, Arial, Helvetica, sans-serif; font-weight: bold; text-align: center; white-space: nowrap; font-size: 19px;'>";
 		for($i=0;$i<count($header);$i++){
-			if($this->lookup_ques_for_colspan() && $i>=$this->where_to_colspan()):
+			if($this->lookup_ques_for_colspan() && $i>=$this->where_to_colspan() && (($this->end_colspan()!=0)?$i<$this->end_colspan():true)):
 				$cols = $this->get_colspan();
 				echo "<td width='$width[$i]' colspan='$cols'>";
 			else:
@@ -65,7 +65,7 @@ class html_builder{
 	}
 
 	function display_subheader($subheader,$subwidth){
-		echo "<tr>";
+		echo "<tr style='color: white; background-color: #000000; text-align: center; font-size: 19px;'>";
 		for($i=0;$i<count($subheader);$i++){
 			//if($this->lookup_ques_for_colspan() && $i>$this->where_to_colspan()):
 			//	echo "<td width='$subwidth[$i]' colspan='2'>";
@@ -82,7 +82,7 @@ class html_builder{
 	function display_cell_content($cell_contents,$width){
 		
 		foreach($cell_contents as $key=>$value){
-			echo "<tr>";
+			echo "<tr style='background-color: #666666; color: #FFFF66; font-weight:bold; white-space: nowrap; font-size: 19px;'>";
 
 			for($i=0;$i<count($value);$i++){
 				//if($this->lookup_ques_for_colspan() && $i<$this->where_to_colspan()):
@@ -110,6 +110,15 @@ class html_builder{
 		#question_number => rows where colspan would start
 		$arr_where_colspan = array('39'=>'2','51'=>'2','70'=>'2','71'=>'2','72'=>'2','73'=>'2','92'=>'1','94'=>'2');
 		return $arr_where_colspan[$_SESSION["ques"]];
+	}
+
+	function end_colspan(){
+		$arr_end_colspan = array('51'=>'3');
+		if($arr_end_colspan[$_SESSION["ques"]]):
+			return $arr_end_colspan[$_SESSION["ques"]];
+		else:
+			return 0;
+		endif;
 	}
 
 	function get_colspan(){
