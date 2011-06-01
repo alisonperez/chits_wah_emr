@@ -293,7 +293,7 @@ class querydb{
 		elseif($quesno>=70 && $quesno<=73):			
 			$ret_file = $this->process_morbidity($quesno);
 		elseif($quesno>=90 && $quesno<=99):
-			$this->process_tb($quesno);	
+			$ret_file = $this->process_tb($quesno);	
 		elseif($quesno==100):
 			$ret_file = $this->process_demographic($quesno);	
 		elseif($quesno==110):
@@ -915,10 +915,12 @@ class querydb{
 		$q_tb = mysql_query("SELECT ques_label FROM question WHERE ques_id='$quesno'") or die("Cannot query 824 ".mysql_error());
 		if(mysql_num_rows($q_tb)!=0):
 			list($ques_label) = mysql_fetch_array($q_tb);
-			if($quesno=='92' || $quesno=='93'):
-				echo "<a href='./pdf_reports/tb_summary.php'>Show $ques_label</a>";
+			if($quesno==92 || $quesno==93):
+				return 'tb_summary.php';
+				//echo "<a href='./pdf_reports/tb_summary.php'>Show $ques_label</a>";
 			elseif($quesno==94):
-				echo "<a href='./pdf_reports/tb_summary.php'>Show $ques_label</a>";
+				return 'tb_summary.php';
+				//echo "<a href='./pdf_reports/tb_summary.php'>Show $ques_label</a>";
 			elseif($quesno==95): //tb register
 				if($_SESSION[brgy]=='all'):					
 					$q_register = mysql_query("SELECT patient_id,ntp_id FROM m_patient_ntp WHERE intensive_start_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' AND patient_id<>0 ORDER by intensive_start_date ASC") or die("Cannot query 836 ".mysql_error());

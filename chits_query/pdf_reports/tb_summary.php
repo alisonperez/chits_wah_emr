@@ -5,10 +5,13 @@ session_start();
 ob_start();
 
 require('./fpdf/fpdf.php');
+require('../layout/class.html_builder.php');
 
 
 $db_conn = mysql_connect("localhost","$_SESSION[dbuser]","$_SESSION[dbpass]");
 mysql_select_db($_SESSION[dbname]);
+
+$html_tab = new html_builder();
 
 class PDF extends FPDF
 {
@@ -161,16 +164,18 @@ function Header()
 	$this->Cell(0,5,$brgy_label,0,1,'C');		
 	$this->Ln(10);
 	//$w = array(30,18,18,18,18,15,18,18,18,15,18,18,18,15,18,18,18,15,18); //340
-	$w = array(54,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16); //340
-    	$header = array('INDICATORS','Target','JAN','FEB','MAR','1st Q','APR','MAY','JUNE','2nd Q','JULY','AUG','SEPT','3rd Q','OCT','NOV','DEC','4th Q','TOTAL');	
+	$_SESSION["w"] = $w = array(54,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16); //340
+    	$_SESSION["header"] = $header = array('INDICATORS','Target','JAN','FEB','MAR','1st Q','APR','MAY','JUNE','2nd Q','JULY','AUG','SEPT','3rd Q','OCT','NOV','DEC','4th Q','TOTAL');	
       		
 	
 	
-	$w2 = array(54,16,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8);
+	$_SESSION["w2"] = $w2 = array(54,16,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8);
 	array_push($gender,' ',' ');
 	for($i=0;$i<17;$i++){
 	  array_push($gender,'M','F');	  
 	}
+
+	$_SESSION["subheader"] = $gender;
 	
 	
 	
@@ -183,11 +188,11 @@ function Header()
     	        $this->SetFont('Arial','B',12);
     	        
                 
-                $w = array('100','90','60','60');
-                $header = array('TUBERCULOSIS','Number','Interpretation','Recommendation / Actions Taken');
+                $_SESSION["w"] = $w = array('100','90','60','60');
+                $_SESSION["header"] = $header = array('TUBERCULOSIS','Number','Interpretation','Recommendation / Actions Taken');
 	    
-                $w2 = array('100','30','30','30','60','60');
-                $header2 = array(' ','Male','Female','Total',' ',' ');
+                $_SESSION["w2"] = $w2 = array('100','30','30','30','60','60');
+                $_SESSION["subheader"] = $header2 = array(' ','Male','Female','Total',' ',' ');
                 
 	    elseif($_SESSION[ques]==93): //TB M report table header
 	        $this->SetFont('Arial','B',15);	    	        	    
@@ -195,8 +200,8 @@ function Header()
     	        
 	        $this->SetFont('Arial','B',12);
 
-	        $w = array('100','45','45');
-                $header = array('TUBERCULOSIS','MALE','FEMALE');
+	        $_SESSION["w"] = $w = array('100','45','45');
+                $_SESSION["header"] = $header = array('TUBERCULOSIS','MALE','FEMALE');
 	    
 	    else:
 	    
@@ -269,7 +274,7 @@ function show_header_province(){
 
 function show_tb_summary(){
 	
-	
+	$arr_consolidate = array();	
 	$brgy_pop = $this->get_brgy_pop();    //compute for the brgy population: ALL or specific brgys only
         $target_pop = $this->get_target($brgy_pop); //compute for the target of FP        
         $str_brgy = $this->get_brgy(); //return list of barangays in CSV format
@@ -313,12 +318,16 @@ function show_tb_summary(){
               $header = array(54,16,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8);                                  
               $this->SetWidths($header);
               $this->Row($disp_arr);  
+
+	      array_push($arr_consolidate,$disp_arr);
           
           elseif($_SESSION[ques]==93): //TB M report
               $header = array('100','45','45');          
               
               $m_arr = array('     '.$disp_arr[0],$disp_arr[$m_index[$_SESSION[smonth]][0]],$disp_arr[$m_index[$_SESSION[smonth]][1]]);
-              
+
+              array_push($arr_consolidate,$m_arr);
+
               $this->Cell($header[0],6,$m_arr[0],'1',0,'L');   
               $this->Cell($header[1],6,$m_arr[1],'1',0,'L');   
               $this->Cell($header[2],6,$m_arr[2],'1',0,'L');   
@@ -326,9 +335,10 @@ function show_tb_summary(){
           
           elseif($_SESSION[ques]==92):
               $header = array('100','30','30','30','60','60');
-              
+		
               $total_q =  $disp_arr[$q_index[$_SESSION[quarter]][0]] + $disp_arr[$q_index[$_SESSION[quarter]][1]];
               $q_arr = array($disp_arr[0],$disp_arr[$q_index[$_SESSION[quarter]][0]],$disp_arr[$q_index[$_SESSION[quarter]][1]],$total_q,'','');
+	      array_push($arr_consolidate,$q_arr);
               
               $this->Cell($header[0],6,$q_arr[0],'1',0,'L');
               $this->Cell($header[1],6,$q_arr[1],'1',0,'L');
@@ -343,6 +353,8 @@ function show_tb_summary(){
           endif;                    
           
         }			
+
+	return $arr_consolidate;
 }
 
 
@@ -650,9 +662,12 @@ $pdf->SetFont('Arial','',10);
 
 $pdf->AddPage();
 
+$tb_rec = $pdf->show_tb_summary();
 
 //$pdf->AddPage();
-$pdf->show_tb_summary();
-$pdf->Output();
-
+if($_GET["type"]=='html'):
+	$html_tab->create_table($_SESSION["w"],$_SESSION["header"],$tb_rec,$_SESSION["w2"],$_SESSION["subheader"]);
+else:	
+	$pdf->Output();
+endif;
 ?>
