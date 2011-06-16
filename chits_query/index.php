@@ -148,13 +148,14 @@ if($_SESSION["userid"]!=""):
 
 
       echo "</td></tr>";
-      echo "</table>";
-
-
+      
+      echo "</table>";      
 else:  
   echo "<font color=\"red\">Access restricted. Please log your account in the CHITS main page.</font><br>";
   echo "<a href=\"$_SERVER[PHP_SELF]\">Try Again</a>";
 endif;
+
+$widconn->footer();
 
 ?>
 </body>

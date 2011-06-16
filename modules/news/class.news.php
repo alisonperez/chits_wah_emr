@@ -109,9 +109,13 @@ class news extends module {
             $isadmin = $arg_list[4];
             //print_r($arg_list);
         }
-        
+	$n = new news;
+
         mysql_query("ALTER TABLE `m_news` DROP PRIMARY KEY, ADD PRIMARY KEY(`news_id`)");
-                
+
+	
+	$n->update_stats();
+
         print "<table width='300'>";
         print "<tr valign='top'><td>";
         print "<span class='library'>".FTITLE_SITE_NEWS."</span><br>";
@@ -190,10 +194,53 @@ class news extends module {
         print "</td></tr></table>";
     }
 
+    function update_stats(){
+	$title = 'Stat Updates for '.date('m/d/Y');
+	$author = '1';	//1 for admin user
+	$lead = 'This is a daily system-generated stats report. Check the numbers by clicking the VIEW button';
+	$q_total_consultation = mysql_query("SELECT count(notes_id) FROM m_consult_notes WHERE DATE(notes_timestamp)<=CURDATE()") or die("Cannot query 202: ".mysql_error());
+
+	list($total_consult) = mysql_fetch_array($q_total_consultation);
+	
+	$q_total_patients = mysql_query("SELECT count(patient_id) FROM m_patient WHERE DATE(registration_date)<=CURDATE()") or die("Cannot query 206: ".mysql_error());
+	list($total_px) = mysql_fetch_array($q_total_patients);
+
+	$q_consults_today = mysql_query("SELECT count(notes_id) FROM m_consult_notes WHERE DATE(notes_timestamp)=CURDATE()") or die("Cannot query 209: ".mysql_error());
+	list($consult_today) = mysql_fetch_array($q_consults_today);
+
+	$q_px_today = mysql_query("SELECT count(patient_id) FROM m_patient where DATE(registration_date)=CURDATE()") or die("Cannot query 209: ".mysql_error());
+	list($px_today) = mysql_fetch_array($q_px_today);
+
+	$top_brgy = mysql_query("SELECT a.barangay_name,COUNT(d.patient_id) as 'bilang' from m_lib_barangay a, m_family_members b, m_family_address c,m_consult_notes d WHERE DATE(d.notes_timestamp) <= CURDATE() AND d.patient_id=b.patient_id AND b.family_id=c.family_id AND c.barangay_id=a.barangay_id GROUP by a.barangay_id ORDER by bilang DESC LIMIT 1") or die("Cannot query 214: ".mysql_error());
+
+	list($brgy,$px_count) = mysql_fetch_array($top_brgy);
+
+	$top_brgy_today = mysql_query("SELECT a.barangay_name,COUNT(d.patient_id) as 'bilang' from m_lib_barangay a, m_family_members b, m_family_address c,m_consult_notes d WHERE DATE(d.notes_timestamp) = CURDATE() AND d.patient_id=b.patient_id AND b.family_id=c.family_id AND c.barangay_id=a.barangay_id GROUP by a.barangay_id ORDER by bilang DESC LIMIT 1") or die("Cannot query 214: ".mysql_error());
+
+	list($brgy_today,$px_count_today) = mysql_fetch_array($top_brgy_today);
+
+	$text = 'Total Consultations ('.date('m/d/Y').'): '.$consult_today.'<br> Total Overall Consultations: '.$total_consult;
+	$text = $text.'<br><br>Total Patients ('.date('m/d/Y').'): '.$px_today.'<br>Total Overall Patients: '.$total_px.'<br>';
+	$text = $text.'<br>All-time Top Visiting Barangay: '.$brgy.' ('.$px_count.') <br>Top Visiting Barangay  ('.date('m/d/Y').'): '.$brgy_today.'<br>';
+
+
+	$q_stat = mysql_query("SELECT news_id FROM m_news WHERE DATE(news_timestamp)=CURDATE()") or die('Cannot query 218 '.mysql_error());
+
+	if(mysql_num_rows($q_stat)!=0):
+		list($news_id) = mysql_fetch_array($q_stat);
+		$q_update = mysql_query("UPDATE m_news SET news_text='$text' WHERE news_id='$news_id'") or die("Cannot query 221 ".mysql_error()); 
+	else:
+
+		$q_insert = mysql_query("INSERT INTO m_news SET news_timestamp=NOW(),news_author='$author',news_title='$title',news_lead='$lead',news_text='$text',news_active='Y'") or die("CAnnot query 225: ".mysql_error());
+	endif;
+
+    }
+
     function display_news() {
     //
     // called from _vaccine()
     //
+	
         if (func_num_args()) {
             $arg_list = func_get_args();
             $menu_id = $arg_list[0];
@@ -223,6 +270,7 @@ class news extends module {
     //
     // called from _vaccine()
     //
+
         if (func_num_args()) {
             $arg_list = func_get_args();
             $menu_id = $arg_list[0];
@@ -307,6 +355,8 @@ class news extends module {
             $get_vars = $arg_list[2];
             //print_r($arg_list);
         }
+
+	
         if ($post_vars["submitnews"]) {
             $active = ($post_vars["news_active"]?"Y":"N");
             if ($post_vars["news_title"] && $post_vars["news_lead"]) {
@@ -353,6 +403,6 @@ class news extends module {
             }
         }
     }
-
 }
+
 ?>

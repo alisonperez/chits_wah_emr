@@ -148,7 +148,7 @@ small { font-family: verdana, sans serif}
        // display two-tier admin menu
        $site->displaymenu($_SESSION["validuser"],"ADMIN", $_SESSION["isadmin"]);
    } else {
-       // display menus as top level menu
+       // display menus as top level menu 
        $site->displaymenu($_SESSION["validuser"],"USER", $_SESSION["isadmin"]);
    }
    ?>
@@ -180,7 +180,7 @@ small { font-family: verdana, sans serif}
             }
             if (!$_SESSION["validuser"]) {
                 $user->authenticate();
-            } else {            
+            } else {
                 $user->signoff($_SESSION["user_first"], $_SESSION["user_last"], $_SESSION["datanode"]["name"], $_SESSION["isadmin"], $_SERVER["REMOTE_ADDR"], $_SESSION["userid"]);
             }
             ?>

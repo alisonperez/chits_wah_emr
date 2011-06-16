@@ -90,7 +90,6 @@ class html_builder{
 				//else:
 					echo "<td>";
 				//endif;
-
 				echo $value[$i];
 				echo "</td>";
 			}
@@ -126,7 +125,6 @@ class html_builder{
 			case '51':
 				return '3';
 				break;
-
 			case '92':
 				return '3';
 				break;
@@ -134,6 +132,11 @@ class html_builder{
 				return '2';
 				break;
 		}
+	}
+
+
+	function link_builder(){
+
 	}
 }
 

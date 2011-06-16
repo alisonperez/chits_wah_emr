@@ -119,13 +119,13 @@
                                         endif;
                                 }
           
-                        echo "</select></td>";                          
+                        echo "</select></td>";
                 else:
                         echo "<td>No barangays found</td>";
                 endif;
-        
-                echo "</tr>";                        
-		
+
+                echo "</tr>";
+
 		elseif($set_filter=='3'):
 		        $this->disp_filter_quarterly($query_brgy);
                 elseif($set_filter=='4'):
@@ -146,8 +146,7 @@
         echo "<input type=\"reset\" name=\"q_reset\" value=\"Reset\"></input></td>";
         echo "</tr>";
 
-      
-      echo "</table>";      
+      echo "</table>";
 
     } 
 
@@ -327,7 +326,21 @@
 				echo "<option value='$i'>$i</option>";
 			endif;
 		}
-		echo "</select></td></tr>";			
+		echo "</select></td></tr>";
 	}
+
+
+	function footer(){
+		echo "<br><br><br>";
+      		echo "<table width='100%' style='font-family: arial; font-size: 11px;'>";
+		echo "<tr><td height='300;'></td></tr>";
+      		echo "<tr align='center'><td valign='top' style=\"background-color: #666666;color: #FFFF66;text-align: center;\">";
+      		echo "Copyright @ 2007-2011 | The Query Browser | ";
+      		echo "Developed and maintained by alison@perez-ph.net";
+      		echo "</td></tr>";
+      		echo "</table>";
+	}
+
+	
   }
 ?>

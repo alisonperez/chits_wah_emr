@@ -155,8 +155,8 @@ function Header()
 		}
 	endif;
 
-	$this->SetFont('Arial','',10);	
-	$this->Cell(0,5,$brgy_label,0,1,'C');		
+	$this->SetFont('Arial','',10);
+	$this->Cell(0,5,$brgy_label,0,1,'C');
 	$_SESSION["w"] = $w = array(30,18,18,18,18,15,18,18,18,15,18,18,18,15,18,18,18,15,18); //340
 	$_SESSION["header"] = $header = array('INDICATORS','Target','JAN','FEB','MAR','1st Q','APR','MAY','JUNE','2nd Q','JULY','AUG','SEPT','3rd Q','OCT','NOV','DEC','4th Q','TOTAL');
 	
@@ -333,7 +333,7 @@ function compute_indicator($crit){
 				endif;
 
 				if($banat==1): //$banat variable, if set to 1 mean the patient is in the barangay
-
+					
 				for($j=1;$j<=3;$j++){   //traverse for checking the trimester format 1-1-2
 					$get_tri = mysql_query("SELECT consult_id, prenatal_date FROM m_consult_mc_prenatal WHERE trimester='$j' AND mc_id='$mcid' ORDER by prenatal_date DESC") or die("Cannot query: 186");
 										
@@ -353,7 +353,7 @@ function compute_indicator($crit){
 							$max_date = date("n",mktime(0,0,0,$latestm,$latestd,$yr)); //get the unix timestamp then return month without trailing 0
 							$arr[$j] = ($num>=2)?1:0; //check if the third trimester has at least 2 visits
 
-						  endif;						
+						  endif;
 					   else:
 						  $arr[$j] = 1; //marked trimester 1 and 2 with 1's if $num!=0
 					   endif;
@@ -362,7 +362,7 @@ function compute_indicator($crit){
 				} //exit 1-1-4 format checking
 								
 				
-				if($arr[1]==1 && $arr[2]==1 && $arr[3]==1):	
+				if($arr[1]==1 && $arr[2]==1 && $arr[3]==1):
 					$month_stat[$max_date]+=1;
 				endif;				
 
@@ -846,6 +846,4 @@ if($_GET["type"]=='html'):
 else:
 	$pdf->Output();
 endif;
-
-
 ?>
