@@ -10,11 +10,12 @@ class news extends module {
     // constructor
     // do not forget to update version
     //
-        $this->author = 'Herman Tolentino MD';
-        $this->version = "0.3-".date("Y-m-d");
+        $this->author = 'Herman Tolentino MD / darth_ali';
+        $this->version = "0.8-".date("Y-m-d");
         $this->module = "news";
         $this->description = "CHITS Content - News";
         // 0.3 improved layout
+	//added a function that would auto generate quick stats of the day
     }
 
     // --------------- STANDARD MODULE FUNCTIONS ------------------

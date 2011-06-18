@@ -30,9 +30,14 @@ class User {
             $get_vars = $arg_list[2];
             //print_r($arg_list);
         }
-        if ($post_vars["submituser"]) {
-            user::process_user($menu_id, $post_vars, $get_vars);
+
+	
+
+        if ($post_vars["submituser"]) {		
+		print_r($_FILES);
+            //user::process_user($menu_id, $post_vars, $get_vars);
         }
+
         print "<table width='600' cellpadding='2'><tr valign='top'><td>";
         user::form_user($menu_id, $post_vars, $get_vars);
         print "</td><td>";
@@ -251,7 +256,7 @@ class User {
         print "<tr valign='top'><td>";
         print "<span class='admin'>".FTITLE_SITE_USER_FORM."</span><br><br>";
         print "</td></tr>";
-        print "<form action = '".$_SERVER["SELF"]."?page=ADMIN&method=USER&user_id=".$get_vars["user_id"]."' name='form_user' method='post'>";
+        print "<form action = '".$_SERVER["SELF"]."?page=ADMIN&method=USER&user_id=".$get_vars["user_id"]."' name='form_user' method='post' enctype='multipart/form-data'>";
         print "<tr><td colspan='2'><b>NOTE: Fields marked with <font color='red'>*</font> are required.</b><br><br></td></tr>";
         print "<tr valign='top'><td>";
         print "<span class='boxtitle'>".LBL_FIRST_NAME."</span><br> ";
@@ -265,6 +270,13 @@ class User {
         print "<span class='boxtitle'>".LBL_LAST_NAME."</span><br> ";
         print "<input type='text' maxlength='50' class='textbox' name='user_lastname' value='".($user["user_lastname"]?$user["user_lastname"]:$post_vars["user_lastname"])."' style='border: 1px solid #000000'> <font color='red'>*</font><br>";
         print "</td></tr>";
+
+	echo "<tr valign='top'><td>";
+	echo "<span class='boxtitle'>UPLOAD PHOTO (less than 500KB)</span><br>";
+	echo "<input type='file' name='profile_pic'></input>";
+	
+	echo "</td></tr>";
+
         print "<tr valign='top'><td>";
         print "<span class='boxtitle'>".LBL_DATE_OF_BIRTH."</span><br> ";
         if ($user["user_dob"]) {
@@ -763,7 +775,7 @@ class User {
         "<tr bgcolor='#CCCC00'><td>".
         "<b>".LBL_SIGN_OUT."</b>".
         "</td></tr>".
-        "<tr><td>".
+        "<tr><td><img src='http://localhost/chits/images/profile/profile_pic.jpg' width='90%' height='10%'><br>".
         "<font size='2'><b>".ucwords("$first $last")."</b> $userid ".($isadmin?"<b>[admin]</b>":"")." from <b>$service</b> logged in from <b>$ipaddress</b>. Please do not forget to sign off.</font><br>".
         "<tr><td>".
         "<input type='submit' value = '".BTN_SIGN_OUT."' class='textbox' name='submitlogout' style='border: 1px solid #000000'><br>".
