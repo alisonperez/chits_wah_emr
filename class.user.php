@@ -34,8 +34,7 @@ class User {
 	
 
         if ($post_vars["submituser"]) {		
-		print_r($_FILES);
-            //user::process_user($menu_id, $post_vars, $get_vars);
+            user::process_user($menu_id, $post_vars, $get_vars);
         }
 
         print "<table width='600' cellpadding='2'><tr valign='top'><td>";
@@ -105,6 +104,7 @@ class User {
             case "Add User":
                 $active = ($post_vars["isactive"]?"Y":"N");
                 $admin = ($post_vars["isadmin"]?"Y":"N");
+		$this->move_image();
                 $sql = "insert into game_user (user_firstname, user_lastname, user_middle, user_lang, ".
                        "user_email, user_cellular, user_login, user_password, user_pin, user_dob, user_gender, ".
                        "user_active, user_admin, user_role) ".
@@ -112,9 +112,9 @@ class User {
                        "'".$post_vars["lang_id"]."', '".strtolower($post_vars["user_email"])."', '".$post_vars["user_cellular"]."', ".
                        "'".strtolower($post_vars["user_login"])."', old_password('".$post_vars["user_password"]."'), '".$post_vars["user_pin"]."', '$dob', '".$post_vars["user_gender"]."', ".
                        "'$active', '$admin', '".$post_vars["role_id"]."')";
-                if ($result = mysql_query($sql)) {
-                    header("location: ".$_SERVER["PHP_SELF"]."?page=ADMIN&method=USER");
-                }
+                //if ($result = mysql_query($sql)) {
+                  //  header("location: ".$_SERVER["PHP_SELF"]."?page=ADMIN&method=USER");
+                //}
                 break;
             case "Update User":
                 $active = ($post_vars["isactive"]?"Y":"N");
@@ -164,6 +164,9 @@ class User {
     }
 
     function validate_user() {
+	$allowed_image_format = array('image/png','image/jpg','image/gif','image/jpeg');
+
+
         if (func_num_args()) {
             $arg_list = func_get_args();
             $post_vars = $arg_list[0];
@@ -203,6 +206,14 @@ class User {
                     }
                 }
             }
+
+
+	    if($_FILES["profile_pic"]["size"]!=0){
+	    if((!in_array($_FILES["profile_pic"]["type"],$allowed_image_format)) || ($_FILES["profile_pic"]["size"] > 200000)){
+		$retval.= "<li class='error'>Uploaded photo should be in png, jpeg or gif and size < 200 KB.</li>";
+	    }
+	    }
+
             return $retval;
         }
     }
@@ -272,7 +283,8 @@ class User {
         print "</td></tr>";
 
 	echo "<tr valign='top'><td>";
-	echo "<span class='boxtitle'>UPLOAD PHOTO (less than 500KB)</span><br>";
+	echo "<input type='hidden' name='MAXSIZE' value='200000' />";
+	echo "<span class='boxtitle'>UPLOAD PHOTO (less than 200KB)</span><br>";
 	echo "<input type='file' name='profile_pic'></input>";
 	
 	echo "</td></tr>";
@@ -775,7 +787,7 @@ class User {
         "<tr bgcolor='#CCCC00'><td>".
         "<b>".LBL_SIGN_OUT."</b>".
         "</td></tr>".
-        "<tr><td><img src='http://localhost/chits/images/profile/profile_pic.jpg' width='90%' height='10%'><br>".
+        "<tr><td>".
         "<font size='2'><b>".ucwords("$first $last")."</b> $userid ".($isadmin?"<b>[admin]</b>":"")." from <b>$service</b> logged in from <b>$ipaddress</b>. Please do not forget to sign off.</font><br>".
         "<tr><td>".
         "<input type='submit' value = '".BTN_SIGN_OUT."' class='textbox' name='submitlogout' style='border: 1px solid #000000'><br>".
@@ -845,6 +857,11 @@ class User {
                 return $name;
             }
         }
+   }
+
+   function move_image(){
+	echo 'alison';
+
    }
 
 }

@@ -271,7 +271,7 @@ function show_mc_summary(){
                     $this->SetFont('Arial','',13);
 
                     array_push($arr_disp,$criteria[$i],$target,$q_array[$_SESSION[quarter]],$this->compute_mc_rate($target,$q_array[$_SESSION[quarter]]).'%',' ',' ');
-		    
+
 		    array_push($arr_consolidate,$arr_disp);
 
                     for($x=0;$x<count($arr_disp);$x++){
@@ -360,7 +360,7 @@ function compute_indicator($crit){
 					endif;
 					
 				} //exit 1-1-4 format checking
-								
+
 				
 				if($arr[1]==1 && $arr[2]==1 && $arr[3]==1):
 					$month_stat[$max_date]+=1;

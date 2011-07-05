@@ -136,7 +136,7 @@ function Header()
 	$this->SetFont('Arial','B',12);
 
 	
-	if($_SESSION[ques]==94):
+ 	if($_SESSION[ques]==94):	//TB summary table
 	
 	$this->Cell(0,5,'Tuberculosis Summary Table ( '.$date_label.' )'.' - '.$municipality_label,0,1,'C');
 	
@@ -172,49 +172,46 @@ function Header()
 	$_SESSION["w2"] = $w2 = array(54,16,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8);
 	array_push($gender,' ',' ');
 	for($i=0;$i<17;$i++){
-	  array_push($gender,'M','F');	  
+	  array_push($gender,'M','F');
 	}
 
 	$_SESSION["subheader"] = $gender;
-	
-	
-	
+
 	elseif($_SESSION[ques]==92 || $_SESSION[ques]==93):
-	    $this->q_report_header();		   
-                                        	    
+	    $this->q_report_header();
+
     	    if($_SESSION[ques]==92): //TB Q report table header
-    	        $this->SetFont('Arial','B',15);	    	        	    
-    	        $this->Cell(310,8,'D I S E A S E   C O N T R O L',1,1,C);    	    
+    	        $this->SetFont('Arial','B',15);
+    	        $this->Cell(310,8,'D I S E A S E   C O N T R O L',1,1,C);
     	        $this->SetFont('Arial','B',12);
-    	        
-                
                 $_SESSION["w"] = $w = array('100','90','60','60');
                 $_SESSION["header"] = $header = array('TUBERCULOSIS','Number','Interpretation','Recommendation / Actions Taken');
-	    
+
                 $_SESSION["w2"] = $w2 = array('100','30','30','30','60','60');
                 $_SESSION["subheader"] = $header2 = array(' ','Male','Female','Total',' ',' ');
-                
+
 	    elseif($_SESSION[ques]==93): //TB M report table header
-	        $this->SetFont('Arial','B',15);	    	        	    
+	        $this->SetFont('Arial','B',15);
     	        $this->Cell(190,8,'D I S E A S E   C O N T R O L',1,1,C);
-    	        
+
 	        $this->SetFont('Arial','B',12);
 
 	        $_SESSION["w"] = $w = array('100','45','45');
                 $_SESSION["header"] = $header = array('TUBERCULOSIS','MALE','FEMALE');
-	    
+        	$_SESSION["w2"] = $w2 = array();
+                $_SESSION["subheader"] = $header2 = array();
 	    else:
-	    
+
 	    endif;
 	else:
 	
-	endif;			
+	endif;
 	
 	$this->SetWidths($w);
 	$this->Row($header);
 	
 	$this->SetWidths($w2);
-	$this->Row($gender);		
+	$this->Row($gender);
 	
 	$this->Row($header2);
 }
@@ -315,15 +312,15 @@ function show_tb_summary(){
           array_push($disp_arr,array_sum($male_quarterly),array_sum($female_quarterly)); //grand total
           
           if($_SESSION[ques]==94):    
-              $header = array(54,16,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8);                                  
+              $header = array(54,16,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8); 
               $this->SetWidths($header);
               $this->Row($disp_arr);  
 
 	      array_push($arr_consolidate,$disp_arr);
           
           elseif($_SESSION[ques]==93): //TB M report
-              $header = array('100','45','45');          
-              
+              $header = array('100','45','45');
+
               $m_arr = array('     '.$disp_arr[0],$disp_arr[$m_index[$_SESSION[smonth]][0]],$disp_arr[$m_index[$_SESSION[smonth]][1]]);
 
               array_push($arr_consolidate,$m_arr);
@@ -331,8 +328,8 @@ function show_tb_summary(){
               $this->Cell($header[0],6,$m_arr[0],'1',0,'L');   
               $this->Cell($header[1],6,$m_arr[1],'1',0,'L');   
               $this->Cell($header[2],6,$m_arr[2],'1',0,'L');   
-              $this->Ln();                               
-          
+              $this->Ln();
+
           elseif($_SESSION[ques]==92):
               $header = array('100','30','30','30','60','60');
 		
