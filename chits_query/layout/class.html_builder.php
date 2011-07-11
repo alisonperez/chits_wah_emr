@@ -29,12 +29,19 @@ class html_builder{
 			$subwidth = $args[3];
 			$subheader = $args[4];
 		endif;
-
-		echo "<table style='font-family: arial; width: 100%; background-color: #CCCCCC'>";
-		$this->display_col_header($header,$width);
-		$this->display_subheader($subheader,$subwidth);
-		$this->display_cell_content($cell_contents,$subwidth);
-		echo "</table>";
+		
+		
+		if(sizeof($cell_contents)!=0):
+			echo "<table style='font-family: arial; width: 100%; background-color: #CCCCCC'>";
+			$this->display_col_header($header,$width);
+			$this->display_subheader($subheader,$subwidth);
+			$this->display_cell_content($cell_contents,$subwidth);
+			echo "</table>";
+		else: 
+			echo "No data found";
+		endif;
+		
+		
 
 		/*print_r($width);
 		print_r($header);
@@ -101,18 +108,18 @@ class html_builder{
 	}
 
 	function lookup_ques_for_colspan(){
-		$arr_with_colspan = array('39','51','70','71','72','73','92','94');
+		$arr_with_colspan = array('39','51','70','71','72','73','92','94','90');
 		return in_array($_SESSION["ques"],$arr_with_colspan);
 	}
 
 	function where_to_colspan(){
 		#question_number => rows where colspan would start
-		$arr_where_colspan = array('39'=>'2','51'=>'2','70'=>'2','71'=>'2','72'=>'2','73'=>'2','92'=>'1','94'=>'2');
+		$arr_where_colspan = array('39'=>'2','51'=>'2','70'=>'2','71'=>'2','72'=>'2','73'=>'2','92'=>'1','94'=>'2','90'=>'6');
 		return $arr_where_colspan[$_SESSION["ques"]];
 	}
 
 	function end_colspan(){
-		$arr_end_colspan = array('51'=>'3');
+		$arr_end_colspan = array('51'=>'3','90'=>'8');
 		if($arr_end_colspan[$_SESSION["ques"]]):
 			return $arr_end_colspan[$_SESSION["ques"]];
 		else:

@@ -5,10 +5,12 @@ session_start();
 ob_start();
 
 require('./fpdf/fpdf.php');
-
+require('../layout/class.html_builder.php');
 
 $db_conn = mysql_connect("localhost","$_SESSION[dbuser]","$_SESSION[dbpass]");
 mysql_select_db($_SESSION[dbname]);
+
+$html_tab = new html_builder();
 
 class PDF extends FPDF
 {
@@ -127,26 +129,23 @@ function Header()
     
     $this->SetFont('Arial','B','15');    
     $this->Cell(0,5,'T B    R E G I S T E R ( '.$date_label.' )'.' - '.$municipality_label,0,1,'C');
-    
-    
     $arr_brgy = array($_SESSION[brgy]);
-    
-    if(in_array('all',$arr_brgy)):        
-        $brgy_label = '(All Barangays)';                
+
+    if(in_array('all',$arr_brgy)):
+        $brgy_label = '(All Barangays)';
     else:
         $brgy_label = '(';
-                            
+
         for($i=0;$i<count($_SESSION[brgy]);$i++){
             $brgy = $_SESSION[brgy][$i];
             $q_brgy = mysql_query("SELECT barangay_name FROM m_lib_barangay WHERE barangay_id='$brgy'") or die("Cannot query: 139");
             list($brgyname) = mysql_fetch_array($q_brgy);
-                                                                        
-                      
-            if($i!=(count($_SESSION[brgy])-1)):                             
+
+            if($i!=(count($_SESSION[brgy])-1)):
                 $brgy_label.= $brgyname.', ';
             else:
                 $brgy_label.= $brgyname.')';
-            endif;                                                                                                                                            
+            endif;
         }
     endif;    
         
@@ -479,18 +478,18 @@ function get_sputum_result($diag){
         case 'P':
             $diag = 'Positive';
             break;
-                        
+
         case 'N':
             $diag = 'Negative';
             break;
-                        
+
         case 'D':
             $diag = 'Doubtful';
             break;
-                        
-        default:                    
+
+        default:
             $diag = '';
-            break;                
+            break;
     }
     
     return $diag;
@@ -520,9 +519,13 @@ $pdf->AliasNbPages();
 $pdf->SetFont('Arial','',10);
 $pdf->AddPage();
 
-$pdf->show_first();
+$tb_rec = $pdf->show_first();
 
 //$_SESSION[pahina]==1?$pdf->show_first():$pdf->show_first();
-$pdf->Output();
+if($_GET["type"]=='html'):
+	$html_tab->create_table($_SESSION["w"],$_SESSION["header"],$tb_rec,$_SESSION["w2"],$_SESSION["subheader"]);
+else:
+	$pdf->Output();
+endif;
 
 ?>

@@ -236,10 +236,10 @@ function q_report_header(){
     $this->show_header_rhu();
     $this->show_header_lgu();
     $this->show_header_province();
-    $this->Ln();                    
+    $this->Ln();
 }
 
-function show_header_freq($freq,$freq_val){    
+function show_header_freq($freq,$freq_val){
     $this->Cell(0,5,$freq.$freq_val."          YEAR: ".$_SESSION[year],0,1,L);    
 }
 
@@ -343,12 +343,12 @@ function show_tb_summary(){
               $this->Cell($header[3],6,$q_arr[3],'1',0,'L');
               $this->Cell($header[4],6,$q_arr[4],'1',0,'L');
               $this->Cell($header[5],6,$q_arr[5],'1',0,'L');
-              
+
               $this->Ln();
           else:
-          
-          endif;                    
-          
+
+          endif;
+
         }			
 
 	return $arr_consolidate;
@@ -404,21 +404,21 @@ function compute_indicator($indicator){
           endif;
           
           array_push($arr_gender_stat,$month_stat);
-        
+
         }
-        
+
         break;
-        
+
       case 2: // new TB patients initiated tretment, 1. new case, 2. have not taken TB drugs in less than a month
-        
+
         for($x=0;$x<count($arr_gender);$x++){
-        
-        $month_stat = array(1=>0,2=>0,3=>0,4=>0,5=>0,6=>0,7=>0,8=>0,9=>0,10=>0,11=>0,12=>0);        
-        
+
+        $month_stat = array(1=>0,2=>0,3=>0,4=>0,5=>0,6=>0,7=>0,8=>0,9=>0,10=>0,11=>0,12=>0);
+
         $q_ntp = mysql_query("SELECT a.patient_id,a.ntp_id,a.patient_type_id,a.intensive_start_date FROM m_patient_ntp a, m_patient b WHERE a.intensive_start_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' AND a.patient_type_id='NEW' AND a.patient_id=b.patient_id AND b.patient_gender='$arr_gender[$x]'") or die("Cannot query 279 ".mysql_error());
-        
+
         if(mysql_num_rows($q_ntp)!=0):
-          
+
           while(list($pxid,$ntp_id,$pxtype,$intensive_date)=mysql_fetch_array($q_ntp)){
             if($this->get_px_brgy($pxid,$brgy)):
               $month_stat[$this->get_max_month($intensive_date)] += 1;
@@ -429,9 +429,9 @@ function compute_indicator($indicator){
           array_push($arr_gender_stat,$month_stat);
         
         }
-        
+
         break;
-      
+
       case 3: // number of NEW smear (+) cases cured: 1. tx completed, 2. sputum negative in the duration of tx and continuation phase. CURED status in db
           for($x=0;$x<count($arr_gender);$x++){
               $month_stat = array(1=>0,2=>0,3=>0,4=>0,5=>0,6=>0,7=>0,8=>0,9=>0,10=>0,11=>0,12=>0);
@@ -443,7 +443,7 @@ function compute_indicator($indicator){
                       if($this->get_px_brgy($pxid,$brgy)):
                           $month_stat[$this->get_max_month($tx_end)] += 1;
                       endif;
-                  
+
                   }              
               endif;
                
@@ -512,7 +512,7 @@ function get_quarterly_total($r_month){
         }
        return $q_total;
 }
-                                                                                                                                                
+ 
 
 function get_target($brgy_pop){
 	return round($brgy_pop * 0.85 * 0.145); //FP Target = total population X 14.5 X 85%
@@ -636,7 +636,6 @@ function get_max_month($date){
 
         return $max_date;
 }    
-
 
 
 function Footer(){

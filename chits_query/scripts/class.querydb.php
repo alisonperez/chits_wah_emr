@@ -921,8 +921,8 @@ class querydb{
 			elseif($quesno==94):
 				return 'tb_summary.php';
 				//echo "<a href='./pdf_reports/tb_summary.php'>Show $ques_label</a>";
-			elseif($quesno==95): //tb register
-				if($_SESSION[brgy]=='all'):					
+			elseif($quesno==95): //tb register 
+				if($_SESSION[brgy]=='all'):
 					$q_register = mysql_query("SELECT patient_id,ntp_id FROM m_patient_ntp WHERE intensive_start_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' AND patient_id<>0 ORDER by intensive_start_date ASC") or die("Cannot query 836 ".mysql_error());
 				else:
 					$q_register = mysql_query("SELECT a.patient_id,a.ntp_id FROM m_patient_ntp a, m_family_members b, m_family_address c WHERE a.intensive_start_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' AND a.patient_id<>0 AND a.patient_id=b.patient_id AND b.family_id=c.family_id AND c.barangay_id='$_SESSION[brgy]'  ORDER by a.intensive_start_date ASC") or die("Cannot query 839 ".mysql_error());
@@ -940,15 +940,18 @@ class querydb{
 					$_SESSION[ntp_id] = $arr_ntp_id;
 					
 					echo "Show $ques_label: <a href='./pdf_reports/tb_register.php?page=1'>Page 1</a>&nbsp;&nbsp;<a href='./pdf_reports/tb_register.php?page=2'>Page 2</a>";
+					
 				
 				else:
 					echo "<font color='red'>No result/s found.</font>";
 				endif;
 			
 			elseif($quesno==90): //tb symptomatics
-				echo "<a href='./pdf_reports/tb_symptomatics.php'>Show $ques_label</a>";
+				//echo "<a href='./pdf_reports/tb_symptomatics.php'>Show $ques_label</a>";
+				return 'tb_symptomatics.php';
 			elseif($quesno==91): //ntp lab register
-				echo "<a href='./pdf_reports/tb_symptomatics.php'>Show $ques_label</a>";
+				//echo "<a href='./pdf_reports/tb_symptomatics.php'>Show $ques_label</a>";
+				return 'tb_register.php';
 			else:
 				
 			endif;

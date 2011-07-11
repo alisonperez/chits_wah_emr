@@ -2,11 +2,12 @@
 session_start();
 ob_start();
 require('./fpdf/fpdf.php');
-
+require('../layout/class.html_builder.php');
 
 $db_conn = mysql_connect("localhost","$_SESSION[dbuser]","$_SESSION[dbpass]");
 mysql_select_db($_SESSION[dbname]);
 
+$html_tab = new html_builder();
 
 class PDF extends FPDF{
 
@@ -130,46 +131,44 @@ function Header()
 	    $this->SetFont('Arial','',10);
 	    $this->Cell(0,5,$brgy_label,0,1,'C');	
 	
-	    $w = array(20,25,50,40,10,10,84,44,17,40); //340
-	    $header = array('Family Serial No.','Date of Registration','Name','Address','Age','Sex','Date Sputum Collected / Examination Result','X-ray Examination','TB Case Number','Remarks');
+	    $_SESSION["w"] = $w = array(20,25,50,40,10,10,84,44,17,40); //340
+	    $_SESSION["header"] = $header = array('Family Serial No.','Date of Registration','Name','Address','Age','Sex','Date Sputum Collected / Examination Result','X-ray Examination','TB Case Number','Remarks');
 
 	    $this->SetFont('Arial','',8);	
-	    $w2 = array(20,25,50,40,10,10,42,42,22,22,17,40);
-	    $header2 = array('','','','','','','1st','2nd','Date Referred','Date & result','','');		    
-	    
+	    $_SESSION["w2"] = $w2 = array(20,25,50,40,10,10,42,42,22,22,17,40);
+	    $_SESSION["subheader"] = $header2 = array('','','','','','','1st','2nd','Date Referred','Date & result','','');
+
         elseif($_SESSION[ques]==91):
             $this->SetFont('Arial','B',12);	
             $this->Cell(0,5,'NTP LABORATORY REGISTER'.'( '.$_SESSION[sdate_orig].' to '.$_SESSION[edate_orig].' )'.' - '.$_SESSION[datanode][name],0,1,'C');        
-            
+
             $this->SetFont('Arial','',10);
 	    $this->Cell(0,5,$brgy_label,0,1,'C');	
-	    
-	    $w = array(15,23,35,10,7,35,40,25,84,35,30); //340
-	    $header = array('Family Serial No.','Date of Registration','Name','Age','Sex','Name of Collection/Treatment Unit','Address','Reason for Examination','Date of Examination / Result','Remarks','Signature of MT/Microscopist');
-	        	        	        
+
+	    $_SESSION["w"] = $w = array(15,23,35,10,7,35,40,25,84,35,30); //340
+	    $_SESSION["header"] = $header = array('Family Serial No.','Date of Registration','Name','Age','Sex','Name of Collection/Treatment Unit','Address','Reason for Examination','Date of Examination / Result','Remarks','Signature of MT/Microscopist');
+
             $this->SetFont('Arial','',8);	
-	                
-            $w2 = array(15,23,35,10,7,35,40,10,15,42,42,35,30);
-            $header2 = array('','','','','','','','DX','F-up (TB Case no)','1st','2nd','','');
-            	                        	                        	    
+
+            $_SESSION["w2"] = $w2 = array(15,23,35,10,7,35,40,10,15,42,42,35,30);
+            $_SESSION["header2"] = $header2 = array('','','','','','','','DX','F-up (TB Case no)','1st','2nd','','');
+
         else:
-        
+
         endif;
 
-
-	
-        
         $this->SetWidths($w);
         $this->Row($header);
-        
+
         $this->SetWidths($w2);
         $this->Row($header2);
 }
 
 
 function show_symptomatic(){ 
-    
-    
+
+    $arr_consolidate = array();
+
     if($_SESSION[brgy]=='all'):
         $q_symptomatic = mysql_query("SELECT patient_id,date_seen,TO_DAYS(date_seen) as day_seen,ntp_id,sputum_diag1,sputum_diag2,xray_date_referred, xray_date_received,xray_result,remarks FROM m_consult_ntp_symptomatics WHERE date_seen BETWEEN '$_SESSION[sdate]' AND '$_SESSION[edate]' ORDER by date_seen ASC") or die("Cannot query: 150: ".mysql_error()); 
     else:
@@ -214,12 +213,17 @@ function show_symptomatic(){
                     
                     if($_SESSION[ques]==90):
                         $w = array(20,25,50,40,10,10,42,42,22,22,17,40);                    
-                        $this->SetWidths($w);                                        
+                        $this->SetWidths($w);
                         $this->Row(array($family_id,$date_seen,$lname.', '.$fname,$address.', '.$brgy,$edad,$gender,$sputum1,$sputum2,$xray_refer,$xray_receive.''.$xray_res,$ntp_id,$remarks));
+
+			array_push($arr_consolidate,array($family_id,$date_seen,$lname.', '.$fname,$address.', '.$brgy,$edad,$gender,$sputum1,$sputum2,$xray_refer,$xray_receive.''.$xray_res,$ntp_id,$remarks));
+
                     elseif($_SESSION[ques]==91):
-                        $w = array(15,23,35,10,7,35,40,10,15,42,42,35,30);                    
-                        $this->SetWidths($w);                                        
-                        $this->Row(array($family_id,$a_sp1,$lname.', '.$fname,$edad,$gender,$_SESSION[datanode][name].' '.'RHU',$address.', '.$brgy,'','',$sputum1,$sputum2,$remarks,''));                    
+                        $w = array(15,23,35,10,7,35,40,10,15,42,42,35,30);
+                        $this->SetWidths($w);
+                        $this->Row(array($family_id,$a_sp1,$lname.', '.$fname,$edad,$gender,$_SESSION[datanode][name].' '.'RHU',$address.', '.$brgy,'','',$sputum1,$sputum2,$remarks,''));
+
+			array_push($arr_consolidate,array($family_id,$a_sp1,$lname.', '.$fname,$edad,$gender,$_SESSION[datanode][name].' '.'RHU',$address.', '.$brgy,'','',$sputum1,$sputum2,$remarks,''));
                     else:
                     
                     endif;
@@ -227,6 +231,8 @@ function show_symptomatic(){
             endif;
         }                        
     endif;
+
+	return $arr_consolidate;
 }
 
 
@@ -276,13 +282,13 @@ function date_difference ($first, $second)
                 $add_year++;
                 $first['year']++;
             }
-                                                                                                            
+
             $add_month = 0;
             while ($this->smoothdate ($first['year'], $first['month'] + 1, $first['day']) <= $target)
             {
                 $add_month++;
                 $first['month']++;
-                
+
                 if ($first['month'] > 12)
                 {
                     $first['year']++;
@@ -347,8 +353,12 @@ $pdf->AliasNbPages();
 $pdf->SetFont('Arial','',10);
 $pdf->AddPage();
 
-$pdf->show_symptomatic();
+$tb_rec = $pdf->show_symptomatic();
 
-$pdf->Output();
 
+if($_GET["type"]=='html'):
+	$html_tab->create_table($_SESSION["w"],$_SESSION["header"],$tb_rec,$_SESSION["w2"],$_SESSION["subheader"]);
+else:
+	$pdf->Output();
+endif;
 ?>
