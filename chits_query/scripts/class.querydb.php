@@ -940,8 +940,7 @@ class querydb{
 					$_SESSION[ntp_id] = $arr_ntp_id;
 					
 					echo "Show $ques_label: <a href='./pdf_reports/tb_register.php?page=1'>Page 1</a>&nbsp;&nbsp;<a href='./pdf_reports/tb_register.php?page=2'>Page 2</a>";
-					
-				
+
 				else:
 					echo "<font color='red'>No result/s found.</font>";
 				endif;
@@ -1009,18 +1008,17 @@ class querydb{
 			while(list($px_id) = mysql_fetch_array($q_philhealth)){
 				array_push($arr_px,$px_id);
 			}
-			
+	
 			$_SESSION["px_id"] = $arr_px;
 			
-			//echo "<a href='./pdf_reports/philhealth.php'>Show PhilHealth Enrollment Masterlist</a>";
+			echo "<a href='./pdf_reports/philhealth.php'>Show PhilHealth Enrollment Masterlist</a>";
 			//$this->display_icons();
-			return 'philhealth.php';
+			//return 'philhealth.php';
 			//echo "<iframe src='./pdf_reports/philhealth.php?type=html' width='600' height='300'></iframe>";
 		else:
 			echo "<font color='red'>No result/s found.</font>";
 		endif;
 	}
-
 
 
 	function display_icons($file_to_call){
@@ -1034,11 +1032,10 @@ class querydb{
 		echo "</tr>";
   		echo "</table>";
 	}
+
 	
 	function process_philhealth_consult(){ // a pre-curson of the OPB Patient Treatment summary
-
-		return 'philhealth.php';
-
+		//return 'philhealth.php';
 		echo "<a href='./pdf_reports/philhealth.php?type=consult'>Philhealth Consultations Report</a>";
 	}
 }

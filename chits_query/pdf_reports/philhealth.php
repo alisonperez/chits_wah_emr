@@ -199,8 +199,8 @@ function show_philhealth_list(){
 
 function show_philhealth_consults(){
     $arr_consults = $_SESSION[arr_consult];
-    //print_r($arr_consults);
-    
+
+
     foreach($arr_consults[1] as $key=>$value){
         foreach($value as $key2=>$value2){
 		echo $value2[0].'<br>';
@@ -279,10 +279,10 @@ $pdf->AddPage();
 
 
 if($_GET["type"]=='consult'):
-    $philhealth_records = $pdf->show_philhealth_list();
+    //$philhealth_records = $pdf->show_philhealth_list();
     $pdf->show_philhealth_consults();
 else:
-    $philhealth_records = $pdf->show_philhealth_list();
+    //$philhealth_records = $pdf->show_philhealth_list();
     $pdf->show_philhealth_list();
 endif;
 
@@ -293,5 +293,4 @@ if($_GET["type"]=='html'):
 else:
 	$pdf->Output();
 endif;
-
 ?>

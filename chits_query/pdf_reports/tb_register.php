@@ -265,47 +265,46 @@ function show_first(){
                 default:                
                     break;                
             }
-            
-            
-            switch($outcome){                    
+
+            switch($outcome){
                     case 'COMP':
                         $tx_comp = '/';
                         break;
-                        
+
                     case 'CURE':
                         $cured = '/';
                         break;
-                        
+
                     case 'DIED':
                         $died = '/';
                         break;
-                        
+
                     case 'FAIL':
                         $fail = '/';
                         break;
-                    
+
                     case 'LOST':
                         $defaulted = '/';
                         break;
-                        
-                    case 'TOUT':                    
+
+                    case 'TOUT':
                         $timeout = '/';
                         break;
-                    
+
                     case 'TX':
                         $under_tx = '/';
                         break;
-                                        
-                    default:                        
-                        break;                                        
-                }            
-            
-            
+
+                    default:
+                        break;
+                } 
+
+
             if($_SESSION[pahina]==1):
-            
+
                 $w = array(21,20,40,9,9,50,40,10,10,40,18,8,13,13,8,8,8,17);    
-                
-                $this->SetFont('Arial','','8');                
+
+                $this->SetFont('Arial','','8');
                 $this->SetWidths($w);
                 $this->Row(array($date_reg,$ntp_id,$lname.', '.$fname,$edad,$gender,$address.', '.$brgy,$_SESSION[datanode][name],$pub,$pri,$refer_md,$tb_class,$new,$rel,$trans,$rad,$fail,$oth,$tx_cat."\n".' '));
 
@@ -314,10 +313,9 @@ function show_first(){
                 //$cured = $tx_comp = $died = $failed = $defaulted = $timeout = $under_tx = "";
                 $q_txpartner = mysql_query("SELECT partner_name FROM m_lib_ntp_treatment_partner WHERE partner_id='$tx_partner'") or die("Cannot query 314".mysql_error());
                 list($partner_name) = mysql_fetch_array($q_txpartner);
-                
+
                 $q_before_tx = mysql_query("SELECT a.sputum_diag1,b.sp3_collection_date,b.consult_id,b.lab_diagnosis FROM m_consult_ntp_symptomatics a, m_consult_lab_sputum b WHERE a.ntp_id='$r_ntp[$x]' AND a.sputum_diag1=b.request_id") or die("Cannot query 317: ".mysql_error());
                 list($sputum_diag,$before_sp3_date,$consult_id,$before_result) = mysql_fetch_array($q_before_tx);
-                    
                 $wt = $this->get_weight($consult_id);                                            
             
                 $before_diag = $this->get_sputum_result($before_result);
@@ -332,48 +330,46 @@ function show_first(){
                        $wt2 = $this->get_weight($consult_id);
                        $result = $this->get_sputum_result($result);
                        switch($sputum_period){
-                           case 'E02':                               
+                           case 'E02':
                                $sputum_2nd = $sp3.'/'.$result.'/'.$wt2;
                                break;
-                               
+
                            case 'E03':
                                $sputum_3rd = $sp3.'/'.$result.'/'.$wt2;
                                break;
-                               
+
                            case 'E04':
-                               $sputum_4th = $sp3.'/'.$result.'/'.$wt2;                               
+                               $sputum_4th = $sp3.'/'.$result.'/'.$wt2;
                                break;
-                               
+
                            case 'E05':
-                               $sputum_5th = $sp3.'/'.$result.'/'.$wt2;                                                          
+                               $sputum_5th = $sp3.'/'.$result.'/'.$wt2;
                                break;
-                               
+
                            case 'E06':
-                               $sputum_6th = $sp3.'/'.$result.'/'.$wt2;                                                                                      
+                               $sputum_6th = $sp3.'/'.$result.'/'.$wt2;
                                 break;
-                                
+
                            case '7M':
-                               $sputum_7th = $sp3.'/'.$result.'/'.$wt2;                                                                                                                 
+                               $sputum_7th = $sp3.'/'.$result.'/'.$wt2;
                                break;
-                           
+
                            default:
                                $sputum_2nd = $sputum_3rd = $sputum_4th = $sputum_5th = $sputum_6th = $sputum_7th = '';
                                break;
-                       
+
                        }
                     }
-                    
+
                 endif;
-                                
-                
+
                 $this->SetFont('Arial','','7');
                 $this->SetWidths($w);
                 $this->Row(array($intensive_date,$before,$sputum_2nd,$sputum_3rd,$sputum_4th,$sputum_5th,$sputum_6th,$sputum_7th,$cured,$tx_comp,$died,$failed,$defaulted,$timeout,$partner_name,$tbdc,''));
-                    
+
             else:
-                
+
             endif;
-            
         endif;
     }
 }
