@@ -8,7 +8,7 @@ class alert extends module{
 		$this->authod = "darth_ali";
 		$this->module = "alert";
 		
-		$this->mods = array('mc'=>array("Maternal Care"),'sick'=>array("Sick Children Under 5"),'epi'=>array("Expanded Program for Immunization"),'fp'=>array("Birth Spacing / Family Planning"),'notifiable'=>array("Notifiable Diseases"));
+		$this->mods = array('mc'=>array("Maternal Care"),'sick'=>array("Sick Children Under 5"),'epi'=>array("Expanded Program for Immunization"),'fp'=>array("Birth Spacing / Family Planning"),'notifiable'=>array("Notifiable Diseases"),'philhealth'=>array("PhilHealth"),'tb'=>array("Tuberculosis"));
 
 		$this->images = array('mc'=>'mc_alert.png','epi'=>'epi_alert.jpeg','fp'=>'fp_alert.jpeg','notifiable'=>'notifiable_alert.jpeg','sick'=>'sick_alert.jpeg');
 		$this->year = date('Y');
@@ -42,10 +42,10 @@ class alert extends module{
 		if(func_num_args()>0):
 			$arg_list = func_get_args();
 		endif;
-		
-	
+
 		module::set_menu($this->module,"Alert Types","LIBRARIES","_alert_type");
 		module::set_menu($this->module,"Alerts","CONSULTS","_alert");
+		module::set_menu($this->module,"SMS Alerts Configuration","_sms_config");
 		module::set_detail($this->description,$this->version,$this->author,$this->module);
 	
 	}
@@ -296,6 +296,12 @@ class alert extends module{
 		echo "</table>";
 		echo "</form>";
 	}
+	
+	function _sms_config(){
+		echo 'test';
+
+	}
+
 
 	function list_alert(){
 		echo "<tr class='alert_table_row'><td>Program</td><td>Indicators</td></tr>";

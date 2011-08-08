@@ -52,11 +52,11 @@ foreach($arr as $key1=>$value1){
 			foreach($value3 as $pxid=>$arr_ind){
 				$case_date = "";	//clear the text aggregate for every px_id traversal
 				echo "<br><br>";
-				$q_name = mysql_query("SELECT patient_lastname,patient_firstname FROM m_patient WHERE patient_id='$pxid'") or die("Cannot query 30 ".mysql_error());
-				list($lname,$fname) = mysql_fetch_array($q_name);
-
+				$q_name = mysql_query("SELECT patient_lastname,patient_firstname,patient_cellphone FROM m_patient WHERE patient_id='$pxid'") or die("Cannot query 30 ".mysql_error());
+				list($lname,$fname,$cp) = mysql_fetch_array($q_name);
+				$cp = (empty($cp)?'No cellphone number':$cp);
 				echo "<tr><td valign='top'>";
-				echo $lname.', '.$fname;	
+				echo $lname.', '.$fname.'<br>'.'('.$cp.')';	
 				echo "</td>";
 
 				echo "<td>";
@@ -74,12 +74,12 @@ foreach($arr as $key1=>$value1){
 						list($sub_ind) = mysql_fetch_array($q_alert);
 
 						echo "<td bgcolor='#ffffff'>";				
-						echo $sub_ind.(empty($case_id[1])?' ':'( '.$case_id[1].' )').'<br>';
+						echo $sub_ind.(empty($case_id[1])?' ':' ('.$case_id[1].') ').'<br>';
 						echo "</td>";
 						
 						if(mysql_num_rows($q_alert_msg)!=0):
 							list($alert_msg,$alert_action) = mysql_fetch_array($q_alert_msg);
-							$alerto = $alert_msg.' '.$alert_action;
+							$alerto = $alert_msg.' '.$alert_action.' '.'<b>'.$case_id[1].'</b>';
 						else:
 							$alerto = '&nbsp;&nbsp;-&nbsp;&nbsp;';
 						endif;
