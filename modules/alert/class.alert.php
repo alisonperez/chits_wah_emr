@@ -300,7 +300,11 @@ class alert extends module{
 	
 	function _sms_config(){
 		if($_POST['submit_alert']=='Save Configuration'): 
-			$this->test_sms($_POST);   //if SMS was successfully been sent, store the setup to the database
+			if(!$this->check_sms_field($_POST)):
+				echo 'nosila';
+			else:
+				$this->test_sms($_POST);   //if SMS was successfully been sent, store the setup to the database
+			endif;
 		endif;
 
 		echo "<form action='$_SERVER[PHP_SELF]?page=$_GET[page]&menu_id=$_GET[menu_id]#sms' name='form_sms' method='POST'>";
@@ -1450,7 +1454,38 @@ class alert extends module{
 			//echo 'Message sent!';
 			return true;
 		else:
-			//echo 'Message not sent!';
+			echo 'Message not sent!';
+			return false;
+		endif;
+	}
+
+	function check_sms_field(){
+		if(func_num_args()>0):
+			$arr = func_get_args();
+			$post = $arr[0];
+		endif;
+
+		print_r($post);
+		
+		$str = '';
+
+		if(empty($post["txt_midserver"]))
+			$str .= '\n\n'.'- URL of the middle server'.'\n';
+		if(empty($post["txt_port"]))
+			$str .= '- Port number of the server'.'\n';
+		if(empty($post["txt_contact"]))
+			$str .= '- Contact information of the RHU'.'\n';
+		if(empty($post["txt_testmsg"]))
+			$str .= '- Test message'.'\n';
+		if(empty($post["txt_testnum"]))
+			$str .= '- Test number'.'\n';
+
+		if($str==''):
+			return true;
+		else:
+			echo "<script language='javascript'>";
+			echo "window.alert('The following items should be supplied: $str')";
+			echo "</script>";
 			return false;
 		endif;
 	}
