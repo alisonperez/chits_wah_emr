@@ -10,7 +10,7 @@ class alert extends module{
 		
 		$this->mods = array('mc'=>array("Maternal Care"),'sick'=>array("Sick Children Under 5"),'epi'=>array("Expanded Program for Immunization"),'fp'=>array("Birth Spacing / Family Planning"),'notifiable'=>array("Notifiable Diseases"),'philhealth'=>array("PhilHealth"),'tb'=>array("Tuberculosis"));
 
-		$this->images = array('mc'=>'mc_alert.png','epi'=>'epi_alert.jpeg','fp'=>'fp_alert.jpeg','notifiable'=>'notifiable_alert.jpeg','sick'=>'sick_alert.jpeg');
+		$this->images = array('mc'=>'mc_alert.png','epi'=>'epi_alert.jpeg','fp'=>'fp_alert.jpeg','notifiable'=>'notifiable_alert.jpeg','sick'=>'sick_alert.jpeg','philhealth'=>'philhealth_alert.jpg','tb'=>'tb_alert.jpg');
 		$this->year = date('Y');
 		$this->morb_wk = $this->get_wk_num();
 	}
@@ -45,7 +45,7 @@ class alert extends module{
 
 		module::set_menu($this->module,"Alert Types","LIBRARIES","_alert_type");
 		module::set_menu($this->module,"Alerts","CONSULTS","_alert");
-		module::set_menu($this->module,"SMS Alerts Configuration","_sms_config");
+		module::set_menu($this->module,"SMS Alerts Configuration","LIBRARIES","_sms_config");
 		module::set_detail($this->description,$this->version,$this->author,$this->module);
 	
 	}
@@ -91,6 +91,7 @@ class alert extends module{
 	// custom-built functions
 	
 	function _alert_type(){
+		echo "<span class='library'>REMINDER AND ALERT ADMINISTRATION</span>";
 		echo "<p align='justify'>The Alert and Reminder administration page will allow the end-user to set necessary messages for the various indicators listed. It also always the user to set the number of days the message will be posted in advance and its duration.</p>";
 		
 		if($_POST[submit_alert]=='Save Reminder/Alert'):		
@@ -298,8 +299,64 @@ class alert extends module{
 	}
 	
 	function _sms_config(){
-		echo 'test';
+		if($_POST['submit_alert']=='Save Configuration'): 
+			$this->test_sms($_POST);   //if SMS was successfully been sent, store the setup to the database
+		endif;
 
+		echo "<form action='$_SERVER[PHP_SELF]?page=$_GET[page]&menu_id=$_GET[menu_id]#sms' name='form_sms' method='POST'>";
+		echo "<a name='sms'></a>";
+		echo "<span class='library'>SMS ALERT CONFIGURATION PAGE</span><br><br>";
+		echo "<table border='1'>";
+		echo "<thead><td colspan='2'>This is the main configuration page for the SMS Alert System</td></thead>";
+		echo "<tr><td>URL of the middle server</td>";
+		echo "<td><input type='text' name='txt_midserver'></td></tr>";
+		
+		echo "<tr><td>Port Number</td>";
+		echo "<td><input type='text' name='txt_port'></td></tr>";
+
+		echo "<tr><td>Time For Batch Sending</td>";
+		echo "<td><select name='sel_hr' value='1'>";
+		for($i=1;$i<=12;$i++){
+			echo "<option value='$i'>$i</option>";
+		}
+		echo "</select>";
+		
+
+		echo "<b>:</b><select name='sel_min'>";
+		for($i=0;$i<=59;$i++){
+			echo "<option value='$i'>".str_pad($i,2,0,STR_PAD_LEFT)."</option>";
+		}		
+		echo "</select>";
+		echo "&nbsp;<select name='sel_min'>";		
+		echo "<option value='AM'>AM</option>";
+		echo "<option value='PM'>PM</option>";
+		echo "</select>";
+		echo "</td></tr>";
+		
+		echo "<tr valign='top'><td>Contact Information Message for the RHU<br>(ie. landline, cp, to be appended to the SMS)</td>";
+		echo "<td><textarea name='txt_contact' cols='30' rows='3'></textarea></tr>";
+		
+		echo "<tr><td>Method of Sending</td>";
+		echo "<td><select name='sel_method'>";
+		echo "<option value='auto'>Automatic</option>";
+		echo "<option value='manual'>Manual</option>";
+		echo "</select>";
+		echo "</td></tr>";
+	
+		echo "<tr><td>Test Message<br></td>";
+		echo "<td><input type='text' name='txt_testmsg'>";
+		echo "</td></tr>";
+
+		echo "<tr><td>Test Number<br></td>";
+		echo "<td><input type='text' name='txt_testnum'>";
+		echo "</td></tr>";
+
+		echo "<tr><td colspan='2' align='center'>";
+		echo "<input type='submit' name='submit_alert' value='Save Configuration' />&nbsp;&nbsp;";
+		echo "<input type='reset' name='Clear' />";
+		echo "</td></tr>";
+		echo "</table>";
+		echo "</form>";
 	}
 
 
@@ -510,7 +567,6 @@ class alert extends module{
 						echo "<a href='../site/show_hh.php?id=$ser_arr&famid=$fam_id' target='_blank'>";
 						echo "<img src='../images/$image' width='30' height='30' alt='$program_id' onclick=\"window.open('$_SERVER[PHP_SELF]/site/show_hh.php?id=$ser_arr&famid=$fam_id')\"></img>";
 						echo "</a>";
-						
 					else:
 						echo "&nbsp";
 					endif;
@@ -518,7 +574,7 @@ class alert extends module{
 					//print ' '.$program_id;
 					echo "</td>";
 				} 
-				
+
 				endif;
 
 				endif;
@@ -1381,6 +1437,23 @@ class alert extends module{
 
 		return $arr_alert;
 	}
-	
+
+	function test_sms(){   //test if the formulated URL is a valid for sending SMS message
+		if(func_num_args()>0):
+			$arr = func_get_args();
+			$post = $arr[0];
+		endif;
+
+		$padded_str = str_replace(' ','%20',$post[txt_testmsg]);
+
+		if(exec('nohup curl http://'.$post[txt_midserver].':'.$post[txt_port].'/send/sms/'.$post[txt_testnum].'/'.$padded_str)):
+			//echo 'Message sent!';
+			return true;
+		else:
+			//echo 'Message not sent!';
+			return false;
+		endif;
+	}
+
 } //end of class
 ?>
