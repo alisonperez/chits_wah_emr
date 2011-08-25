@@ -27,7 +27,7 @@ class alert extends module{
 	}
 
 	function init_lang(){
-		
+
 	}
 
 	function init_stats(){
@@ -56,6 +56,7 @@ class alert extends module{
 		module::execsql("CREATE TABLE IF NOT EXISTS `m_lib_alert_type` (
 			`alert_id` int(11) NOT NULL AUTO_INCREMENT,
   			`module_id` varchar(50) NOT NULL, `alert_indicator_id` int(2) NOT NULL,,
+
   			`date_pre` date NOT NULL,`date_until` date NOT NULL,
   			`alert_message` text NOT NULL,`alert_action` text NOT NULL,
   			`date_basis` varchar(50) NOT NULL,`alert_url_redirect` text NOT NULL,
@@ -108,10 +109,10 @@ class alert extends module{
 		
 		
 		$main_indicator = (!empty($_POST[sel_mods]))?($_POST[sel_mods]):($vals_update["module_id"]);
-		
+
 
 		$q_indicator = mysql_query("SELECT alert_indicator_id,main_indicator,sub_indicator FROM m_lib_alert_indicators WHERE main_indicator='$main_indicator' ORDER by sub_indicator ASC") or die("Cannot query: 94 ".mysql_error());
-		
+
 		echo "<form name='form_alert_lib' method='POST' action='$_SERVER[PHP_SELF]?page=$_GET[page]&menu_id=$_GET[menu_id]#alert'>";
 
 		echo "<input type='hidden' name='confirm_delete' value='0'>";
@@ -301,58 +302,103 @@ class alert extends module{
 	function _sms_config(){
 		if($_POST['submit_alert']=='Save Configuration'): 
 			if(!$this->check_sms_field($_POST)):
-				echo 'nosila';
+
 			else:
-				$this->test_sms($_POST);   //if SMS was successfully been sent, store the setup to the database
+				if(!is_numeric($_POST[txt_testnum]) && strlen($_POST[txt_testnum])!=11):
+					echo "<script language='javascript'>";
+					echo "window.alert('Test cellphone number is not valid number.')";
+					echo "</script>";
+				else:
+					$time_send = $_POST['sel_hr'].':'.str_pad($_POST['sel_min'],2,0).' '.$_POST['sel_day'];
+
+					if($this->test_sms($_POST)):   //if SMS was successfully been sent, store the setup to the database
+
+						$get_sms = mysql_query("SELECT sms_config_id from m_lib_sms_config") or die("Cannot query 312: ".mysql_error());
+
+						if(mysql_num_rows($get_sms)!=0):
+							$sms_id = mysql_fetch_array($get_sms);
+							$q_sms = mysql_query("UPDATE m_lib_sms_config SET sms_url='$_POST[txt_midserver]',sms_port='$_POST[txt_port]',sms_time='$time_send',sms_contact_info='$_POST[txt_contact]',sms_sending_method='$_POST[sel_method]',sms_test_message='$_POST[txt_testmsg]',sms_test_number='$_POST[txt_testnum]',sms_last_edited=NOW(),sms_edited_by='$_SESSION[userid]'") or die("Cannot query 315: ".mysql_error());
+						else:
+							$q_sms = mysql_query("INSERT into m_lib_sms_config SET sms_url='$_POST[txt_midserver]', sms_port='$_POST[txt_port]',sms_time='$time_send',sms_contact_info='$_POST[txt_contact]', sms_sending_method='$_POST[sel_method]',sms_test_message='$_POST[txt_testmsg]', sms_test_number='$_POST[txt_testnum]',sms_last_edited=NOW(), sms_edited_by='$_SESSION[userid]'") or die("Cannot query 315: ".mysql_error());
+						endif;
+
+						if($q_sms):
+							echo "<script language='javascript'>";
+							echo "window.alert('The SMS configuration was successfully been saved! You should be able to receive the test messages shortly.')";
+							echo "</script>";
+						endif;
+					else:
+						echo "<script language='javascript'>";
+						echo "window.alert('Test sending failed. Please supply the correct values.')";
+						echo "</script>";
+					endif;
+				endif;
+				
 			endif;
 		endif;
+
+		$q_sms_info = mysql_query("SELECT * FROM m_lib_sms_config") or die("Cannot query 339 ".mysql_error());
+		$sms_info = mysql_fetch_array($q_sms_info);
+		$arr_sms_time = explode(':',$sms_info['sms_time']);
 
 		echo "<form action='$_SERVER[PHP_SELF]?page=$_GET[page]&menu_id=$_GET[menu_id]#sms' name='form_sms' method='POST'>";
 		echo "<a name='sms'></a>";
 		echo "<span class='library'>SMS ALERT CONFIGURATION PAGE</span><br><br>";
-		echo "<table border='1'>";
-		echo "<thead><td colspan='2'>This is the main configuration page for the SMS Alert System</td></thead>";
+		echo "<table border='1' width='600'>";
+		echo "<thead><td colspan='2'>This is the main configuration page for the SMS Alert System. Supply proper values for the SMS settings. To test if the values are correct, enter your mobile number at the 'Test Number' box and a sample message at the 'Test Message' box. You should be able to receive the message in the number you supplied. </td></thead>";
 		echo "<tr><td>URL of the middle server</td>";
-		echo "<td><input type='text' name='txt_midserver'></td></tr>";
-		
+		echo "<td><input type='text' name='txt_midserver' value='$sms_info[sms_url]'></td></tr>";
+
 		echo "<tr><td>Port Number</td>";
-		echo "<td><input type='text' name='txt_port'></td></tr>";
+		echo "<td><input type='text' name='txt_port' value='$sms_info[sms_port]'></td></tr>";
 
 		echo "<tr><td>Time For Batch Sending</td>";
 		echo "<td><select name='sel_hr' value='1'>";
-		for($i=1;$i<=12;$i++){
-			echo "<option value='$i'>$i</option>";
+		for($i=1;$i<=23;$i++){
+			if($i!=$arr_sms_time[0]):
+				echo "<option value='$i'>$i</option>";
+			else:
+				echo "<option value='$i' SELECTED>$i</option>";
+			endif;
 		}
 		echo "</select>";
-		
 
 		echo "<b>:</b><select name='sel_min'>";
 		for($i=0;$i<=59;$i++){
-			echo "<option value='$i'>".str_pad($i,2,0,STR_PAD_LEFT)."</option>";
+			echo "<option value='".str_pad($i)."'>".str_pad($i,2,0,STR_PAD_LEFT)."</option>";
 		}		
 		echo "</select>";
-		echo "&nbsp;<select name='sel_min'>";		
-		echo "<option value='AM'>AM</option>";
-		echo "<option value='PM'>PM</option>";
-		echo "</select>";
+		//echo "&nbsp;<select name='sel_day'>";	
+		//echo "<option value='AM'>AM</option>";
+		//echo "<option value='PM'>PM</option>";
+		//echo "</select>";
 		echo "</td></tr>";
 		
 		echo "<tr valign='top'><td>Contact Information Message for the RHU<br>(ie. landline, cp, to be appended to the SMS)</td>";
-		echo "<td><textarea name='txt_contact' cols='30' rows='3'></textarea></tr>";
-		
+		echo "<td><textarea name='txt_contact' cols='30' rows='3'>$sms_info[sms_contact_info]</textarea></tr>";
+
 		echo "<tr><td>Method of Sending</td>";
 		echo "<td><select name='sel_method'>";
-		echo "<option value='auto'>Automatic</option>";
-		echo "<option value='manual'>Manual</option>";
+		
+		$auto_mode = $manual_mode = '';
+		if($sms_info['sms_sending_method']=='auto'):
+			$auto_mode = 'SELECTED';
+		elseif($sms_info['sms_sending_method']=='manual'):
+			$manual_mode = 'SELECTED';
+		else:
+		endif;
+
+		echo "<option value='auto' $auto_mode>Automatic</option>";
+		echo "<option value='manual' $manual_mode>Manual</option>";
 		echo "</select>";
 		echo "</td></tr>";
 	
 		echo "<tr><td>Test Message<br></td>";
-		echo "<td><input type='text' name='txt_testmsg'>";
+		echo "<td><input type='text' name='txt_testmsg' value=''>";
 		echo "</td></tr>";
 
-		echo "<tr><td>Test Number<br></td>";
-		echo "<td><input type='text' name='txt_testnum'>";
+		echo "<tr><td>Test Number (11 digits)<br></td>";
+		echo "<td><input type='text' name='txt_testnum' value=''>";
 		echo "</td></tr>";
 
 		echo "<tr><td colspan='2' align='center'>";
@@ -362,7 +408,6 @@ class alert extends module{
 		echo "</table>";
 		echo "</form>";
 	}
-
 
 	function list_alert(){
 		echo "<tr class='alert_table_row'><td>Program</td><td>Indicators</td></tr>";
@@ -393,7 +438,7 @@ class alert extends module{
 				$indicator_arr = mysql_fetch_array($q_indicator);
 			endif;
 		endif;
-		
+
 		return $indicator_arr;
 	}
 
@@ -1346,7 +1391,6 @@ class alert extends module{
 				
 			if(mysql_num_rows($q_vaccine)==0):
 				if($this->get_vaccine_min_age_eligibility($vaccine)<=($this->get_patient_age($patient_id)*12)):
-				
 				//echo $patient_id.' '.$this->get_vaccine_min_age_eligibility($vaccine).' '.$vaccine.'<br>';
 					return true;
 				else: 
@@ -1443,6 +1487,7 @@ class alert extends module{
 	}
 
 	function test_sms(){   //test if the formulated URL is a valid for sending SMS message
+		print_r($_POST);
 		if(func_num_args()>0):
 			$arr = func_get_args();
 			$post = $arr[0];
@@ -1465,7 +1510,7 @@ class alert extends module{
 			$post = $arr[0];
 		endif;
 
-		print_r($post);
+		//print_r($post);
 		
 		$str = '';
 
