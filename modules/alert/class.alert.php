@@ -68,7 +68,13 @@ class alert extends module{
 		  	`sub_indicator` text NOT NULL,`efhsis_code` varchar(25) NOT NULL,
 		         PRIMARY KEY (`alert_indicator_id`)
 		        ) ENGINE=MyISAM  DEFAULT CHARSET=latin1 ;");
-		        
+
+		module::execsql("CREATE TABLE  IF NOT EXISTS `m_lib_sms_px_enroll` (`enroll_id` INT( 20 ) NOT NULL AUTO_INCREMENT PRIMARY KEY		
+			,`patient_id` INT( 20 ) NOT NULL ,`program_id` VARCHAR( 20 ) NOT NULL ,`last_modified` DATETIME NOT NULL ,`modified_by` INT( 5 ) NOT NULL) ENGINE = MYISAM ;");
+
+		module::execsql("CREATE TABLE IF NOT EXISTS `m_lib_sms_config` (`sms_config_id` int(2) NOT NULL AUTO_INCREMENT,`sms_url` text NOT NULL,
+  			`sms_port` varchar(5) NOT NULL,`sms_time` time NOT NULL,`sms_contact_info` text NOT NULL,`sms_sending_method` set('auto','manual') NOT NULL,`sms_test_message` text NOT NULL,`sms_test_number` varchar(15) NOT NULL,`sms_last_edited` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,`sms_edited_by` varchar(3) NOT NULL,PRIMARY KEY (`sms_config_id`)) ENGINE=MyISAM;");
+
 		module::execsql("INSERT INTO `m_lib_alert_indicators` (`alert_indicator_id`, `main_indicator`, `sub_indicator`, `efhsis_code`) VALUES
 		(1, 'mc', 'Quality Prenatal Visit', ''),(2, 'mc', 'Expected Date of Delivery', ''),(3, 'mc', 'Postpartum Visit', ''),(4, 'mc', 'Tetanus Toxoid Intake (CPAB)', ''),
 		(5, 'mc', 'Vitamin A Intake (20,000 unit)', ''),(6, 'mc', 'Iron with Folic Acid Intake', ''),(7, 'epi', 'BCG Immunization', ''),(8, 'epi', 'DPT 1 Immunization', ''),
