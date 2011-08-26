@@ -46,6 +46,7 @@ class alert extends module{
 		module::set_menu($this->module,"Alert Types","LIBRARIES","_alert_type");
 		module::set_menu($this->module,"Alerts","CONSULTS","_alert");
 		module::set_menu($this->module,"SMS Alerts Configuration","LIBRARIES","_sms_config");
+		module::set_menu($this->module,"SMS Patient Enrollment","LIBRARIES","_sms_enroll");
 		module::set_detail($this->description,$this->version,$this->author,$this->module);
 	
 	}
@@ -451,11 +452,11 @@ class alert extends module{
 	function verify_form($post_arr){
 
 		$q_alert = mysql_query("SELECT alert_id,alert_indicator_id FROM m_lib_alert_type WHERE alert_indicator_id='$post_arr[sel_alert_indicators]'") or die("Cannot query 74 ".mysql_error());
-			
-			if(mysql_num_rows($q_alert)!=0 && $post_arr[submit_alert]=='Save Reminder/Alert'):				
+
+			if(mysql_num_rows($q_alert)!=0 && $post_arr[submit_alert]=='Save Reminder/Alert'):
 				echo "<script language='javascript'>";
 				echo "window.alert('There is already a definition for this alert. To update click the alert link on the right side panel.')";
-				echo "</script>";	
+				echo "</script>";
 
 			elseif(empty($post_arr[sel_alert_indicators])):
 				echo "<script language='javascript'>";
