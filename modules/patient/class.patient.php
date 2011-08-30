@@ -402,8 +402,8 @@ class patient extends module{
 							
 					//print_r($post_vars);
                     $result = mysql_query($sql) or die(mysql_error());
+		    $pxid = mysql_insert_id();
 		    if(isset($arr_sms)):
-			$pxid = mysql_insert_id();
 			$this->sms_patient_enroll($pxid,$arr_sms);
 		    endif;
 
@@ -443,6 +443,8 @@ class patient extends module{
                 if ($result) {
 					if(isset($arr_sms)):
 						$this->sms_patient_enroll($post_vars["patient_id"],$arr_sms);
+					else:
+						$this->sms_patient_enroll($post_vars["patient_id"],$arr_sms,'no');
 		    			endif;
 
 					echo "<script language=\"Javascript\">";
@@ -750,7 +752,7 @@ class patient extends module{
         }
     }
 
-    function sms_patient_enroll($pxid,$arr_sms){
+    function sms_patient_enroll($pxid,$arr_sms,$del){
 	$q_px = mysql_query("SELECT enroll_id FROM m_lib_sms_px_enroll WHERE patient_id='$pxid'") or die("Cannot query 747: ".mysql_error());
 	if(mysql_num_rows($q_px)==0):
 		foreach($arr_sms as $key=>$value){
@@ -758,9 +760,14 @@ class patient extends module{
 		}
 	else:
 		$delete_sms = mysql_query("DELETE FROM m_lib_sms_px_enroll WHERE patient_id='$pxid' ") or die("Cannot query 761: ".mysql_error());
+
+		if($del!='no'):
+
 		foreach($arr_sms as $key=>$value){
 			$insert_sms = mysql_query("INSERT INTO m_lib_sms_px_enroll SET patient_id='$pxid',program_id='$value',last_modified=NOW(),modified_by='$_SESSION[userid]'") or die("Cannot query 757: ".mysql_error());
 		}
+
+		endif;
 	endif;
     }
 
