@@ -1213,6 +1213,9 @@ class healthcenter extends module{
         print "<tr><td>";
         print "<br><input type='submit' value = 'Save Details' class='textbox' name='submitdetails' style='border: 1px solid #000000'><br>";
         print "</td></tr>";
+
+		
+
         print "</form>";
         print "</table><br>";
     }

@@ -416,6 +416,32 @@ class alert extends module{
 		echo "</form>";
 	}
 
+	function _sms_enroll(){
+
+
+		echo "<form action='$_SERVER[PHP_SELF]?page=$_GET[page]&menu_id=$_GET[menu_id]#px' name='form_sms' method='POST'>";
+		echo "<input type='hidden' name='pxid' />";
+		
+		echo "<a name='px'></a>";
+		echo "<span class='library'>SMS PATIENT ENROLLMENT FORM</span><br><br>";
+		echo "<table border='1' width='600'>";
+		echo "<thead><td>Search the name of the patient</td></thead>";
+
+		echo "<tr>";
+		echo "<td>";
+		echo "</td>";
+		echo "</tr>";
+
+
+		echo "<tr>";
+		
+
+
+
+		echo "</tr>";
+		echo "</table>";
+	}
+
 	function list_alert(){
 		echo "<tr class='alert_table_row'><td>Program</td><td>Indicators</td></tr>";
 		foreach($this->mods as $key=>$value){

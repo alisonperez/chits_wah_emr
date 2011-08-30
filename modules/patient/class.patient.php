@@ -372,6 +372,12 @@ class patient extends module{
         list($month,$day,$year) = explode("/", $post_vars["patient_dob"]);
         $dob = $year."-".str_pad($month, 2, "0", STR_PAD_LEFT)."-".str_pad($day, 2, "0", STR_PAD_LEFT);
         $post_vars["conv_dob"] = $dob;
+
+	$q_sms_enroll = mysql_query("SELECT menu_id FROM module_menu WHERE menu_id='1370'") or die("Cannot quer 535: ".mysql_error());
+	if(mysql_num_rows($q_sms_enroll)!=0):
+		$arr_sms = $_POST['sms_prog']; 
+	endif;
+
         switch ($post_vars["submitpatient"]) {
         case "Add Patient":
             if ($post_vars["patient_lastname"] && $post_vars["patient_firstname"] && $post_vars["patient_gender"] && $post_vars["patient_dob"] && $post_vars["patient_mother"]) {
@@ -396,18 +402,22 @@ class patient extends module{
 							
 					//print_r($post_vars);
                     $result = mysql_query($sql) or die(mysql_error());
+		    if(isset($arr_sms)):
+			$pxid = mysql_insert_id();
+			$this->sms_patient_enroll($pxid,$arr_sms);
+		    endif;
 
-					if ($result) {
-						echo "<script language=\"Javascript\">";
-						echo "alert('Patient $post_vars[patient_firstname], $post_vars[patient_lastname] was successfully added!')";
-						//header("location: ".$_SERVER["PHP_SELF"]."?page=".$get_vars["page"]."&menu_id=".$get_vars["menu_id"]);  
-						echo "</script>";
-                    }
+			if ($result) {
+			echo "<script language=\"Javascript\">";
+			echo "alert('Patient $post_vars[patient_firstname], $post_vars[patient_lastname] was successfully added!')";
+			//header("location: ".$_SERVER["PHP_SELF"]."?page=".$get_vars["page"]."&menu_id=".$get_vars["menu_id"]);  
+			echo "</script>";
+                    	}
                 } else {
-					echo "<script language=\"Javascript\">";
-					echo "alert('Patient was not added due to similarity with existing records!')";
-					echo "</script>";
-                    print "<font size='5' color='red'><b>Duplicate detected ".round($sim_index,2)."%.</b></font><br/>";
+			echo "<script language=\"Javascript\">";
+			echo "alert('Patient was not added due to similarity with existing records!')";
+			echo "</script>";
+                 	print "<font size='5' color='red'><b>Duplicate detected ".round($sim_index,2)."%.</b></font><br/>";
                 }
             } else {
 				echo "<script language=\"Javascript\">";
@@ -424,13 +434,16 @@ class patient extends module{
                        "patient_middle = '".ucwords($post_vars["patient_middle"])."', ".
                        "patient_lastname = '".ucwords($post_vars["patient_lastname"])."', ".
                        "user_id = '".$_SESSION["userid"]."', ".
-						"patient_gender = '".$post_vars["patient_gender"]."', ".
-						"patient_mother = '".$post_vars["patient_mother"]."', ".
-						"patient_cellphone = '".$post_vars["patient_cellphone"]."', ".
+	  	       "patient_gender = '".$post_vars["patient_gender"]."', ".
+		       "patient_mother = '".$post_vars["patient_mother"]."', ".
+		       "patient_cellphone = '".$post_vars["patient_cellphone"]."', ".
                        "patient_dob = '$dob' ".
                        "where patient_id = '".$post_vars["patient_id"]."'";
 				$result = mysql_query($sql) or die(mysql_error());
                 if ($result) {
+					if(isset($arr_sms)):
+						$this->sms_patient_enroll($post_vars["patient_id"],$arr_sms);
+		    			endif;
 
 					echo "<script language=\"Javascript\">";
 					echo "alert('Record of patient $post_vars[patient_firstname] $post_vars[patient_lastname] was successfully been updated.')";
@@ -531,6 +544,9 @@ class patient extends module{
                 }
             }
         }
+
+	$q_sms_enroll = mysql_query("SELECT menu_id FROM module_menu WHERE menu_id='1370'") or die("Cannot quer 535: ".mysql_error());
+
         print "<a name='ptform'>";
         print "<table width='300'>";
         print "<form action = '".$_SERVER["SELF"]."?page=".$get_vars["page"]."&menu_id=$menu_id' name='form_patient' method='post'>";
@@ -600,21 +616,31 @@ class patient extends module{
         //print "<input type='text' size='30' class='textbox' ".($_SESSION["isadmin"]||!$get_vars["patient_id"]?"":"disabled")." name='patient_mother' value='".($patient["patient_mother"]?$patient["patient_mother"]:$post_vars["patient_mother"])."' style='border: 1px solid #000000'><br>";
 		print "<input type='text' size='30' class='textbox' name='patient_mother' value='".($patient["patient_mother"]?$patient["patient_mother"]:"")."' style='border: 1px solid #000000'><br>";
         print "</td></tr>";
-                
+
         //if ($patient["patient_gender"]) {
         //    print "<input type='hidden' name='patient_gender' value='".$patient["patient_gender"]."' />";
         //}
-        print "</td></tr>";		
+        print "</td></tr>";
 
-		print "<tr><td>";
-		print "<span class='boxtitle'>CELLPHONE NUMBER (11-digit,i.e. 09XX1234567)</span><br> ";
-		
-		print "<input type='text' size='10' class='textbox' maxlength='11' name='patient_cellphone' value='$patient[patient_cellphone]'></input>";
-		
-		print "</td></tr>";
-		
-        
-		print "<tr><td>";
+	print "<tr><td>";
+	print "<span class='boxtitle'>CELLPHONE NUMBER (11-digit,i.e. 09XX1234567)</span><br> ";
+
+	print "<input type='text' size='10' class='textbox' maxlength='11' name='patient_cellphone' value='$patient[patient_cellphone]'></input>";
+	print "</td></tr>";
+
+	if(mysql_num_rows($q_sms_enroll)!=0):
+		echo "<tr valign='top'>";
+		echo "<td><span class='boxtitle'>ENROLL PATIENT TO SMS ALERT PROGRAM?</span><br>";
+		echo "<input type='checkbox' name='sms_prog[]' value='epi'>EPI</input><br>";
+		echo "<input type='checkbox' name='sms_prog[]' value='fp'>Family Planning</input><br>";
+		echo "<input type='checkbox' name='sms_prog[]' value='mc'>Maternal Care</input><br>";
+		echo "<input type='checkbox' name='sms_prog[]' value='mc'>PhilHealth</input><br>";
+		echo "<input type='checkbox' name='sms_prog[]' value='sick'>Sick Child Under 5</input><br>";
+		echo "<input type='checkbox' name='sms_prog[]' value='tb'>Tuberculosis</input><br>";
+		echo "</td></tr>";
+	endif;
+
+	print "<tr><td>";
         if ($get_vars["patient_id"]) {
             print "<input type='hidden' name='patient_id' value='".$get_vars["patient_id"]."'>";
             if ($_SESSION["priv_update"]) {
@@ -631,6 +657,7 @@ class patient extends module{
             }
         }
         print "</td></tr>";
+
         print "</form>";
         print "</table><br>";
     }
@@ -721,6 +748,20 @@ class patient extends module{
                 return $dob;
             }
         }
+    }
+
+    function sms_patient_enroll($pxid,$arr_sms){
+	$q_px = mysql_query("SELECT enroll_id FROM m_lib_sms_px_enroll WHERE patient_id='$pxid'") or die("Cannot query 747: ".mysql_error());
+	if(mysql_num_rows($q_px)==0):
+		foreach($arr_sms as $key=>$value){
+			$insert_sms = mysql_query("INSERT INTO m_lib_sms_px_enroll SET patient_id='$pxid',program_id='$value',last_modified=NOW(),modified_by='$_SESSION[userid]'") or die("Cannot query 757: ".mysql_error());
+		}
+	else:
+		$delete_sms = mysql_query("DELETE FROM m_lib_sms_px_enroll WHERE patient_id='$pxid' ") or die("Cannot query 761: ".mysql_error());
+		foreach($arr_sms as $key=>$value){
+			$insert_sms = mysql_query("INSERT INTO m_lib_sms_px_enroll SET patient_id='$pxid',program_id='$value',last_modified=NOW(),modified_by='$_SESSION[userid]'") or die("Cannot query 757: ".mysql_error());
+		}
+	endif;
     }
 
     // SIMILARITIES AND DUPLICATES
