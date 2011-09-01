@@ -4,7 +4,7 @@ class health_facility extends module{
 
 	function health_facility(){
 		$this->author="darth_ali";
-		$this->version="0.1-".date("Y-m-d");
+		$this->version="0.3-".date("Y-m-d");
 		$this->module="health_facility";
 		$this->description="CHITS Module - Health Facility";
 
@@ -12,6 +12,7 @@ class health_facility extends module{
 			1. allow assigning of barangays to health facility (i.e. municipality w/ two or more centers)
 			2. embed the GPS latitude and longitude of the facility for mapping purposes
 			3. contains official DOH health facility code for integration purposes
+			4. inclusion of staff assignment and creation of barangay health station
 			4. and many more !
 		*/
 	}
@@ -28,7 +29,7 @@ class health_facility extends module{
 		endif;
 
 		module::set_menu($this->module,"Health Facility","LIBRARIES","_health_facility");
-
+		module::set_menu($this->module,"Brgy Health Station","LIBRARIES","_form_bhs");
 		module::set_detail($this->description,$this->version,$this->author,$this->module);
 	}
 
@@ -136,6 +137,7 @@ class health_facility extends module{
 			echo "<table style=\"background-color: #99CCCC;text-align: center;font-size:10px;\">";
 			echo "<tr style=\"background-color: #666666;color: #FFFF66;text-align: center;font-weight: bold;font-size:10px;\"><td>HEALTH FACILITY</td>";
 			echo "<td>BARANGAYS (click barangay name to remove barangay)</td>";
+			echo "<td>Barangay Health Stations</td>";
 			echo "</tr>";
 
 			while(list($fac_id,$fac_name) = mysql_fetch_array($q_hf)){	
@@ -154,6 +156,10 @@ class health_facility extends module{
 				foreach($arr_brgy as $key=>$value){
 					echo "<a href='$_SERVER[PHP_SELF]?page=$_GET[page]&menu_id=$_GET[menu_id]&action=delete&brgy_id=$value[1]&facility_id=$fac_id'>".$value[0]."</a> /";
 				}
+				echo "</td>";
+
+				echo "<td>";
+				echo "<input type='button' name='btn_add_bhs' style='border: 1px solid black' value='Add BHS' onclick='add_bhs($fac_id);'/>";
 				echo "</td>";
 				echo "</tr>";
 			}
@@ -202,6 +208,16 @@ class health_facility extends module{
 			endif;
 		endif;
 		
+	}
+
+	function form_bhs(){
+		echo "<form action='$_SERVER[PHP_SELF]?page=$_GET[page]&menu_id=$_GET[menu_id]#bhs' method='POST' name='form_bhs'>";
+		echo "<table>";
+		echo "<thead><td>BARANGAY HEALTH STATIONS</td></thead>";
+		echo "<tr><td>Name of Barangay Health Station</td>";
+		echo "<td><input type='text' name='txt_bhs' size='10'></td></tr>";
+		echo "</form>";
+
 	}
 }
 ?>

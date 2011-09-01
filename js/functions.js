@@ -30,7 +30,7 @@ function show_bfeed_date(){
 }
 
 function verify_mother_id(){		
-	window.open ("../site/verify_patient.php?id="+ form_consult_ccdev.mother_px_id.value,"CHITS - Verify Patient ID","location=1,status=0,scrollbars=0,width=200,height=200,resizable=0,menubar=0,toolbars=0");
+	window.open ("../site/verify_patient.php?id="+ form_consult_ccdev.mother_px_id.value,"Verify Patient ID","location=1,status=0,scrollbars=0,width=200,height=200,resizable=0,menubar=0,toolbars=0");
 }
 
 function edit_consult_date(){
@@ -166,4 +166,8 @@ function autoSubmit_alert()
 	if(formObject!=0){
 		formObject.submit();
 	}
+}
+
+function add_bhs(facid){
+	window.open("../site/process_bhs.php?facid="+ facid,"Process Barangay Health Station","location=1,status=0,scrollbars=0,width=200,height=200,resizable=0,menubar=0,toolbars=0");
 }
