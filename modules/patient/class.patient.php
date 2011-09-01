@@ -9,12 +9,13 @@ class patient extends module{
         // do not forget to update version
         //
         $this->author = 'Herman Tolentino MD';
-        $this->version = "0.42-".date("Y-m-d");
+        $this->version = "0.67-".date("Y-m-d");
         $this->module = "patient";
         $this->description = "CHITS Module - Patient";
         // 0.4 installed foreign key constraints
         // 0.41 fixed patient update bug with gender
         // 0.42 included uniquid for cross-healthcenter migration
+	// 0.67 tons of changes from .42. latest is the addition of checkboxes for enrollment
     }
 
     // --------------- STANDARD MODULE FUNCTIONS ------------------
@@ -631,14 +632,21 @@ class patient extends module{
 	print "</td></tr>";
 
 	if(mysql_num_rows($q_sms_enroll)!=0):
+		$arr_alert = array();
+		$q_alert = mysql_query("SELECT program_id FROM m_lib_sms_px_enroll WHERE patient_id='$_GET[patient_id]'") or die("Cannot query 634: ".mysql_error());
+
+		while(list($program_id)=mysql_fetch_array($q_alert)){
+			array_push($arr_alert,$program_id);
+		}
+
 		echo "<tr valign='top'>";
 		echo "<td><span class='boxtitle'>ENROLL PATIENT TO SMS ALERT PROGRAM?</span><br>";
-		echo "<input type='checkbox' name='sms_prog[]' value='epi'>EPI</input><br>";
-		echo "<input type='checkbox' name='sms_prog[]' value='fp'>Family Planning</input><br>";
-		echo "<input type='checkbox' name='sms_prog[]' value='mc'>Maternal Care</input><br>";
-		echo "<input type='checkbox' name='sms_prog[]' value='mc'>PhilHealth</input><br>";
-		echo "<input type='checkbox' name='sms_prog[]' value='sick'>Sick Child Under 5</input><br>";
-		echo "<input type='checkbox' name='sms_prog[]' value='tb'>Tuberculosis</input><br>";
+		echo "<input type='checkbox' name='sms_prog[]' value='epi' ".(in_array('epi',$arr_alert)?CHECKED:'').">EPI</input><br>";
+		echo "<input type='checkbox' name='sms_prog[]' value='fp' ".(in_array('fp',$arr_alert)?CHECKED:'').">Family Planning</input><br>";
+		echo "<input type='checkbox' name='sms_prog[]' value='mc' ".(in_array('mc',$arr_alert)?CHECKED:'').">Maternal Care</input><br>";
+		echo "<input type='checkbox' name='sms_prog[]' value='philhealth' ".(in_array('philhealth',$arr_alert)?CHECKED:'').">PhilHealth</input><br>";
+		echo "<input type='checkbox' name='sms_prog[]' value='sick' ".(in_array('sick',$arr_alert)?CHECKED:'').">Sick Child Under 5</input><br>";
+		echo "<input type='checkbox' name='sms_prog[]' value='tb' ".(in_array('tb',$arr_alert)?CHECKED:'').">Tuberculosis</input><br>";
 		echo "</td></tr>";
 	endif;
 

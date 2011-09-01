@@ -169,5 +169,5 @@ function autoSubmit_alert()
 }
 
 function add_bhs(facid){
-	window.open("../site/process_bhs.php?facid="+ facid,"Process Barangay Health Station","location=1,status=0,scrollbars=0,width=200,height=200,resizable=0,menubar=0,toolbars=0");
+	window.open("../site/process_bhs.php?facid="+ facid,"Process Barangay Health Station","location=1,status=0,scrollbars=0,width=800,height=400,resizable=0,menubar=0,toolbars=0");
 }
