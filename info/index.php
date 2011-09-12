@@ -47,6 +47,7 @@ $user = new User;
 $site = new Site;
 $module = new Module;
 
+
 // load language constants
 // for multilingualization
 // courtesy of the MBDS Project
@@ -55,7 +56,7 @@ $module = new Module;
 include "../lang.php";
 
 // check if any users exist
-if ($user->check_users()) {    
+if ($user->check_users()) {
     // redirect to welcome page
     header("location: ".$_SERVER["PHP_SELF"]."?page=WELCOME");
 }
@@ -66,8 +67,6 @@ if ($user->check_users()) {
 // this is server-generated code
 // do not edit or delete
 include "../modules/_modules.php";
-
-
 ?>
 
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
@@ -122,7 +121,7 @@ small { font-family: verdana, sans serif}
 <body text="black" bgcolor="#FFFFCC" link="black" vlink="black">
 <?php        
 	//echo "Print page module: ";
-	//print_r($_GET);	
+	//print_r($_GET);
 ?>
 
 <br/>
@@ -162,10 +161,11 @@ small { font-family: verdana, sans serif}
         <tr>
             <td>
             <?
-            if ($_POST["submitlogin"]) {                
+            if ($_POST["submitlogin"]) { 
                 $user = $user->process_auth($_POST["login"], $_POST["passwd"]);
                 if (count($user)>0) {
-                    //print_r($user);                                        
+                    //print_r($user); 
+		    alert::check_sms_alert();
                     $site->session_user($user);
                     //$site->record_access($_SESSION["userid"],$HTTP_USER_AGENT,"ASC","login");
                     header("location: ".$_SERVER["PHP_SELF"]);
@@ -262,7 +262,7 @@ small { font-family: verdana, sans serif}
             } else {
                 print "<font color='red'>You have no authorization for this page.</font>";
             }
-		            break;
+	     break;
         default:
             if ($errorinfo) {
                 // since this the default page errors appear here
@@ -272,7 +272,7 @@ small { font-family: verdana, sans serif}
             }
             if (module::in_menu($_GET["page"],array_values($menu_array[0]))) {
                 $module->default_action($_GET["page"]);
-            } else {                            
+            } else {
                 $site->content($menu_id, $_POST, $_GET);
 
             }
@@ -288,6 +288,7 @@ small { font-family: verdana, sans serif}
 <br/>
 <div align="center" class='copyright'>
   &copy;2004-2011 Generic Architecture for Modular Enterprise (GAME) Engine Version <?=$module->get_version()?> Herman Tolentino MD / UPCM Medical Informatics Unit / License - GPL<br>
+
 </div>
 </body>
 </html>

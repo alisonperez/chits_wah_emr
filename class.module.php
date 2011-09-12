@@ -1698,5 +1698,11 @@ Class Module {
         return str_pad($input_string, $pad_length,"0", STR_PAD_LEFT);
     }
 
+	function get_git_timestamp(){
+		if(file_exists()):
+
+
+		endif;
+	}
 }
 ?>

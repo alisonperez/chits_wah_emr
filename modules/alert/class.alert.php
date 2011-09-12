@@ -181,7 +181,16 @@ class alert extends module{
 		echo "</tr>";
 
 		echo "<tr>";
-		echo "<td valign='top' class='alert_table_row'>Reminder/Alert Message</td>";
+		echo "<td valign='top' class='alert_table_row'>Reminder Message (Pre-event)</td>";
+		echo "<td>";
+		echo "<textarea name='txt_msg' cols='25' rows='3'>$vals_update[alert_message]";
+		echo "</textarea>";
+		echo "</td>";
+		echo "</tr>";
+
+
+		echo "<tr>";
+		echo "<td valign='top' class='alert_table_row'>Message on the actual occurence of event</td>";
 		echo "<td>";
 		echo "<textarea name='txt_msg' cols='25' rows='3'>$vals_update[alert_message]";
 		echo "</textarea>";
@@ -189,7 +198,7 @@ class alert extends module{
 		echo "</tr>";
 
 		echo "<tr>";
-		echo "<td valign='top' class='alert_table_row'>Recommended Actions</td>";
+		echo "<td valign='top' class='alert_table_row'>Alert Message (Post-event)</td>";
 		echo "<td>";
 		echo "<textarea name='txt_action' cols='25' rows='3'>$vals_update[alert_action]";
 		echo "</textarea>";
@@ -197,7 +206,7 @@ class alert extends module{
 		echo "</tr>";
 
 		echo "<tr>";
-		echo "<td valign='top' class='alert_table_row'>No. of Days Reminder is posted before base date</td>";
+		echo "<td valign='top' class='alert_table_row'>No. of Days Reminder is posted before event date</td>";
 		echo "<td>";
 		echo "<select name='sel_days_before' size='1'>";
 		
@@ -214,7 +223,7 @@ class alert extends module{
 		echo "</tr>";
 
 		echo "<tr>";
-		echo "<td class='alert_table_row'>No. of Days Reminder is posted after base date</td>";
+		echo "<td class='alert_table_row'>No. of Days Reminder is posted after event date</td>";
 		echo "<td>";
 		echo "<select name='sel_days_after' size='1'>";
 		
@@ -238,7 +247,16 @@ class alert extends module{
 		echo "<input type='text' name='txt_url' size='25' value='$vals_update[alert_url_redirect]'></input>";
 		echo "</td>";
 		echo "</tr>";
-		
+
+		echo "<tr>";
+		echo "<td class='alert_table_row'>Activate SMS Message?</td>";
+		echo "<td>";
+		echo "<select name='sel_msg' size='1'>";
+		echo "<option value='Y'>Yes</option>";
+		echo "<option value='N'>No</option>";
+		echo "</select>";
+		echo "</td>";
+		echo "</tr>";
 		
 		echo "<tr align='center'>";
 		echo "<td colspan='2'>";
@@ -693,7 +711,7 @@ class alert extends module{
 				
 				break;
 		}
-		
+
 		if(!empty($arr_px)):
 			array_push($arr_case,$arr_px);
 		endif;
@@ -730,10 +748,8 @@ class alert extends module{
 			//$arr_case_id = array(); //this will contain the consult_id and enrollment id's		
 
 			while(list($indicator_id,$sub_indicator) = mysql_fetch_array($q_mc_indicators)){
-				
-		
-				$arr_case_id = array(); //this will contain the consult_id and enrollment id's		
-				
+
+				$arr_case_id = array(); //this will contain the consult_id and enrollment id's
 				$arr_definition = $this->get_alert_definition($indicator_id); //composed of defition id, days before and after. 
 				$alert_id = $arr_definition[0];
 				$days_before = $arr_definition[1];
@@ -1499,6 +1515,75 @@ class alert extends module{
 		return $min_age; 
 	}	
 
+
+
+	function check_sms_alert(){ 
+		$alert = new alert;
+		$arr_alert = array();
+		$today = date('Y-m-d');
+		
+		$q_sms_alert = mysql_query("SELECT sms_id FROM m_lib_sms_alert WHERE alert_date='$today'") or die("Cannot query 732: ".mysql_error());
+
+		$q_fam_id = mysql_query("SELECT DISTINCT a.family_id FROM m_family_address a, m_family_members b, m_lib_barangay c WHERE a.family_id=b.family_id AND a.barangay_id=c.barangay_id ORDER by c.barangay_name ASC") or die("Cannot query 1576: ".mysql_error());
+			
+		while($r_fam = mysql_fetch_array($q_fam_id)){ 
+			array_push($arr_alert,$alert->determine_alert_hh($r_fam['family_id']));
+		}
+		//print_r($arr_alert);
+
+		if(mysql_num_rows($q_sms_alert)==0):
+			foreach($arr_alert as $key1=>$value1){				
+				foreach($value1 as $key2=>$value2){
+					foreach($value2 as $key3=>$value3){
+						foreach($value3 as $key4=>$value4){
+							foreach($value4 as $key5=>$value5){
+								foreach($value5 as $key6=>$value6){ //key is the patient_id
+										//print_r($value6);
+									foreach($value6 as $key7=>$alert_details){
+										//echo $key7.'<br>';
+										//print_r($value6).'<br><br>';
+										foreach($alert_details as $alert_id=>$arr_alert){
+											if($alert->determine_px_enrollment($key6,$alert_id)):
+												if(count($alert->check_alert_msg($alert_id))!=0):
+													
+												endif;
+											endif;
+										}
+									//$insert_sms_alert = mysql_query("INSERT INTO m_lib_sms_alert SET alert_date=NOW()") or die("Cannot query 735: ".mysql_error()); 
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		endif;
+ 
+	}
+
+
+	function determine_px_enrollment($pxid,$alert_id){
+		$prog_id = $this->determine_program_id($alert_id);
+		$q_enrollment = mysql_query("SELECT enroll_id FROM m_lib_sms_px_enroll WHERE patient_id='$pxid' AND program_id='$prog_id'") or die("Cannot query 1545: ".mysql_error());
+
+		if(mysql_num_rows($q_enrollment)!=0):
+			return true;
+		else:
+			return false;
+		endif;
+	}
+
+	function determine_program_id($alert_id){
+		$q_prog_id = mysql_query("SELECT main_indicator FROM m_lib_alert_indicators WHERE alert_indicator_id='$alert_id'") or die("CAnnot query 1547: ".mysql_error());
+
+		list($program_id) = mysql_fetch_array($q_prog_id);
+		return $program_id;
+	}
+
+	function check_alert_msg($alert_id){
+		//$q_alert_prog_id = mysql_query("SELECT alert_id,alert_messages,alert_action FROM ") or die("Cannot query 1566: ".mysql_error());
+	}
+	
 	function determine_alert_hh(){
 		//function determine_alert_hh
 		if(func_num_args()>0):
@@ -1542,9 +1627,7 @@ class alert extends module{
 			$arr = func_get_args();
 			$post = $arr[0];
 		endif;
-
 		//print_r($post);
-		
 		$str = '';
 
 		if(empty($post["txt_midserver"]))

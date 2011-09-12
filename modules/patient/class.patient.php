@@ -443,7 +443,7 @@ class patient extends module{
 				$result = mysql_query($sql) or die(mysql_error());
                 if ($result) {
 					if(isset($arr_sms)):
-						$this->sms_patient_enroll($post_vars["patient_id"],$arr_sms);
+						$this->sms_patient_enroll($post_vars["patient_id"],$arr_sms,'');
 					else:
 						$this->sms_patient_enroll($post_vars["patient_id"],$arr_sms,'no');
 		    			endif;

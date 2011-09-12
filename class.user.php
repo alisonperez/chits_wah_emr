@@ -860,9 +860,7 @@ class User {
    }
 
    function move_image(){
-	echo 'alison';
 
    }
-
 }
 ?>

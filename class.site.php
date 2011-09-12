@@ -727,8 +727,5 @@ class Site {
     function print_error($error) {
         print "<ol>$error</ol>";
     }
-
-    
-
 }
 ?>
