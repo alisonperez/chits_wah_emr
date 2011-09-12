@@ -114,7 +114,6 @@ class alert extends module{
 		
 		$vals_update = $this->set_vals_update($_GET);
 		
-		
 		$main_indicator = (!empty($_POST[sel_mods]))?($_POST[sel_mods]):($vals_update["module_id"]);
 
 
@@ -192,7 +191,7 @@ class alert extends module{
 		echo "<tr>";
 		echo "<td valign='top' class='alert_table_row'>Message on the actual occurence of event</td>";
 		echo "<td>";
-		echo "<textarea name='txt_msg' cols='25' rows='3'>$vals_update[alert_message]";
+		echo "<textarea name='txt_actual_msg' cols='25' rows='3'>$vals_update[alert_actual_message]";
 		echo "</textarea>";
 		echo "</td>";
 		echo "</tr>";
@@ -248,12 +247,20 @@ class alert extends module{
 		echo "</td>";
 		echo "</tr>";
 
+		if($vals_update['alert_flag_activate']=='Y'):
+			$y_activate = 'SELECTED';
+		elseif($vals_update['alert_flag_activate']=='N'):
+			$n_activate = 'SELECTED';
+		else: 
+			
+		endif;
+
 		echo "<tr>";
 		echo "<td class='alert_table_row'>Activate SMS Message?</td>";
 		echo "<td>";
-		echo "<select name='sel_msg' size='1'>";
-		echo "<option value='Y'>Yes</option>";
-		echo "<option value='N'>No</option>";
+		echo "<select name='sel_activate' size='1'>";
+		echo "<option value='Y' $y_activate>Yes</option>";
+		echo "<option value='N' $n_activate>No</option>";
 		echo "</select>";
 		echo "</td>";
 		echo "</tr>";
@@ -483,7 +490,7 @@ class alert extends module{
 
 		if($get_arr["action"]=='update'):
 			
-			$q_indicator = mysql_query("SELECT a.alert_id,a.module_id,a.alert_indicator_id,a.date_pre,a.date_until,a.alert_message,a.alert_action,a.date_basis,a.alert_url_redirect,b.sub_indicator FROM m_lib_alert_type a, m_lib_alert_indicators b WHERE a.alert_indicator_id='$get_arr[indicator_id]' AND a.alert_indicator_id=b.alert_indicator_id") or die("Cannot query 306 ".mysql_error());
+			$q_indicator = mysql_query("SELECT a.alert_id,a.module_id,a.alert_indicator_id,a.date_pre,a.date_until,a.alert_message,a.alert_action,a.date_basis,a.alert_url_redirect,b.sub_indicator,a.alert_actual_message,a.alert_flag_activate,a.alert_url_redirect FROM m_lib_alert_type a, m_lib_alert_indicators b WHERE a.alert_indicator_id='$get_arr[indicator_id]' AND a.alert_indicator_id=b.alert_indicator_id") or die("Cannot query 306 ".mysql_error());
 
 			if(mysql_num_rows($q_indicator)!=0):
 				$indicator_arr = mysql_fetch_array($q_indicator);
@@ -524,13 +531,13 @@ class alert extends module{
 					echo "window.alert('Please supply entry for reminder / alert message or actions.')";
 					echo "</script>";
 					
-				else:
+				else: print_r($post_arr);
 					if($post_arr[submit_alert]=='Save Reminder/Alert'):
 					
-					$alert_transact = mysql_query("INSERT INTO m_lib_alert_type SET module_id='$post_arr[sel_mods]',alert_indicator_id='$post_arr[sel_alert_indicators]',date_pre='$post_arr[sel_days_before]',date_until='$post_arr[sel_days_after]',alert_message='$post_arr[txt_msg]',alert_action='$post_arr[txt_action]'") or die("Cannot query: 107");
+					$alert_transact = mysql_query("INSERT INTO m_lib_alert_type SET module_id='$post_arr[sel_mods]',alert_indicator_id='$post_arr[sel_alert_indicators]',date_pre='$post_arr[sel_days_before]',date_until='$post_arr[sel_days_after]',alert_message='$post_arr[txt_msg]',alert_action='$post_arr[txt_action]',alert_actual_message='$post_arr[txt_actual_msg]',alert_flag_activate='$post_arr[sel_activate]'") or die("Cannot query: 107");
 
-					elseif($post_arr[submit_alert]=='Update Reminder/Alert'):
-					$alert_transact = mysql_query("UPDATE m_lib_alert_type SET module_id='$post_arr[sel_mods]',alert_indicator_id='$post_arr[sel_alert_indicators]',date_pre='$post_arr[sel_days_before]',date_until='$post_arr[sel_days_after]',alert_message='$post_arr[txt_msg]',alert_action='$post_arr[txt_action]' WHERE alert_indicator_id='$post_arr[sel_alert_indicators]'") or die("Cannot query: 341");
+					elseif($post_arr[submit_alert]=='Update Reminder/Alert'): 
+					$alert_transact = mysql_query("UPDATE m_lib_alert_type SET module_id='$post_arr[sel_mods]',alert_indicator_id='$post_arr[sel_alert_indicators]',date_pre='$post_arr[sel_days_before]',date_until='$post_arr[sel_days_after]',alert_message='$post_arr[txt_msg]',alert_action='$post_arr[txt_action]',alert_actual_message='$post_arr[txt_actual_msg]',alert_flag_activate='$post_arr[sel_activate]' WHERE alert_indicator_id='$post_arr[sel_alert_indicators]'") or die("Cannot query: 341");
 
 					else:
 					endif;
