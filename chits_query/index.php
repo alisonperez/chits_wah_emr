@@ -21,7 +21,7 @@
 <link rel=StyleSheet href="design.css" type="text/css">
 <html>
 <head>
-<title>CHITS QUERY BROWSER</title>
+<title>QUERY BROWSER -- Report Generator for Philippine Health Programs</title>
 
 <script language="JavaScript">
 
@@ -59,7 +59,7 @@ if($_SESSION["userid"]!=""):
 
       echo "<table style=\"font-family: arial\">";
 
-      echo "<tr valign='top' align='center' style=\"background-color: #666666;color: #FFFF66;text-align: center;font-weight: bold;font-size:16pt;\"><td colspan='3'>CHITS Query Browser</td></tr>";
+      echo "<tr valign='top' align='center' style=\"background-color: #666666;color: #FFFF66;text-align: center;font-weight: bold;font-size:16pt;\"><td colspan='3'>QUERY BROWSER -- Report Generator for Health Programs and Indicators</td></tr>";
 
       echo "<tr valign='top' align='center' style=\"background-color: #666666;color: #FFFF66;text-align: left;font-weight: bold;font-size:13px;\"><td colspan='3'>DIRECTIONS:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1. Select Classification&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2. Select Queries&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3. Set the Filters&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;4. Click SUBMIT and download the REPORT</td></tr>";
 	
@@ -142,7 +142,7 @@ if($_SESSION["userid"]!=""):
                     $queryconn->querycrit($dbname,$dbname2,$sdate,$edate,$_POST[brgy],0);
 
                 else:	
-                
+
 		endif;
 	  endif;
 
@@ -151,7 +151,7 @@ if($_SESSION["userid"]!=""):
       
       echo "</table>";      
 else:  
-  echo "<font color=\"red\">Access restricted. Please log your account in the CHITS main page.</font><br>";
+  echo "<font color=\"red\">Access restricted. Please log your account in the main page.</font><br>";
   echo "<a href=\"$_SERVER[PHP_SELF]\">Try Again</a>";
 endif;
 

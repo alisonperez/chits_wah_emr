@@ -252,7 +252,6 @@ class alert extends module{
 		elseif($vals_update['alert_flag_activate']=='N'):
 			$n_activate = 'SELECTED';
 		else: 
-			
 		endif;
 
 		echo "<tr>";
@@ -531,7 +530,7 @@ class alert extends module{
 					echo "window.alert('Please supply entry for reminder / alert message or actions.')";
 					echo "</script>";
 					
-				else: print_r($post_arr);
+				else:
 					if($post_arr[submit_alert]=='Save Reminder/Alert'):
 					
 					$alert_transact = mysql_query("INSERT INTO m_lib_alert_type SET module_id='$post_arr[sel_mods]',alert_indicator_id='$post_arr[sel_alert_indicators]',date_pre='$post_arr[sel_days_before]',date_until='$post_arr[sel_days_after]',alert_message='$post_arr[txt_msg]',alert_action='$post_arr[txt_action]',alert_actual_message='$post_arr[txt_actual_msg]',alert_flag_activate='$post_arr[sel_activate]'") or die("Cannot query: 107");
@@ -588,7 +587,7 @@ class alert extends module{
 		echo "</select>";
 	}
 
-	function show_barangay(){		
+	function show_barangay(){
 		echo "Barangay ";
 		$q_brgy = mysql_query("SELECT barangay_id, barangay_name FROM m_lib_barangay ORDER by barangay_name ASC") or die("Cannot query 422".mysql_error());
 
@@ -601,12 +600,10 @@ class alert extends module{
 				else:
 					echo "<option value='$r_brgy[barangay_id]'>$r_brgy[barangay_name]</option>";
 				endif;
-
 			}
 			echo "</select>&nbsp;";
 			echo "<input type='submit' name='submit_brgy' value='GO'></input>";
 		endif;
-
 	}
 
 	function show_categories(){
@@ -1544,15 +1541,25 @@ class alert extends module{
 					foreach($value2 as $key3=>$value3){
 						foreach($value3 as $key4=>$value4){
 							foreach($value4 as $key5=>$value5){
-								foreach($value5 as $key6=>$value6){ //key is the patient_id
-										//print_r($value6);
+								foreach($value5 as $key6=>$value6){ //key6 is the patient_id
+										$q_name = mysql_query("SELECT patient_lastname,patient_firstname FROM m_patient WHERE patient_id='$key6'") or die("Cannot query 1545: ".mysql_error());
+										list($lname,$fname) = mysql_fetch_array($q_name);
+										$ngalan = $lname.', '.$fname;
+
 									foreach($value6 as $key7=>$alert_details){
 										//echo $key7.'<br>';
 										//print_r($value6).'<br><br>';
-										foreach($alert_details as $alert_id=>$arr_alert){
+										foreach($alert_details as $alert_id=>$arr_alert){  //arr_alert[0] is the program_id, arr_alert[1] is the base date
 											if($alert->determine_px_enrollment($key6,$alert_id)):
-												if(count($alert->check_alert_msg($alert_id))!=0):
-													
+												$arr_alert_msg = $alert->check_alert_msg($alert_id,$arr_alert[1],$key6);
+												if(count($arr_alert_msg)!=0):
+													//print_r($arr_alert_msg);
+													$day_diff = $alert->get_date_diff_days(date('Y-m-d'),$arr_alert[1]);
+													echo $arr_alert[1]; 
+													$mensahe = $alert->get_message($day_diff,$arr_alert_msg,$ngalan,$arr_alert[1]);
+													if($mensahe!=''):
+														$alert->queue_sms($key6,$arr_alert[0],date('Y-m-d'),'not sent');
+													endif;
 												endif;
 											endif;
 										}
@@ -1587,8 +1594,25 @@ class alert extends module{
 		return $program_id;
 	}
 
-	function check_alert_msg($alert_id){
-		//$q_alert_prog_id = mysql_query("SELECT alert_id,alert_messages,alert_action FROM ") or die("Cannot query 1566: ".mysql_error());
+	function check_alert_msg(){
+		/* use this function to check if the alert message is: 1). activated, 2). present, 3). if it is, then return an array containint the alert message details to the foreach loop*/
+		$arr_alert = array();
+
+		if(func_num_args()>0):
+			$arr = func_get_args();
+			$alert_id = $arr[0];
+			$base_date = $arr[1];
+			$pxid = $arr[2];
+		endif;
+
+		$q_alert_prog_id = mysql_query("SELECT alert_id,date_pre,date_until,alert_message,alert_action,alert_actual_message FROM m_lib_alert_type WHERE alert_indicator_id='$alert_id' AND alert_flag_activate='Y'") or die("Cannot query 1590: ".mysql_error());	
+
+
+		if(mysql_num_rows($q_alert_prog_id)!=0):
+			$arr_alert = mysql_fetch_array($q_alert_prog_id);
+		endif;
+
+			return $arr_alert;
 	}
 	
 	function determine_alert_hh(){
@@ -1656,6 +1680,55 @@ class alert extends module{
 			echo "</script>";
 			return false;
 		endif;
+	}
+
+	function get_date_diff_days(){
+		/* function returns difference in days*/
+
+		if(func_num_args()>0){
+			$arr = func_get_args();
+			$sdate = $arr[0];     //base date
+			$edate = $arr[1];     //date today
+		}
+
+		$diff_days = (strtotime($edate) - strtotime($sdate)) / (60 * 60 * 24);
+
+		return $diff_days;
+	}
+
+	function get_message(){
+		//function checks the number of days from the actual date then selects and return the appropriate message content based in the query. Function will pad the key variable $date in the message with the base date */
+		if(func_num_args()>0){
+			$arr = func_get_args();
+			$day_diff = $arr[0];
+			$arr_alert_msg = $arr[1];
+			$pxname = $arr[2];
+			$base_date = $arr[3];
+		}
+echo $day_diff;
+//print_r($arr_alert_msg);
+		if($day_diff==0):
+			$str_msg = str_replace('$name',$pxname,$arr_alert_msg['alert_actual_message']);
+			$str_msg = str_replace('$date',$base_date,$str_msg);
+		elseif(($day_diff > 0) && ($day_diff==$arr_alert_msg['date_pre'])):
+			$str_msg = str_replace('$name',$pxname,$arr_alert_msg['alert_message']);
+			$str_msg = str_replace('$date',$base_date,$str_msg);
+		elseif(($day_diff < 0) && (abs($date_diff)==$arr_alert_msg['date_until'])):
+			$str_msg = str_replace('$name',$pxname,$arr_alert_msg['alert_message']);
+			$str_msg = str_replace('$date',$base_date,$str_msg);
+		else: //echo $day_diff.' nada'; 
+			
+		endif;
+			return $str_msg;
+	}
+
+	function queue_sms(){
+		if(func_num_args()>0){
+			$arr = func_get_args();
+			$pxid = $arr[0];
+			
+		}
+
 	}
 
 } //end of class
