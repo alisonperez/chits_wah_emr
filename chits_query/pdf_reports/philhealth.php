@@ -200,10 +200,9 @@ function show_philhealth_list(){
 function show_philhealth_consults(){
     $arr_consults = $_SESSION[arr_consult];
 
-
     foreach($arr_consults[1] as $key=>$value){
         foreach($value as $key2=>$value2){
-		echo $value2[0].'<br>';
+		//echo $value2[0].'<br>';
             $philhealth_id='';
             $mem_type = $this->get_member_type($value2[0]);   //determine if the patient is a philhealth member, dependent or none of the two
             
@@ -278,8 +277,8 @@ $pdf->SetFont('Arial','',10);
 $pdf->AddPage();
 
 
-if($_GET["type"]=='consult'):
-    //$philhealth_records = $pdf->show_philhealth_list();
+if($_GET["type"]=='consult'): 
+    //$philhealth_records = $pdf->show_philhealth_list(); 
     $pdf->show_philhealth_consults();
 else:
     //$philhealth_records = $pdf->show_philhealth_list();

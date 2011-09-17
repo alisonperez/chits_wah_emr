@@ -2,7 +2,7 @@
     ob_start();
     session_start();
     include('globals.php');
-    include('layout/class.widgets.php');      
+    include('layout/class.widgets.php');
     include('scripts/class.querydb.php');
 
     $widconn = new widgets();
@@ -13,7 +13,7 @@
 		$_SESSION[cat] = $_POST[sel_class];
 	endif;
 
-	if($_POST[sel_ques]!=0):	      
+	if($_POST[sel_ques]!=0):
 		$_SESSION[ques] = $_POST[sel_ques];
 	endif;	
 ?>
