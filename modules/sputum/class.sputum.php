@@ -155,9 +155,9 @@ class sputum extends module {
         }
                 
         $sql = mysql_query("select l.request_id, l.request_user_id, l.request_done, ".
-               "date_format(l.request_timestamp, '%a %d %b %Y, %h:%i%p') request_timestamp, ".
+               "date_format(l.request_timestamp, '%a %d %M %b %Y, %h:%i%p') request_timestamp, ".
                "s.consult_id, s.patient_id, done_user_id, ".
-               "if(l.done_timestamp<>'00000000000000', date_format(l.done_timestamp, '%a %d %b %Y, %h:%i%p'), 'NA') done_timestamp, ".
+               "if(l.done_timestamp<>'00000000000000', date_format(l.done_timestamp, '%a %d %M %b %Y, %h:%i%p'), 'NA') done_timestamp, ".
                "if(l.request_done='Y', (unix_timestamp(l.done_timestamp)-unix_timestamp(l.request_timestamp))/3600,(unix_timestamp(sysdate())-unix_timestamp(l.request_timestamp))/3600) elapsed, ".
                "s.sp1_collection_date, s.sp2_collection_date, s.sp3_collection_date, ".
                "s.sp1_appearance, s.sp2_appearance, s.sp3_appearance, ".
@@ -260,7 +260,7 @@ class sputum extends module {
         print "</td></tr>";
         print "<tr valign='top'><td>";
         print "<span class='boxtitle'>".LBL_LAB_REQUEST_DETAILS."</span><br> ";
-        $sql = "select lab_id, consult_id, date_format(request_timestamp, '%a %d %b %Y, %h:%i%p') request_timestamp, request_user_id, request_done, "."date_format(done_timestamp, '%a %d %b %Y, %h:%i%p') done_timestamp, done_user_id "."from m_consult_lab "."where request_id = '".$get_vars["request_id"]."'";
+        $sql = "select lab_id, consult_id, date_format(request_timestamp, '%a %d %M %b %Y, %h:%i%p') request_timestamp, request_user_id, request_done, "."date_format(done_timestamp, '%a %d %M %b %Y, %h:%i%p') done_timestamp, done_user_id "."from m_consult_lab "."where request_id = '".$get_vars["request_id"]."'";
         if ($result = mysql_query($sql)) {
             if (mysql_num_rows($result)) {
                 $lab = mysql_fetch_array($result);
