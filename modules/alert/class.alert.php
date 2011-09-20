@@ -47,6 +47,7 @@ class alert extends module{
 		module::set_menu($this->module,"Alerts","CONSULTS","_alert");
 		module::set_menu($this->module,"SMS Alerts Configuration","LIBRARIES","_sms_config");
 		module::set_menu($this->module,"SMS Patient Enrollment","LIBRARIES","_sms_enroll");
+		module::set_menu($this->module,"SMS Alerts","CONSULTS","_sms_alert");
 		module::set_detail($this->description,$this->version,$this->author,$this->module);
 	
 	}
@@ -483,6 +484,11 @@ class alert extends module{
 				echo "</tr>";
 			endif;
 		}
+	}
+
+	function _sms_alert(){
+		echo 'nosila';
+
 	}
 
 	function set_vals_update($get_arr){
@@ -1555,10 +1561,12 @@ class alert extends module{
 												if(count($arr_alert_msg)!=0):
 													//print_r($arr_alert_msg);
 													$day_diff = $alert->get_date_diff_days(date('Y-m-d'),$arr_alert[1]);
-													echo $arr_alert[1]; 
+													//echo $arr_alert[1]; 
 													$mensahe = $alert->get_message($day_diff,$arr_alert_msg,$ngalan,$arr_alert[1]);
 													if($mensahe!=''):
-														$alert->queue_sms($key6,$arr_alert[0],date('Y-m-d'),'not sent');
+														/* $key: patient_id, $arr_alert[0]: program_id, $arr_alert[1]: base date, $alert_id: id for alert, 'queue': sms_status, $mensahe: alert message
+														*/
+														$alert->queue_sms($key6,$arr_alert[0],$arr_alert[1],$alert_id,'queue',$mensahe);
 													endif;
 												endif;
 											endif;
@@ -1705,8 +1713,7 @@ class alert extends module{
 			$pxname = $arr[2];
 			$base_date = $arr[3];
 		}
-echo $day_diff;
-//print_r($arr_alert_msg);
+
 		if($day_diff==0):
 			$str_msg = str_replace('$name',$pxname,$arr_alert_msg['alert_actual_message']);
 			$str_msg = str_replace('$date',$base_date,$str_msg);
@@ -1726,10 +1733,27 @@ echo $day_diff;
 		if(func_num_args()>0){
 			$arr = func_get_args();
 			$pxid = $arr[0];
-			
+			$prog_id = $arr[1];
+			$base_date = $arr[2];
+			$alert_id = $arr[3];
+			$sms_status = $arr[4];
+			$sms_message = $arr[5];
+
+		/* $key6: patient_id, $arr_alert[0]: program_id, $arr_alert[1]: base date, $alert_id: id for alert, 'queue': sms_status, $mensahe: alert message
+		$alert->queue_sms($key6,$arr_alert[0],$arr_alert[1],$alert_id,date('Y-m-d'),'queue',$mensahe); */
 		}
 
+		$get_brgy = mysql_query("SELECT a.barangay_id FROM m_family_address a, m_family_members b WHERE b.patient_id='$pxid' AND a.family_id=b.family_id") or die("Cannot query 1740: ".mysql_error());
+
+		list($brgy_id) = mysql_fetch_array($get_brgy);
+		
+		$alert_date = date('Y-m-d');
+
+		$insert_sms_alert = mysql_query("INSERT INTO m_lib_sms_alert SET patient_id='$pxid',program_id='$prog_id',alert_id='$alert_id',alert_date='$alert_date',base_date='$base_date',sms_status='$sms_status',sms_message='$sms_message',last_update=NOW(),barangay_id='$brgy_id'") or die("Cannot query 1740: ".mysql_error());
+
 	}
+
+	
 
 } //end of class
 ?>
