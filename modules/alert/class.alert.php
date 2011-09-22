@@ -1638,11 +1638,23 @@ class alert extends module{
 
 		else:
 			$arr_config = $alert->get_sms_config();
-			if(count($arr_config)!=0): print_r($arr_config);
-				if($arr_config['sms_time_sched'] == date('H:i')):
+			if(count($arr_config)!=0):
+				if($arr_config['sms_time_sched'] <= date('H:i')):
+					$date_today = date('Y-m-d');
 					
-					$q_alert = mysql_query("SELECT sms_id, ") or die("Cannot query 1644: ".mysql_error());
-					$alert->send_sms();
+					$q_alert = mysql_query("SELECT sms_id,alert_date,sms_message,sms_number FROM m_lib_sms_alert WHERE alert_date='$date_today' AND sms_status!='sent'") or die("Cannot query 1644: ".mysql_error());
+					
+					if(mysql_num_rows($q_alert)!=0):
+					while($r_alert = mysql_fetch_array($q_alert)){  
+						if($alert->send_sms($arr_config['sms_url'],$arr_config['sms_port'],$r_alert['sms_number'],$r_alert['sms_message'])): echo 'sent';
+							$alert->update_sms_status($r_alert['sms_id'],'sent');
+						else: echo ' not sent';
+							$alert->update_sms_status($r_alert['sms_id'],'not_sent');
+						endif;
+					}
+					endif;
+					
+
 
 				endif;
 				
@@ -1743,14 +1755,14 @@ class alert extends module{
 		endif;
 
 		$padded_str = str_replace(' ','%20',$sms_message);
-		print_r($arr);
-		/*if(exec('nohup curl http://'.$midserver.':'.$port.'/send/sms/'.$post[txt_testnum].'/'.$padded_str)):
+		
+		if(exec('nohup curl http://'.$midserver.':'.$port.'/send/sms/'.$sms_number.'/'.$padded_str)):
 			//echo 'Message sent!';
 			return true;
 		else:
 			echo 'Message not sent!';
 			return false;
-		endif; */
+		endif;
 
 	}
 
@@ -1857,6 +1869,16 @@ class alert extends module{
 
 		$insert_sms_alert = mysql_query("INSERT INTO m_lib_sms_alert SET patient_id='$pxid',program_id='$prog_id',alert_id='$alert_id',alert_date='$alert_date',base_date='$base_date',sms_status='$sms_status',sms_message='$sms_message',last_update=NOW(),barangay_id='$brgy_id',sms_number='$cp'") or die("Cannot query 1740: ".mysql_error());
 
+	}
+
+	function update_sms_status(){
+		if(func_num_args()>0){
+			$arr = func_get_args();
+			$sms_id = $arr[0];
+			$status = $arr[1];
+		}
+		echo $sms_id.' '.$status;
+		$q_sms_status = mysql_query("UPDATE m_lib_sms_alert SET sms_status='$status' WHERE sms_id='$sms_id'") or die("Cannot query 1879: ".mysql_error());
 	}
 
 	

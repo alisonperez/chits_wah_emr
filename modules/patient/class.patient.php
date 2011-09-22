@@ -404,13 +404,18 @@ class patient extends module{
 					//print_r($post_vars);
                     $result = mysql_query($sql) or die(mysql_error());
 		    $pxid = mysql_insert_id();
-		    if(isset($arr_sms)):
+		    if(isset($arr_sms) && !empty($post_vars['patient_cellphone'])):
 			$this->sms_patient_enroll($pxid,$arr_sms);
+		    else:
+			echo "<script language=\"Javascript\">";
+			echo "alert('Patient $post_vars[patient_firstname] $post_vars[patient_lastname] was not enrolled for SMS alert because no cellphone number was recorded.')";
+			//header("location: ".$_SERVER["PHP_SELF"]."?page=".$get_vars["page"]."&menu_id=".$get_vars["menu_id"]);  
+			echo "</script>";
 		    endif;
 
 			if ($result) {
 			echo "<script language=\"Javascript\">";
-			echo "alert('Patient $post_vars[patient_firstname], $post_vars[patient_lastname] was successfully added!')";
+			echo "alert('Patient $post_vars[patient_firstname] $post_vars[patient_lastname] was successfully added!')";
 			//header("location: ".$_SERVER["PHP_SELF"]."?page=".$get_vars["page"]."&menu_id=".$get_vars["menu_id"]);  
 			echo "</script>";
                     	}
@@ -442,7 +447,7 @@ class patient extends module{
                        "where patient_id = '".$post_vars["patient_id"]."'";
 				$result = mysql_query($sql) or die(mysql_error());
                 if ($result) {
-					if(isset($arr_sms)):
+					if(isset($arr_sms) && !empty($post_vars["patient_cellphone"])):
 						$this->sms_patient_enroll($post_vars["patient_id"],$arr_sms,'');
 					else:
 						$this->sms_patient_enroll($post_vars["patient_id"],$arr_sms,'no');
@@ -628,7 +633,7 @@ class patient extends module{
 	print "<tr><td>";
 	print "<span class='boxtitle'>CELLPHONE NUMBER (11-digit,i.e. 09XX1234567)</span><br> ";
 
-	print "<input type='text' size='10' class='textbox' maxlength='11' name='patient_cellphone' value='$patient[patient_cellphone]'></input>";
+	print "<input type='text' size='12' class='textbox' maxlength='11' name='patient_cellphone' value='$patient[patient_cellphone]'></input>";
 	print "</td></tr>";
 
 	if(mysql_num_rows($q_sms_enroll)!=0):
