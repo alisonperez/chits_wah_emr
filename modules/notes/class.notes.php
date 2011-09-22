@@ -824,7 +824,7 @@ class notes extends module {
                 } else {
                     print "<font color='red'>No recorded history.</font><br/>";
                 }
-                print "<hr size='1'/>";
+                print "<br><br><hr size='1'/>";
                 print "<b>PHYSICAL EXAM:</b><br/>";
                 if (strlen($notes["notes_physicalexam"])>0) {
                     print stripslashes(nl2br($notes["notes_physicalexam"]))."<br/>";
@@ -835,10 +835,10 @@ class notes extends module {
                 } else {
                     print "<font color='red'>No recorded PE.</font><br/>";
                 }
-                print "<hr size='1'/>";
+                print "<br><br><hr size='1'>";
                 print "<b>DIAGNOSIS:</b><br/>";
                 notes::show_diagnosis($menu_id, $post_vars, $get_vars);
-                print "<hr size='1'/>";
+                print "<br><br><hr size='1'/>";
                 print "<b>PLAN:</b><br/>";
                 if (strlen($notes["notes_plan"])>0) {
                     print stripslashes(nl2br($notes["notes_plan"]))."<br/>";
@@ -1572,15 +1572,15 @@ class notes extends module {
 				echo "<span class='boxtitle'>DIARRHEA TREAMENT INFORMATION</span>";
 				echo "<table>";
 
-				echo "<tr><td class='tinylight'><b>DATE ORT WAS GIVEN</b></td><td><input type='text' size='7' name='date_ort_given' value='$date_ort'></input>";				
+				echo "<tr><td class='tinylight'><b>DATE ORT WAS GIVEN</b></td><td><input type='text' size='11' name='date_ort_given' value='$date_ort'></input>";				
 				echo "&nbsp;<a href=\"javascript:show_calendar4('document.form_diarrhea.date_ort_given', document.form_diarrhea.date_ort_given.value);\"><img src='../images/cal.gif' width='16' height='16' border='0' alt='Click Here to Pick up the date'></a>";								
 				echo "</td></tr>";
 
-				echo "<tr><td class='tinylight'><b>DATE ORS WAS GIVEN</b></td><td><input type='text' size='7' name='date_ors_given' value='$date_ors'></input>";
+				echo "<tr><td class='tinylight'><b>DATE ORS WAS GIVEN</b></td><td><input type='text' size='11' name='date_ors_given' value='$date_ors'></input>";
 				echo "&nbsp;<a href=\"javascript:show_calendar4('document.form_diarrhea.date_ors_given', document.form_diarrhea.date_ors_given.value);\"><img src='../images/cal.gif' width='16' height='16' border='0' alt='Click Here to Pick up the date'></a>";								
 				echo "</td></tr>";
 
-				echo "<tr><td class='tinylight'><b>DATE ORS WITH ZINC WAS GIVEN</b></td><td><input type='text' size='7' name='date_orswz_given' value='$date_orswz'></input>";
+				echo "<tr><td class='tinylight'><b>DATE ORS WITH ZINC WAS GIVEN</b></td><td><input type='text' size='11' name='date_orswz_given' value='$date_orswz'></input>";
 				echo "&nbsp;<a href=\"javascript:show_calendar4('document.form_diarrhea.date_orswz_given', document.form_diarrhea.date_orswz_given.value);\"><img src='../images/cal.gif' width='16' height='16' border='0' alt='Click Here to Pick up the date'></a>";
 				echo "</td></tr>";
 				
