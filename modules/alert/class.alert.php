@@ -371,12 +371,15 @@ class alert extends module{
 		$q_sms_info = mysql_query("SELECT * FROM m_lib_sms_config") or die("Cannot query 339 ".mysql_error());
 		$sms_info = mysql_fetch_array($q_sms_info);
 		$arr_sms_time = explode(':',$sms_info['sms_time']);
-
+		
+		echo "<span class='library'>REMINDER AND ALERT ADMINISTRATION</span>";
+		echo "<p align='justify'>The SMS Alert and Configuration page will allow the end-user to configure the sending of the SMS messages. To facilitate sending of SMS, set a valid SMS gateway and port. The <b>Time for Batch Sending</b> is a reserved time within the day wherein the SMS messages are going to be sent out. <br><br>The <b>Contact Information Message</b> is a customizable message appended at the end of the SMS and has dynamic values. Append the keywords ".'$midwife for name of midwive, $bhs for name of barangay health station, $source name of health center and $msgcode for message code'."<br><br>To test if the settings are working, to test if the values are correct, enter your mobile number at the <b>Test Number</b> box and a sample message at the <b>Test Message</b> box. You should be able to receive the message in the number you supplied.</p>";
+		
 		echo "<form action='$_SERVER[PHP_SELF]?page=$_GET[page]&menu_id=$_GET[menu_id]#sms' name='form_sms' method='POST'>";
 		echo "<a name='sms'></a>";
 		echo "<table width='600' bgcolor='FFCCFF'>";
  		echo "<thead><td class='alert_table_header' colspan='2'>SMS ALERT CONFIGURATION PAGE</td></thead>";
-		echo "<tr><td colspan='2' class='alert_table_row'><b>This is the main configuration page for the SMS Alert System. Supply proper values for the SMS settings. To test if the values are correct, enter your mobile number at the 'Test Number' box and a sample message at the 'Test Message' box. You should be able to receive the message in the number you supplied. </b></td></tr>";
+		//echo "<tr><td colspan='2' class='alert_table_row'><b>This is the main configuration page for the SMS Alert System. Supply proper values for the SMS settings. To test if the values are correct, enter your mobile number at the 'Test Number' box and a sample message at the 'Test Message' box. You should be able to receive the message in the number you supplied. </b></td></tr>";
 		
 		echo "<tr><td class='alert_table_row'>URL of the middle server</td>";
 		echo "<td><input type='text' name='txt_midserver' value='$sms_info[sms_url]'></td></tr>";
@@ -410,7 +413,7 @@ class alert extends module{
 		//echo "</select>";
 		echo "</td></tr>";
 		
-		echo "<tr valign='top'><td class='alert_table_row'>Contact Information Message for the RHU<br>(ie. name of midwife, BHS, health center)</td>";
+		echo "<tr valign='top'><td class='alert_table_row'>Contact Information Message<br>(ie. name of midwife, BHS, health center)</td>";
 		echo "<td><textarea name='txt_contact' cols='30' rows='5'>$sms_info[sms_contact_info]</textarea></tr>";
 
 		echo "<tr><td class='alert_table_row'>Method of Sending</td>";
