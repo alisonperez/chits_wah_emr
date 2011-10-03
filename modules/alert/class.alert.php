@@ -305,7 +305,6 @@ class alert extends module{
 
 	function _alert(){
 		//echo "this is the container for the alert and reminder master list";
-		
 		echo "<form action='$_SERVER[PHP_SELF]?page=$_GET[page]&menu_id=$_GET[menu_id]#reminder' method='POST'>";
 		echo "<a name='reminder'></a>";
 		echo "<table bgcolor='#FFCCFF' id='alert_table'>";
@@ -375,16 +374,18 @@ class alert extends module{
 
 		echo "<form action='$_SERVER[PHP_SELF]?page=$_GET[page]&menu_id=$_GET[menu_id]#sms' name='form_sms' method='POST'>";
 		echo "<a name='sms'></a>";
-		echo "<span class='library'>SMS ALERT CONFIGURATION PAGE</span><br><br>";
-		echo "<table border='1' width='600'>";
-		echo "<thead><td colspan='2'>This is the main configuration page for the SMS Alert System. Supply proper values for the SMS settings. To test if the values are correct, enter your mobile number at the 'Test Number' box and a sample message at the 'Test Message' box. You should be able to receive the message in the number you supplied. </td></thead>";
-		echo "<tr><td>URL of the middle server</td>";
+		echo "<span class='library'></span><br><br>";
+		echo "<table width='600' bgcolor='FFCCFF'>";
+ 		echo "<thead><td class='alert_table_header' colspan='2'>SMS ALERT CONFIGURATION PAGE</td></thead>";
+		echo "<tr><td colspan='2' class='alert_table_row'><b>This is the main configuration page for the SMS Alert System. Supply proper values for the SMS settings. To test if the values are correct, enter your mobile number at the 'Test Number' box and a sample message at the 'Test Message' box. You should be able to receive the message in the number you supplied. </b></td></tr>";
+		
+		echo "<tr><td class='alert_table_row'>URL of the middle server</td>";
 		echo "<td><input type='text' name='txt_midserver' value='$sms_info[sms_url]'></td></tr>";
 
-		echo "<tr><td>Port Number</td>";
+		echo "<tr><td class='alert_table_row'>Port Number</td>";
 		echo "<td><input type='text' name='txt_port' value='$sms_info[sms_port]'></td></tr>";
 
-		echo "<tr><td>Time For Batch Sending</td>";
+		echo "<tr><td class='alert_table_row'>Time For Batch Sending</td>";
 		echo "<td><select name='sel_hr' value='1'>";
 		for($i=1;$i<=23;$i++){
 			if($i!=$arr_sms_time[0]):
@@ -410,10 +411,10 @@ class alert extends module{
 		//echo "</select>";
 		echo "</td></tr>";
 		
-		echo "<tr valign='top'><td>Contact Information Message for the RHU<br>(ie. landline, cp, to be appended to the SMS)</td>";
+		echo "<tr valign='top'><td class='alert_table_row'>Contact Information Message for the RHU<br>(ie. name of midwife, BHS, health center)</td>";
 		echo "<td><textarea name='txt_contact' cols='30' rows='3'>$sms_info[sms_contact_info]</textarea></tr>";
 
-		echo "<tr><td>Method of Sending</td>";
+		echo "<tr><td class='alert_table_row'>Method of Sending</td>";
 		echo "<td><select name='sel_method'>";
 		
 		$auto_mode = $manual_mode = '';
@@ -429,11 +430,11 @@ class alert extends module{
 		echo "</select>";
 		echo "</td></tr>";
 	
-		echo "<tr><td>Test Message<br></td>";
+		echo "<tr><td class='alert_table_row'>Test Message<br></td>";
 		echo "<td><input type='text' name='txt_testmsg' value=''>";
 		echo "</td></tr>";
 
-		echo "<tr><td>Test Number (11 digits)<br></td>";
+		echo "<tr><td class='alert_table_row'>Test Number (11 digits)<br></td>";
 		echo "<td><input type='text' name='txt_testnum' value=''>";
 		echo "</td></tr>";
 
@@ -461,12 +462,7 @@ class alert extends module{
 		echo "</td>";
 		echo "</tr>";
 
-
 		echo "<tr>";
-		
-
-
-
 		echo "</tr>";
 		echo "</table>";
 	}
@@ -523,8 +519,6 @@ class alert extends module{
 			$q_sms_alert = mysql_query("SELECT sms_id,patient_id,barangay_id,program_id,alert_id,alert_date,base_date,sms_status,sms_message,sms_code,sms_number FROM m_lib_sms_alert WHERE alert_date='$_POST[date_alert]'") or die("Cannot query 490: ".mysql_error());
 		endif;
 
-		
-		
 		echo "<form action='$_SERVER[PHP_SELF]?page=$_GET[page]&menu_id=$_GET[menu_id]' method='POST' name='sms_form'>";
 		echo "<table border='1'>";
 		echo "<thead><td colspan='9'>SMS Alert Messages for Broadcasting</td></thead>";
@@ -542,7 +536,6 @@ class alert extends module{
 			echo "<td>Sending Status</td>";
 			echo "<td>View Message</td>";
 			echo "</tr>";
-
 
 			while(list($sms_id,$pxid,$brgy_id,$program,$alert,$alert_date,$base_date,$sms_status,$sms_message,$sms_code,$sms_number)=mysql_fetch_array($q_sms_alert)){
 
@@ -1656,7 +1649,6 @@ class alert extends module{
 			array_push($arr_alert,$alert->determine_alert_hh($r_fam['family_id']));
 		}
 
-
 		if(mysql_num_rows($q_sms_alert)==0):
 			foreach($arr_alert as $key1=>$value1){				
 				foreach($value1 as $key2=>$value2){
@@ -1697,7 +1689,7 @@ class alert extends module{
 				}
 			}
 
-		else:
+		else: 
 			$arr_config = $alert->get_sms_config();
 			if(count($arr_config)!=0):
 				if($arr_config['sms_time_sched'] <= date('H:i')):
@@ -1714,11 +1706,7 @@ class alert extends module{
 						endif;
 					}
 					endif;
-					
-
-
 				endif;
-				
 			else:
 				echo "<font>There is no SMS configuration!</font>";
 			endif;
