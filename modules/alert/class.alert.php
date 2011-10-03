@@ -397,7 +397,11 @@ class alert extends module{
 
 		echo "<b>:</b><select name='sel_min'>";
 		for($i=0;$i<=59;$i++){
-			echo "<option value='".str_pad($i)."'>".str_pad($i,2,0,STR_PAD_LEFT)."</option>";
+			if($i!=$arr_sms_time[1]):
+				echo "<option value='".str_pad($i)."'>".str_pad($i,2,0,STR_PAD_LEFT)."</option>";
+			else:
+				echo "<option value='".str_pad($i)."' SELECTED>".str_pad($i,2,0,STR_PAD_LEFT)."</option>";
+			endif;
 		}		
 		echo "</select>";
 		//echo "&nbsp;<select name='sel_day'>";	
@@ -488,18 +492,42 @@ class alert extends module{
 
 	function _sms_alert(){
 
+		if($_POST['submit_alert']=='Send Manually'):
+			$arr_config = $this->get_sms_config();
+			foreach($_POST['sms'] as $key=>$sms_id){
+				$q_sms_message = mysql_query("SELECT sms_number, sms_message from m_lib_sms_alert WHERE sms_id='$sms_id'") or die("Cannot query 496: ".mysql_error()); 
+				list($sms_number,$sms_message) = mysql_fetch_array($q_sms_message);
+				
+				if($this->send_sms($arr_config['sms_url'],$arr_config['sms_port'],$sms_number,$sms_message)):
+					$this->update_sms_status($sms_id,'sent');
+				else:
+					$this->update_sms_status($sms_id,'not_sent');
+				endif;
+			}
+
+		elseif($_POST['submit_alert']=='Hold Message'):
+			foreach($_POST['sms'] as $key=>$sms_id){
+				$this->update_sms_status($sms_id,'hold');
+			}
+		elseif($_POST['submit_alert']=='Terminate Message'):
+			foreach($_POST['sms'] as $key=>$sms_id){
+				$this->update_sms_status($sms_id,'terminate');
+			}
+		else:
+		endif;
+
 		if(!isset($_POST['date_alert'])):
 			$date_today = date('Y-m-d');
-			$q_sms_alert = mysql_query("SELECT sms_id,patient_id,barangay_id,program_id,alert_id,alert_date,base_date,sms_status,sms_message,sms_code FROM m_lib_sms_alert WHERE alert_date='$date_today'") or die("Cannot query 490: ".mysql_error());
+			$q_sms_alert = mysql_query("SELECT sms_id,patient_id,barangay_id,program_id,alert_id,alert_date,base_date,sms_status,sms_message,sms_code,sms_number FROM m_lib_sms_alert WHERE alert_date='$date_today'") or die("Cannot query 490: ".mysql_error());
 		else:
 			$q_sms_alert = mysql_query("SELECT sms_id,patient_id,barangay_id,program_id,alert_id,alert_date,base_date,sms_status,sms_message,sms_code,sms_number FROM m_lib_sms_alert WHERE alert_date='$_POST[date_alert]'") or die("Cannot query 490: ".mysql_error());
 		endif;
 
 		
 		
-		echo "<form action='$_SERVER[PHP_SELF]?page=$_GET[page]&menu_id=$_GET[menu_id]' action='POST' name='sms_form'>";
+		echo "<form action='$_SERVER[PHP_SELF]?page=$_GET[page]&menu_id=$_GET[menu_id]' method='POST' name='sms_form'>";
 		echo "<table border='1'>";
-		echo "<thead><td colspan='8'>SMS Alert Messages for Broadcasting</td></thead>";
+		echo "<thead><td colspan='9'>SMS Alert Messages for Broadcasting</td></thead>";
 
 		if(mysql_num_rows($q_sms_alert)!=0):
 			
@@ -512,6 +540,7 @@ class alert extends module{
 			echo "<td>Program</td>";
 			echo "<td>Alert Type</td>";
 			echo "<td>Sending Status</td>";
+			echo "<td>View Message</td>";
 			echo "</tr>";
 
 
@@ -527,7 +556,13 @@ class alert extends module{
 				list($main_indicator,$sub_indicator) = mysql_fetch_array($q_program);
 
 				echo "<tr>";
-				echo "<td><input type='checkbox' name='sms[]' value='$sms_id'></input></td>";
+				echo "<td>";
+				if($sms_status!='sent'):
+					echo "<input type='checkbox' name='sms[]' value='$sms_id'></input>";
+				else:
+					echo "&nbsp;";
+				endif;
+				echo "</td>";
 				echo "<td>&nbsp;</td>";
 				echo "<td>$lname, $fname</td>";
 				echo "<td>$sms_number</td>";
@@ -535,8 +570,16 @@ class alert extends module{
 				echo "<td>$main_indicator</td>";
 				echo "<td>$sub_indicator</td>";
 				echo "<td>$sms_status</td>";
+				echo "<td><a href='#' onclick=\"window.alert('".$sms_message."');return true;\">View</a></td>";
 				echo "</tr>";
 			}
+
+			echo "<tr>";
+			echo "<td colspan='9' align='center'>";
+			echo "<input type='submit' value='Send Manually' name='submit_alert' />&nbsp;&nbsp;";
+			echo "<input type='submit' value='Hold Message' name='submit_alert' />&nbsp;&nbsp;";
+			echo "<input type='submit' value='Terminate Message' name='submit_alert' />&nbsp;&nbsp;";
+			echo "</td></tr>";
 
 		else:
 			echo "<tr><td>No scheduled SMS messages to be broadcasted.</td></tr>";
@@ -770,7 +813,7 @@ class alert extends module{
 				$arr_px = $this->fp_alarms($family_id,$arr_members,'fp');
 				break;
 
-			case 'epi':
+			case 'epi': 
 				$arr_px = $this->epi_alarms($family_id,$arr_members,'epi');
 				break;
 			default:
@@ -1127,7 +1170,7 @@ class alert extends module{
 							list($fp_px_id,$date_registered) = mysql_fetch_array($q_fp);
 							
 							$px_age = $this->get_patient_age($patient_id);
-
+							
 							if($px_age >= 50):	//candidate for dropout in BTL is px_age>=50
 								array_push($arr_case_id,$fp_px_id);
 							endif;
@@ -1196,47 +1239,61 @@ class alert extends module{
 
 					case '7':		//BCG immunization
 						$eligibility = $this->check_vaccine_eligibility($patient_id,$dob,'BCG');
+						$buffer_day = $this->get_vaccine_min_age_eligibility('BCG');
 						break;
 
 					case '8':		//DPT1 immunization
 						$eligibility = $this->check_vaccine_eligibility($patient_id,$dob,'DPT1');
+						$buffer_day = $this->get_vaccine_min_age_eligibility('DPT1');
 						break;
 
 					case '9':		//DPT2 immunization
 						$eligibility = $this->check_vaccine_eligibility($patient_id,$dob,'DPT2');
+						$buffer_day = $this->get_vaccine_min_age_eligibility('DPT2');
 						break;
 
 					case '10':		//DPT3 immunization
 						$eligibility = $this->check_vaccine_eligibility($patient_id,$dob,'DPT3');
+						$buffer_day = $this->get_vaccine_min_age_eligibility('DPT3');
 						break;
 					case '11':
 						$eligibility = $this->check_vaccine_eligibility($patient_id,$dob,'OPV1');
+						$buffer_day = $this->get_vaccine_min_age_eligibility('OPV1');
 						break;
 					case '12':
 						$eligibility = $this->check_vaccine_eligibility($patient_id,$dob,'OPV2');
+						$buffer_day = $this->get_vaccine_min_age_eligibility('OPV2');
 						break;
 					case '13':
 						$eligibility = $this->check_vaccine_eligibility($patient_id,$dob,'OPV3');
+						$buffer_day = $this->get_vaccine_min_age_eligibility('OPV3');
 						break;
 					case '14':
 						$eligibility = $this->check_vaccine_eligibility($patient_id,$dob,'HEPB1');
+						$buffer_day = $this->get_vaccine_min_age_eligibility('HEPB1');
 						break;
 					case '15':
 						$eligibility = $this->check_vaccine_eligibility($patient_id,$dob,'HEPB2');
+						$buffer_day = $this->get_vaccine_min_age_eligibility('HEPB2');
 						break;
 					case '16':
 						$eligibility = $this->check_vaccine_eligibility($patient_id,$dob,'HEPB3');
+						$buffer_day = $this->get_vaccine_min_age_eligibility('HEPB3');
 						break;
 					case '17':
 						$eligibility = $this->check_vaccine_eligibility($patient_id,$dob,'MSL');
+						$buffer_day = $this->get_vaccine_min_age_eligibility('MSL');
 						break;
 					case '18':		//FIC
 						//$eligibility = $this->check_vaccine_eligibility($patient_id,$dob,'MSL');
-						$eligibility = eregi('FIC',ccdev::determine_vacc_status($patient_id))?false:true;
+						$eligibility = ((eregi('FIC',ccdev::determine_vacc_status($patient_id))?false:true) && ($this->get_patient_age($patient_id)>0));
+						$buffer_day = '365';
+
 						break;
 
 					case '19':		//CIC
 						if((eregi('CIC',ccdev::determine_vacc_status($patient_id))==true) && (eregi('FIC',ccdev::determine_vacc_status($patient_id))==false)):
+							$buffer_day = '365';
 							$eligibility = true;
 						else:
 							$eligibility = false;
@@ -1245,11 +1302,11 @@ class alert extends module{
 						break;
 
 					default:
-						 
 						break;
 				}	//end switch
 				if($eligibility==true):
-					array_push($arr_case_id,$ccdev_id);
+					$base_date = date('Y/m/d',(strtotime(date("Y-m-d", strtotime($dob)) . " +".$buffer_day." day")));
+					array_push($arr_case_id,$ccdev_id,$base_date);
 				endif;
 
 				if(!empty($arr_case_id)):
@@ -1466,10 +1523,12 @@ class alert extends module{
 
 
 	function get_patient_age($patient_id){
-		$q_age = mysql_query("SELECT round((TO_DAYS(NOW()) - TO_DAYS(patient_dob))/365 ,2) as 'px_age' FROM m_patient WHERE patient_id='$patient_id'") or die("Cannot query: 1113");
+		$q_age = mysql_query("SELECT ((TO_DAYS(NOW()) - TO_DAYS(patient_dob))/365) as 'px_age' FROM m_patient WHERE patient_id='$patient_id'") or die("Cannot query: 1113");
 
 		list($px_age) = mysql_fetch_array($q_age);
+		
 		return $px_age;
+		
 	}
 
 	function check_ccdev_enrollment($patient_id){
@@ -1505,10 +1564,10 @@ class alert extends module{
 			$q_vaccine = mysql_query("SELECT consult_id FROM m_consult_ccdev_vaccine WHERE ccdev_id='$ccdev_id' AND patient_id='$patient_id' AND vaccine_id='$vaccine'") or die("Cannot query 1158 ".mysql_error());
 				
 			if(mysql_num_rows($q_vaccine)==0):
-				if($this->get_vaccine_min_age_eligibility($vaccine)<=($this->get_patient_age($patient_id)*12)):
-				//echo $patient_id.' '.$this->get_vaccine_min_age_eligibility($vaccine).' '.$vaccine.'<br>';
+				if($this->get_vaccine_min_age_eligibility($vaccine)<=($this->get_patient_age($patient_id)*12*30.42)):
+				//echo $patient_id.' '.$this->get_vaccine_min_age_eligibility($vaccine).' '.$vaccine.'<br>'; 
 					return true;
-				else: 
+				else:
 					return false;
 				endif;
 			else:
@@ -1521,7 +1580,7 @@ class alert extends module{
 	}
 
 	function get_vaccine_min_age_eligibility(){
-		//function returns the minimum number of months 
+		//function returns the minimum number of days
 		
 		if(func_num_args()>0):
 			$arr = func_get_args();
@@ -1535,27 +1594,28 @@ class alert extends module{
 				break;
 
 			case 'DPT1':
-				$min_age = 1.5;		//6 weeks
+				//$min_age = 1.5;		//6 weeks
+				$min_age = 42;
 				break;
 
 			case 'DPT2':
-				$min_age = 2.5;		//10 weeks
+				$min_age = 70;		//10 weeks
 				break;
 
 			case 'DPT3':
-				$min_age = 3.5;		//14 weeks
+				$min_age = 98;		//14 weeks
 				break;
 
 			case 'OPV1':
-				$min_age = 1.5;		//6 weeks
+				$min_age = 42;		//6 weeks
 				break;
 
 			case 'OPV2':
-				$min_age = 2.5;		//10 weeks
+				$min_age = 70;		//10 weeks
 				break;
 
 			case 'OPV3':
-				$min_age = 3.5;		//14 weeks
+				$min_age = 98;		//14 weeks
 				break;
 
 			case 'HEPB1':			//at birth
@@ -1563,15 +1623,15 @@ class alert extends module{
 				break;
 
 			case 'HEPB2':
-				$min_age = 1; 		//4 weeks
+				$min_age = 28; 		//4 weeks
 				break;
 
 			case 'HEPB3':
-				$min_age = 2; 		//8 weeks
+				$min_age = 56; 		//8 weeks
 				break;
 
 			case 'MSL':
-				$min_age = 9; 		//9 months
+				$min_age = 63; 		//9 months
 				break;
 
 			default:
@@ -1595,7 +1655,7 @@ class alert extends module{
 		while($r_fam = mysql_fetch_array($q_fam_id)){ 
 			array_push($arr_alert,$alert->determine_alert_hh($r_fam['family_id']));
 		}
-		//print_r($arr_alert);
+
 
 		if(mysql_num_rows($q_sms_alert)==0):
 			foreach($arr_alert as $key1=>$value1){				
@@ -1611,14 +1671,15 @@ class alert extends module{
 									foreach($value6 as $key7=>$alert_details){
 										//echo $key7.'<br>';
 										//print_r($value6).'<br><br>';
-										foreach($alert_details as $alert_id=>$arr_alert){  //arr_alert[0] is the program_id, arr_alert[1] is the base date
+										foreach($alert_details as $alert_id=>$arr_alert){ //arr_alert[0] is the program_id, arr_alert[1] is the base date
 											if($alert->determine_px_enrollment($key6,$alert_id)):
 												$arr_alert_msg = $alert->check_alert_msg($alert_id,$arr_alert[1],$key6);
-												if(count($arr_alert_msg)!=0):
+												if(count($arr_alert_msg)!=0): 
 													//print_r($arr_alert_msg);
 													$day_diff = $alert->get_date_diff_days(date('Y-m-d'),$arr_alert[1]);
 													//echo $arr_alert[1]; 
-													$mensahe = $alert->get_message($day_diff,$arr_alert_msg,$ngalan,$arr_alert[1]);
+													$mensahe = $alert->get_message($day_diff,$arr_alert_msg,$ngalan,$arr_alert[1]); 
+
 													if($mensahe!=''):
 														/* $key: patient_id, $arr_alert[0]: program_id, $arr_alert[1]: base date, $alert_id: id for alert, 'queue': sms_status, $mensahe: alert message
 														*/
@@ -1646,9 +1707,9 @@ class alert extends module{
 					
 					if(mysql_num_rows($q_alert)!=0):
 					while($r_alert = mysql_fetch_array($q_alert)){  
-						if($alert->send_sms($arr_config['sms_url'],$arr_config['sms_port'],$r_alert['sms_number'],$r_alert['sms_message'])): echo 'sent';
+						if($alert->send_sms($arr_config['sms_url'],$arr_config['sms_port'],$r_alert['sms_number'],$r_alert['sms_message'])):
 							$alert->update_sms_status($r_alert['sms_id'],'sent');
-						else: echo ' not sent';
+						else: 
 							$alert->update_sms_status($r_alert['sms_id'],'not_sent');
 						endif;
 					}
@@ -1661,8 +1722,8 @@ class alert extends module{
 			else:
 				echo "<font>There is no SMS configuration!</font>";
 			endif;
-			
-		endif;
+		endif;	
+
  
 	}
 
@@ -1722,12 +1783,14 @@ class alert extends module{
 				array_push($arr_alert,$arr_prog);
 			endif;
 		}
-
+		/*echo $fam_id;
+		print_r($arr_alert);
+		echo "<br><br><br>";*/
 		return $arr_alert;
 	}
 
 	function test_sms(){   //test if the formulated URL is a valid for sending SMS message
-		print_r($_POST);
+		//print_r($_POST);
 		if(func_num_args()>0):
 			$arr = func_get_args();
 			$post = $arr[0];
@@ -1736,10 +1799,10 @@ class alert extends module{
 		$padded_str = str_replace(' ','%20',$post[txt_testmsg]);
 
 		if(exec('nohup curl http://'.$post[txt_midserver].':'.$post[txt_port].'/send/sms/'.$post[txt_testnum].'/'.$padded_str)):
-			//echo 'Message sent!';
+			echo 'Message/s sent!';
 			return true;
 		else:
-			echo 'Message not sent!';
+			echo 'Message/s not sent! Please check the SMS configuration.';
 			return false;
 		endif;
 	}
@@ -1757,10 +1820,10 @@ class alert extends module{
 		$padded_str = str_replace(' ','%20',$sms_message);
 		
 		if(exec('nohup curl http://'.$midserver.':'.$port.'/send/sms/'.$sms_number.'/'.$padded_str)):
-			//echo 'Message sent!';
+			echo 'Message/s sent!';
 			return true;
 		else:
-			echo 'Message not sent!';
+			echo 'Message/s not sent! Please check the SMS configuration.';
 			return false;
 		endif;
 
@@ -1839,6 +1902,7 @@ class alert extends module{
 		else: //echo $day_diff.' nada'; 
 			
 		endif;
+			$str_msg = str_replace('/','-',$str_msg);
 			return $str_msg;
 	}
 
@@ -1864,10 +1928,25 @@ class alert extends module{
 		$get_brgy = mysql_query("SELECT a.barangay_id FROM m_family_address a, m_family_members b WHERE b.patient_id='$pxid' AND a.family_id=b.family_id") or die("Cannot query 1740: ".mysql_error());
 
 		list($brgy_id) = mysql_fetch_array($get_brgy);
+
+		$q_program = mysql_query("SELECT main_indicator,sub_indicator FROM m_lib_alert_indicators WHERE alert_indicator_id='$alert_id'") or die("Cannot query 1907 ".mysql_error());
+		list($main_indicator,$sub_indicator) = mysql_fetch_array($q_program);
+
+		$get_fac_id = mysql_query("SELECT facility_id FROM m_lib_health_facility_barangay WHERE barangay_id='$brgy_id'") or die("Cannot query 1910: ".mysql_error());
+		list($facid) = mysql_fetch_array($get_fac_id);
 		
 		$alert_date = date('Y-m-d');
 
-		$insert_sms_alert = mysql_query("INSERT INTO m_lib_sms_alert SET patient_id='$pxid',program_id='$prog_id',alert_id='$alert_id',alert_date='$alert_date',base_date='$base_date',sms_status='$sms_status',sms_message='$sms_message',last_update=NOW(),barangay_id='$brgy_id',sms_number='$cp'") or die("Cannot query 1740: ".mysql_error());
+		$insert_sms_alert = mysql_query("INSERT INTO m_lib_sms_alert SET patient_id='$pxid',program_id='$prog_id',alert_id='$alert_id',alert_date='$alert_date',base_date='$base_date',sms_status='$sms_status',last_update=NOW(),barangay_id='$brgy_id',sms_number='$cp'") or die("Cannot query 1740: ".mysql_error());
+
+		$sms_id = mysql_insert_id();
+
+		$sms_code = $facid.'-'.$main_indicator.'-'.$sms_id;
+
+		$get_outro = $this->get_outro_msg($brgy_id,$sms_code);
+		$sms_message = $sms_message.$get_outro;
+		
+		$update_sms_alert = mysql_query("UPDATE m_lib_sms_alert SET sms_code='$sms_code',sms_message='$sms_message' WHERE sms_id='$sms_id'") or die("Cannot query 1920: ".mysql_error());
 
 	}
 
@@ -1877,8 +1956,25 @@ class alert extends module{
 			$sms_id = $arr[0];
 			$status = $arr[1];
 		}
-		echo $sms_id.' '.$status;
+		//echo $sms_id.' '.$status;
 		$q_sms_status = mysql_query("UPDATE m_lib_sms_alert SET sms_status='$status' WHERE sms_id='$sms_id'") or die("Cannot query 1879: ".mysql_error());
+	}
+
+
+	function get_outro_msg($brgy_id,$sms_code){
+		$q_bhs_midwife = mysql_query("SELECT a.user_lastname,a.user_firstname,b.bhs_name FROM game_user a, m_lib_bhs b WHERE b.barangay_id='$brgy_id' AND a.user_id=b.user_id") or die("Cannot query 1943: ".mysql_error());
+		
+		list($lname,$fname,$bhs) = mysql_fetch_array($q_bhs_midwife);
+		
+		$get_sms_info = mysql_query("SELECT sms_contact_info FROM m_lib_sms_config") or die("Cannot query 1947: ".mysql_error());
+		list($sms_info) = mysql_fetch_array($get_sms_info);
+
+		$sms_info = str_replace('$bhs',$bhs,$sms_info);
+		$sms_info = str_replace('$midwife',$fname.' '.$lname,$sms_info);
+		$sms_info = str_replace('$msgcode',$sms_code,$sms_info);
+		$sms_info = str_replace('$source',$_SESSION['datanode']['name'],$sms_info);
+
+		return $sms_info;
 	}
 
 	
