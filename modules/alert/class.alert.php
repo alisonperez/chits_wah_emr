@@ -126,8 +126,8 @@ class alert extends module{
 
 		echo "<a name='alert'></a>";
 		
-		echo "<table border='1'>";
-		echo "<tr><td width='65%'>";
+		echo "<table bgcolor='ffccff'>";
+		echo "<tr><td width='65%' valign='top'>";
 		
 		echo "<table bgcolor='#FFCCFF'>";
 		echo "<tr class='alert_table_header'><td colspan='2'>REMINDER & ALERT ADMINISTRATION</td></tr>";
@@ -374,7 +374,6 @@ class alert extends module{
 
 		echo "<form action='$_SERVER[PHP_SELF]?page=$_GET[page]&menu_id=$_GET[menu_id]#sms' name='form_sms' method='POST'>";
 		echo "<a name='sms'></a>";
-		echo "<span class='library'></span><br><br>";
 		echo "<table width='600' bgcolor='FFCCFF'>";
  		echo "<thead><td class='alert_table_header' colspan='2'>SMS ALERT CONFIGURATION PAGE</td></thead>";
 		echo "<tr><td colspan='2' class='alert_table_row'><b>This is the main configuration page for the SMS Alert System. Supply proper values for the SMS settings. To test if the values are correct, enter your mobile number at the 'Test Number' box and a sample message at the 'Test Message' box. You should be able to receive the message in the number you supplied. </b></td></tr>";
@@ -412,7 +411,7 @@ class alert extends module{
 		echo "</td></tr>";
 		
 		echo "<tr valign='top'><td class='alert_table_row'>Contact Information Message for the RHU<br>(ie. name of midwife, BHS, health center)</td>";
-		echo "<td><textarea name='txt_contact' cols='30' rows='3'>$sms_info[sms_contact_info]</textarea></tr>";
+		echo "<td><textarea name='txt_contact' cols='30' rows='5'>$sms_info[sms_contact_info]</textarea></tr>";
 
 		echo "<tr><td class='alert_table_row'>Method of Sending</td>";
 		echo "<td><select name='sel_method'>";
@@ -478,7 +477,7 @@ class alert extends module{
 				echo "<td valign='top' class='alert_table_row'>$value[0]</td>";
 				echo "<td>";
 				while($r_ind = mysql_fetch_array($q_mods)){
-					echo "<a href='$_SERVER[PHP_SELF]?page=$_GET[page]&menu_id=$_GET[menu_id]&indicator_id=$r_ind[alert_indicator_id]&action=update#alert'>$r_ind[sub_indicator]</a><br>";
+					echo "<a href='$_SERVER[PHP_SELF]?page=$_GET[page]&menu_id=$_GET[menu_id]&indicator_id=$r_ind[alert_indicator_id]&action=update#alert'>$r_ind[sub_indicator]</a><br><br>";
 				}
 				echo "</td>";
 				echo "</tr>";
