@@ -430,7 +430,7 @@ class lab extends module {
             $arg_list = func_get_args();
             $lab_id = $arg_list[0];
         }
-        $sql = "select lab_id, lab_name from m_lib_laboratory order by lab_name";
+        $sql = "select lab_id, lab_name from m_lib_laboratory WHERE active='Y' order by lab_name";
         if ($result = mysql_query($sql)) {
             if (mysql_num_rows($result)) {
                 while (list($id, $name) = mysql_fetch_array($result)) {
