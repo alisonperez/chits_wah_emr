@@ -1312,6 +1312,8 @@ class healthcenter extends module{
                     $visits = healthcenter::get_total_visits($pid);
                     $consult_array[$i] = "<a href='".$_SERVER["PHP_SELF"]."?page=CONSULTS&menu_id=$consult_menu_id&consult_id=$cid&ptmenu=DETAILS' title='".INSTR_CLICK_TO_VIEW_RECORD."' ".($see_doctor=="Y"?"style='background-color: #FFFF33'":"").">".
                     "<b>$plast, $pfirst</b></a> [$visits] ".($see_doctor=="Y"?"<img src='../images/star.gif' border='0'/>":"").(($request_id!="")?(($done=="Y")?"<a href='$_SERVER[PHP_SELF]?$url' title='lab completed'><img src='../images/lab.png' width='15px' height='15px' border='0' alt='lab completed' /></a>":"<a href='$_SERVER[PHP_SELF]?$url' title='lab pending'><img src='../images/lab_untested.png' width='15px' height='15px' border='0' alt='lab pending' /></a>"):"");
+		
+		    $consult_array[$i] = $consult_array[$i].$this->check_icons($cid,$pid);
 
                     $i++;
                 }
@@ -1839,6 +1841,20 @@ function hypertension_code() {
 		}
 		$ret_val .= "</select>";
         	return $ret_val;
+	}
+
+	function check_icons($pxid,$cid){
+		//displays icons for mc, epi, fp, dental clients
+		$str_icons = '';
+
+		$q_dent = mysql_query("SELECT ohc_id FROM m_dental_patient_ohc WHERE consult_id='$cid'") or die("Cannot query 1849: ".mysql_error());
+
+		list($ohc_id) = mysql_fetch_array($q_dent);
+
+		
+
+		
+
 	}
 
 // end of class

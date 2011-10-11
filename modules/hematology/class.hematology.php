@@ -6,9 +6,7 @@ class hematology extends module{
     $this->author = "darth_ali";
     $this->version = "0.1-".date("Y-m-d");
     $this->module = "hematology";
-    $this->description = "CHITS Module - Hematology Lab Examination";      
-    
-    
+    $this->description = "CHITS Module - Hematology Lab Examination";
   }
   
   // ---- STANDARD CHITS FUNCTIONS ---
@@ -176,7 +174,7 @@ class hematology extends module{
     echo "<tr><td class='boxtitle'>POLYS</td><td><input type='text' name='txt_polys' size='9' value='$polys' class='tinylight'></input></td><td class='boxtitle'>FBS</td><td class='boxtitle'><input type='text' name='txt_fbs' size='9' value='$fbs' class='tinylight'></input></td></tr>";
     echo "<tr><td class='boxtitle'>LYMPHO</td><td><input type='text' name='txt_lympho' size='9' value='$lympho' class='tinylight'></input></td><td class='boxtitle'>";
     
-    echo "BLOOD TYPE";    
+    echo "BLOOD TYPE";
     echo "</td><td>";
     echo "<select name='sel_bloodtype' size='1'>";
     
@@ -187,8 +185,17 @@ class hematology extends module{
         echo "<option value='$key_type'>$label_type</option>";
       endif;
     }
-    
+
+    echo "<tr><td class='boxtitle'>LYMPHO</td><td><input type='text' name='txt_lympho' size='9' value='$lympho' class='tinylight'></input></td><td class='boxtitle'>";
+    echo "RH";
+    echo "</td><td>";
+    echo "<select name='sel_rh' size='1'>";
+    echo "<option value='+'>---</option>";
+    echo "<option value='-'>-</option>";
+    echo "<option value='+'>+</option>";
+    echo "<option value='-'>-</option>";
     echo "</select></td></tr>";
+
     echo "<tr><td class='boxtitle'>MXD</td><td><input type='text' name='txt_mxd' size='9' value='$mxd' class='tinylight'></input></td><td colspan='2'>&nbsp;</td></tr>";
     echo "<tr><td class='boxtitle'>MONO</td><td><input type='text' name='txt_mono' size='9' value='$mono' class='tinylight'></input></td><td colspan='2'>&nbsp;</td></tr>";
     echo "<tr><td class='boxtitle'>EOSIN</td><td><input type='text' name='txt_eosin' size='9' value='$eosin' class='tinylight'></input></td><td colspan='2'>&nbsp;</td></tr>";

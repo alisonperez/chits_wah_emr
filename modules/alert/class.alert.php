@@ -3,8 +3,8 @@
 class alert extends module{
 
 	function alert(){
-		$this->description = "CHITS Reminder and Alert Module";
-		$this->version = "0.2-".date('Y-m-d');
+		$this->description = "Automated Reminder and Alert Module";
+		$this->version = "0.95-".date('Y-m-d');
 		$this->authod = "darth_ali";
 		$this->module = "alert";
 		
@@ -518,25 +518,28 @@ class alert extends module{
 			$date_today = date('Y-m-d');
 			$q_sms_alert = mysql_query("SELECT sms_id,patient_id,barangay_id,program_id,alert_id,alert_date,base_date,sms_status,sms_message,sms_code,sms_number FROM m_lib_sms_alert WHERE alert_date='$date_today'") or die("Cannot query 490: ".mysql_error());
 		else:
-			$q_sms_alert = mysql_query("SELECT sms_id,patient_id,barangay_id,program_id,alert_id,alert_date,base_date,sms_status,sms_message,sms_code,sms_number FROM m_lib_sms_alert WHERE alert_date='$_POST[date_alert]'") or die("Cannot query 490: ".mysql_error());
+			$q_sms_alert = mysql_query("SELECT sms_id,patient_id,barangay_id,program_id,alert_id,alert_date,base_date,sms_status,sms_message,sms_code,sms_number FROM m_lib_sms_alert WHERE alert_date='$_POST[date_alert]' ORDER by barangay_id ASC") or die("Cannot query 490: ".mysql_error());
 		endif;
+		
+		echo "<span class='library'>SMS ALERT MESSAGE FOR BROADCASTING</span>";
+		echo "<p align='justify'>The SMS Alert Message for Broadcasting page displays the SMS message for sending on the date specified. The messages are automatically being sent out based on the scheduled time set in the configuration page. If the message were unsuccessfully been sent, it could be sent manually by ticking the checkbox next to the record and pressing the <b>Send Manually </b>button. The messages can be suspended by pressing the <b>Hold Message</b> button. To display the message to be sent, click </p>";
 
 		echo "<form action='$_SERVER[PHP_SELF]?page=$_GET[page]&menu_id=$_GET[menu_id]' method='POST' name='sms_form'>";
-		echo "<table border='1'>";
-		echo "<thead><td colspan='9'>SMS Alert Messages for Broadcasting</td></thead>";
+		echo "<table bgcolor='FFCCFF'>";
+		echo "<thead><td colspan='9' class='alert_table_header'>SMS ALERT MESSAGE FOR BROADCASTING</td></thead>";
 
 		if(mysql_num_rows($q_sms_alert)!=0):
-			
+
 			echo "<tr>";
-			echo "<td>&nbsp;</td>";
-			echo "<td>SMS #</td>";
-			echo "<td>Name Recipient</td>";
-			echo "<td>SMS Number</td>";
-			echo "<td>Barangay</td>";
-			echo "<td>Program</td>";
-			echo "<td>Alert Type</td>";
-			echo "<td>Sending Status</td>";
-			echo "<td>View Message</td>";
+			echo "<td class='alert_table_row'>&nbsp;</td>";
+			echo "<td class='alert_table_row'>&nbsp;SMS Code&nbsp;</td>";
+			echo "<td class='alert_table_row'>&nbsp;Name Recipient&nbsp;</td>";
+			echo "<td class='alert_table_row'>&nbsp;SMS Number&nbsp;</td>";
+			echo "<td class='alert_table_row'>&nbsp;Barangay&nbsp;</td>";
+			echo "<td class='alert_table_row'>&nbsp;Program&nbsp;</td>";
+			echo "<td class='alert_table_row'>&nbsp;Alert Type&nbsp;</td>";
+			echo "<td class='alert_table_row'>&nbsp;Sending Status&nbsp;</td>";
+			echo "<td class='alert_table_row'>&nbsp;View Message&nbsp;</td>";
 			echo "</tr>";
 
 			while(list($sms_id,$pxid,$brgy_id,$program,$alert,$alert_date,$base_date,$sms_status,$sms_message,$sms_code,$sms_number)=mysql_fetch_array($q_sms_alert)){
@@ -550,7 +553,7 @@ class alert extends module{
 				$q_program = mysql_query("SELECT main_indicator,sub_indicator FROM m_lib_alert_indicators WHERE alert_indicator_id='$alert'") or die("Cannot query 526 ".mysql_error());
 				list($main_indicator,$sub_indicator) = mysql_fetch_array($q_program);
 
-				echo "<tr>";
+				echo "<tr align='center'>";
 				echo "<td>";
 				if($sms_status!='sent'):
 					echo "<input type='checkbox' name='sms[]' value='$sms_id'></input>";
@@ -558,7 +561,7 @@ class alert extends module{
 					echo "&nbsp;";
 				endif;
 				echo "</td>";
-				echo "<td>&nbsp;</td>";
+				echo "<td>$sms_code</td>";
 				echo "<td>$lname, $fname</td>";
 				echo "<td>$sms_number</td>";
 				echo "<td>$brgy_name</td>";
@@ -1672,6 +1675,8 @@ class alert extends module{
 													//print_r($arr_alert_msg);
 													$day_diff = $alert->get_date_diff_days(date('Y-m-d'),$arr_alert[1]);
 													//echo $arr_alert[1]; 
+													//echo $key6.' '.$arr_alert[1].'  '.$day_diff.'<br>';
+
 													$mensahe = $alert->get_message($day_diff,$arr_alert_msg,$ngalan,$arr_alert[1]); 
 
 													if($mensahe!=''):
