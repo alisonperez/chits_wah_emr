@@ -168,7 +168,7 @@ small { font-family: verdana, sans serif}
 		    alert::check_sms_alert();
                     $site->session_user($user);
                     //$site->record_access($_SESSION["userid"],$HTTP_USER_AGENT,"ASC","login");
-                    header("location: ".$_SERVER["PHP_SELF"]);
+                    //header("location: ".$_SERVER["PHP_SELF"]);
                 } else {
                     // Invalid account
                     header("location: ".$_SERVER["PHP_SELF"]."?errorinfo=001");
@@ -288,7 +288,7 @@ small { font-family: verdana, sans serif}
 <br/>
 <div align="center" class='copyright'>
   &copy;2004-2011 Generic Architecture for Modular Enterprise (GAME) Engine Version <?=$module->get_version()?> Herman Tolentino MD / UPCM Medical Informatics Unit / License - GPL<br>
-
+<?php $site->get_version_number(); ?>
 </div>
 </body>
 </html>

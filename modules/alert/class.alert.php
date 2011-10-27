@@ -1641,7 +1641,7 @@ class alert extends module{
 
 
 
-	function check_sms_alert(){ 
+	function check_sms_alert(){
 		$alert = new alert;
 		$arr_alert = array();
 		$today = date('Y-m-d');
@@ -1650,8 +1650,11 @@ class alert extends module{
 
 		$q_fam_id = mysql_query("SELECT DISTINCT a.family_id FROM m_family_address a, m_family_members b, m_lib_barangay c WHERE a.family_id=b.family_id AND a.barangay_id=c.barangay_id ORDER by c.barangay_name ASC") or die("Cannot query 1576: ".mysql_error());
 			
-		while($r_fam = mysql_fetch_array($q_fam_id)){ 
+		while($r_fam = mysql_fetch_array($q_fam_id)){
 			array_push($arr_alert,$alert->determine_alert_hh($r_fam['family_id']));
+			echo $r_fam[family_id].' ';
+			print_r($arr_alert);
+			echo "<br><br><br>"; 
 		}
 
 		if(mysql_num_rows($q_sms_alert)==0):
@@ -1696,7 +1699,7 @@ class alert extends module{
 				}
 			}
 
-		else: 
+		else:
 			$arr_config = $alert->get_sms_config();
 			if(count($arr_config)!=0):
 				if($arr_config['sms_time_sched'] <= date('H:i')):
@@ -1885,11 +1888,13 @@ class alert extends module{
 			$base_date = $arr[3];
 		}
 
+		//echo $pxname.$arr_alert_msg['date_pre'].$arr_alert_msg['alert_action'].$day_diff.'/'.$base_date.'<br>';
+
 		if($day_diff==0):
 			$str_msg = str_replace('$name',$pxname,$arr_alert_msg['alert_actual_message']);
 			$str_msg = str_replace('$date',$base_date,$str_msg);
 		elseif(($day_diff > 0) && ($day_diff==$arr_alert_msg['date_pre'])):
-			$str_msg = str_replace('$name',$pxname,$arr_alert_msg['alert_message']);
+			$str_msg = str_replace('$name',$pxname,$arr_alert_msg['alert_action']);
 			$str_msg = str_replace('$date',$base_date,$str_msg);
 		elseif(($day_diff < 0) && (abs($date_diff)==$arr_alert_msg['date_until'])):
 			$str_msg = str_replace('$name',$pxname,$arr_alert_msg['alert_message']);
@@ -1897,8 +1902,9 @@ class alert extends module{
 		else: //echo $day_diff.' nada'; 
 			
 		endif;
-			$str_msg = str_replace('/','-',$str_msg);
-			return $str_msg;
+		
+		$str_msg = str_replace('/','-',$str_msg);
+		return $str_msg;
 	}
 
 	function queue_sms(){

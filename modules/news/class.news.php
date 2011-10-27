@@ -15,7 +15,7 @@ class news extends module {
         $this->module = "news";
         $this->description = "CHITS Content - News";
         // 0.3 improved layout
-	//added a function that would auto generate quick stats of the day
+	//added a function that would auto generate quick stats of the day (July 2011)
     }
 
     // --------------- STANDARD MODULE FUNCTIONS ------------------

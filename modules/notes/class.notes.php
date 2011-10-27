@@ -241,7 +241,7 @@ class notes extends module {
             $n->form_consult_plan($menu_id, $post_vars, $get_vars);
             break;
         case "ARCH": // Archive of notes
-            $n->display_notes_detail($menu_id, $post_vars, $get_vars);
+            $n->display_notes_archive($menu_id, $post_vars, $get_vars);
             break;
         }
     }
@@ -273,7 +273,37 @@ class notes extends module {
         print "</td></tr></table><br/>";
     }
 
-    function display_notes_detail() {
+    function display_notes_archive() {
+		$patient_id = healthcenter::get_patient_id($_GET["consult_id"]);
+		$q_consult = mysql_query("SELECT * FROM m_consult_notes a, m_consult b WHERE a.consult_id=b.consult_id AND a.patient_id='$patient_id' ORDER by b.consult_date DESC") or die("Cannot query 277: ".mysql_error());
+
+		if(mysql_num_rows($q_consult)!=0):
+			echo "<font size='2'>Note: Highlighted record is the current consultation transaction.</font>";
+			echo "<table cellpadding='2' border='1' style='border: 1px solid black'>";
+			echo "<tr align='center'><td><b>Consultation Date</td><td><b>SOAP</td></tr>";
+			while($r_consult = mysql_fetch_array($q_consult)){ //print_r($r_consult);
+				$str_cons =  "CC: ".$this->get_complaint($r_consult["consult_id"],$r_consult["notes_id"])."<br>"."HX: ".stripslashes(nl2br($r_consult["notes_history"]))."<br>"."PE: ".stripslashes(nl2br($r_consult["notes_physicalexam"]))."<br>"."DX: ".$this->get_diagnosis($r_consult["consult_id"],$r_consult["notes_id"])."<br>"."TX: ".stripslashes(nl2br($r_consult["notes_plan"]))."<br>";
+				
+				if($_GET["consult_id"]==$r_consult["consult_id"]):
+					echo "<tr style='background-color: #FFF380; color: black;'>";
+				else:
+					echo "<tr>";
+				endif;
+
+				echo "<td valign='top' align='center'>";
+				echo date('m-d-Y',strtotime($r_consult["consult_date"]));
+				echo "</td>";
+		
+				echo "<td>";
+				echo $str_cons;
+				echo "</td>";
+				echo "</tr>";
+				
+			}
+			echo "</table>";
+		else:
+			echo "<font size='2' color='red'>No archived consultations.</font>";
+		endif;
     }
     
     function process_consult_notes() {
@@ -722,7 +752,10 @@ class notes extends module {
             $validuser = $arg_list[3];
             $isadmin = $arg_list[4];
         }
-        print "<b>".FTITLE_CONSULT_NOTES_ARCHIVE."</b><br>";
+	
+	$patient_id = healthcenter::get_patient_id($get_vars["consult_id"]);
+
+        print "<b>CONSULT NOTES TODAY</b><br>";
         /*$sql_list = "select notes_id, date_format(notes_timestamp, '%a %d %b %Y, %h:%i%p') ts ".
                     "from m_consult_notes where consult_id = '".$get_vars["consult_id"]."'";
 		*/
@@ -739,7 +772,7 @@ class notes extends module {
                         echo "&nbsp;&nbsp;<input type='submit' name='submitdetail' value='Edit Date' class='tinylight' style='border: 1px solid black'></input><br>";
                         $this->process_consultation_dates($menu_id, $post_vars, $get_vars);
                     endif;
-                    
+ 
                     echo "</form>";
 
                     if ($get_vars["notes_id"]==$id) {
@@ -750,6 +783,23 @@ class notes extends module {
                 print "<font color='red'>No recorded notes for this consult.</font><br/>";
             }
         }
+
+
+	/* print "<br><b>".FTITLE_CONSULT_NOTES_ARCHIVE."</b><br>"; xxx
+
+	$q_past_consults = mysql_query("select a.notes_id, date_format(b.consult_date, '%a %d %b %Y') ts, a.consult_id from m_consult_notes a, m_consult b where a.patient_id='$patient_id' AND a.consult_id=b.consult_id AND a.consult_id != '$get_vars[consult_id]' ORDER by b.consult_date ASC") or die("Cannot query 757: ".mysql_error);
+
+	if(mysql_num_rows($q_past_consults)!=0):
+		while($r_past = mysql_fetch_array($q_past_consults)){
+			echo "<a href='".$_SERVER["PHP_SELF"]."?page=".$get_vars["page"]."&menu_id=".$get_vars["menu_id"]."&consult_id=".$r_past["consult_id"]."&ptmenu=NOTES&notes_id=$r_past[notes_id]&action=view'>$r_past[ts]</a>";
+
+			if($_GET["action"]=='view'):
+				echo 'alison';
+			endif;
+		}
+	else:
+		print "<font color='red'>No previous consultations for this patient.</font><br/>";
+	endif; */
     }
 
     function display_consult_notes_detail() {
@@ -956,6 +1006,7 @@ class notes extends module {
             $menu_id = $arg_list[0];
             $post_vars = $arg_list[1];
             $get_vars = $arg_list[2];
+	    $status = $arg_list[3]; //if status is no, do not show the delete buttons and the arrows
             //print_r($arg_list);
         }
         $sql = "select c.complaint_id, l.complaint_name ".
@@ -964,17 +1015,65 @@ class notes extends module {
                "consult_id = '".$get_vars["consult_id"]."' and notes_id = '".$get_vars["notes_id"]."'";
         if ($result = mysql_query($sql)) {
             if (mysql_num_rows($result)) {
-                print "<span class='textbox'>";
                 while (list($id, $name) = mysql_fetch_array($result)) {
+
+		if($status!='no'):
+                    print "<span class='textbox'>";
                     print "<img src='../images/arrow_redwhite.gif' border='0'/> $name ";
                     print "<a href='".$_SERVER["PHP_SELF"]."?page=".$get_vars["page"]."&menu_id=".$get_vars["menu_id"]."&consult_id=".$get_vars["consult_id"]."&ptmenu=DETAILS&module=notes&notes=".$get_vars["notes"]."&notes_id=".$get_vars["notes_id"]."&delete_complaint_id=$id'><img src='../images/delete.png' border='0'/></a><br/>";
-                }
-                print "</span>";
+                    print "</span>";
+		else:
+			echo $name.',';
+		endif;
+
+		}
+
             } else {
                 print "<font color='red'>No complaints recorded</font><br/>";
             }
         }
     }
+
+	function get_complaint($consult_id,$notes_id){
+	$sql = "select c.complaint_id, l.complaint_name ".
+               "from m_consult_notes_complaint c, m_lib_complaint l ".
+               "where c.complaint_id = l.complaint_id and ".
+               "consult_id = '".$consult_id."' and notes_id = '".$notes_id."'";
+
+
+	$result = mysql_query($sql);
+
+	if(mysql_num_rows($result)!=0):
+		while($r_complain = mysql_fetch_array($result)){
+			$complain .= $r_complain["complaint_name"].', ';
+		}
+	else:
+		
+	endif;
+
+	return $complain;
+
+	}
+
+	function get_diagnosis($consult_id,$notes_id){
+	$sql = "select c.class_id, l.class_name ".
+               "from m_consult_notes_dxclass c, m_lib_notes_dxclass l ".
+               "where c.class_id = l.class_id and ".
+               "consult_id = '".$consult_id."' and notes_id = '".$notes_id."'";
+	
+	$result = mysql_query($sql) or die("Cannot query 1056 ".mysql_error());
+
+	if(mysql_num_rows($result)!=0):
+		while($r_diag=mysql_fetch_array($result)){ 
+			$diag .= $r_diag["class_name"];
+		}
+	else:
+		
+	endif;
+
+	return $diag;
+
+	}
 
     function show_diagnosis() {
         if (func_num_args()>0) {
@@ -1838,10 +1937,6 @@ class notes extends module {
 			break;
 
 	}
-
-
-
-
     }
 
 }

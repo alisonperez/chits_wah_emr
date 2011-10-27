@@ -727,5 +727,27 @@ class Site {
     function print_error($error) {
         print "<ol>$error</ol>";
     }
+
+	function get_version_number(){
+		$git_dir = '../.git/logs/HEAD';
+		if(file_exists($git_dir)): //echo 'nosila';
+			$file = fopen($git_dir,"r");
+			$arr_builds = array();
+			while(!feof($file)){
+				$arr_get_date = array();
+				$line = fgets($file);
+				$arr_get_date = explode(' ',$line);
+				if($arr_get_date[5]!=''):
+					array_push($arr_builds,$arr_get_date[5]);
+				endif;
+			}
+			$bilang = count($arr_builds);
+			
+			print 'Build ('.date('Ymd',$arr_builds[($bilang-1)]).')';
+		else:
+
+		endif;
+
+	}
 }
 ?>
