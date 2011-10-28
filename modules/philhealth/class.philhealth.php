@@ -477,7 +477,7 @@ class philhealth {
                 $sql = "update m_patient_philhealth (philhealth_id, healthcenter_id, patient_id, philhealth_timestamp, expiry_date) ".
                        "values ('".$post_vars["philhealth_id"]."', '".$_SESSION["datanode"]["code"]."', '".$post_vars["patient_id"]."', sysdate(), '$expiry_date')";
 
-		$sql = "update m_patient_philhealth set philhealth_id='$post_vars[philhealth_id]',healthcenter_id='$_SESSION[datanode][code]',patient_id='$post_vars[patient_id]',philhealth_timestamp='sysdate()',expiry_date='$expiry_date' WHERE philhealth_id='$post_vars[philhealth_id]'";
+		$sql = "update m_patient_philhealth set healthcenter_id='$_SESSION[datanode][code]',patient_id='$post_vars[patient_id]',philhealth_timestamp='sysdate()',expiry_date='$expiry_date' WHERE philhealth_id='$post_vars[philhealth_id]'";
 
                 $result = mysql_query($sql);
 
