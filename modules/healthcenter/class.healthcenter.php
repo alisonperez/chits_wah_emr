@@ -1313,8 +1313,8 @@ class healthcenter extends module{
                     $consult_array[$i] = "<a href='".$_SERVER["PHP_SELF"]."?page=CONSULTS&menu_id=$consult_menu_id&consult_id=$cid&ptmenu=DETAILS' title='".INSTR_CLICK_TO_VIEW_RECORD."' ".($see_doctor=="Y"?"style='background-color: #FFFF33'":"").">".
                     "<b>$plast, $pfirst</b></a> [$visits] ".($see_doctor=="Y"?"<img src='../images/star.gif' border='0'/>":"").(($request_id!="")?(($done=="Y")?"<a href='$_SERVER[PHP_SELF]?$url' title='lab completed'><img src='../images/lab.png' width='15px' height='15px' border='0' alt='lab completed' /></a>":"<a href='$_SERVER[PHP_SELF]?$url' title='lab pending'><img src='../images/lab_untested.png' width='15px' height='15px' border='0' alt='lab pending' /></a>"):"");
 		
-		    $consult_array[$i] = $consult_array[$i].$this->check_icons($cid,$pid);
-
+		    $consult_array[$i] = $consult_array[$i].$this->check_icons($pid,$cid,$consult_menu_id);
+			
                     $i++;
                 }
                 // pass on patient list to be columnized
@@ -1843,20 +1843,40 @@ function hypertension_code() {
         	return $ret_val;
 	}
 
-	function check_icons($pxid,$cid){
+	function check_icons($pid,$cid,$consult_menu_id){
 		//displays icons for mc, epi, fp, dental clients
-		$str_icons = '';
+		$str_icon = '';
 
-		$q_dent = mysql_query("SELECT ohc_id FROM m_dental_patient_ohc WHERE consult_id='$cid'") or die("Cannot query 1849: ".mysql_error());
+		$q_mc = mysql_query("SELECT consult_id FROM m_consult_ptgroup WHERE consult_id='$cid' AND ptgroup_id='MATERNAL'") or die("Cannot query 1850: ".mysql_error());
+		if(mysql_num_rows($q_mc)!=0):
+			list($consult_id) = mysql_fetch_array($q_mc);
+			$str_icon .= "<img src='../images/mc_alert.png' width='15' height='15' title='CLICK TO GO TO MC RECORD'></img>";
+		else:
+		endif;
 
-		list($ohc_id) = mysql_fetch_array($q_dent);
+		$q_dent = mysql_query("SELECT consult_id FROM m_consult_ptgroup WHERE consult_id='$cid' AND ptgroup_id='DENTAL'") or die("Cannot query 1849: ".mysql_error());
+		if(mysql_num_rows($q_dent)!=0):
+			$str_icon .= "<img src='../images/dental_alert.png' width='10%' height='10%' title='CLICK TO GO TO MC RECORD'></img>";
+		endif;
 
+
+		$q_child = mysql_query("SELECT consult_id FROM m_consult_ptgroup WHERE consult_id='$cid' AND ptgroup_id='CHILD'") or die("Cannot query: 1863");
+		if(mysql_num_rows($q_child)!=0):
+			$str_icon .= "<img src='../images/epi_alert.jpeg' width='10%' height='10%' title='CLICK TO GO TO EPI RECORD'></img>";
+		endif;
+
+		$q_fp = mysql_query("SELECT consult_id FROM m_consult_ptgroup WHERE consult_id='$cid' AND ptgroup_id='FP'") or die("Cannot query: 1863");
+		if(mysql_num_rows($q_fp)!=0):
+			$str_icon .= "<img src='../images/fp_alert.jpeg' width='10%' height='10%' title='CLICK TO GO TO FP RECORD'></img>";
+		endif;
 		
+		$q_ntp = mysql_query("SELECT consult_id FROM m_consult_ptgroup WHERE consult_id='$cid' AND ptgroup_id='NTP'") or die("Cannot query: 1863");
+		if(mysql_num_rows($q_ntp)!=0):
+			$str_icon .= "<img src='../images/tb_alert.jpg' width='10%' height='10%' title='CLICK TO GO TO NTP RECORD'></img>";
+		endif;
 
-		
-
+		return $str_icon;
 	}
-
 // end of class
 }
 ?>
