@@ -424,6 +424,7 @@ class philhealth {
         print "<tr><td>";
         if ($get_vars["pid"]||$post_vars["philhealth_id"]) {
             print "<input type='hidden' name='philhealth_id' value='".$get_vars["pid"]."'>";
+            print "<input type='submit' value = 'Update Card' class='textbox' name='submitcard' style='border: 1px solid #000000'> ";
             print "<input type='submit' value = 'Delete Card' class='textbox' name='submitcard' style='border: 1px solid #000000'> ";
         } else {
             print "<input type='submit' value = 'Add Card' class='textbox' name='submitcard' style='border: 1px solid #000000'> ";
@@ -468,6 +469,24 @@ class philhealth {
                 }
             }
             break;
+
+	case "Update Card":
+	    if ($post_vars["philhealth_id"] && $post_vars["patient_id"]) {
+                list($month,$day,$year) = explode("/", $post_vars["expiry_date"]);
+                $expiry_date = $year."-".str_pad($month, 2, "0", STR_PAD_LEFT)."-".str_pad($day, 2, "0", STR_PAD_LEFT);
+                $sql = "update m_patient_philhealth (philhealth_id, healthcenter_id, patient_id, philhealth_timestamp, expiry_date) ".
+                       "values ('".$post_vars["philhealth_id"]."', '".$_SESSION["datanode"]["code"]."', '".$post_vars["patient_id"]."', sysdate(), '$expiry_date')";
+
+		$sql = "update m_patient_philhealth set philhealth_id='$post_vars[philhealth_id]',healthcenter_id='$_SESSION[datanode][code]',patient_id='$post_vars[patient_id]',philhealth_timestamp='sysdate()',expiry_date='$expiry_date' WHERE philhealth_id='$post_vars[philhealth_id]'";
+
+                $result = mysql_query($sql);
+
+                // save this any way and refresh page
+                header("location: ".$_SERVER["PHP_SELF"]."?page=".$get_vars["page"]."&menu_id=".$get_vars["menu_id"]."&consult_id=".$get_vars["consult_id"]."&ptmenu=".$get_vars["ptmenu"]."&module=".$get_vars["module"]."&philhealth=CARD");
+            }
+            break;
+
+	    break;
         }
     }
 
