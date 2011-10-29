@@ -487,7 +487,63 @@ class alert extends module{
 	}
 
 	function _sms_alert(){
-		echo 'nosila';
+
+		if(!isset($_POST['date_alert'])):
+			$date_today = date('Y-m-d');
+			$q_sms_alert = mysql_query("SELECT sms_id,patient_id,barangay_id,program_id,alert_id,alert_date,base_date,sms_status,sms_message,sms_code FROM m_lib_sms_alert WHERE alert_date='$date_today'") or die("Cannot query 490: ".mysql_error());
+		else:
+			$q_sms_alert = mysql_query("SELECT sms_id,patient_id,barangay_id,program_id,alert_id,alert_date,base_date,sms_status,sms_message,sms_code,sms_number FROM m_lib_sms_alert WHERE alert_date='$_POST[date_alert]'") or die("Cannot query 490: ".mysql_error());
+		endif;
+
+		
+		
+		echo "<form action='$_SERVER[PHP_SELF]?page=$_GET[page]&menu_id=$_GET[menu_id]' action='POST' name='sms_form'>";
+		echo "<table border='1'>";
+		echo "<thead><td colspan='8'>SMS Alert Messages for Broadcasting</td></thead>";
+
+		if(mysql_num_rows($q_sms_alert)!=0):
+			
+			echo "<tr>";
+			echo "<td>&nbsp;</td>";
+			echo "<td>SMS #</td>";
+			echo "<td>Name Recipient</td>";
+			echo "<td>SMS Number</td>";
+			echo "<td>Barangay</td>";
+			echo "<td>Program</td>";
+			echo "<td>Alert Type</td>";
+			echo "<td>Sending Status</td>";
+			echo "</tr>";
+
+
+			while(list($sms_id,$pxid,$brgy_id,$program,$alert,$alert_date,$base_date,$sms_status,$sms_message,$sms_code,$sms_number)=mysql_fetch_array($q_sms_alert)){
+
+				$q_px_num  = mysql_query("SELECT patient_lastname, patient_firstname FROM m_patient WHERE patient_id='$pxid'") or die("Cannot query 520: ".mysql_error());
+				list($lname,$fname) = mysql_fetch_array($q_px_num);
+
+				$q_brgy = mysql_query("SELECT barangay_name FROM m_lib_barangay WHERE barangay_id='$brgy_id'") or die("Cannot query 523: ".mysql_error());
+				list($brgy_name) = mysql_fetch_array($q_brgy);
+
+				$q_program = mysql_query("SELECT main_indicator,sub_indicator FROM m_lib_alert_indicators WHERE alert_indicator_id='$alert'") or die("Cannot query 526 ".mysql_error());
+				list($main_indicator,$sub_indicator) = mysql_fetch_array($q_program);
+
+				echo "<tr>";
+				echo "<td><input type='checkbox' name='sms[]' value='$sms_id'></input></td>";
+				echo "<td>&nbsp;</td>";
+				echo "<td>$lname, $fname</td>";
+				echo "<td>$sms_number</td>";
+				echo "<td>$brgy_name</td>";
+				echo "<td>$main_indicator</td>";
+				echo "<td>$sub_indicator</td>";
+				echo "<td>$sms_status</td>";
+				echo "</tr>";
+			}
+
+		else:
+			echo "<tr><td>No scheduled SMS messages to be broadcasted.</td></tr>";
+		endif;
+
+		echo "</table>";
+		echo "</form>";
 
 	}
 
@@ -1579,6 +1635,21 @@ class alert extends module{
 					}
 				}
 			}
+
+		else:
+			$arr_config = $alert->get_sms_config();
+			if(count($arr_config)!=0): print_r($arr_config);
+				if($arr_config['sms_time_sched'] == date('H:i')):
+					
+					$q_alert = mysql_query("SELECT sms_id, ") or die("Cannot query 1644: ".mysql_error());
+					$alert->send_sms();
+
+				endif;
+				
+			else:
+				echo "<font>There is no SMS configuration!</font>";
+			endif;
+			
 		endif;
  
 	}
@@ -1659,6 +1730,36 @@ class alert extends module{
 			echo 'Message not sent!';
 			return false;
 		endif;
+	}
+
+	function send_sms(){
+		
+		if(func_num_args()>0):
+			$arr = func_get_args();
+			$midserver = $arr[0];
+			$port = $arr[1];
+			$sms_number = $arr[2];
+			$sms_message = $arr[3];
+		endif;
+
+		$padded_str = str_replace(' ','%20',$sms_message);
+		print_r($arr);
+		/*if(exec('nohup curl http://'.$midserver.':'.$port.'/send/sms/'.$post[txt_testnum].'/'.$padded_str)):
+			//echo 'Message sent!';
+			return true;
+		else:
+			echo 'Message not sent!';
+			return false;
+		endif; */
+
+	}
+
+
+	function get_sms_config(){
+		$q_sms_config = mysql_query("SELECT sms_url, sms_port, date_format(sms_time,'%H:%i') sms_time_sched  FROM m_lib_sms_config") or die("Cannot query 1722: ".mysql_error());
+		$arr_sms_config = mysql_fetch_array($q_sms_config);
+		
+		return $arr_sms_config;
 	}
 
 	function check_sms_field(){
@@ -1743,13 +1844,18 @@ class alert extends module{
 		$alert->queue_sms($key6,$arr_alert[0],$arr_alert[1],$alert_id,date('Y-m-d'),'queue',$mensahe); */
 		}
 
+
+		$q_px_cp  = mysql_query("SELECT patient_cellphone FROM m_patient WHERE patient_id='$pxid'") or die("Cannot query 520: ".mysql_error());
+		list($cp) = mysql_fetch_array($q_px_cp);
+
+
 		$get_brgy = mysql_query("SELECT a.barangay_id FROM m_family_address a, m_family_members b WHERE b.patient_id='$pxid' AND a.family_id=b.family_id") or die("Cannot query 1740: ".mysql_error());
 
 		list($brgy_id) = mysql_fetch_array($get_brgy);
 		
 		$alert_date = date('Y-m-d');
 
-		$insert_sms_alert = mysql_query("INSERT INTO m_lib_sms_alert SET patient_id='$pxid',program_id='$prog_id',alert_id='$alert_id',alert_date='$alert_date',base_date='$base_date',sms_status='$sms_status',sms_message='$sms_message',last_update=NOW(),barangay_id='$brgy_id'") or die("Cannot query 1740: ".mysql_error());
+		$insert_sms_alert = mysql_query("INSERT INTO m_lib_sms_alert SET patient_id='$pxid',program_id='$prog_id',alert_id='$alert_id',alert_date='$alert_date',base_date='$base_date',sms_status='$sms_status',sms_message='$sms_message',last_update=NOW(),barangay_id='$brgy_id',sms_number='$cp'") or die("Cannot query 1740: ".mysql_error());
 
 	}
 
