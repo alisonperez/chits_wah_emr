@@ -511,14 +511,20 @@ class alert extends module{
 			foreach($_POST['sms'] as $key=>$sms_id){
 				$this->update_sms_status($sms_id,'terminate');
 			}
+
+		elseif($_POST['submit_alert']=='Go to Date'):
+			
 		else:
 		endif;
 
 		if(!isset($_POST['date_alert'])):
 			$date_today = date('Y-m-d');
 			$q_sms_alert = mysql_query("SELECT sms_id,patient_id,barangay_id,program_id,alert_id,alert_date,base_date,sms_status,sms_message,sms_code,sms_number FROM m_lib_sms_alert WHERE alert_date='$date_today'") or die("Cannot query 490: ".mysql_error());
-		else:
-			$q_sms_alert = mysql_query("SELECT sms_id,patient_id,barangay_id,program_id,alert_id,alert_date,base_date,sms_status,sms_message,sms_code,sms_number FROM m_lib_sms_alert WHERE alert_date='$_POST[date_alert]' ORDER by barangay_id ASC") or die("Cannot query 490: ".mysql_error());
+		else: 	
+			$arr_date = explode('/',$_POST["date_alert"]);
+			$date_today = $arr_date[2].'-'.$arr_date[0].'-'.$arr_date[1];
+
+			$q_sms_alert = mysql_query("SELECT sms_id,patient_id,barangay_id,program_id,alert_id,alert_date,base_date,sms_status,sms_message,sms_code,sms_number FROM m_lib_sms_alert WHERE alert_date='$date_today' ORDER by barangay_id ASC") or die("Cannot query 490: ".mysql_error());
 		endif;
 		
 		echo "<span class='library'>SMS ALERT MESSAGE FOR BROADCASTING</span>";
@@ -526,8 +532,15 @@ class alert extends module{
 
 		echo "<form action='$_SERVER[PHP_SELF]?page=$_GET[page]&menu_id=$_GET[menu_id]' method='POST' name='sms_form'>";
 		echo "<table bgcolor='FFCCFF'>";
-		echo "<thead><td colspan='9' class='alert_table_header'>SMS ALERT MESSAGE FOR BROADCASTING</td></thead>";
-
+		echo "<thead><td colspan='9' class='alert_table_header'>SMS ALERT MESSAGE FOR BROADCASTING ON</td></thead>";
+		echo "<tr><td colspan='9' class='alert_table_header'>";
+		echo "<input type='text' size='10' maxlength='10' class='textbox' name='date_alert' value='".(isset($_POST["date_alert"])?($_POST["date_alert"]):(date('m/d/Y')))."' style='border: 1px solid #000000'>";
+        
+        
+	        echo "<a href=\"javascript:show_calendar4('document.sms_form.date_alert', document.sms_form.date_alert.value);\"><img src='../images/cal.gif' width='16' height='16' border='0' alt='Click Here to Pick up the date'></a>";
+		
+		echo "<input type='submit' name='submit_alert' value='Go to Date' />";
+		echo "</td></tr>";
 		if(mysql_num_rows($q_sms_alert)!=0):
 
 			echo "<tr>";
