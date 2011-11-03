@@ -104,7 +104,7 @@ class User {
             case "Add User":
                 $active = ($post_vars["isactive"]?"Y":"N");
                 $admin = ($post_vars["isadmin"]?"Y":"N");
-		$this->move_image();
+		//$this->move_image();
                 $sql = "insert into game_user (user_firstname, user_lastname, user_middle, user_lang, ".
                        "user_email, user_cellular, user_login, user_password, user_pin, user_dob, user_gender, ".
                        "user_active, user_admin, user_role) ".
@@ -112,9 +112,9 @@ class User {
                        "'".$post_vars["lang_id"]."', '".strtolower($post_vars["user_email"])."', '".$post_vars["user_cellular"]."', ".
                        "'".strtolower($post_vars["user_login"])."', old_password('".$post_vars["user_password"]."'), '".$post_vars["user_pin"]."', '$dob', '".$post_vars["user_gender"]."', ".
                        "'$active', '$admin', '".$post_vars["role_id"]."')";
-                //if ($result = mysql_query($sql)) {
-                  //  header("location: ".$_SERVER["PHP_SELF"]."?page=ADMIN&method=USER");
-                //}
+                if ($result = mysql_query($sql)) {
+                    header("location: ".$_SERVER["PHP_SELF"]."?page=ADMIN&method=USER");
+                }
                 break;
             case "Update User":
                 $active = ($post_vars["isactive"]?"Y":"N");
@@ -207,12 +207,12 @@ class User {
                 }
             }
 
-
+	    /*
 	    if($_FILES["profile_pic"]["size"]!=0){
 	    if((!in_array($_FILES["profile_pic"]["type"],$allowed_image_format)) || ($_FILES["profile_pic"]["size"] > 200000)){
 		$retval.= "<li class='error'>Uploaded photo should be in png, jpeg or gif and size < 200 KB.</li>";
 	    }
-	    }
+	    })*/
 
             return $retval;
         }
@@ -282,12 +282,12 @@ class User {
         print "<input type='text' maxlength='50' class='textbox' name='user_lastname' value='".($user["user_lastname"]?$user["user_lastname"]:$post_vars["user_lastname"])."' style='border: 1px solid #000000'> <font color='red'>*</font><br>";
         print "</td></tr>";
 
-	echo "<tr valign='top'><td>";
+	/*echo "<tr valign='top'><td>";
 	echo "<input type='hidden' name='MAXSIZE' value='200000' />";
 	echo "<span class='boxtitle'>UPLOAD PHOTO (less than 200KB)</span><br>";
 	echo "<input type='file' name='profile_pic'></input>";
 	
-	echo "</td></tr>";
+	echo "</td></tr>";*/
 
         print "<tr valign='top'><td>";
         print "<span class='boxtitle'>".LBL_DATE_OF_BIRTH."</span><br> ";

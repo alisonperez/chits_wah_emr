@@ -627,13 +627,13 @@ class alert extends module{
 
 			else:
 				
-				if(empty($post_arr[txt_msg]) || empty($post_arr[txt_action])):
+				/*if(empty($post_arr[txt_msg]) || empty($post_arr[txt_action])):
 					
 					echo "<script language='javascript'>";
 					echo "window.alert('Please supply entry for reminder / alert message or actions.')";
 					echo "</script>";
 					
-				else:
+				else: */
 					if($post_arr[submit_alert]=='Save Reminder/Alert'):
 					
 					$alert_transact = mysql_query("INSERT INTO m_lib_alert_type SET module_id='$post_arr[sel_mods]',alert_indicator_id='$post_arr[sel_alert_indicators]',date_pre='$post_arr[sel_days_before]',date_until='$post_arr[sel_days_after]',alert_message='$post_arr[txt_msg]',alert_action='$post_arr[txt_action]',alert_actual_message='$post_arr[txt_actual_msg]',alert_flag_activate='$post_arr[sel_activate]'") or die("Cannot query: 107");
@@ -650,7 +650,7 @@ class alert extends module{
 						echo "</script>";
 					endif;
 								
-				endif;
+				//endif;
 			endif;
 
 	}
@@ -959,7 +959,40 @@ class alert extends module{
 						endif;
 
 						break;
-					default:			
+
+					case '40':   //post trimester alert. patient didn't attended any prenatal visits
+						$q_mc = mysql_query("SELECT mc_id,trimester1_date,trimester2_date,trimester3_date FROM m_patient_mc WHERE patient_id='$patient_id' AND end_pregnancy_flag='N' AND delivery_date='0000-00-00' AND patient_edc >= NOW()") or die("Cannot query 510 ".mysql_error());
+
+
+						if(mysql_num_rows($q_mc)!=0):
+							list($mc_id,$tri1,$tri2,$tri3,) = mysql_fetch_array($q_mc);
+							$trimester = $this->get_trimester($mc_id,date('Y-m-d'));
+
+							$tri_date = ($trimester=='2')?($tri1):(($trimester=='3')?$tri2:'');
+							
+							if($tri_date!=''):
+
+								$q_prenatal = mysql_query("SELECT date_until FROM m_lib_alert_type WHERE alert_indicator_id=1") or die("Cannot query 975: ".mysql_error());
+
+								if(mysql_num_rows($q_prenatal)!=0):
+									list($date_until) = mysql_fetch_array($q_prenatal);
+									if($date_until==$this->get_date_diff_days($tri_date,date('Y-m-d'))):
+									
+									//echo $trimester.'/'.$tri1.'/'.$tri2.'/'.$tri3.'/'.$tri_date.'/'.$this->get_date_diff_days($tri_date,date('Y-m-d')).'<br>';
+									array_push($arr_case_id,$mc_id,date('Y-m-d'));
+									endif;
+								else:
+									
+								endif;
+								
+							endif;
+						else:
+							
+						endif;
+
+						
+	
+					default:
 
 						break;
 
@@ -1652,13 +1685,13 @@ class alert extends module{
 			
 		while($r_fam = mysql_fetch_array($q_fam_id)){
 			array_push($arr_alert,$alert->determine_alert_hh($r_fam['family_id']));
-			echo $r_fam[family_id].' ';
-			print_r($arr_alert);
-			echo "<br><br><br>"; 
+			//echo $r_fam[family_id].' ';
+			//print_r($arr_alert);
+			//echo "<br><br><br>"; 
 		}
 
 		if(mysql_num_rows($q_sms_alert)==0):
-			foreach($arr_alert as $key1=>$value1){				
+			foreach($arr_alert as $key1=>$value1){	
 				foreach($value1 as $key2=>$value2){
 					foreach($value2 as $key3=>$value3){
 						foreach($value3 as $key4=>$value4){
@@ -1685,7 +1718,10 @@ class alert extends module{
 													if($mensahe!=''):
 														/* $key: patient_id, $arr_alert[0]: program_id, $arr_alert[1]: base date, $alert_id: id for alert, 'queue': sms_status, $mensahe: alert message
 														*/
+
 														$alert->queue_sms($key6,$arr_alert[0],$arr_alert[1],$alert_id,'queue',$mensahe);
+
+														
 													endif;
 												endif;
 											endif;
@@ -1938,7 +1974,7 @@ class alert extends module{
 		
 		$alert_date = date('Y-m-d');
 
-		$insert_sms_alert = mysql_query("INSERT INTO m_lib_sms_alert SET patient_id='$pxid',program_id='$prog_id',alert_id='$alert_id',alert_date='$alert_date',base_date='$base_date',sms_status='$sms_status',last_update=NOW(),barangay_id='$brgy_id',sms_number='$cp'") or die("Cannot query 1740: ".mysql_error());
+		$insert_sms_alert = mysql_query("INSERT INTO m_lib_sms_alert SET patient_id='$pxid',program_id='$prog_id',alert_id='$alert_id',alert_date='$alert_date',base_date='$base_date',sms_status='$sms_status',last_update=NOW(),barangay_id='$brgy_id',sms_number='$cp',recipient_type='px'") or die("Cannot query 1740: ".mysql_error());
 
 		$sms_id = mysql_insert_id();
 
@@ -1948,7 +1984,8 @@ class alert extends module{
 		$sms_message = $sms_message.$get_outro;
 		
 		$update_sms_alert = mysql_query("UPDATE m_lib_sms_alert SET sms_code='$sms_code',sms_message='$sms_message' WHERE sms_id='$sms_id'") or die("Cannot query 1920: ".mysql_error());
-
+		
+		$this->insert_sms_provider($brgy_id, $pxid,$prog_id,$alert_id,$alert_date,$base_date,$sms_status,$sms_code,$sms_message);
 	}
 
 	function update_sms_status(){
@@ -1979,6 +2016,65 @@ class alert extends module{
 	}
 
 	
+	function insert_sms_provider($brgy_id, $pxid,$prog_id,$alert_id,$alert_date,$base_date,$sms_status,$sms_code,$sms_message){
+
+		$q_provider_info = mysql_query("SELECT a.user_lastname,a.user_id,a.user_cellular FROM game_user a,m_lib_bhs b WHERE b.barangay_id=$brgy_id AND a.user_id=b.user_id") or die("Cannot query 1984: ".mysql_error());
+
+
+		if(mysql_num_rows($q_provider_info)!=0):
+
+			while(list($user_lname,$user_id,$cp) = mysql_fetch_array($q_provider_info)){			
+			
+			echo $user_lname.','.$user_id.','.$cp;
+
+			if(!empty($cp)):
+				$q_sms = mysql_query("INSERT INTO m_lib_sms_alert SET patient_id='$pxid',barangay_id='$brgy_id',program_id='$prog_id',alert_id='$alert_id',alert_date='$alert_date',base_date='$base_date',sms_status='$sms_status',sms_message='$sms_message',sms_code='$sms_code',last_update=NOW(),sms_number='$cp',recipient_type='midwife'") or die("Cannot query 1995: ".mysql_error());
+			endif;
+
+			}
+		endif;
+
+	}
+
+	function check_weekend($date_to_check){
+	//check if the date would fall in saturday or sunday.
+		
+		$dtimestamp = strtotime($date_to_check);
+	
+		$day = date("D",$dtimestamp);
+
+		if(($day=='Sat') || ($day=='Sun')):
+			return true;
+		else:
+			return false;
+		endif;
+	}
+
+
+	function get_trimester() {
+		//
+		// get_trimester()
+		// what trimester is patient in?
+		// returns trimester integer
+		//
+        	if (func_num_args()>0) {
+            		$arg_list = func_get_args();
+            		$mc_id = $arg_list[0];
+            		$consult_date = $arg_list[1];
+        	}
+        	$sql = "select case when (to_days('$consult_date')<=to_days(trimester1_date)) then 1 ".
+               		"when (to_days('$consult_date')<=to_days(trimester2_date) and to_days('$consult_date')>to_days(trimester1_date)) then 2 ".
+               		"when to_days('$consult_date')>to_days(trimester2_date) then 3 end ".
+               		"from m_patient_mc ".
+               		"where mc_id = '$mc_id'";
+        	
+		if ($result = mysql_query($sql)) {
+            		if (mysql_num_rows($result)) {
+                		list($trimester) = mysql_fetch_array($result);
+		                return $trimester;
+            		}
+        	}
+    	}
 
 } //end of class
 ?>
