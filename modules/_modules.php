@@ -1,7 +1,7 @@
 <?
 // BEGIN SERVER CODE: DO NOT EDIT
 // Server generated code
-// Generated 2011-09-20 12:46:45
+// Generated 2011-11-05 12:12:14
 // Module: _module.php
 // Author: Herman Tolentino MD
 //
@@ -553,6 +553,17 @@ if (file_exists('../modules/urinalysis/class.urinalysis.php')) {
 		$urinalysis->init_deps();
 		$urinalysis->init_lang();
 		$urinalysis->init_help();
+	}
+}
+if (file_exists('../modules/usage/class.usage.php')) {
+	include '../modules/usage/class.usage.php';
+	$usage = new usage;
+	if (!$module->activated('usage') && $initmod) {
+		$usage->init_sql();
+		$usage->init_menu();
+		$usage->init_deps();
+		$usage->init_lang();
+		$usage->init_help();
 	}
 }
 if (file_exists('../modules/vaccine/class.vaccine.php')) {

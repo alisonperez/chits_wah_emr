@@ -1,7 +1,7 @@
 <?
 // BEGIN SERVER CODE: DO NOT EDIT
 // Server generated code
-// Generated 2011-09-20 12:46:45
+// Generated 2011-11-05 12:12:14
 // Module: _menu.php
 // Author: Herman Tolentino MD
 //
@@ -228,6 +228,9 @@ if ($HTTP_GET_VARS["menu_id"]) {
 		break;
 	case 717:
 		$template->_templates($menu_id, $HTTP_POST_VARS, $HTTP_GET_VARS,$_SESSION["validuser"],$_SESSION["isadmin"]);
+		break;
+	case 1380:
+		$usage->_usage($menu_id, $HTTP_POST_VARS, $HTTP_GET_VARS,$_SESSION["validuser"],$_SESSION["isadmin"]);
 		break;
 	case 1214:
 		$vaccine->_vaccine($menu_id, $HTTP_POST_VARS, $HTTP_GET_VARS,$_SESSION["validuser"],$_SESSION["isadmin"]);

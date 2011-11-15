@@ -10,27 +10,35 @@
 	if($_SESSION[userid]):
 
 		$dbconn = mysql_connect('localhost',$_SESSION["dbuser"],$_SESSION["dbpass"]) or die("Cannot query 4 ".mysql_error());
-    		
+
 		mysql_select_db($_SESSION["dbname"],$dbconn) or die("cannot select db");		
-		
-		$graph_details = $_SESSION["graph_details"];
-		$ydata = $_SESSION["ydata"];	
-		
-		if($_SESSION["indicator"]=='BMI'):			
-			draw_bmi($ydata,$graph_details);
-		elseif($_SESSION["indicator"]=='WT'):		
-			draw_weight($ydata,$graph_details);
+	
 
-		elseif($_SESSION["indicator"]=='BP'):
-			draw_bp($ydata,$graph_details);
-		else:
+		if(!empty($_GET["type"])): $this->draw_usage();
+			//print_r($_SESSION["arr_usage"]);
+			//echo $_GET["type"];
 
+		else:	
+			$graph_details = $_SESSION["graph_details"];
+			$ydata = $_SESSION["ydata"];	
+		
+			if($_SESSION["indicator"]=='BMI'):			
+				draw_bmi($ydata,$graph_details);
+			elseif($_SESSION["indicator"]=='WT'):		
+				draw_weight($ydata,$graph_details);
+			elseif($_SESSION["indicator"]=='BP'):
+				draw_bp($ydata,$graph_details);
+			else:
+			
 		endif;
-
 		
 	
 
+		endif;
+	else:
+	
 	endif;
+
 
 	function draw_bmi($actual,$graph_details){
 		$arr_bmi_bound = get_bmi_bound();
@@ -249,5 +257,58 @@
 		list($lname,$fname) = mysql_fetch_array($q_patient);
 
 		return $fname.' '.$lname;
+	}
+
+	function draw_usage(){
+
+	
+		$w = 400;
+		$h = 300;
+
+		$graph = new Graph($w,$h);
+		$graph->SetScale('intlin',0,50);
+		
+		$graph->SetMargin(40,40,40,60);
+		$graph->title->Set('Data Usage');
+
+		$graph->xaxis->title->Set('User');
+		$graph->yaxis->title->Set('Usage');
+
+		$graph->xaxis->SetTickLabels(array('1','2','3'));
+		 
+		
+
+		$lineplot=new LinePlot(array('10','12','14'));
+		$lineplot->SetColor( 'blue' );
+		$lineplot->SetWeight( 2 );
+
+		$lineplot->value->Show();
+
+		$bmi_under = new LinePlot(array('15','25','30'));
+		$bmi_under->SetColor('yellow');
+		$bmi_under->SetWeight( 3 );
+				
+
+		$bmi_normal = new LinePlot(array('15','25','30'));
+		$bmi_normal->SetColor('green');
+		$bmi_normal->SetWeight( 3 );
+
+		$bmi_over = new LinePlot(array('10','40','45'));
+		$bmi_over->SetColor('red');
+		$bmi_over->SetWeight( 3 );				
+		
+		$lineplot->SetLegend('Actual BMI');
+		$bmi_under->SetLegend('Normal');
+		$bmi_normal->SetLegend('Overweight');
+		$bmi_over->SetLegend('Obese');
+
+		$graph->legend->SetLayout(LEGEND_HOR);
+		$graph->legend->Pos(0.5,.99,'center','bottom');
+
+		$graph->Add($bmi_under);
+		$graph->Add($bmi_normal);
+		$graph->Add($bmi_over);
+		$graph->Add($lineplot);
+		$graph->Stroke();
 	}
 ?>

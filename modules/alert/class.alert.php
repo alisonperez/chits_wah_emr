@@ -450,14 +450,15 @@ class alert extends module{
 
 	function _sms_enroll(){
 
+		$this->check_sms_alert();
 
 		echo "<form action='$_SERVER[PHP_SELF]?page=$_GET[page]&menu_id=$_GET[menu_id]#px' name='form_sms' method='POST'>";
 		echo "<input type='hidden' name='pxid' />";
 		
-		echo "<a name='px'></a>";
+		/*echo "<a name='px'></a>";
 		echo "<span class='library'>SMS PATIENT ENROLLMENT FORM</span><br><br>";
 		echo "<table border='1' width='600'>";
-		echo "<thead><td>Search the name of the patient</td></thead>";
+		echo "<thead><td>Search the name of the patient</td></thead>"; */
 
 		echo "<tr>";
 		echo "<td>";
@@ -1695,7 +1696,9 @@ class alert extends module{
 		$q_sms_alert = mysql_query("SELECT sms_id FROM m_lib_sms_alert WHERE alert_date='$today'") or die("Cannot query 732: ".mysql_error());
 
 		$q_fam_id = mysql_query("SELECT DISTINCT a.family_id FROM m_family_address a, m_family_members b, m_lib_barangay c WHERE a.family_id=b.family_id AND a.barangay_id=c.barangay_id ORDER by c.barangay_name ASC") or die("Cannot query 1576: ".mysql_error());
-			
+
+
+
 		while($r_fam = mysql_fetch_array($q_fam_id)){
 			array_push($arr_alert,$alert->determine_alert_hh($r_fam['family_id']));
 			//echo $r_fam[family_id].' ';
@@ -1713,7 +1716,6 @@ class alert extends module{
 										$q_name = mysql_query("SELECT patient_lastname,patient_firstname FROM m_patient WHERE patient_id='$key6'") or die("Cannot query 1545: ".mysql_error());
 										list($lname,$fname) = mysql_fetch_array($q_name);
 										$ngalan = $lname.', '.$fname;
-
 									foreach($value6 as $key7=>$alert_details){
 										//echo $key7.'<br>';
 										//print_r($value6).'<br><br>';
@@ -1723,11 +1725,12 @@ class alert extends module{
 												if(count($arr_alert_msg)!=0): 
 													//print_r($arr_alert_msg);
 													$day_diff = $alert->get_date_diff_days(date('Y-m-d'),$arr_alert[1]);
+
 													//echo $arr_alert[1]; 
 													//echo $key6.' '.$arr_alert[1].'  '.$day_diff.'<br>';
 
 													$mensahe = $alert->get_message($day_diff,$arr_alert_msg,$ngalan,$arr_alert[1]); 
-
+//echo $day_diff.'/'.$ngalan.'/'.$mensahe.'/'.$alert_id.'/'.$arr_alert[1].'<br>xxx';
 													if($mensahe!=''):
 														/* $key: patient_id, $arr_alert[0]: program_id, $arr_alert[1]: base date, $alert_id: id for alert, 'queue': sms_status, $mensahe: alert message
 														*/
@@ -1943,10 +1946,10 @@ class alert extends module{
 			$str_msg = str_replace('$name',$pxname,$arr_alert_msg['alert_actual_message']);
 			$str_msg = str_replace('$date',$base_date,$str_msg);
 		elseif(($day_diff > 0) && ($day_diff==$arr_alert_msg['date_pre'])):
-			$str_msg = str_replace('$name',$pxname,$arr_alert_msg['alert_action']);
+			$str_msg = str_replace('$name',$pxname,$arr_alert_msg['alert_message']);
 			$str_msg = str_replace('$date',$base_date,$str_msg);
 		elseif(($day_diff < 0) && (abs($date_diff)==$arr_alert_msg['date_until'])):
-			$str_msg = str_replace('$name',$pxname,$arr_alert_msg['alert_message']);
+			$str_msg = str_replace('$name',$pxname,$arr_alert_msg['alert_action']);
 			$str_msg = str_replace('$date',$base_date,$str_msg);
 		else: //echo $day_diff.' nada'; 
 			
@@ -2038,7 +2041,7 @@ class alert extends module{
 
 			while(list($user_lname,$user_id,$cp) = mysql_fetch_array($q_provider_info)){			
 			
-			echo $user_lname.','.$user_id.','.$cp;
+			//echo $user_lname.','.$user_id.','.$cp;
 
 			if(!empty($cp)):
 				$q_sms = mysql_query("INSERT INTO m_lib_sms_alert SET patient_id='$pxid',barangay_id='$brgy_id',program_id='$prog_id',alert_id='$alert_id',alert_date='$alert_date',base_date='$base_date',sms_status='$sms_status',sms_message='$sms_message',sms_code='$sms_code',last_update=NOW(),sms_number='$cp',recipient_type='midwife'") or die("Cannot query 1995: ".mysql_error());
