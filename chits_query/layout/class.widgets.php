@@ -137,10 +137,9 @@
 		else:
 			$this->disp_filter_form2($query_brgy);
 		endif;
-        
+
         $this->additional_filter($_SESSION["ques"],"FP Methods");
-        
-        
+
         echo "<tr align=\"center\">";
         echo "<td colspan=\"2\"><input type=\"submit\" name=\"q_submit\" value=\"Submit\" target=\"new\"></input>&nbsp;&nbsp;&nbsp;";
         echo "<input type=\"reset\" name=\"q_reset\" value=\"Reset\"></input></td>";
@@ -151,10 +150,10 @@
     } 
 
 	function get_filter(){ //set filter determines what date and barangay form shall be displayed. summary tables usually uses checkbox for brgy while tcl's are using dropdown list
-                
+
                 $q_type = mysql_query("SELECT report_type FROM question WHERE ques_id='$_SESSION[ques]'") or die("Cannot query (147)".mysql_error());
                 list($report_type) = mysql_fetch_array($q_type);
-                
+
  		if($report_type=='S'): //for other question codes, just add || here. this is for summary tables.
 			$_SESSION[filter] = 2;
                 elseif($report_type=='Q'):
@@ -192,7 +191,7 @@
 		echo "<tr><td style=\"background-color: #666666;color: #FFFF66;text-align: center;\">End Month</td>";
 		echo "<td>";
 		echo "<select name='emonth' size='1'>";
-		foreach($buwan as $key=>$value){                        		
+		foreach($buwan as $key=>$value){
 			echo "<option value='$key'>$value</option>";	
 		}
 		echo "</select>";
@@ -216,8 +215,7 @@
 	}
 	
 	function additional_filter($ques_id,$label){
-        
-        
+
         if($ques_id==40): //if the query is about FP TCL, display another list showing the FP methods
                 $q_fp_method = mysql_query("SELECT method_name, method_id, fhsis_code FROM m_lib_fp_methods ORDER by method_name ASC") or die("Cannot query: Check FP tables");
 	
@@ -229,28 +227,20 @@
                         }
                         echo "</select></td>";
                         echo "</tr>";
-                        
                         $this->show_year();
-                        
                 endif;
-                
-        
          endif;        	
 	}
 	
 	function disp_filter_quarterly($q_brgy){
-	        
 	                echo "<tr><td style=\"background-color: #666666;color: #FFFF66;text-align: center;\">Quarter</td>";
 	                echo "<td><select name='sel_quarter' size='1'>";
-	                        for($i=1;$i<5;$i++){	                
-                                        echo "<option value='$i'>$i</option>";                                        
+	                        for($i=1;$i<5;$i++){
+                                        echo "<option value='$i'>$i</option>";
 	                        }
-	                                
 	                echo "</select></td></tr>";
-	                
-	                $this->show_year();	                
+	                $this->show_year();
                         $this->checkbox_brgy($q_brgy);
-                                                
 	}
 	
 	function disp_filter_monthly($q_brgy){
@@ -298,7 +288,6 @@
 
 	
 	function checkbox_brgy($q_brgy){
-	        
 	        echo "<tr><td valign='top' style=\"background-color: #666666;color: #FFFF66;text-align: center;\">Barangay</td><td>";
 		
 		echo "<input type='checkbox' name='brgy[]' value='all' checked>All</input>&nbsp;";
@@ -339,8 +328,6 @@
       		echo "Developed and maintained by alison@perez-ph.net";
       		echo "</td></tr>";
       		echo "</table>";
-	}
-
-	
+	}	
   }
 ?>

@@ -274,15 +274,30 @@ class notes extends module {
     }
 
     function display_notes_archive() {
+
+		if($_POST["submit_consult"]=='Print Consult'):
+			if(count($_POST["consult_rec"])!=0): 
+				$arr_consult_rec = serialize($_POST["consult_rec"]);
+				header("Location: http://localhost/chits/chits_query/pdf_reports/gen_consult.php?pxid=$_POST[patient_id]&consult_rec=$arr_consult_rec");
+			else:
+				echo "<script language='Javascript'>";
+				echo "window.alert('Please select at least one consultation record.')";
+				echo "</script>";
+			endif;
+		endif;
+
 		$patient_id = healthcenter::get_patient_id($_GET["consult_id"]);
 		$q_consult = mysql_query("SELECT * FROM m_consult_notes a, m_consult b WHERE a.consult_id=b.consult_id AND a.patient_id='$patient_id' ORDER by b.consult_date DESC") or die("Cannot query 277: ".mysql_error());
-
+		
 		if(mysql_num_rows($q_consult)!=0):
+			echo "<form action='$_SERVER[PHP_SELF]?page=$_GET[page]&menu_id=$_GET[menu_id]&consult_id=$_GET[consult_id]&ptmenu=$_GET[ptmenu]&module=$_GET[module]&notes=$_GET[notes]#consult_tab' method='POST' name='form_consults'>";
 			echo "<font size='2'>Note: Highlighted record is the current consultation transaction.</font>";
+			echo "<a name='consult_tab' />";
 			echo "<table cellpadding='2' border='1' style='border: 1px solid black'>";
-			echo "<tr align='center'><td><b>Consultation Date</td><td><b>SOAP</td></tr>";
+			echo "<tr align='center'>";
+			echo "<td><b>Print?</b></td><td><b>Consultation Date</td><td><b>SOAP</td></tr>";
 			while($r_consult = mysql_fetch_array($q_consult)){ //print_r($r_consult);
-				$str_cons =  "CC: ".$this->get_complaint($r_consult["consult_id"],$r_consult["notes_id"])."<br>"."HX: ".stripslashes(nl2br($r_consult["notes_history"]))."<br>"."PE: ".stripslashes(nl2br($r_consult["notes_physicalexam"]))."<br>"."DX: ".$this->get_diagnosis($r_consult["consult_id"],$r_consult["notes_id"])."<br>"."TX: ".stripslashes(nl2br($r_consult["notes_plan"]))."<br>";
+				$str_cons =  "CC: ".$this->get_complaint($r_consult["consult_id"],$r_consult["notes_id"])."<br>"."HX: ".stripslashes(nl2br($r_consult["notes_history"]))."<br>"."PE: ".stripslashes(nl2br($r_consult["notes_physicalexam"]))."<br>"."DX: ".$this->get_diagnosis($r_consult["consult_id"],$r_consult["notes_id"])." <br>"."TX: ".stripslashes(nl2br($r_consult["notes_plan"]))."<br>";
 				
 				if($_GET["consult_id"]==$r_consult["consult_id"]):
 					echo "<tr style='background-color: #FFF380; color: black;'>";
@@ -290,6 +305,7 @@ class notes extends module {
 					echo "<tr>";
 				endif;
 
+				echo "<td><input type='checkbox' value='$r_consult[consult_id]' name='consult_rec[]'></input></td>";
 				echo "<td valign='top' align='center'>";
 				echo date('m-d-Y',strtotime($r_consult["consult_date"]));
 				echo "</td>";
@@ -298,9 +314,14 @@ class notes extends module {
 				echo $str_cons;
 				echo "</td>";
 				echo "</tr>";
-				
+
 			}
+			echo "<tr><td colspan='3' align='center'><input type='submit' name='submit_consult' value='Print Consult'></td></tr>";
+			echo "<input type='hidden' name='patient_id' value='$patient_id' />";
+
 			echo "</table>";
+
+			echo "</form>";
 		else:
 			echo "<font size='2' color='red'>No archived consultations.</font>";
 		endif;
@@ -1045,7 +1066,12 @@ class notes extends module {
 
 	if(mysql_num_rows($result)!=0):
 		while($r_complain = mysql_fetch_array($result)){
-			$complain .= $r_complain["complaint_name"].', ';
+			$i++;
+			if($i!=mysql_num_rows($result)):	
+				$complain .= $r_complain["complaint_name"].', ';
+			else:
+				$complain .= $r_complain["complaint_name"];
+			endif;
 		}
 	else:
 		
@@ -1065,7 +1091,12 @@ class notes extends module {
 
 	if(mysql_num_rows($result)!=0):
 		while($r_diag=mysql_fetch_array($result)){ 
-			$diag .= $r_diag["class_name"];
+			$i++;
+			if($i!=mysql_num_rows($result)):
+				$diag .= $r_diag["class_name"].', ';
+			else:
+				$diag .= $r_diag["class_name"];
+			endif;
 		}
 	else:
 		

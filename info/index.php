@@ -166,7 +166,7 @@ small { font-family: verdana, sans serif}
                 $user = $user->process_auth($_POST["login"], $_POST["passwd"]);
                 if (count($user)>0) {
                     //print_r($user);
-		    //alert::check_sms_alert();
+		    alert::check_sms_alert();
                     $site->session_user($user);
                     //$site->record_access($_SESSION["userid"],$HTTP_USER_AGENT,"ASC","login");
                     header("location: ".$_SERVER["PHP_SELF"]);

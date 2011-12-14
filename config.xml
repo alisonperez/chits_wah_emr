@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <config>
     <node>
-        <name>RHU NAME</name>
+        <name>GERONA RHU 1</name>
         <code>036901000</code>
         <telephone>2444284</telephone>
         <level>self</level>
@@ -13,7 +13,7 @@
         <level>parent</level>        
     </node>
     <node>
-        <name>RHU NAME</name>
+        <name>GERONA RHU 1</name>
 	<code>036900000</code>
         <telephone>2444284</telephone>
         <level>child</level>

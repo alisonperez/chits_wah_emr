@@ -593,7 +593,7 @@ class alert extends module{
 			echo "<input type='submit' value='Terminate Message' name='submit_alert' />&nbsp;&nbsp;";
 			echo "</td></tr>";
 
-		else:
+		else: 
 			echo "<tr><td>No scheduled SMS messages to be broadcasted.</td></tr>";
 		endif;
 
@@ -1687,12 +1687,18 @@ class alert extends module{
 	}	
 
 
-
-	function check_sms_alert(){
+	function check_sms_alert($date_passed){
 		$alert = new alert;
 		$arr_alert = array();
-		$today = date('Y-m-d');
-		
+
+		if(isset($date_passed)):
+			$today = $date_passed;
+		else:
+			$today = date('Y-m-d');
+		endif;
+
+		echo $today;
+
 		$q_sms_alert = mysql_query("SELECT sms_id FROM m_lib_sms_alert WHERE alert_date='$today'") or die("Cannot query 732: ".mysql_error());
 
 		$q_fam_id = mysql_query("SELECT DISTINCT a.family_id FROM m_family_address a, m_family_members b, m_lib_barangay c WHERE a.family_id=b.family_id AND a.barangay_id=c.barangay_id ORDER by c.barangay_name ASC") or die("Cannot query 1576: ".mysql_error());
@@ -1700,7 +1706,9 @@ class alert extends module{
 
 
 		while($r_fam = mysql_fetch_array($q_fam_id)){
-			array_push($arr_alert,$alert->determine_alert_hh($r_fam['family_id']));
+			if($alert->check_px_enrolled_sms($r_fam['family_id'])):
+				array_push($arr_alert,$alert->determine_alert_hh($r_fam['family_id']));
+			endif;
 			//echo $r_fam[family_id].' ';
 			//print_r($arr_alert);
 			//echo "<br><br><br>"; 
@@ -1724,7 +1732,9 @@ class alert extends module{
 												$arr_alert_msg = $alert->check_alert_msg($alert_id,$arr_alert[1],$key6);
 												if(count($arr_alert_msg)!=0): 
 													//print_r($arr_alert_msg);
-													$day_diff = $alert->get_date_diff_days(date('Y-m-d'),$arr_alert[1]);
+													//$day_diff = $alert->get_date_diff_days(date('Y-m-d'),$arr_alert[1]);
+													
+													$day_diff = $alert->get_date_diff_days($today,$arr_alert[1]);
 
 													//echo $arr_alert[1]; 
 													//echo $key6.' '.$arr_alert[1].'  '.$day_diff.'<br>';
@@ -1854,6 +1864,7 @@ class alert extends module{
 		else:
 			echo 'Message/s not sent! Please check the SMS configuration.';
 			return false;
+		
 		endif;
 	}
 
@@ -2091,6 +2102,25 @@ class alert extends module{
             		}
         	}
     	}
+
+	function check_px_enrolled_sms(){
+		//function returns true if the family_id has a patient wherein he/she is enrolled on a sms alert, false otherwise
+		
+		if(func_num_args()>0):
+			$arg_list = func_get_args();
+			$family_id = $arg_list[0];
+		endif;
+
+		$q_enroll = mysql_query("SELECT a.family_id FROM m_family_members a, m_lib_sms_px_enroll b WHERE a.family_id='$family_id' AND a.patient_id=b.patient_id") or die("Cannot query 2105: ".mysql_error());
+
+
+		if(mysql_num_rows($q_enroll)!=0):
+			return true;
+		else:
+			return false;
+		endif;
+
+	}
 
 } //end of class
 ?>
