@@ -449,13 +449,6 @@ class consult_report extends module {
 	$_SESSION["arr_consult"] = $this->display_consults($report_date,"patient_id",$end_report_date); //pass the report_date and patient_id
 	$_SESSION["arr_ccdev"] = $this->display_ccdev($report_date,$end_report_date);
 	$_SESSION["arr_mc"] = $this->display_mc($report_date,$end_report_date);	 
-
-	$sql = "select count(distinct(patient_id)) from m_consult where ".
-	       "to_days(consult_date) = to_days('$report_date') and patient_id != '0'";
-	$result = mysql_result(mysql_query($sql),0);
-			          
-	print "<br/>";
-	print "Total No. of Today's Patients : $result";
     }
 
     function display_consults() {
@@ -1096,7 +1089,7 @@ class consult_report extends module {
 
 
 	function get_str_elapsed($start,$end,$elapsed){
-		
+
 		if($elapsed>0):
 			if($elapsed>60):
 				$elapsed = round(($elapsed / 60),2);
@@ -1107,12 +1100,12 @@ class consult_report extends module {
 				$unit = 'minutes';
 			endif;
 			
-			$str = $start.' to '.$end.'( '.$elapsed.$unit.' )';
+			$str = $start.' to '.$end.'('.$elapsed.' '.$unit.')';
 		else:
 			$str = $start.' to -';
 		endif;
 
-			return $str;
+		return $str;
 	}
 
 // end of class
