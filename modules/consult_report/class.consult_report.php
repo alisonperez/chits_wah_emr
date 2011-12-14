@@ -448,7 +448,7 @@ class consult_report extends module {
 
 	$_SESSION["arr_consult"] = $this->display_consults($report_date,"patient_id",$end_report_date); //pass the report_date and patient_id
 	$_SESSION["arr_ccdev"] = $this->display_ccdev($report_date,$end_report_date);
-	$_SESSION["arr_mc"] = $this->display_mc($report_date,$end_report_date);	 
+	$_SESSION["arr_mc"] = $this->display_mc($report_date,$end_report_date);
     }
 
     function display_consults() {
@@ -895,7 +895,7 @@ class consult_report extends module {
             $isadmin = $arg_list[4];
             //print_r($arg_list);
         }
-        print "<a href='../modules/_uploads/ntp_tcl.pdf' target='_blank'>NTP TCL</a><br/>";
+        //print "<a href='../modules/_uploads/ntp_tcl.pdf' target='_blank'>NTP TCL</a><br/>";
     }
 
     function display_form_summary_date() {
