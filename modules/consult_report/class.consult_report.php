@@ -1099,9 +1099,10 @@ class consult_report extends module {
 		
 		if($elapsed>0):
 			if($elapsed>60):
+				$elapsed = round(($elapsed / 60),2);
 				$unit = 'hrs';
-			elseif($elapsed>1440):
-				$unit = 'days';
+			//elseif($elapsed>1440):
+			//	$unit = 'days';
 			else:
 				$unit = 'minutes';
 			endif;

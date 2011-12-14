@@ -157,12 +157,9 @@ function show_philhealth_list(){
 	//print_r($arr_px);
 	
 	for($i=0;$i<count($arr_px);$i++){
-
 		$arr_philhealth = array();
 
-
 	        $relatives = '';
-	                        
 
 		$q_px = mysql_query("SELECT patient_lastname, patient_firstname, patient_middle, date_format(patient_dob,'%m-%d-%Y') as patient_dob FROM m_patient WHERE patient_id='$arr_px[$i]'") or die("Cannot query 147 ".mysql_error("Cannot query 147" .mysql_error()));
 
@@ -191,7 +188,6 @@ function show_philhealth_list(){
 		$this->Row($arr_philhealth);
 
 		array_push($arr_philhealth_record,$arr_philhealth);
-			
 	}
 
 	return $arr_philhealth_record;
