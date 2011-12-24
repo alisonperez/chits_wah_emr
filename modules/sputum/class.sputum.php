@@ -322,17 +322,19 @@ class sputum extends module {
         	        
         print "</tr>";
 
+	
+        print "<tr><td class='boxtitle'>".LBL_READING."</td>";
+        print "<td>".sputum::show_sputum_reading(($sputum["sp1_reading"]?$sputum["sp1_reading"]:$post_vars["sp1_reading"]),'sp1_reading')."</td>";
+        print "<td>".sputum::show_sputum_reading(($sputum["sp2_reading"]?$sputum["sp2_reading"]:$post_vars["sp2_reading"]),'sp2_reading')."</td>";
+        print "<td>".sputum::show_sputum_reading(($sputum["sp3_reading"]?$sputum["sp3_reading"]:$post_vars["sp3_reading"]),'sp3_reading')."</td>";
+        print "</tr>";
+
 	print "<tr><td class='boxtitle'>SPUTUM EXAM RESULT</td>";
 	print sputum::show_sputum_dropdown('lab_diag1',$sputum["lab_diag1"]);
         print sputum::show_sputum_dropdown('lab_diag2',$sputum["lab_diag2"]);
         print sputum::show_sputum_dropdown('lab_diag3',$sputum["lab_diag3"]);
 	print "</tr>";
 
-        print "<tr><td class='boxtitle'>".LBL_READING."</td>";
-        print "<td>".sputum::show_sputum_reading(($sputum["sp1_reading"]?$sputum["sp1_reading"]:$post_vars["sp1_reading"]),'sp1_reading')."</td>";
-        print "<td>".sputum::show_sputum_reading(($sputum["sp2_reading"]?$sputum["sp2_reading"]:$post_vars["sp2_reading"]),'sp2_reading')."</td>";
-        print "<td>".sputum::show_sputum_reading(($sputum["sp3_reading"]?$sputum["sp3_reading"]:$post_vars["sp3_reading"]),'sp3_reading')."</td>";
-        print "</tr>";
         print "<tr><td class='boxtitle'>".LBL_SPUTUM_PERIOD."</td>";
         print "<td colspan='3'>";
         print sputum::show_sputum_period(($sputum["sputum_period"]?$sputum["sputum_period"]:$post_vars["sputum_period"]));
