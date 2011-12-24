@@ -138,9 +138,9 @@ class hematology extends module{
     else:
       $date_lab_exam = date('m/d/Y');
     endif;    
-    
+
     list($pxid,$date_request,$request_user_id,$date_done,$request_done,$done_user_id) = mysql_fetch_array($q_lab);        
-    
+
     echo "<a name='hematology'>";
     echo "<form action='$_SERVER[PHP_SELF]?page=$_GET[page]&menu_id=$_GET[menu_id]&consult_id=$_GET[consult_id]&ptmenu=LABS&module=hematology&request_id=$_GET[request_id]&lab_id=HEM#hematology' method='POST' name='form_lab'>";
 
@@ -162,7 +162,7 @@ class hematology extends module{
     echo "<tr><td colspan='4' class='boxtitle' class='boxtitle'>DATE EXAMINED &nbsp; <input type='text' name='hematology_date' size='10' maxlength='10' value='$date_lab_exam' class='tinylight'></input>&nbsp;";
     echo "<a href=\"javascript:show_calendar4('document.form_lab.hematology_date', document.form_lab.hematology_date.value);\"><img src='../images/cal.gif' width='16' height='16' border='0' alt='Click Here to Pick up the date'></a> ";
     echo "</td></tr>";
-                      
+
     echo "<tr align='center' class='boxtitle'><td>TEST</td><td>RESULT</td><td>TEST</td><td>RESULT</td></tr>";
     echo "<tr><td class='boxtitle'>HEMOGLOBIN</td><td><input type='text' name='txt_hemoglobin' size='9' value='$hemo' class='tinylight'></input></td><td class='boxtitle'>PLATELET</td><td><input type='text' name='txt_platelet' size='9' value='$platelet' class='tinylight'></input></td></tr>";
     echo "<tr><td class='boxtitle'>HEMATOCRIT</td><td><input type='text' name='txt_hemocrit' size='9' value='$hema' class='tinylight'></input></td><td class='boxtitle'>RETICULOCYTES</td><td><input type='text' name='txt_reticulocytes' size='9' value='$reticulocytes' class='tinylight'></input></td></tr>";
@@ -186,7 +186,9 @@ class hematology extends module{
       endif;
     }
 
-    echo "<tr><td class='boxtitle'>LYMPHO</td><td><input type='text' name='txt_lympho' size='9' value='$lympho' class='tinylight'></input></td><td class='boxtitle'>";
+     echo "<tr><td class='boxtitle'>MID</td><td><input type='text' name='txt_mxd' size='9' value='$mxd' class='tinylight'></input></td>";
+
+    echo "<td class='boxtitle'>";
 
     if($rh=='+'):
 	$rh_pos = 'SELECTED';
@@ -205,7 +207,6 @@ class hematology extends module{
     echo "<option value='-' $rh_neg>-</option>";
     echo "</select></td></tr>";
 
-    echo "<tr><td class='boxtitle'>MXD</td><td><input type='text' name='txt_mxd' size='9' value='$mxd' class='tinylight'></input></td><td colspan='2'>&nbsp;</td></tr>";
     echo "<tr><td class='boxtitle'>MONO</td><td><input type='text' name='txt_mono' size='9' value='$mono' class='tinylight'></input></td><td colspan='2'>&nbsp;</td></tr>";
     echo "<tr><td class='boxtitle'>EOSIN</td><td><input type='text' name='txt_eosin' size='9' value='$eosin' class='tinylight'></input></td><td colspan='2'>&nbsp;</td></tr>";
     echo "<tr><td class='boxtitle'>BASO</td><td><input type='text' name='txt_baso' size='9' value='$baso' class='tinylight'></input></td><td colspan='2'>&nbsp;</td></tr>";
