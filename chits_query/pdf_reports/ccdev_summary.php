@@ -170,7 +170,7 @@ function Header()
         elseif($_SESSION[ques]==50 || $_SESSION[ques]==51):
 
             $q_pop = mysql_query("SELECT SUM(population) FROM m_lib_population WHERE population_year='$_SESSION[year]'") or die("CAnnot query: 164");
-                                                    
+
             if(mysql_num_rows($q_pop)!=0):
                 list($population) = mysql_fetch_row($q_pop);
             else:
@@ -179,7 +179,7 @@ function Header()
 
 	if($_SESSION[ques]==50):  //monthly report
 		$this->Cell(0,5,'FHSIS REPORT FOR THE MONTH: '.date('F',mktime(0,0,0,$_SESSION[smonth],1,0)).'          YEAR: '.$_SESSION[year],0,1,L);
-                
+
 		$this->Cell(0,5,'NAME OF BHS: '.$this->get_brgy(),0,1,L);
 		$w = array(200,40,40);
 
@@ -192,7 +192,7 @@ function Header()
 		$header = array('Indicators', 'Eligible Population','Number','%','Interpretation','Recommendation/Action Taken');
                 $subheader = array('','','Male','Female','Total','','','');
 		$this->Cell(0,5,'FHSIS REPORT FOR THE QUARTER: '.$_SESSION[quarter].'          YEAR: '.$_SESSION[year],0,1,L);
-		
+
 	else:
 
 	endif;	
@@ -615,7 +615,7 @@ function compute_indicators(){
 				foreach($sub_arr_crit as $arr_key=>$arr_label){
 
 				foreach($arr_label as $sick_key=>$sick_label){
-				
+
 				foreach($arr_gender as $sex_key=>$sex_label){
 					$month_stat = array(1=>0,2=>0,3=>0,4=>0,5=>0,6=>0,7=>0,8=>0,9=>0,10=>0,11=>0,12=>0);
 					
@@ -870,11 +870,11 @@ function compute_indicators(){
 					$month_stat = array(1=>0,2=>0,3=>0,4=>0,5=>0,6=>0,7=>0,8=>0,9=>0,10=>0,11=>0,12=>0);
 					
 					$q_bfeed = mysql_query("SELECT a.patient_id, b.bfed_month1,b.bfed_month2,b.bfed_month3,b.bfed_month4,b.bfed_month5,b.bfed_month6,b.bfed_month6_date FROM m_patient a, m_patient_ccdev b WHERE a.patient_id=b.patient_id AND round((TO_DAYS(b.bfed_month6_date) - TO_DAYS(a.patient_dob))/30,2) BETWEEN 6 AND 7 AND a.patient_gender='$arr_gender[$sex]' AND b.bfed_month6_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]'") or die(mysql_error());
-
-					if(mysql_num_rows($q_bfeed)!=0):
-						while($r_bfeed = mysql_fetch_array($q_bfeed)){
+					
+					if(mysql_num_rows($q_bfeed)!=0):  
+						while($r_bfeed = mysql_fetch_array($q_bfeed)){ 
 							if(!in_array('N',$r_bfeed)):
-								if($this->get_px_brgy($pxid,$brgy_array)):
+								if($this->get_px_brgy($r_bfeed["patient_id"],$brgy_array)):
 									$month_stat[$this->get_max_month($r_bfeed[bfed_month6_date])] += 1;
 								endif;
 							endif;
