@@ -1676,7 +1676,7 @@ class alert extends module{
 				break;
 
 			case 'MSL':
-				$min_age = 63; 		//9 months
+				$min_age = 274; 		//9 months
 				break;
 
 			default:
