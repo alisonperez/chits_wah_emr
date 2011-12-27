@@ -1668,11 +1668,11 @@ class alert extends module{
 				break;
 
 			case 'HEPB2':
-				$min_age = 28; 		//4 weeks
+				$min_age = 42; 		//6 weeks
 				break;
 
 			case 'HEPB3':
-				$min_age = 56; 		//8 weeks
+				$min_age = 98; 		//14 weeks
 				break;
 
 			case 'MSL':
