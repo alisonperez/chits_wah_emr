@@ -2027,7 +2027,7 @@ class alert extends module{
 
 
 	function get_outro_msg($brgy_id,$sms_code){
-		$q_bhs_midwife = mysql_query("SELECT a.user_lastname,a.user_firstname,b.bhs_name FROM game_user a, m_lib_bhs b WHERE b.barangay_id='$brgy_id' AND a.user_id=b.user_id") or die("Cannot query 1943: ".mysql_error());
+		$q_bhs_midwife = mysql_query("SELECT a.user_lastname,a.user_firstname,b.bhs_name FROM game_user a, m_lib_bhs b,m_lib_bhs_barangay c WHERE b.bhs_id=c.bhs_id AND c.barangay_id='$brgy_id' AND a.user_id=b.user_id") or die("Cannot query 1943: ".mysql_error());
 		
 		list($lname,$fname,$bhs) = mysql_fetch_array($q_bhs_midwife);
 		
@@ -2045,8 +2045,10 @@ class alert extends module{
 	
 	function insert_sms_provider($brgy_id, $pxid,$prog_id,$alert_id,$alert_date,$base_date,$sms_status,$sms_code,$sms_message){
 
-		$q_provider_info = mysql_query("SELECT a.user_lastname,a.user_id,a.user_cellular FROM game_user a,m_lib_bhs b WHERE b.barangay_id=$brgy_id AND a.user_id=b.user_id") or die("Cannot query 1984: ".mysql_error());
 
+
+		$q_provider_info = mysql_query("SELECT a.user_lastname,a.user_id,a.user_cellular FROM game_user a,m_lib_bhs b,m_lib_bhs_barangay c WHERE b.bhs_id=c.bhs_id AND c.barangay_id='$brgy_id' AND a.user_id=b.user_id") or die("Cannot query 1984: ".mysql_error());
+		
 
 		if(mysql_num_rows($q_provider_info)!=0):
 
