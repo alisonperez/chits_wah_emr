@@ -424,39 +424,36 @@ function compute_indicator($crit){
 			
 
 			if(in_array('all',$_SESSION[brgy])):
-				$get_px_tt = mysql_query("SELECT distinct patient_id, max(vaccine_id), actual_vaccine_date FROM m_consult_mc_vaccine WHERE vaccine_id IN ('TT1','TT2','TT3','TT4','TT5') GROUP by patient_id") or die(mysql_error());
+				//$get_px_tt = mysql_query("SELECT distinct patient_id, max(vaccine_id), actual_vaccine_date FROM m_consult_mc_vaccine WHERE vaccine_id IN ('TT1','TT2','TT3','TT4','TT5') GROUP by patient_id") or die(mysql_error());
+				$get_px_tt = mysql_query("SELECT distinct patient_id, max(vaccine_id), actual_vaccine_date FROM m_consult_mc_vaccine WHERE vaccine_id IN ('TT3','TT4','TT5') AND actual_vaccine_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' GROUP by patient_id") or die(mysql_error());
 
 			else:
-				$get_px_tt = mysql_query("SELECT distinct a.patient_id, max(a.vaccine_id), a.actual_vaccine_date FROM m_consult_mc_vaccine a, m_family_members b, m_family_address c WHERE a.vaccine_id IN ('TT1','TT2','TT3','TT4','TT5') AND a.patient_id=b.patient_id AND b.family_id=c.family_id AND c.barangay_id IN ($brgy_array) GROUP by a.patient_id") or die(mysql_error());
+				//$get_px_tt = mysql_query("SELECT distinct a.patient_id, max(a.vaccine_id), a.actual_vaccine_date FROM m_consult_mc_vaccine a, m_family_members b, m_family_address c WHERE a.vaccine_id IN ('TT1','TT2','TT3','TT4','TT5') AND a.patient_id=b.patient_id AND b.family_id=c.family_id AND c.barangay_id IN ($brgy_array) GROUP by a.patient_id") or die(mysql_error());
+				$get_px_tt = mysql_query("SELECT distinct a.patient_id, max(a.vaccine_id), a.actual_vaccine_date FROM m_consult_mc_vaccine a, m_family_members b, m_family_address c WHERE a.vaccine_id IN ('TT3','TT4','TT5') AND a.patient_id=b.patient_id AND b.family_id=c.family_id AND c.barangay_id IN ($brgy_array) AND a.actual_vaccine_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' GROUP by a.patient_id") or die(mysql_error());
 			endif;
 			
 				
 			while(list($pxid,$vacc_id,$vacc_date)=mysql_fetch_array($get_px_tt)){ 
-			
 				//check if the patient is in the active maternal cases for the time span
 				//echo $pxid.'/'.$vacc_id.'/'.$vacc_date.'<br>';
 				
-				if($vacc_id!='TT1'):
+				/*if($vacc_id!='TT1'):
 				
-				list($ttbuffer,$tt_num) = explode('TT',$vacc_id);
+					list($ttbuffer,$tt_num) = explode('TT',$vacc_id);				
 
-				//$q_check_mc = mysql_query("SELECT a.mc_id,b.prenatal_date FROM m_patient_mc a,m_consult_mc_prenatal b WHERE a.patient_id='$pxid' AND a.mc_id=b.mc_id AND b.visit_sequence=1 AND b.prenatal_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' AND (TO_DAYS(a.patient_edc)-TO_DAYS('$vacc_date'))<='$tt_duration[$tt_num]'") or die("Cannot query : 297"); //killer SQL code
-
-				//echo $ttbuffer.' '.$ttnum.' '.$vacc_id.' '.$pxid.' '.$vacc_date.'<br>'; 
-
-				if($this->check_all_antigen($pxid,$vacc)):
-			
-				$q_check_mc = mysql_query("SELECT a.patient_id,a.actual_vaccine_date,c.patient_edc FROM m_consult_mc_vaccine a,m_consult_mc_prenatal b,m_patient_mc c WHERE a.vaccine_id='TT5' AND a.patient_id='$pxid' AND a.patient_id=c.patient_id AND (TO_DAYS(c.patient_edc)-TO_DAYS(a.actual_vaccine_date)) <= 10000 AND a.actual_vaccine_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' ORDER by a.actual_vaccine_date DESC LIMIT 1") or die(mysql_error());
-
-
-				if(mysql_num_rows($q_check_mc)!=0):
-					list($mcid,$vdate,$px_edc) = mysql_fetch_array($q_check_mc);
-					$month_stat[$this->get_max_month($vdate)]+=1;
-				endif;
-
-				endif;
-
-				endif;
+					if($this->check_all_antigen($pxid,$vacc)):
+				
+						$q_check_mc = mysql_query("SELECT a.patient_id,a.actual_vaccine_date,c.patient_edc FROM m_consult_mc_vaccine a,m_consult_mc_prenatal b,m_patient_mc c WHERE a.vaccine_id='TT5' AND a.patient_id='$pxid' AND a.patient_id=c.patient_id AND (TO_DAYS(c.patient_edc)-TO_DAYS(a.actual_vaccine_date)) <= 10000 AND a.actual_vaccine_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' ORDER by a.actual_vaccine_date DESC LIMIT 1") or die(mysql_error());
+				
+						if(mysql_num_rows($q_check_mc)!=0):
+							list($mcid,$vdate,$px_edc) = mysql_fetch_array($q_check_mc);
+							$month_stat[$this->get_max_month($vdate)]+=1;
+						endif;
+				/*	endif;
+					
+				endif; */
+							
+				$month_stat[$this->get_max_month($vacc_date)]+=1;
 			}
 
 			
