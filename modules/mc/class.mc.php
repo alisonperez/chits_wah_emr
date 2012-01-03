@@ -1649,20 +1649,10 @@ class mc extends module {
         }
         //if ($post_vars["prenatal_id"] && $post_vars["submitmc"] && $post_vars["visit_sequence"]) {
 	if ($post_vars["prenatal_id"] && $post_vars["submitmc"]) {
-            /*$sql = "select mc_id, patient_id, consult_id, patient_weight, prenatal_date, ".
-                   "blood_pressure_systolic, blood_pressure_diastolic, fundic_height, ".
-                   "presentation, fhr, fhr_location, trimester, visit_sequence, data_type, flag_private ".
-                   "from m_consult_mc_prenatal ".
-                   "where mc_id = '".$post_vars["prenatal_id"]."' and visit_sequence = '".$post_vars["visit_sequence"]."'";
-	    */ 
+            
+	    $result = mysql_query("SELECT mc_id, patient_id, consult_id, patient_weight, prenatal_date, blood_pressure_systolic, blood_pressure_diastolic, fundic_height, presentation, fhr, fhr_location, trimester, visit_sequence, data_type, flag_private FROM m_consult_mc_prenatal WHERE mc_id='$post_vars[prenatal_id]' AND visit_sequence='$post_vars[visit_sequence]'") or die("Cannot query: 1665: ".mysql_error());
 
-	    $sql = "select mc_id, patient_id, consult_id, patient_weight, prenatal_date, ".
-                   "blood_pressure_systolic, blood_pressure_diastolic, fundic_height, ".
-                   "presentation, fhr, fhr_location, trimester, visit_sequence, data_type, flag_private ".
-                   "from m_consult_mc_prenatal ".
-                   "where mc_id = '".$post_vars["prenatal_id"]."'";
-
-            if ($result = mysql_query($sql)) {
+            if ($result) {
                 if (mysql_num_rows($result)) {
                     $mc = mysql_fetch_array($result);
                     //print_r($mc);
@@ -1705,6 +1695,7 @@ class mc extends module {
                 $tail = "";
             }
             print "<form action = '".$_SERVER["SELF"]."?page=".$get_vars["page"]."&menu_id=".$get_vars["menu_id"]."&consult_id=".$get_vars["consult_id"]."&ptmenu=".$get_vars["ptmenu"]."&module=mc&mc=PREN&mc_id=$mc_id#$tail' name='form_mc_prenatal' method='post'>";
+            print "<a name='prenatal_form'>";
             print "<tr valign='top'><td>";
             print "<b>".FTITLE_MC_PRENATAL_FORM."</b><br/><br/>";
             print "</td></tr>";
@@ -1770,8 +1761,8 @@ class mc extends module {
             print mc::show_presentation($mc["presentation"]);
             print "</td></tr>";
             
-			/*
-			print "<tr valign='top'><td>";
+	    /*			
+            print "<tr valign='top'><td>";
             print "<span class='boxtitle'>".LBL_RISK_FACTORS." (risk factors shown are those that are marked for monitoring)</span> <br> ";
             if ($visit_sequence>1) {
                 if ($post_vars["prenatal_id"]) {
@@ -2904,7 +2895,7 @@ class mc extends module {
             }
             break;
         case "Update Record";
-
+        	
             $adr = ($post_vars["adr_flag"]?"Y":"N");
             list($month,$day,$year) = explode("/", $post_vars["actual_vaccine_date"]);
 
