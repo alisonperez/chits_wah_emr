@@ -931,7 +931,11 @@ class ccdev extends module {
                 $patient_id = healthcenter::get_patient_id($get_vars["consult_id"]);
                 $patient_dob = patient::get_dob($patient_id);
                 
-				$sql = "insert into m_patient_ccdev set patient_id='$patient_id',mother_name='$post_vars[mother_name]',mother_educ_id='$post_vars[mother_educ]',mother_occup_id='$post_vars[mother_occup]',father_name='$post_vars[father_name]',father_educ_id='$post_vars[father_educ]',father_occup_id='$post_vars[father_occup]',ccdev_timestamp='sysdate()',ccdev_dob='$patient_dob',birth_weight='$post_vars[birth_weight]',delivery_location='$post_vars[delivery_location]',date_registered='$_POST[ccdev_date_range]',mother_px_id='$_POST[mother_px_id]'";
+
+		list($m,$d,$y) = explode('/',$_POST["ccdev_date_reg"]);
+		$date_reg = $y.'-'.$m.'-'.$d;
+
+		$sql = "insert into m_patient_ccdev set patient_id='$patient_id',mother_name='$post_vars[mother_name]',mother_educ_id='$post_vars[mother_educ]',mother_occup_id='$post_vars[mother_occup]',father_name='$post_vars[father_name]',father_educ_id='$post_vars[father_educ]',father_occup_id='$post_vars[father_occup]',ccdev_timestamp='sysdate()',ccdev_dob='$patient_dob',birth_weight='$post_vars[birth_weight]',delivery_location='$post_vars[delivery_location]',date_registered='$date_reg',mother_px_id='$_POST[mother_px_id]'";
 
 				/*print $sql = "insert into m_patient_ccdev (patient_id, mother_name, mother_educ_id, mother_occup_id, father_name, father_educ_id, father_occup_id, ccdev_timestamp, ccdev_dob, birth_weight, delivery_location, date_registered,mother_px_id) ".
                        "values ('$patient_id', '".$post_vars["mother_name"]."', '".$post_vars["mother_educ"]."', '".$post_vars["mother_occup"]."', ".
@@ -940,7 +944,7 @@ class ccdev extends module {
                 */
 				
 				if ($result = mysql_query($sql)) {
-                    header("location: ".$_SERVER["PHP_SELF"]."?page=".$get_vars["page"]."&menu_id=".$get_vars["menu_id"]."&consult_id=".$get_vars["consult_id"]."&ptmenu=".$get_vars["ptmenu"]."&module=".$get_vars["module"]."&ccdev=VISIT1");
+                    //header("location: ".$_SERVER["PHP_SELF"]."?page=".$get_vars["page"]."&menu_id=".$get_vars["menu_id"]."&consult_id=".$get_vars["consult_id"]."&ptmenu=".$get_vars["ptmenu"]."&module=".$get_vars["module"]."&ccdev=VISIT1");
                 }
 
             }
@@ -1109,7 +1113,7 @@ class ccdev extends module {
 		
         
 		
-		print "<a name='visit'>";
+	print "<a name='visit'>";
         print "<table width='400'>";
         print "<form action = '".$_SERVER["SELF"]."?page=".$get_vars["page"]."&menu_id=$menu_id&consult_id=".$get_vars["consult_id"]."&ptmenu=".$get_vars["ptmenu"]."&module=".$get_vars["module"]."&ccdev=VISIT1' name='form_consult_ccdev' method='post'>";
 		

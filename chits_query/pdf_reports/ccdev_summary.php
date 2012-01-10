@@ -1064,7 +1064,7 @@ function get_lbw($ccdev_id){
 		$sdate = ($lbw_sdate=='0000-00-00')?' - ':$lbw_sdate;
 		$edate = ($lbw_edate=='0000-00-00')?' - ':$lbw_edate;
 
-		if($bwt<0.25):
+		if($bwt<2.5):
 			$lbw_status = 'lbw';
 		else:
 			$lbw_status = 'normal';
