@@ -12,7 +12,7 @@ echo "</head>";
     $dbconn = mysql_connect('localhost',$_SESSION["dbuser"],$_SESSION["dbpass"]) or die("Cannot query 4 ".mysql_error());
     mysql_select_db($_SESSION["dbname"],$dbconn) or die("cannot select db");
 
-    if($_POST['btn_bhs']): print_r($_POST['brgy_bhs']);
+    if($_POST['btn_bhs']): 
 	$q_bhs = mysql_query("INSERT INTO m_lib_bhs SET bhs_name='$_POST[txt_bhs]',barangay_id='$_POST[sel_brgy]',user_id='$_POST[sel_user]',facility_id='$_GET[facid]'") or die("Cannot query 12: ".mysql_error());
 
 	$bhs_id = mysql_insert_id();
