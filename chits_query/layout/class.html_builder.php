@@ -128,17 +128,28 @@ class html_builder{
 	}
 
 	function get_colspan(){
-		switch($_SESSION["ques"]){
+		/*switch($_SESSION["ques"]){
 			case '51':
 				return '3';
 				break;
 			case '92':
 				return '3';
 				break;
+			case ''
 			default:
 				return '2';
 				break;
-		}
+		}*/
+
+
+		//if($_SESSION["ques"]=='51' || $_SESSION["ques"]=='92' || $_SESSION["ques"]=='120' || $_SESSION["ques"]=='121' || $_SESSION["ques"]=='122' || $_SESSION["ques"]=='123'):
+		if($_SESSION["ques"]=='51' || $_SESSION["ques"]=='92'):
+			return '3';
+		elseif($_SESSION["ques"]=='120' || $_SESSION["ques"]=='121' || $_SESSION["ques"]=='122' || $_SESSION["ques"]=='123'):
+			return '5';
+		else:
+			return '2';
+		endif;
 	}
 
 

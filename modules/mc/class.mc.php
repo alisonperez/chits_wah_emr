@@ -713,7 +713,7 @@ class mc extends module {
                 break;
 
 
-		case "Update Postpartum Data Form":
+		case "Update Postpartum Data Form":			
 			break;
 
 		case "Update Postpartum":
@@ -2661,7 +2661,7 @@ class mc extends module {
                 if ($get_vars["mc_id"]==$mc["mc_id"]) {
                     print "<a name='prenatal_detail'>";
                     $bgcolor = ($get_vars["consult_id"]==$mc["consult_id"]?"#FFFFCC":"#FFFFFF");
-                    print "<form method='post' action='".$_SERVER["PHP_SELF"]."?page=".$get_vars["page"]."&menu_id=".$get_vars["menu_id"]."&consult_id=".$get_vars["consult_id"]."&ptmenu=DETAILS&module=mc&mc=PREN".($get_vars["mc_id"]?"&mc_id=".$get_vars["mc_id"]."&visitseq=".$get_vars["visitseq"]."#visit1form":"")."'>";
+                    print "<form method='post' action='".$_SERVER["PHP_SELF"]."?page=".$get_vars["page"]."&menu_id=".$get_vars["menu_id"]."&consult_id=".$get_vars["consult_id"]."&ptmenu=DETAILS&module=mc&mc=PREN".($get_vars["mc_id"]?"&mc_id=".$get_vars["mc_id"]."&visitseq=".$get_vars["visitseq"]."#prenatal":"")."'>";
                     print "<table bgcolor='$bgcolor' width='280' style='border: 1px dotted black'><tr><td>";
                     print "<span class='tinylight'>";
                     //print ($mc["data_type"]=="EXT"?"<font color='red'><b>DATA FROM EXTERNAL RECORDS</b></font><br/>":"")."";
@@ -2838,8 +2838,8 @@ class mc extends module {
 						endif;
 						echo "</script>";
 
-/*				else:
-					echo 'b';
+				/*				else:
+			
 						echo "<script language='Javascript'>";
 						echo "window.alert('Service was not updated. Actual date of service already exists.')";
 						echo "</script>";									
