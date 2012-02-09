@@ -302,6 +302,8 @@ class querydb{
 			$ret_file = $this->process_philhealth_consult($quesno);
                 elseif($quesno>=120 && $quesno<=123): 
                         $ret_file = $this->process_natality($quesno);
+		elseif($quesno>=124 && $quesno<=127):
+			$ret_file = $this->process_natality($quesno);
 		else:
 			echo "No available query for this indicator.";
 		endif;

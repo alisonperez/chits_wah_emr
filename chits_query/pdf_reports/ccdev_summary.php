@@ -128,7 +128,7 @@ function Header()
 
 	$municipality_label = $_SESSION[datanode][name];
 	
-	$this->SetFont('Arial','B',12);		
+	$this->SetFont('Arial','B',12);	
 	
 	if($_SESSION[ques]==39):
 	
