@@ -89,8 +89,8 @@ foreach($arr as $key1=>$value1){
 								$alerto = $after;
 							endif;
 
-							$alerto = str_replace('$name',$lname.', '.$fname,$alerto);
-							$alerto = str_replace('$date',$case_date,$alerto);
+							$alerto = str_replace('$name',$lname.', '.$fname,$alerto);	//replace $name with px name
+							$alerto = str_replace('$date',$case_date,$alerto);		//replace $date with px date
 						else:
 							$alerto = '&nbsp;&nbsp;-&nbsp;&nbsp;';
 						endif;
