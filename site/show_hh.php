@@ -56,7 +56,7 @@ foreach($arr as $key1=>$value1){
 				list($lname,$fname,$cp) = mysql_fetch_array($q_name);
 				$cp = (empty($cp)?'No cellphone number':$cp);
 				echo "<tr><td valign='top'>";
-				echo $lname.', '.$fname.'<br>'.'('.$cp.')';	
+				echo $lname.', '.$fname.'<br>'.'('.$cp.')';
 				echo "</td>";
 
 				echo "<td>";
@@ -69,7 +69,8 @@ foreach($arr as $key1=>$value1){
 						
 						$q_alert = mysql_query("SELECT sub_indicator FROM m_lib_alert_indicators WHERE alert_indicator_id='$ind_id'") or die("Cannot query 60 ".mysql_error());
 						
-						$q_alert_msg = mysql_query("SELECT alert_message, alert_action FROM m_lib_alert_type WHERE alert_indicator_id='$ind_id'") or die("Cannot query 62 ".mysql_error());
+						
+						$q_alert_msg = mysql_query("SELECT alert_message, alert_action, alert_actual_message FROM m_lib_alert_type WHERE alert_indicator_id='$ind_id'") or die("Cannot query 62 ".mysql_error());
 
 						list($sub_ind) = mysql_fetch_array($q_alert);
 
@@ -78,8 +79,18 @@ foreach($arr as $key1=>$value1){
 						echo "</td>";
 						
 						if(mysql_num_rows($q_alert_msg)!=0):
-							list($alert_msg,$alert_action) = mysql_fetch_array($q_alert_msg);
-							$alerto = $alert_msg.' '.$alert_action.' '.'<b>'.$case_id[1].'</b>';
+							list($pre,$after, $during) = mysql_fetch_array($q_alert_msg);
+							if(date('Y-m-d')==$case_date):
+								//$alerto = $alert_msg.' '.$alert_action.' '.'<b>'.$case_id[1].'</b>';
+								$alerto = $during;
+							elseif(date('Y-m-d') < $case_date):
+								$alerto = $pre;
+							else:
+								$alerto = $after;
+							endif;
+
+							$alerto = str_replace('$name',$lname.', '.$fname,$alerto);
+							$alerto = str_replace('$date',$case_date,$alerto);
 						else:
 							$alerto = '&nbsp;&nbsp;-&nbsp;&nbsp;';
 						endif;
