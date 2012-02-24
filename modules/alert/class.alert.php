@@ -14,7 +14,7 @@ class alert extends module{
 		$this->year = date('Y');
 		$this->morb_wk = $this->get_wk_num();
 
-		$this->arr_dep = array("DPT2"=>array('DPT1','30'),"DPT3"=>array('DPT2','30'),"OPV2"=>array('OPV1','30'),"OPV3"=>array('OPV2','30'),"HEPAB2"=>array('HEPAB1','42'),"HEPAB3"=>array('HEPAB2','56')); //first argument contains the antigen and second contains the 
+		$this->arr_dep = array("DPT2"=>array('DPT1','30'),"DPT3"=>array('DPT2','30'),"OPV2"=>array('OPV1','30'),"OPV3"=>array('OPV2','30'),"HEPB2"=>array('HEPB1','42'),"HEPB3"=>array('HEPB2','56')); //first argument contains the antigen and second contains the 
 	}
 
 

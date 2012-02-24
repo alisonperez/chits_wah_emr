@@ -304,6 +304,8 @@ class querydb{
                         $ret_file = $this->process_natality($quesno);
 		elseif($quesno>=124 && $quesno<=127):
 			$ret_file = $this->process_natality($quesno);
+		elseif($quesno>=150 && $quesno<=155):
+			$ret_file = $this->process_alert($quesno);
 		else:
 			echo "No available query for this indicator.";
 		endif;
@@ -1022,6 +1024,41 @@ class querydb{
 			echo "<font color='red'>No result/s found.</font>";
 		endif;
 	}
+
+
+	function process_alert($quesno){
+
+		list($sm,$sd,$sy) = explode('/',$_POST[sdate]);
+		list($em,$ed,$ey) = explode('/',$_POST[edate]);
+
+		$sdate = $sy.'-'.$sm.'-'.$sd;
+		$edate = $ey.'-'.$em.'-'.$ed;
+
+		switch($quesno){ 
+			case '150': //prenatal alerts //dates should enclosed the LMPs
+
+				if($_POST['sel_brgy']=='all'):
+					$q_alert = mysql_query("SELECT a.enroll_id FROM m_lib_sms_px_enroll a, m_patient_mc b,m_family_members c, m_family_address d WHERE a.program_id='mc' AND a.patient_id=b.patient_id AND b.patient_lmp BETWEEN '$sdate' AND '$edate' AND a.patient_id=c.patient_id AND c.family_id=d.family_id AND d.barangay_id='$_POST[sel_brgy]' ORDER by b.patient_lmp") or die("Cannot query 1041: ".mysql_error()); 
+				else:
+					$q_alert = mysql_query("SELECT a.enroll_id FROM m_lib_sms_px_enroll a, m_patient_mc b, m_family_members c, m_family_address d WHERE a.program_id='mc' AND a.m_patient_id=b.m_patient_id AND b.patient_lmp BETWEEN '$sdate' AND '$edate' AND a.patient_id=c.patient_id AND c.family_id=d.family_id AND d.barangay_id='$_POST[sel_brgy]' ORDER by b.patient_lmp") or die("Cannot query 1043: ".mysql_error());
+				endif;
+
+				if(mysql_num_rows($q_alert)!=0):
+					echo mysql_num_rows($q_alert);
+				endif;
+
+				break;
+
+			case '151':
+
+				break;
+			default:
+
+				break;
+			
+		}
+	}
+
 
 
 	function display_icons($file_to_call){

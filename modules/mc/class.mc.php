@@ -831,7 +831,7 @@ class mc extends module {
             case "Save Data":
                 if ($post_vars["lmp_date"] && $post_vars["obscore_gp"] && $post_vars["obscore_fpal"] && $post_vars["patient_height"]) {
 
-		$sql = "INSERT INTO m_patient_mc SET patient_id='$patient_id',consult_id='$get_vars[consult_id]',mc_timestamp=sysdate(),mc_consult_date=sysdate(),patient_lmp='$lmp_date',patient_edc=from_days(to_days('$lmp_date')+280),trimester1_date=from_days(to_days('$lmp_date')+93.3),trimester2_date=from_days(to_days('$lmp_date')+186.67),trimester3_date=from_days(to_days('$lmp_date')+280),postpartum_date=from_days(to_days('$lmp_date')+322),obscore_gp='$post_vars[obscore_gp]',obscore_fpal='$post_vars[obscore_fpal]',user_id='$_SESSION[userid]',blood_type='$post_vars[bloodtype]',patient_age='$patient_age',patient_height='$post_vars[patient_height]'";
+		$sql = "INSERT INTO m_patient_mc SET patient_id='$patient_id',consult_id='$get_vars[consult_id]',mc_timestamp=sysdate(),mc_consult_date=sysdate(),patient_lmp='$lmp_date',patient_edc=from_days(to_days('$lmp_date')+280),trimester1_date=from_days(to_days('$lmp_date')+84),trimester2_date=from_days(to_days('$lmp_date')+168),trimester3_date=from_days(to_days('$lmp_date')+280),postpartum_date=from_days(to_days('$lmp_date')+322),obscore_gp='$post_vars[obscore_gp]',obscore_fpal='$post_vars[obscore_fpal]',user_id='$_SESSION[userid]',blood_type='$post_vars[bloodtype]',patient_age='$patient_age',patient_height='$post_vars[patient_height]'";
 
 		$result = mysql_query($sql) or die("Cannot query 845".mysql_error());
 
@@ -887,8 +887,8 @@ class mc extends module {
                     $sql = "update m_patient_mc set ".
                            "patient_lmp = '$lmp_date', ".
                            "patient_edc = from_days(to_days('$lmp_date')+280), ".
-                           "trimester1_date = from_days(to_days('$lmp_date')+93.3), ".
-                           "trimester2_date = from_days(to_days('$lmp_date')+186.67), ".
+                           "trimester1_date = from_days(to_days('$lmp_date')+84), ".
+                           "trimester2_date = from_days(to_days('$lmp_date')+168), ".
                            "trimester3_date = from_days(to_days('$lmp_date')+280), ".
                            "postpartum_date = from_days(to_days('$lmp_date')+322), ".
                            "mc_timestamp = sysdate(), ".
@@ -1134,7 +1134,7 @@ class mc extends module {
 
 						$patient_id = healthcenter::get_patient_id($_GET[consult_id]);
 
-						$sql = "insert into m_patient_mc SET patient_id='$patient_id',consult_id='$_GET[consult_id]',patient_lmp=from_days(to_days('$delivery_date')-280),trimester1_date=from_days(to_days('$delivery_date')-186.7),trimester2_date=from_days(to_days('$delivery_date')-93.3),trimester3_date=from_days(to_days('$delivery_date')),mc_timestamp=sysdate(),mc_consult_date=sysdate(),patient_edc='$delivery_date',delivery_date='$delivery_date',postpartum_date=from_days(to_days('$delivery_date')+42),obscore_gp='$post_vars[obscore_gp]',obscore_fpal='$post_vars[obscore_fpal]',birthweight='$post_vars[birth_weight]',child_patient_id='$post_vars[child_patient_id]',delivery_location='$post_vars[delivery_location]',outcome_id='$post_vars[outcome]',healthy_baby='$health_baby',end_pregnancy_flag='$end_pregnancy',breastfeeding_asap='$breastfeeding',date_breastfed='$bfeed_date',birthmode='$post_vars[attendant]'";
+						$sql = "insert into m_patient_mc SET patient_id='$patient_id',consult_id='$_GET[consult_id]',patient_lmp=from_days(to_days('$delivery_date')-280),trimester1_date=from_days(to_days('$delivery_date')-168),trimester2_date=from_days(to_days('$delivery_date')-84),trimester3_date=from_days(to_days('$delivery_date')),mc_timestamp=sysdate(),mc_consult_date=sysdate(),patient_edc='$delivery_date',delivery_date='$delivery_date',postpartum_date=from_days(to_days('$delivery_date')+42),obscore_gp='$post_vars[obscore_gp]',obscore_fpal='$post_vars[obscore_fpal]',birthweight='$post_vars[birth_weight]',child_patient_id='$post_vars[child_patient_id]',delivery_location='$post_vars[delivery_location]',outcome_id='$post_vars[outcome]',healthy_baby='$health_baby',end_pregnancy_flag='$end_pregnancy',breastfeeding_asap='$breastfeeding',date_breastfed='$bfeed_date',birthmode='$post_vars[attendant]'";
 						
 						//$sql = "insert into m_patient_mc SET patient_id='$patient_id',consult_id='$_GET[consult_id]',patient_lmp=from_days(to_days('$delivery_date')-280),trimester1_date=from_days(to_days('$delivery_date')-186.7),trimester2_date=from_days(to_days('$delivery_date')-93.3),trimester3_date=from_days(to_days('$delivery_date')),mc_timestamp=sysdate(),mc_consult_date=sysdate(),delivery_date='$delivery_date',patient_edc='$date_delivery',postpartum_date=from_days(to_days('$delivery_date')+42),obscore_gp='$post_vars[obscore_gp]',obscore_fpal='$post_vars[obscore_fpal]',birthweight='$post_vars[birth_weight]',child_patient_id='$post_vars[child_patient_id]',delivery_location='$post_vars[delivery_location]',outcome_id='$post_vars[outcome]',healthy_baby='$health_baby',end_pregnancy_flag='$end_pregnancy',breastfeeding_asap='$breastfeeding',date_breastfed='$bfeed_date',birthmode='$post_vars[attendant]'";
 
