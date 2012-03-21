@@ -573,16 +573,17 @@ function compute_indicator($crit){
 					$iron_total = 0;
 					$target_reach = 0;
 
-				$q_mc = mysql_query("SELECT a.service_qty, a.actual_service_date FROM m_consult_mc_services a,m_patient_mc b WHERE a.mc_id=b.mc_id AND a.mc_id='$mcid' AND a.service_id='IRON' AND a.actual_service_date BETWEEN b.delivery_date AND '$_SESSION[edate2]' AND (TO_DAYS(a.actual_service_date)-TO_DAYS(b.delivery_date))<=93 AND b.delivery_date!='0000-00-00' ORDER by a.actual_service_date ASC") or die("Cannot query; 277 ".mysql_error());
+				$q_mc = mysql_query("SELECT a.service_qty, a.actual_service_date, b.delivery_date FROM m_consult_mc_services a,m_patient_mc b WHERE a.mc_id=b.mc_id AND a.mc_id='$mcid' AND a.service_id='IRON' AND a.actual_service_date BETWEEN b.delivery_date AND '$_SESSION[edate2]' AND (TO_DAYS(a.actual_service_date)-TO_DAYS(b.delivery_date)) BETWEEN 0 AND 93 AND b.delivery_date!='0000-00-00' ORDER by a.actual_service_date ASC") or die("Cannot query; 277 ".mysql_error());
 					
-					
-					while(list($qty,$serv_date)=mysql_fetch_array($q_mc)){
+					while(list($qty,$serv_date,$delivery_date)=mysql_fetch_array($q_mc)){
 						//echo $mcid.'/'.$qty.'/'.$serv_date.'<br>';
-						$iron_total+=$qty;
-						if($iron_total >= 90 && $target_reach==0):							
-							$target_reach = 1;
-							$month_stat[$this->get_max_month($serv_date)]+=1;
+						if((strtotime($serv_date) - strtotime($delivery_date)) >= 0):
+							$iron_total+=$qty;
+							if($iron_total >= 90 && $target_reach==0):							
+								$target_reach = 1;
+								$month_stat[$this->get_max_month($serv_date)]+=1;
 							//echo $max_date.'<br>'.$mcid;
+							endif;
 						endif;
 					}				
 				}
@@ -727,8 +728,8 @@ function get_brgy(){
 	}	        
 
 	}                
-    endif;                                                                         
-                                                                          
+    endif;
+
     return $str_brgy;
 }
 

@@ -355,7 +355,7 @@ class querydb{
 			endif;
 
 			echo "</tr>";
-		}	
+		}
 		
 		if($col==1):
 		
