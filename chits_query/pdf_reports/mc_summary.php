@@ -238,7 +238,7 @@ function show_mc_summary(){
 
                 if($_SESSION[ques]==36):
                     $w = array(30,18,18,18,18,15,18,18,18,15,18,18,18,15,18,18,18,15,18); //340
-                    $this->SetWidths($w);                		
+                    $this->SetWidths($w);
 
 		    array_push($arr_consolidate,array($criteria[$i],$target,$mstat[1],$mstat[2],$mstat[3],$q_array[1],$mstat[4],$mstat[5],$mstat[6],$q_array[2],$mstat[7],$mstat[8],$mstat[9],$q_array[3],$mstat[10],$mstat[11],$mstat[12],$q_array[4],$gt));
 
@@ -307,7 +307,8 @@ function compute_indicator($crit){
 		switch($crit){
 
 		case 1: //pregnant with 4 or more prenatal visits
-				
+			$anc_name_px = array();
+
 //				if(in_array('all',$_SESSION[brgy])):
 			$get_visits = mysql_query("SELECT distinct mc_id,patient_id,MIN(prenatal_date) FROM m_consult_mc_prenatal WHERE visit_sequence >=  4 AND trimester=3 AND prenatal_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' GROUP by mc_id") or die("Cannot query: 186");
 //				else:
@@ -473,18 +474,24 @@ function compute_indicator($crit){
 					$iron_total = 0;
 					$target_reach = 0; //reset the flag target reach for every mc_id
 
-					$q_mc = mysql_query("SELECT a.service_qty, a.actual_service_date FROM m_consult_mc_services a,m_patient_mc b WHERE a.mc_id=b.mc_id AND a.mc_id='$mcid' AND a.service_id='IRON' AND a.actual_service_date BETWEEN b.patient_lmp AND '$_SESSION[edate2]' AND a.actual_service_date<=b.patient_edc ORDER by a.actual_service_date ASC") or die("Cannot query; 277");
+					$q_mc = mysql_query("SELECT a.service_qty, a.actual_service_date, b.delivery_date FROM m_consult_mc_services a,m_patient_mc b WHERE a.mc_id=b.mc_id AND a.mc_id='$mcid' AND a.service_id='IRON' AND a.actual_service_date BETWEEN b.patient_lmp AND '$_SESSION[edate2]' AND a.actual_service_date<=b.patient_edc ORDER by a.actual_service_date ASC") or die("Cannot query; 277");
 
 
-					while(list($qty,$serv_date)=mysql_fetch_array($q_mc)){
+					while(list($qty,$serv_date,$delivery_date)=mysql_fetch_array($q_mc)){
+
+						if($delivery_date=='0000-00-00' || ((strtotime($delivery_date) - strtotime($serv_date)) > 0)):
 						//echo $mcid.'/'.$qty.'/'.$serv_date.'<br>';
-						$iron_total+=$qty;
-						if($iron_total >= 180 && $target_reach==0):
-							$target_reach = 1;
-							list($taon,$buwan,$araw) = explode('-',$serv_date);
-							$max_date = date("n",mktime(0,0,0,$buwan,$araw,$taon)); //get the unix timestamp then return month without trailing 0
-							$month_stat[$max_date]+=1;
-							//echo $max_date.'<br>'.$mcid;
+							$iron_total+=$qty;
+							$s_serv_date = strtotime($serv_date) - strtotime($_SESSION["sdate2"]); //from date of service - minus start date of range
+							$e_serv_date = strtotime($_SESSION["edate2"]) - strtotime($serv_date); //from end date minus date of service
+
+							if($iron_total >= 180 && $target_reach==0 && $s_serv_date>=0 && $e_serv_date>=0):
+								$target_reach = 1;
+								list($taon,$buwan,$araw) = explode('-',$serv_date);
+								$max_date = date("n",mktime(0,0,0,$buwan,$araw,$taon)); //get the unix timestamp then return month without trailing 0
+								$month_stat[$max_date]+=1;
+								//echo $max_date.'<br>'.$mcid;
+							endif;
 						endif;
 					}
 				}
@@ -505,16 +512,22 @@ function compute_indicator($crit){
 				while(list($mcid,$pxid)=mysql_fetch_array($get_vita)){
 					$vit_total = 0;
 					$target_reach = 0;
-						$q_mc = mysql_query("SELECT a.service_qty, a.actual_service_date FROM m_consult_mc_services a,m_patient_mc b WHERE a.mc_id=b.mc_id AND a.mc_id='$mcid' AND a.service_id='VITA' AND a.actual_service_date BETWEEN b.patient_lmp AND '$_SESSION[edate2]' AND a.actual_service_date <= b.patient_edc ORDER by a.actual_service_date ASC") or die("Cannot query; 277");
+						//$q_mc = mysql_query("SELECT a.service_qty, a.actual_service_date,b.delivery_date FROM m_consult_mc_services a,m_patient_mc b WHERE a.mc_id=b.mc_id AND a.mc_id='$mcid' AND a.service_id='VITA' AND a.actual_service_date BETWEEN b.patient_lmp AND '$_SESSION[edate2]' AND a.actual_service_date <= b.patient_edc ORDER by a.actual_service_date ASC") or die("Cannot query; 277");
+						$q_mc = mysql_query("SELECT a.service_qty, a.actual_service_date,b.delivery_date FROM m_consult_mc_services a,m_patient_mc b WHERE a.mc_id=b.mc_id AND a.mc_id='$mcid' AND a.service_id='VITA' AND a.actual_service_date BETWEEN b.patient_lmp AND '$_SESSION[edate2]' AND a.actual_service_date <= b.patient_edc ORDER by a.actual_service_date ASC") or die("Cannot query; 514");
 
-					while(list($qty,$serv_date)=mysql_fetch_array($q_mc)){
+					while(list($qty,$serv_date,$delivery_date)=mysql_fetch_array($q_mc)){
+						//echo $delivery_date.' '.$serv_date.' '.$_SESSION[edate2].' '.(strtotime($delivery_date) - strtotime($serv_date)).'<br>';
+				
+						if($delivery_date=='0000-00-00' || ((strtotime($delivery_date) - strtotime($serv_date)) > 0)):
+							$vita_total+=$qty;
+							$s_serv_date = strtotime($serv_date) - strtotime($_SESSION["sdate2"]); //from date of service - minus start date of range
+							$e_serv_date = strtotime($_SESSION["edate2"]) - strtotime($serv_date); //from end date minus date of service
 
-						$vita_total+=$qty;
-
-						if($vita_total >= 200000 && $target_reach==0):				
-							$target_reach = 1;
-							$month_stat[$this->get_max_month($serv_date)]+=1;
-							//echo $max_date.'<br>'.$mcid;
+							if($vita_total >= 200000 && $target_reach==0 && $s_serv_date>=0 && $e_serv_date>=0):
+								$target_reach = 1;
+								$month_stat[$this->get_max_month($serv_date)]+=1;
+								//echo $max_date.'<br>'.$mcid;
+							endif;
 						endif;
 					}
 				}			
