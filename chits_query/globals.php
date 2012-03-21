@@ -1,13 +1,13 @@
 <?
   session_start();
   
-  $dbname = 'chits_server';
+  $dbname = 'moncada_0125';
   #$dbname2 = 'chitsquery';
   $_SESSION["query"] = $dbname;
-  $dbuser = $_SESSION["dbuser"];
-  $dbpwd = $_SESSION["dbpass"];
+  $dbuser = "root";
+  $dbpwd = "root";
   $_SESSION["province"] = "Tarlac";
-  $_SESSION["lgu"] = "Sample LGU";
+  $_SESSION["lgu"] = "Paniqui";
   $dbconn = mysql_connect("localhost",$dbuser,$dbpwd) or die(mysql_error());
   mysql_select_db($dbname,$dbconn);
 ?>

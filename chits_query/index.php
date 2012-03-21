@@ -72,6 +72,7 @@ if($_SESSION["userid"]!=""):
       echo "<br><br>";
 
 	if(isset($_SESSION[ques]) || $_POST[q_submit]):
+		unset($_SESSION["arr_px_labels"]);
 	      $widconn->query_cat($dbname,$dbname2,$_POST[sdate],$_POST[edate],$_POST[sel_brgy]);
 	endif;
 

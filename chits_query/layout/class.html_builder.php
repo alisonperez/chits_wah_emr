@@ -17,6 +17,9 @@ class html_builder{
       		$this->appName="HTML Builder";
       		$this->appVersion="0.13";
       		$this->appAuthor="Alison Perez";
+
+		list($this->syear,$this->smonth,$this->sdate) = explode('-',$_SESSION["sdate2"]);
+		list($this->eyear,$this->emonth,$this->emonth) = explode('-',$_SESSION["edate2"]);
 	}
 
 	function create_table($width,$header,$cell_contents){
@@ -40,8 +43,6 @@ class html_builder{
 		else: 
 			echo "No data found";
 		endif;
-		
-		
 
 		/*print_r($width);
 		print_r($header);
@@ -52,7 +53,6 @@ class html_builder{
 		print_r($width);
 		print_r($header);
 		print_r($cell_contents);*/
-
 	}
 
 	function display_col_header($header,$width){
@@ -87,17 +87,32 @@ class html_builder{
 	}
 
 	function display_cell_content($cell_contents,$width){
+		//print_r($_SESSION["arr_px_labels"]);
+		$arr_px_labels = $_SESSION["arr_px_labels"];
 		
 		foreach($cell_contents as $key=>$value){
 			echo "<tr style='background-color: #666666; color: #FFFF66; font-weight:bold; white-space: nowrap; font-size: 19px;'>";
 
 			for($i=0;$i<count($value);$i++){
+				$arr_names = array();
 				//if($this->lookup_ques_for_colspan() && $i<$this->where_to_colspan()):
 				//	echo "<td colspan='2'>";
 				//else:
 					echo "<td>";
 				//endif;
-				echo $value[$i];
+				if(!empty($arr_px_labels)):
+					if($i!=0 && $value[$i]!=0):
+						$arr_names = $this->return_px_names(((($key*2)+$i)-1),$arr_px_labels);
+						$ser_arr_names = serialize($this->return_px_names(((($key*2)+$i)-1),$arr_px_labels)); 
+
+						echo "<a href='../../site/disp_name.php?id=$ser_arr_names&cat=$value[0]' target='new'>".$value[$i]."</a>";
+						
+					else:
+						echo $value[$i];
+					endif;
+				else:
+					echo $value[$i];
+				endif;
 				echo "</td>";
 			}
 
@@ -105,6 +120,24 @@ class html_builder{
 
 		}
 
+	}
+
+	function return_px_names($cell_num,$arr_px_labels){
+		$arr_px_names = array();
+		//echo $cell_num;
+		//print_r($arr_px_labels[$cell_num]);
+
+		for($i=$this->smonth;$i<=$this->emonth;$i++){
+			foreach($arr_px_labels[$cell_num] as $key=>$value){
+				if(!empty($value)):
+					foreach($value as $key2=>$value2){
+						array_push($arr_px_names,$value2);
+					}
+				endif;
+			}
+		}
+		
+		return $arr_px_names;
 	}
 
 	function lookup_ques_for_colspan(){

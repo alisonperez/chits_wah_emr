@@ -311,12 +311,12 @@ function show_ccdev_summary(){
                                             $this->Cell($header[1],6,' ','1',0,'L');
                                             $this->Cell($header[2],6,' ','1',0,'L');
                                             $this->Ln();
-                                            $counter = 1;                                            
+                                            $counter = 1;
                                         endif;
                                         $this->Cell($header[$x],6,$m_arr[$x],'1',0,'L');
                                     }
 
-                                    $this->Ln();                                    
+                                    $this->Ln();
                                     //$this->Row(array($disp_arr[0],$disp_arr[$m_index[$_SESSION[smonth]][0]],$disp_arr[$m_index[$_SESSION[smonth]][1]]));                                
                                 elseif($_SESSION[ques]==51):
                                     $total_q = $disp_arr[$q_index[$_SESSION[quarter]][0]] + $disp_arr[$q_index[$_SESSION[quarter]][1]];
@@ -401,9 +401,9 @@ function show_ccdev_summary(){
                             }
                             $this->Ln();
                         else:
-                            
+
                         endif;
-                        
+
                         //print_r($disp_arr);
 
 		endif;
@@ -438,6 +438,7 @@ function compute_indicators(){
 		switch($crit){
 			case 1:
 				$arr_antigen = array();
+				$arr_antigen_px = array();
 
 				foreach($sub_arr_crit as $antigen_label=>$antigen_array){
 					
@@ -445,7 +446,9 @@ function compute_indicators(){
 					
 					foreach($arr_gender as $key2=>$value2){
 
-					$month_stat = array(1=>0,2=>0,3=>0,4=>0,5=>0,6=>0,7=>0,8=>0,9=>0,10=>0,11=>0,12=>0);					
+					$month_stat = array(1=>0,2=>0,3=>0,4=>0,5=>0,6=>0,7=>0,8=>0,9=>0,10=>0,11=>0,12=>0);
+					$month_stat_px = array(1=>array(),2=>array(),3=>array(),4=>array(),5=>array(),6=>array(),7=>array(),8=>array(),9=>array(),10=>array(),11=>array(),12=>array());
+
 					if($key=='HEPB1<24'):
 						$q_antigen = mysql_query("SELECT a.actual_vaccine_date,a.vaccine_id,b.patient_id FROM m_consult_vaccine a,m_patient b WHERE a.patient_id=b.patient_id AND (TO_DAYS(a.actual_vaccine_date)-TO_DAYS(b.patient_dob)) <= 1 AND a.vaccine_id='HEPB1' AND a.actual_vaccine_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' AND b.patient_gender='$value2'") or die(mysql_error());
 					elseif($key=='HEPB1>24'):
@@ -458,20 +461,19 @@ function compute_indicators(){
 					if(mysql_num_rows($q_antigen)!=0):
 						while(list($actual_vaccine_date,$vaccine_id,$patient_id)=mysql_fetch_array($q_antigen)){
 							if($this->get_px_brgy($patient_id,$brgy_array)):
-								if($key=='MSL'):
-									echo 'MSL '.$patient_id.'<br>';
-								endif;
 								$month_stat[$this->get_max_month($actual_vaccine_date)] += 1;
+								array_push($month_stat_px[$this->get_max_month($actual_vaccine_date)],array($patient_id,$vaccine_id));
 							endif;
 						}
 					endif;
-							
+					
+					array_push($arr_antigen_px,$month_stat_px);
 					array_push($arr_antigen,$month_stat);
 					//echo '/'.$key.'/'.array_sum($month_stat).'<br>';
 					}
-					
 					}
 				}
+				$_SESSION["arr_px_labels"] = $arr_antigen_px; 
 				return $arr_antigen;
 				break;
 			
@@ -770,11 +772,14 @@ function compute_indicators(){
 
 		switch($crit){
 			case 2: // fully immunized child
-				
-				for($sex=0;$sex<count($arr_gender);$sex++){
+				$fic_name_px = array();
+
+				for($sex=0;$sex<=count($arr_gender);$sex++){
 
 				$month_stat = array(1=>0,2=>0,3=>0,4=>0,5=>0,6=>0,7=>0,8=>0,9=>0,10=>0,11=>0,12=>0);
-				$q_cic = mysql_query("SELECT DISTINCT a.patient_id, MAX(b.actual_vaccine_date),floor((TO_DAYS(MAX(b.actual_vaccine_date)) - TO_DAYS(a.patient_dob))/30) days_vacc,a.patient_dob FROM m_patient a,m_consult_vaccine b WHERE a.patient_id=b.patient_id AND a.patient_gender='$arr_gender[$sex]' AND b.vaccine_id IN ('BCG','DPT1','DPT2','DPT3','HEPB1','HEPB2','HEPB3','MSL','OPV1','OPV2','OPV3') GROUP by a.patient_id") or die(mysql_query());
+				$month_stat_px = array(1=>array(),2=>array(),3=>array(),4=>array(),5=>array(),6=>array(),7=>array(),8=>array(),9=>array(),10=>array(),11=>array(),12=>array());
+
+				$q_cic = mysql_query("SELECT DISTINCT a.patient_id, MAX(b.actual_vaccine_date),floor((TO_DAYS(MAX(b.actual_vaccine_date)) - TO_DAYS(a.patient_dob))/30) days_vacc,a.patient_dob FROM m_patient a,m_consult_vaccine b WHERE a.patient_id=b.patient_id AND a.patient_gender='$arr_gender[$sex]' AND b.vaccine_id IN ('BCG','DPT1','DPT2','DPT3','HEPB1','HEPB2','HEPB3','MSL','OPV1','OPV2','OPV3') GROUP by a.patient_id ORDER BY a.patient_dob ASC") or die(mysql_query());
 				
 					while(list($pxid,$actual_vaccine_date,$day_vacc,$patient_dob)=mysql_fetch_array($q_cic)){
 						list($staon,$sbuwan,$sdate) = explode('-',$_SESSION[sdate2]);
@@ -788,24 +793,38 @@ function compute_indicators(){
 						if($vacc>=$start && $vacc<=$end):
 							if($this->determine_vacc_status($pxid)=='FIC'):
 								if($this->get_px_brgy($pxid,$brgy_array)): 
-									echo 'FIC '.$pxid."<br>";
+									//echo 'FIC '.$pxid."<br>";
 									$month_stat[$this->get_max_month($actual_vaccine_date)] += 1;
+									array_push($month_stat_px[$this->get_max_month($actual_vaccine_date)],array($pxid,'FIC '.$arr_gender[$sex].' '.$sex));
 								endif;
 							endif;
 						endif;
 
 					}
-				array_push($arr_gender_stat,$month_stat);
+				if($sex<2): //to avoid pushing a blank array, there is alway an extra blank array
+					array_push($_SESSION["arr_px_labels"],$month_stat_px);
+					//array_push($fic_name_px,$month_stat_px);
+				endif;
+					array_push($arr_gender_stat,$month_stat);
 				}
+
+				//array_push($_SESSION["arr_px_labels"],$fic_name_px);
+				//print_r($fic_name_px);
+				//print_r($_SESSION["arr_px_labels"]);
+				//echo count($_SESSION["arr_px_labels"]);
+
 				break;
 			
 			case 3: //completely immunized child (12-23 mos)
 				
-				for($sex=0;$sex<count($arr_gender);$sex++){
+				$cic_name_px = array();
+
+				for($sex=0;$sex<=count($arr_gender);$sex++){
 				
 				$month_stat = array(1=>0,2=>0,3=>0,4=>0,5=>0,6=>0,7=>0,8=>0,9=>0,10=>0,11=>0,12=>0);
-				
-				$q_cic = mysql_query("SELECT DISTINCT a.patient_id, MAX(b.actual_vaccine_date),floor((TO_DAYS(MAX(b.actual_vaccine_date)) - TO_DAYS(a.patient_dob))/30) days_vacc,a.patient_dob FROM m_patient a,m_consult_vaccine b WHERE a.patient_id=b.patient_id AND a.patient_gender='$arr_gender[$sex]' AND b.vaccine_id IN ('BCG','DPT1','DPT2','DPT3','HEPB1','HEPB2','HEPB3','MSL','OPV1','OPV2','OPV3') GROUP by a.patient_id") or die(mysql_query());
+				$month_stat_px = array(1=>array(),2=>array(),3=>array(),4=>array(),5=>array(),6=>array(),7=>array(),8=>array(),9=>array(),10=>array(),11=>array(),12=>array());
+
+				$q_cic = mysql_query("SELECT DISTINCT a.patient_id, MAX(b.actual_vaccine_date),floor((TO_DAYS(MAX(b.actual_vaccine_date)) - TO_DAYS(a.patient_dob))/30) days_vacc,a.patient_dob FROM m_patient a,m_consult_vaccine b WHERE a.patient_id=b.patient_id AND a.patient_gender='$arr_gender[$sex]' AND b.vaccine_id IN ('BCG','DPT1','DPT2','DPT3','HEPB1','HEPB2','HEPB3','MSL','OPV1','OPV2','OPV3') GROUP by a.patient_id ORDER BY a.patient_dob ASC ") or die(mysql_query());
 				
 					while(list($pxid,$actual_vaccine_date,$day_vacc,$patient_dob)=mysql_fetch_array($q_cic)){ 
 						list($staon,$sbuwan,$sdate) = explode('-',$_SESSION[sdate2]);
@@ -820,33 +839,46 @@ function compute_indicators(){
 							if($this->determine_vacc_status($pxid)=='CIC'): 
 								if($this->get_px_brgy($pxid,$brgy_array)):
 									$month_stat[$this->get_max_month($actual_vaccine_date)] += 1;
+									array_push($month_stat_px[$this->get_max_month($actual_vaccine_date)],array($pxid,'CIC'));
 								endif;
 							endif;
 						endif;
 
 					}
-				array_push($arr_gender_stat,$month_stat);
+
+				if($sex<2):
+					array_push($_SESSION["arr_px_labels"],$month_stat_px);
+				endif;
+					array_push($arr_gender_stat,$month_stat);
 				}				
 				break;
 
 			case 4:  //cpab
-				
+				$cpab_name_px = array();
+
 				for($sex=0;$sex<count($arr_gender);$sex++){
 					$month_stat = array(1=>0,2=>0,3=>0,4=>0,5=>0,6=>0,7=>0,8=>0,9=>0,10=>0,11=>0,12=>0);
-					
-					$q_cpab = mysql_query("SELECT DISTINCT a.patient_id,a.date_registered FROM m_patient_ccdev a, m_patient b WHERE a.patient_id=b.patient_id AND a.date_registered BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' AND b.patient_gender='$arr_gender[$sex]'") or die("Cannot query:385");
+					$month_stat_px = array(1=>array(),2=>array(),3=>array(),4=>array(),5=>array(),6=>array(),7=>array(),8=>array(),9=>array(),10=>array(),11=>array(),12=>array());					
 
-					while(list($pxid,$date_reg)=mysql_fetch_array($q_cpab)){
+					$q_cpab = mysql_query("SELECT DISTINCT a.patient_id,a.date_registered,b.patient_dob FROM m_patient_ccdev a, m_patient b WHERE a.patient_id=b.patient_id AND b.patient_dob BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' AND b.patient_gender='$arr_gender[$sex]'") or die("Cannot query:385");
+
+					while(list($pxid,$date_reg,$patient_dob)=mysql_fetch_array($q_cpab)){
 						// kelan matatara ang CPAB? date of ccdev reg, date of birth, date of TT intake of mom
 						
 						list($vacc_id,$status,$vacc_date) = explode('*',$this->get_cpab($pxid));
 
-						if($status=='Active'):
+						if($status=='Active'): //echo $pxid.'<br>';
 							if($this->get_px_brgy($pxid,$brgy_array)):
-								$month_stat[$this->get_max_month($date_reg)] += 1;
+								$month_stat[$this->get_max_month($patient_dob)] += 1;
+								array_push($month_stat_px[$this->get_max_month($patient_dob)],array($pxid,'CPAB'));
 							endif;
 						endif;
 					}
+
+					if($sex<2):
+						array_push($_SESSION["arr_px_labels"],$month_stat_px);
+					endif;
+
 					array_push($arr_gender_stat,$month_stat);
 				}
 				
