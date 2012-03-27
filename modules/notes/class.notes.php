@@ -1164,13 +1164,20 @@ class notes extends module {
             $arg_list = func_get_args();
             $patient_id = $arg_list[0];
             $consult_date = $arg_list[1];
-        }
-        $sql = "select l.class_name ".
+            $consult_id = $arg_list[2];
+        } 
+        /*$sql = "select l.class_name ".
                "from m_lib_notes_dxclass l, m_consult_notes_dxclass n ".
                "where l.class_id = n.class_id and ".
                "n.patient_id = '$patient_id' and to_days(n.diagnosis_date) = to_days('$consult_date')";
+        */
+        $sql = "select l.class_name ".
+               "from m_lib_notes_dxclass l, m_consult_notes_dxclass n ".
+               "where l.class_id = n.class_id and ".
+               "n.patient_id = '$patient_id' and n.consult_id='$consult_id'";
+        
         if ($result = mysql_query($sql)) {
-            if (mysql_num_rows($result)) {
+            if (mysql_num_rows($result)) { 
                 while (list($dx_name) = mysql_fetch_array($result)) {
                     $dx_list .= $dx_name.", ";
                 }
