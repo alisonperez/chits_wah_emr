@@ -273,11 +273,10 @@ function show_morbidity(){
         $bilang += 1;    
 
         foreach($arr_gender as $gender_key=>$gender){
-            //echo $gender;
-            
-            //$q_px_id = mysql_query("SELECT a.patient_id,round((to_days(a.diagnosis_date)-to_days(b.patient_dob))/365,0) as computed_age FROM m_consult_notes_dxclass a, m_patient b WHERE a.diagnosis_date BETWEEN '$_SESSION[sdate]' AND '$_SESSION[edate]' AND a.class_id='$diag_id' AND a.patient_id=b.patient_id AND b.patient_gender='$gender'") or die("Cannot query 164 ".mysql_error());
-            
-            $q_px_id = mysql_query("SELECT a.patient_id,round((to_days(a.diagnosis_date)-to_days(b.patient_dob))/365,0) as computed_age FROM m_consult_notes_dxclass a, m_patient b, m_lib_notes_dxclass c WHERE a.diagnosis_date BETWEEN '$_SESSION[sdate]' AND '$_SESSION[edate]' AND a.class_id=c.class_id AND c.icd10 LIKE '%$icd10_orig%' AND c.morbidity='Y' AND a.patient_id=b.patient_id AND b.patient_gender='$gender'") or die("Cannot query 164 ".mysql_error());
+
+            //$q_px_id = mysql_query("SELECT a.patient_id,round((to_days(a.diagnosis_date)-to_days(b.patient_dob))/365,0) as computed_age FROM m_consult_notes_dxclass a, m_patient b, m_lib_notes_dxclass c WHERE a.diagnosis_date BETWEEN '$_SESSION[sdate]' AND '$_SESSION[edate]' AND a.class_id=c.class_id AND c.icd10 LIKE '%$icd10_orig%' AND c.morbidity='Y' AND a.patient_id=b.patient_id AND b.patient_gender='$gender'") or die("Cannot query 164 ".mysql_error());
+
+		$q_px_id = mysql_query("SELECT a.patient_id,round((to_days(a.diagnosis_date)-to_days(b.patient_dob))/365,0) as computed_age FROM m_consult_notes_dxclass a, m_patient b, m_lib_notes_dxclass c WHERE a.diagnosis_date BETWEEN '$_SESSION[sdate]' AND '$_SESSION[edate]' AND a.class_id=c.class_id AND c.icd10 LIKE '%$icd10_orig%' AND c.morbidity='Y' AND a.patient_id=b.patient_id AND b.patient_gender='$gender'") or die("Cannot query 164 ".mysql_error());
             
             while(list($pxid,$computed_age) = mysql_fetch_array($q_px_id)){
                 if($this->get_px_brgy($pxid,$str_brgy)):

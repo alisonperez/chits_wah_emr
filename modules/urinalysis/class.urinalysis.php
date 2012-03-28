@@ -274,7 +274,7 @@
       echo "<span class='tinylight'>";      
       echo "<b>LAB REQUEST DETAILS</b><br/>";
       echo "<table width='550' bgcolor='#ffff99' style='border: 1px solid black'>";      
-      echo "<tr><td class='tinylight'><b>LAB EXAM: </b>FECALYSIS<br/>";
+      echo "<tr><td class='tinylight'><b>LAB EXAM: </b>URINALYSIS<br/>";
       echo "<b>DATE REQUESTED: </b>".$date_request."<br/>";
       echo "<b>REQUESTED BY: </b>".user::get_username($request_user_id)."<br/>";
       echo "<b>DATE COMPLETED: </b>".$date_done."<br/>";
