@@ -1196,17 +1196,25 @@ class notes extends module {
             $arg_list = func_get_args();
             $patient_id = $arg_list[0];
             $consult_date = $arg_list[1];
+	    $consult_id = $arg_list[2];
         }
-        $sql = "select l.complaint_name ".
+        /*$sql = "select l.complaint_name ".
                "from m_lib_complaint l, m_consult_notes_complaint n ".
                "where l.complaint_id = n.complaint_id and ".
                "n.patient_id = '$patient_id' and to_days(n.complaint_date) = to_days('$consult_date')";
+	*/
+
+	$sql = "select l.complaint_name ".
+               "from m_lib_complaint l, m_consult_notes_complaint n ".
+               "where l.complaint_id = n.complaint_id and ".
+               "n.patient_id = '$patient_id' and n.consult_id='$consult_id'";
+
         if ($result = mysql_query($sql)) {
             if (mysql_num_rows($result)) {
                 while (list($complaint_name) = mysql_fetch_array($result)) {
                     $complaint_list .= $complaint_name.", ";
                 }
-                $complaint_list = substr($complaint_list, 0, strlen($complaint_list)-2);
+                $complaint_list = substr($complaint_list, 0, strlen($complaint_list)-2); 
                 return $complaint_list;
             }
         }

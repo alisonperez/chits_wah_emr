@@ -333,7 +333,7 @@ class consult_report extends module {
                         //$barangay_name = reminder::get_barangay($patient_id);
                     }
                     // get chief complaint and diagnosis from notes
-                    $complaints = notes::get_complaints($patient["patient_id"], $report_date);
+                    $complaints = notes::get_complaints($patient["patient_id"], $report_date,$patient["consult_id"]); 
 		    $diagnosis = notes::get_diagnosis_list($patient["patient_id"], $report_date,$patient["consult_id"]); 
 		    $treatment = notes::get_plan($patient["patient_id"], $report_date);
 
@@ -513,7 +513,7 @@ class consult_report extends module {
 
                     $phid = philhealth::get_philhealth_id($pid);                    		    
 
-                    $cc = notes::get_complaints($pid, $consult_date);
+                    $cc = notes::get_complaints($pid, $consult_date,$consult_id);
 		    $dx = notes::get_diagnosis_list($pid, $consult_date,$consult_id);
    		    $tx = notes::get_plan($pid, $consult_date);                    
                                       
