@@ -101,7 +101,7 @@ class html_builder{
 					echo "<td>";
 				//endif;
 				if(!empty($arr_px_labels)):
-					if($i!=0 && $value[$i]!=0):
+					if($i!=0 && $value[$i]!=0): 
 						$arr_names = $this->return_px_names(((($key*2)+$i)-1),$arr_px_labels);
 						$ser_arr_names = serialize($this->return_px_names(((($key*2)+$i)-1),$arr_px_labels)); 
 
@@ -126,7 +126,7 @@ class html_builder{
 		$arr_px_names = array();
 		//echo $cell_num;
 		//print_r($arr_px_labels[$cell_num]);
-
+		if(count($arr_px_labels)!=0):
 		for($i=$this->smonth;$i<=$this->emonth;$i++){
 			foreach($arr_px_labels[$cell_num] as $key=>$value){
 				if(!empty($value)):
@@ -136,6 +136,7 @@ class html_builder{
 				endif;
 			}
 		}
+		endif;
 		
 		return $arr_px_names;
 	}

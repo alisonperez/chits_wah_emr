@@ -579,13 +579,14 @@ function compute_indicator($crit){
 						//echo $mcid.'/'.$qty.'/'.$serv_date.'<br>';
 						if((strtotime($serv_date) - strtotime($delivery_date)) >= 0):
 							$iron_total+=$qty;
-							if($iron_total >= 90 && $target_reach==0):							
+							if($iron_total >= 90 && $target_reach==0):	
+								//echo $pxid.'/'.$delivery_date.'/'.$serv_date.'/'.$_SESSION["edate2"].'<br>';
 								$target_reach = 1;
 								$month_stat[$this->get_max_month($serv_date)]+=1;
 							//echo $max_date.'<br>'.$mcid;
 							endif;
 						endif;
-					}				
+					}
 				}
 			endif;
 
