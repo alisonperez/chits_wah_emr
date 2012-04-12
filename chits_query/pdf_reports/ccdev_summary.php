@@ -462,7 +462,7 @@ function compute_indicators(){
 						while(list($actual_vaccine_date,$vaccine_id,$patient_id)=mysql_fetch_array($q_antigen)){
 							if($this->get_px_brgy($patient_id,$brgy_array)):
 								$month_stat[$this->get_max_month($actual_vaccine_date)] += 1;
-								array_push($month_stat_px[$this->get_max_month($actual_vaccine_date)],array($patient_id,$vaccine_id,'epi'));
+								array_push($month_stat_px[$this->get_max_month($actual_vaccine_date)],array($patient_id,$vaccine_id,'epi',$actual_vaccine_date));
 							endif;
 						}
 					endif;
@@ -795,7 +795,7 @@ function compute_indicators(){
 								if($this->get_px_brgy($pxid,$brgy_array)): 
 									//echo 'FIC '.$pxid."<br>";
 									$month_stat[$this->get_max_month($actual_vaccine_date)] += 1;
-									array_push($month_stat_px[$this->get_max_month($actual_vaccine_date)],array($pxid,'FIC '.$arr_gender[$sex].' '.$sex,'epi'));
+									array_push($month_stat_px[$this->get_max_month($actual_vaccine_date)],array($pxid,'FIC '.$arr_gender[$sex].' '.$sex,'epi',$actual_vaccine_date));
 								endif;
 							endif;
 						endif;
@@ -839,7 +839,7 @@ function compute_indicators(){
 							if($this->determine_vacc_status($pxid)=='CIC'): 
 								if($this->get_px_brgy($pxid,$brgy_array)):
 									$month_stat[$this->get_max_month($actual_vaccine_date)] += 1;
-									array_push($month_stat_px[$this->get_max_month($actual_vaccine_date)],array($pxid,'CIC','epi'));
+									array_push($month_stat_px[$this->get_max_month($actual_vaccine_date)],array($pxid,'CIC','epi',$actual_vaccine_date));
 								endif;
 							endif;
 						endif;

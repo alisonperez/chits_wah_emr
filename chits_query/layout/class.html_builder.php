@@ -169,7 +169,7 @@ class html_builder{
 				foreach($val_arr[$cell_num] as $key2=>$val_arr2){ 
 					if($key2>=$this->smonth && $key2<=$this->emonth):
 						foreach($val_arr2 as $key3=>$val_arr3){
-							array_push($arr_px_names,$val_arr3[0]); //extract the patient ID and push it to the array
+							array_push($arr_px_names,$val_arr3[0].'*'.$val_arr3[3]); //extract the patient ID and push it to the array
 						}
 					endif;
 				}
