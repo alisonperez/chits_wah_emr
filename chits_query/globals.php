@@ -1,7 +1,7 @@
 <?
   session_start();
   
-  $dbname = 'paniqui_02292011';
+  $dbname = 'paniqui_0329';
   #$dbname2 = 'chitsquery';
   $_SESSION["query"] = $dbname;
   $dbuser = "root";

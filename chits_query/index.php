@@ -15,7 +15,7 @@
 
 	if($_POST[sel_ques]!=0):
 		$_SESSION[ques] = $_POST[sel_ques];
-	endif;	
+	endif;
 ?>
 
 <link rel=StyleSheet href="design.css" type="text/css">

@@ -301,13 +301,14 @@ function compute_indicator($crit){
 	list($eyr,$emonth,$edate) = explode('-',$_SESSION[edate2]);
 	$brgy_array = $this->get_brgy_array();
 	$brgy_array = implode(',',$brgy_array);
+	
 
 	//print_r($brgy_array);
 
 		switch($crit){
 
 		case 1: //pregnant with 4 or more prenatal visits
-			$anc_name_px = array();
+			$anc_name_px = array(1=>array(),2=>array(),3=>array(),4=>array(),5=>array(),6=>array(),7=>array(),8=>array(),9=>array(),10=>array(),11=>array(),12=>array());
 
 //				if(in_array('all',$_SESSION[brgy])):
 			$get_visits = mysql_query("SELECT distinct mc_id,patient_id,MIN(prenatal_date) FROM m_consult_mc_prenatal WHERE visit_sequence >=  4 AND trimester=3 AND prenatal_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' GROUP by mc_id") or die("Cannot query: 186");
@@ -353,7 +354,7 @@ function compute_indicator($crit){
 							$yr = date('Y');
 							$max_date = date("n",mktime(0,0,0,$latestm,$latestd,$yr)); //get the unix timestamp then return month without trailing 0
 							$arr[$j] = ($num>=2)?1:0; //check if the third trimester has at least 2 visits
-
+							
 						  endif;
 					   else:
 						  $arr[$j] = 1; //marked trimester 1 and 2 with 1's if $num!=0
@@ -364,24 +365,33 @@ function compute_indicator($crit){
 
 				
 				if($arr[1]==1 && $arr[2]==1 && $arr[3]==1):
+					array_push($anc_name_px[$max_date],array($pxid,'Pregnant women with 4 or more prenatal visits','mc',$latestdate));
+					//array_push($anc_name_px,$pxid,'Pregnant women with 4 or more prenatal visits','mc');
 					$month_stat[$max_date]+=1;
 				endif;				
-
+				
+			
+				
 				endif;
 			} //end while
 			
-			
+			array_push($_SESSION["arr_px_labels"]["mc"],$anc_name_px); 
+			//print_r($_SESSION["arr_px_labels"]);
 			endif; //end 
 
 			break;
 			
 		case 2: 
+
+			$tt2_name_px = array(1=>array(),2=>array(),3=>array(),4=>array(),5=>array(),6=>array(),7=>array(),8=>array(),9=>array(),10=>array(),11=>array(),12=>array());
+
 			if(in_array('all',$_SESSION[brgy])):
 				$q_px_tt = mysql_query("SELECT patient_id,actual_vaccine_date FROM m_consult_mc_vaccine WHERE vaccine_id='TT1'") or die(mysql_error());
 			else:
 				$q_px_tt = mysql_query("SELECT a.patient_id,a.actual_vaccine_date FROM m_consult_mc_vaccine a,m_family_members b,m_family_address c WHERE a.vaccine_id='TT1' AND a.patient_id=b.patient_id AND b.family_id=c.family_id AND c.barangay_id IN ($brgy_array)") or die(mysql_error());
 			endif;
 			
+			if(mysql_num_rows($q_px_tt)!=0):
 
 			while(list($pxid,$vacc_date)=mysql_fetch_array($q_px_tt)){			
 				//condition 1: prenatal is the base date
@@ -395,7 +405,7 @@ function compute_indicator($crit){
 				//$q_t2 = mysql_query("SELECT DISTINCT a.patient_id,a.actual_vaccine_date,c.patient_edc FROM m_consult_mc_vaccine a,m_consult_mc_prenatal b,m_patient_mc c WHERE a.vaccine_id='TT2' AND a.patient_id='$pxid' AND a.patient_id=c.patient_id AND (TO_DAYS(c.patient_edc)-TO_DAYS(a.actual_vaccine_date)) <= 1095 AND c.end_pregnancy_flag='N' AND c.delivery_date='0000-00-00' AND a.actual_vaccine_date <= '$_SESSION[edate2]'") or die(mysql_error());
 				
 				//condition 3: 1). patient is pregnant, 2). patient was injected with TT2 between the start and end date  3). distance between vaccine date and patient EDC is less than 1095 days
-				$q_t2 = mysql_query("SELECT a.patient_id,a.actual_vaccine_date,c.patient_edc FROM m_consult_mc_vaccine a,m_consult_mc_prenatal b,m_patient_mc c WHERE a.vaccine_id='TT2' AND a.patient_id='$pxid' AND a.patient_id=c.patient_id AND (TO_DAYS(c.patient_edc)-TO_DAYS(a.actual_vaccine_date)) <= 1095 AND a.actual_vaccine_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' ORDER by a.actual_vaccine_date DESC LIMIT 1") or die(mysql_error());
+				$q_t2 = mysql_query("SELECT a.patient_id,a.actual_vaccine_date,c.patient_edc,a.consult_id FROM m_consult_mc_vaccine a,m_consult_mc_prenatal b,m_patient_mc c WHERE a.vaccine_id='TT2' AND a.patient_id='$pxid' AND a.patient_id=c.patient_id AND (TO_DAYS(c.patient_edc)-TO_DAYS(a.actual_vaccine_date)) <= 1095 AND a.actual_vaccine_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' ORDER by a.actual_vaccine_date DESC LIMIT 1") or die(mysql_error());
 
 				if(mysql_num_rows($q_t2)!=0):
 					while(list($pxid,$vacc_date,$edc)=mysql_fetch_array($q_t2)){
@@ -405,12 +415,17 @@ function compute_indicator($crit){
 							//$month_stat[$this->get_max_month($vacc_date)]+=1;
 							$month_stat[$i]+=1;
 						}*/
-
+						array_push($tt2_name_px[$this->get_max_month($vacc_date)],array($pxid,'Pregnant Women given 2 doses of TT','mc',$vacc_date));
 						$month_stat[$this->get_max_month($vacc_date)]+=1;
 					}
 				endif;
 			}
+
+			array_push($_SESSION["arr_px_labels"]["mc"],$tt2_name_px); 
+			print_r($_SESSION["arr_px_labels"]);
 			
+			endif;
+
 			break;
 		
 		case 3: //pregnant women who are protected with TT2 plus protection
@@ -561,9 +576,11 @@ function compute_indicator($crit){
 
 		case 7://postpartum mothers wih complete iron w/ folic acid intake
 			if(in_array('all',$_SESSION[brgy])):
-				$get_iron_mc = mysql_query("SELECT distinct a.mc_id,a.patient_id FROM m_consult_mc_services a, m_patient_mc b WHERE a.service_id='IRON' AND b.postpartum_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' ORDER by a.mc_id ASC, a.actual_service_date ASC") or die("Cannot query: 525 ".mysql_error());
+				//$get_iron_mc = mysql_query("SELECT distinct a.mc_id,a.patient_id FROM m_consult_mc_services a, m_patient_mc b WHERE a.service_id='IRON' AND b.postpartum_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' ORDER by a.mc_id ASC, a.actual_service_date ASC") or die("Cannot query: 525 ".mysql_error());
+				$get_iron_mc = mysql_query("SELECT distinct a.mc_id,a.patient_id FROM m_consult_mc_services a, m_patient_mc b WHERE a.service_id='IRON' AND a.actual_service_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' ORDER by a.mc_id ASC, a.actual_service_date ASC") or die("Cannot query: 525 ".mysql_error());
 			else:
-				$get_iron_mc = mysql_query("SELECT distinct a.mc_id,a.patient_id FROM m_consult_mc_services a,m_family_members b,m_family_address c,m_patient_mc d WHERE a.service_id='IRON' AND a.patient_id=b.patient_id AND b.family_id=c.family_id AND c.barangay_id IN ($brgy_array) AND d.postpartum_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' ORDER by a.mc_id ASC, a.actual_service_date ASC") or die("Cannot query: 527".mysql_error());
+				//$get_iron_mc = mysql_query("SELECT distinct a.mc_id,a.patient_id FROM m_consult_mc_services a,m_family_members b,m_family_address c,m_patient_mc d WHERE a.service_id='IRON' AND a.patient_id=b.patient_id AND b.family_id=c.family_id AND c.barangay_id IN ($brgy_array) AND d.postpartum_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' ORDER by a.mc_id ASC, a.actual_service_date ASC") or die("Cannot query: 527".mysql_error());
+				$get_iron_mc = mysql_query("SELECT distinct a.mc_id,a.patient_id FROM m_consult_mc_services a,m_family_members b,m_family_address c,m_patient_mc d WHERE a.service_id='IRON' AND a.patient_id=b.patient_id AND b.family_id=c.family_id AND c.barangay_id IN ($brgy_array) AND a.actual_service_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' ORDER by a.mc_id ASC, a.actual_service_date ASC") or die("Cannot query: 527".mysql_error());
 			endif;
 
 
@@ -594,9 +611,11 @@ function compute_indicator($crit){
 
 		case 8: // postpartum women given vitamin A supplementation
 			if(in_array('all',$_SESSION[brgy])):
-				$get_vita = mysql_query("SELECT distinct a.mc_id,a.patient_id FROM m_consult_mc_services a, m_patient_mc b WHERE a.service_id='VITA' AND b.postpartum_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' ORDER by a.mc_id ASC, a.actual_service_date ASC") or die("Cannot query: 358".mysql_error());
+				//$get_vita = mysql_query("SELECT distinct a.mc_id,a.patient_id FROM m_consult_mc_services a, m_patient_mc b WHERE a.service_id='VITA' AND b.postpartum_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' ORDER by a.mc_id ASC, a.actual_service_date ASC") or die("Cannot query: 358".mysql_error());
+				$get_vita = mysql_query("SELECT distinct a.mc_id,a.patient_id FROM m_consult_mc_services a, m_patient_mc b WHERE a.service_id='VITA' AND a.actual_service_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' ORDER by a.mc_id ASC, a.actual_service_date ASC") or die("Cannot query: 358".mysql_error());
 			else:
-				$get_vita = mysql_query("SELECT distinct a.mc_id,a.patient_id FROM m_consult_mc_services a,m_family_members b,m_family_address c,m_patient_mc d WHERE a.service_id='VITA' AND a.patient_id=b.patient_id AND b.family_id=c.family_id AND c.barangay_id IN ($brgy_array) AND d.postpartum_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' ORDER by a.mc_id ASC, a.actual_service_date ASC") or die("Cannot query: 558".mysql_error());
+				//$get_vita = mysql_query("SELECT distinct a.mc_id,a.patient_id FROM m_consult_mc_services a,m_family_members b,m_family_address c,m_patient_mc d WHERE a.service_id='VITA' AND a.patient_id=b.patient_id AND b.family_id=c.family_id AND c.barangay_id IN ($brgy_array) AND d.postpartum_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' ORDER by a.mc_id ASC, a.actual_service_date ASC") or die("Cannot query: 558".mysql_error());
+				$get_vita = mysql_query("SELECT distinct a.mc_id,a.patient_id FROM m_consult_mc_services a,m_family_members b,m_family_address c,m_patient_mc d WHERE a.service_id='VITA' AND a.patient_id=b.patient_id AND b.family_id=c.family_id AND c.barangay_id IN ($brgy_array) AND a.actual_service_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' ORDER by a.mc_id ASC, a.actual_service_date ASC") or die("Cannot query: 558".mysql_error());
 			endif;
 
 			if(mysql_num_rows($get_vita)!=0):
@@ -850,7 +869,7 @@ else:
 endif; */
 
 
-
+$_SESSION["arr_px_labels"] = array('mc'=>array());
 $mc_content = $pdf->show_mc_summary();
 
 if($_GET["type"]=='html'): 

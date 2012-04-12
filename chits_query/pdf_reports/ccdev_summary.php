@@ -267,7 +267,6 @@ function show_ccdev_summary(){
 				$disp_arr = array();				
 				$load = 0;
 				
-				
 				$lbl_indicator = $this->disp_arr_indicator($i,$j);
 
 				$counter = $j*2;
@@ -433,6 +432,7 @@ function compute_indicators(){
 	$arr_antigens = array('BCG','DPT1','DPT2','DPT3','HEPB1','HEPB2','HEPB3','MSL','OPV1','OPV2','OPV3');
 	$fic_antigens = implode(',',$arr_antigens);
 	
+
 	if(!empty($sub_arr_crit)):  //indicators with sub arrays 0,7,8,9,10
 
 		switch($crit){
@@ -462,7 +462,7 @@ function compute_indicators(){
 						while(list($actual_vaccine_date,$vaccine_id,$patient_id)=mysql_fetch_array($q_antigen)){
 							if($this->get_px_brgy($patient_id,$brgy_array)):
 								$month_stat[$this->get_max_month($actual_vaccine_date)] += 1;
-								array_push($month_stat_px[$this->get_max_month($actual_vaccine_date)],array($patient_id,$vaccine_id));
+								array_push($month_stat_px[$this->get_max_month($actual_vaccine_date)],array($patient_id,$vaccine_id,'epi'));
 							endif;
 						}
 					endif;
@@ -473,7 +473,7 @@ function compute_indicators(){
 					}
 					}
 				}
-				$_SESSION["arr_px_labels"] = $arr_antigen_px; 
+				array_push($_SESSION["arr_px_labels"]["epi"],$arr_antigen_px);  //print_r($_SESSION["arr_px_labels"]);
 				return $arr_antigen;
 				break;
 			
@@ -795,14 +795,14 @@ function compute_indicators(){
 								if($this->get_px_brgy($pxid,$brgy_array)): 
 									//echo 'FIC '.$pxid."<br>";
 									$month_stat[$this->get_max_month($actual_vaccine_date)] += 1;
-									array_push($month_stat_px[$this->get_max_month($actual_vaccine_date)],array($pxid,'FIC '.$arr_gender[$sex].' '.$sex));
+									array_push($month_stat_px[$this->get_max_month($actual_vaccine_date)],array($pxid,'FIC '.$arr_gender[$sex].' '.$sex,'epi'));
 								endif;
 							endif;
 						endif;
 
 					}
 				if($sex<2): //to avoid pushing a blank array, there is alway an extra blank array
-					array_push($_SESSION["arr_px_labels"],$month_stat_px);
+					array_push($_SESSION["arr_px_labels"]["epi"],$month_stat_px);
 					//array_push($fic_name_px,$month_stat_px);
 				endif;
 					array_push($arr_gender_stat,$month_stat);
@@ -839,7 +839,7 @@ function compute_indicators(){
 							if($this->determine_vacc_status($pxid)=='CIC'): 
 								if($this->get_px_brgy($pxid,$brgy_array)):
 									$month_stat[$this->get_max_month($actual_vaccine_date)] += 1;
-									array_push($month_stat_px[$this->get_max_month($actual_vaccine_date)],array($pxid,'CIC'));
+									array_push($month_stat_px[$this->get_max_month($actual_vaccine_date)],array($pxid,'CIC','epi'));
 								endif;
 							endif;
 						endif;
@@ -847,7 +847,7 @@ function compute_indicators(){
 					}
 
 				if($sex<2):
-					array_push($_SESSION["arr_px_labels"],$month_stat_px);
+					array_push($_SESSION["arr_px_labels"]["epi"],$month_stat_px);
 				endif;
 					array_push($arr_gender_stat,$month_stat);
 				}				
@@ -870,13 +870,13 @@ function compute_indicators(){
 						if($status=='Active'): //echo $pxid.'<br>';
 							if($this->get_px_brgy($pxid,$brgy_array)):
 								$month_stat[$this->get_max_month($patient_dob)] += 1;
-								array_push($month_stat_px[$this->get_max_month($patient_dob)],array($pxid,'CPAB'));
+								array_push($month_stat_px[$this->get_max_month($patient_dob)],array($pxid,'CPAB'),'epi');
 							endif;
 						endif;
 					}
 
 					if($sex<2):
-						array_push($_SESSION["arr_px_labels"],$month_stat_px);
+						array_push($_SESSION["arr_px_labels"]["epi"],$month_stat_px);
 					endif;
 
 					array_push($arr_gender_stat,$month_stat);
@@ -1370,6 +1370,7 @@ $pdf->AliasNbPages();
 $pdf->SetFont('Arial','',10);
 $pdf->AddPage();
 
+$_SESSION["arr_px_labels"] = array('epi'=>array());
 $ccdev_rec = $pdf->show_ccdev_summary();
 
 if($_GET["type"]=='html'): 
