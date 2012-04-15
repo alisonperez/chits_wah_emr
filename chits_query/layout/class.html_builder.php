@@ -92,8 +92,8 @@ class html_builder{
 		
 
 		$arr_px_labels = $_SESSION["arr_px_labels"];
-		
-		foreach($cell_contents as $key=>$value){
+		//print_r($arr_px_labels);
+		foreach($cell_contents as $key=>$value){ 
 			echo "<tr style='background-color: #666666; color: #FFFF66; font-weight:bold; white-space: nowrap; font-size: 19px;'>";
 
 			for($i=0;$i<count($value);$i++){
@@ -105,11 +105,11 @@ class html_builder{
 				//endif;
 				if(!empty($arr_px_labels)):
 					if($i!=0 && $value[$i]!=0):
-						if(isset($arr_px_labels["epi"])): 
+						if(isset($arr_px_labels["epi"])):
 							$cat = 'epi';
 							$arr_names = $this->return_px_names(((($key*2)+$i)-1),$arr_px_labels,$cat);
-							$ser_arr_names = serialize($this->return_px_names(((($key*2)+$i)-1),$arr_px_labels["epi"],$cat)); 
-						elseif(isset($arr_px_labels["mc"])): 
+							$ser_arr_names = serialize($this->return_px_names(((($key*2)+$i)-1),$arr_px_labels,$cat));
+						elseif(isset($arr_px_labels["mc"])):
 							$cat = 'mc';
 							$arr_names = $this->return_px_names($key,$arr_px_labels,$cat);
 							$ser_arr_names = serialize($this->return_px_names($key,$arr_px_labels,$cat)); 
@@ -118,7 +118,7 @@ class html_builder{
 						endif;
 
 						//echo "<a href='../../site/disp_name.php?id=$ser_arr_names&cat=$value[0]&prog=$cat' target='new'>".$value[$i]."</a>";
-						echo "<a href='../../site/disp_name.php?id=$ser_arr_names&cat=$value[0]&prog=$cat' target='new'>".$value[$i]."</a>";
+						echo "<a href='../../site/disp_name.php?id=$ser_arr_names&cat=$value[0]&prog=$cat' target='new'>".$value[$i]."</a>"; 
 						
 					else:
 						echo $value[$i];
@@ -134,22 +134,22 @@ class html_builder{
 	}
 
 	function return_px_names($cell_num,$arr_px_labels,$prog){
-		$arr_px_names = array(); 
-		
+		$arr_px_names = array();
+		//print_r($arr_px_labels[$cell_num]);
 		//print_r($arr_px_labels);
 		if(count($arr_px_labels)!=0):
-
-			/*if($prog=='epi'):
-				foreach($arr_px_labels as $key_prog=>$val_arr){ //print_r($val_arr);
+			/*
+			if($prog=='epi'):
+				foreach($arr_px_labels as $key_prog=>$val_arr){
 					foreach($val_arr[$cell_num] as $key2=>$val_arr2){ 
-						if($key2>=$this->smonth && $key2<=$this->emonth):
+						if($key2>=$this->smonth && $key2<=$this->emonth): 
 							foreach($val_arr2 as $key3=>$val_arr3){
 								array_push($arr_px_names,$val_arr3[0]);
 							}
 						endif;
-					}
-					
+					}	
 				}
+
 			elseif($prog=='mc'):  
 				foreach($arr_px_labels as $key_prog=>$val_arr){ //print_r($val_arr);
 					foreach($val_arr[$cell_num] as $key2=>$val_arr2){ 
@@ -163,9 +163,9 @@ class html_builder{
 				}
 			else: 
 
-			endif;)*/
+			endif; */
 
-			foreach($arr_px_labels as $key_prog=>$val_arr){ //print_r($val_arr);
+			foreach($arr_px_labels as $key_prog=>$val_arr){; //print_r($val_arr[$cell_num]); //echo $cell_num.'<br>';
 				foreach($val_arr[$cell_num] as $key2=>$val_arr2){ 
 					if($key2>=$this->smonth && $key2<=$this->emonth):
 						foreach($val_arr2 as $key3=>$val_arr3){
@@ -175,6 +175,7 @@ class html_builder{
 				}
 					
 			}
+
 		endif; 
 		$arr_px_names = array_unique($arr_px_names);
 		return $arr_px_names;
