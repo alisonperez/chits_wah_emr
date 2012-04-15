@@ -1,4 +1,4 @@
-t <?php
+ <?php
    session_start();
    ob_start();
    include('../chits_query/layout/class.widgets.php');

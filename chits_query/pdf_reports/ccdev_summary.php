@@ -890,17 +890,25 @@ function compute_indicators(){
 			case 5: //infants seen at 6 mos
 				for($sex=0;$sex<count($arr_gender);$sex++){
 					$month_stat = array(1=>0,2=>0,3=>0,4=>0,5=>0,6=>0,7=>0,8=>0,9=>0,10=>0,11=>0,12=>0);
-					
-					$q_sixth = mysql_query("SELECT DISTINCT a.patient_id,date_format(b.consult_date,'%Y-%m-%d'),a.patient_dob  FROM m_patient a, m_consult b,m_patient_ccdev c WHERE a.patient_id=b.patient_id AND b.patient_id=c.patient_id AND round((TO_DAYS(date_format(b.consult_date,'%Y-%m-%d')) - TO_DAYS(a.patient_dob))/30,2) BETWEEN 6 AND 6.999 AND a.patient_gender='$arr_gender[$sex]'") or die("Cannot query:396");
+
+					$infant_name_px = array(1=>array(),2=>array(),3=>array(),4=>array(),5=>array(),6=>array(),7=>array(),8=>array(),9=>array(),10=>array(),11=>array(),12=>array());
+
+					$q_sixth = mysql_query("SELECT DISTINCT a.patient_id,date_format(b.consult_date,'%Y-%m-%d'),a.patient_dob  FROM m_patient a, m_consult b,m_patient_ccdev c WHERE a.patient_id=b.patient_id AND b.patient_id=c.patient_id AND round((TO_DAYS(date_format(b.consult_date,'%Y-%m-%d')) - TO_DAYS(a.patient_dob))/30,2) BETWEEN 6 AND 6.999 AND a.patient_gender='$arr_gender[$sex]' AND b.consult_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' GROUP BY a.patient_id") or die("Cannot query:396");
 
 					if(mysql_num_rows($q_sixth)!=0):
 						while(list($pxid,$consult_date,$px_dob)=mysql_fetch_array($q_sixth)){
 							//echo $pxid.'/'.$consult_date.'/'.$px_dob.'<br>';
 							if($this->get_px_brgy($pxid,$brgy_array)):
 								$month_stat[$this->get_max_month($consult_date)] += 1;
+								array_push($infant_name_px[$this->get_max_month($consult_date)],array($pxid,'Infant seen at 6mos','epi',$consult_date));
 							endif;
 						}
 					endif;
+
+					if($sex<2):
+						array_push($_SESSION["arr_px_labels"]["epi"],$infant_name_px);
+					endif;
+
 					array_push($arr_gender_stat,$month_stat);
 				}
 
@@ -910,18 +918,25 @@ function compute_indicators(){
 				for($sex=0;$sex<count($arr_gender);$sex++){
 					
 					$month_stat = array(1=>0,2=>0,3=>0,4=>0,5=>0,6=>0,7=>0,8=>0,9=>0,10=>0,11=>0,12=>0);
-					
+					$ebf_name_px = array(1=>array(),2=>array(),3=>array(),4=>array(),5=>array(),6=>array(),7=>array(),8=>array(),9=>array(),10=>array(),11=>array(),12=>array());
+
 					$q_bfeed = mysql_query("SELECT a.patient_id, b.bfed_month1,b.bfed_month2,b.bfed_month3,b.bfed_month4,b.bfed_month5,b.bfed_month6,b.bfed_month6_date FROM m_patient a, m_patient_ccdev b WHERE a.patient_id=b.patient_id AND round((TO_DAYS(b.bfed_month6_date) - TO_DAYS(a.patient_dob))/30,2) BETWEEN 6 AND 7 AND a.patient_gender='$arr_gender[$sex]' AND b.bfed_month6_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]'") or die(mysql_error());
 					
 					if(mysql_num_rows($q_bfeed)!=0):  
 						while($r_bfeed = mysql_fetch_array($q_bfeed)){ 
 							if(!in_array('N',$r_bfeed)):
 								if($this->get_px_brgy($r_bfeed["patient_id"],$brgy_array)):
-									$month_stat[$this->get_max_month($r_bfeed[bfed_month6_date])] += 1;
+									$month_stat[$this->get_max_month($r_bfeed["bfed_month6_date"])] += 1;
+									array_push($ebf_name_px[$this->get_max_month($r_bfeed["bfed_month6_date"])],array($r_bfeed["patient_id"],'EBF','epi',$r_bfeed["bfed_month6_date"]));
 								endif;
 							endif;
 						}
 					endif;
+
+					if($sex<2):
+						array_push($_SESSION["arr_px_labels"]["epi"],$ebf_name_px);
+					endif;
+
 					array_push($arr_gender_stat,$month_stat);				
 				}
 				
