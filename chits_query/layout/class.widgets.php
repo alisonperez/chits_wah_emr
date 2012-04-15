@@ -324,7 +324,7 @@
       		echo "<table width='100%' style='font-family: arial; font-size: 11px;'>";
 		echo "<tr><td height='300;'></td></tr>";
       		echo "<tr align='center'><td valign='top' style=\"background-color: #666666;color: #FFFF66;text-align: center;\">";
-      		echo "Copyright @ 2007-2011 | The Query Browser | ";
+      		echo "Copyright @ 2007-2012 | The Query Browser | ";
       		echo "Developed and maintained by alison@perez-ph.net";
       		echo "</td></tr>";
       		echo "</table>";
