@@ -374,11 +374,11 @@ function compute_indicator($crit){
 				
 				endif;
 			} //end while
-			
-			array_push($_SESSION["arr_px_labels"]["mc"],$anc_name_px); 
-			//print_r($_SESSION["arr_px_labels"]);
+
 			endif; //end 
 
+			array_push($_SESSION["arr_px_labels"]["mc"],$anc_name_px); 
+			//print_r($_SESSION["arr_px_labels"]);
 			break;
 			
 		case 2: 
@@ -421,10 +421,9 @@ function compute_indicator($crit){
 				endif;
 			}
 
-			array_push($_SESSION["arr_px_labels"]["mc"],$tt2_name_px); 
-			//print_r($_SESSION["arr_px_labels"]);
-			
 			endif;
+
+			array_push($_SESSION["arr_px_labels"]["mc"],$tt2_name_px); 
 
 			break;
 		
@@ -473,8 +472,10 @@ function compute_indicator($crit){
 				$month_stat[$this->get_max_month($vacc_date)]+=1;
 			}
 			
-			array_push($_SESSION["arr_px_labels"]["mc"],$ttplus_name_px);
+			
 			endif;
+
+			array_push($_SESSION["arr_px_labels"]["mc"],$ttplus_name_px);
 
 			break;
 
@@ -504,7 +505,7 @@ function compute_indicator($crit){
 							$s_serv_date = strtotime($serv_date) - strtotime($_SESSION["sdate2"]); //from date of service - minus start date of range
 							$e_serv_date = strtotime($_SESSION["edate2"]) - strtotime($serv_date); //from end date minus date of service
 
-							if($iron_total >= 180 && $target_reach==0 && $s_serv_date>=0 && $e_serv_date>=0):
+							if($iron_total == 180 && $target_reach==0 && $s_serv_date>=0 && $e_serv_date>=0):
 								$target_reach = 1;
 								list($taon,$buwan,$araw) = explode('-',$serv_date);
 								$max_date = date("n",mktime(0,0,0,$buwan,$araw,$taon)); //get the unix timestamp then return month without trailing 0
@@ -518,9 +519,11 @@ function compute_indicator($crit){
 					}
 				}
 
-			array_push($_SESSION["arr_px_labels"]["mc"],$iron_name_px); 
 			
+			//print_r($_SESSION["arr_px_labels"]);
 			endif;
+
+			array_push($_SESSION["arr_px_labels"]["mc"],$iron_name_px); 
 
 			break;
 
@@ -550,7 +553,7 @@ function compute_indicator($crit){
 							$s_serv_date = strtotime($serv_date) - strtotime($_SESSION["sdate2"]); //from date of service - minus start date of range
 							$e_serv_date = strtotime($_SESSION["edate2"]) - strtotime($serv_date); //from end date minus date of service
 
-							if($vita_total >= 200000 && $target_reach==0 && $s_serv_date>=0 && $e_serv_date>=0):
+							if($vita_total == 200000 && $target_reach==0 && $s_serv_date>=0 && $e_serv_date>=0):
 								$target_reach = 1;
 					
 								array_push($vita_name_px[$this->get_max_month($serv_date)],array($pxid,'Pregnant given Vit. A','mc',$serv_date));
@@ -562,9 +565,9 @@ function compute_indicator($crit){
 					}
 				}
 
-			array_push($_SESSION["arr_px_labels"]["mc"],$vita_name_px); 
-
 			endif;
+			
+			array_push($_SESSION["arr_px_labels"]["mc"],$vita_name_px); 
 
 			break;
 		case 6:    //postpartum women given at with 2PPV
@@ -593,9 +596,9 @@ function compute_indicator($crit){
 				endif;
 			
 			}
+			endif;
 
 			array_push($_SESSION["arr_px_labels"]["mc"],$ppv2_name_px); 
-			endif;
 
 			break; 
 
@@ -622,7 +625,7 @@ function compute_indicator($crit){
 						//echo $mcid.'/'.$qty.'/'.$serv_date.'<br>';
 						if((strtotime($serv_date) - strtotime($delivery_date)) >= 0):
 							$iron_total+=$qty;
-							if($iron_total >= 90 && $target_reach==0):	
+							if($iron_total == 90 && $target_reach==0):	
 								//echo $pxid.'/'.$delivery_date.'/'.$serv_date.'/'.$_SESSION["edate2"].'<br>';
 								$target_reach = 1;
 
@@ -635,9 +638,9 @@ function compute_indicator($crit){
 					}
 				}
 
-			array_push($_SESSION["arr_px_labels"]["mc"],$iron_name_px); 
-
 			endif;
+
+			array_push($_SESSION["arr_px_labels"]["mc"],$iron_name_px); 
 
 			break;
 
@@ -661,7 +664,7 @@ function compute_indicator($crit){
 					while(list($qty,$serv_date)=mysql_fetch_array($q_mc)){						
 						$vita_total+=$qty;
 
-						if($vita_total >= 200000 && $target_reach==0):							
+						if($vita_total == 200000 && $target_reach==0):							
 							$target_reach = 1;
 
 							array_push($vita_name_px[$this->get_max_month($serv_date)],array($pxid,'Postpartum women given Vit. A','mc',$serv_date));
@@ -691,9 +694,10 @@ function compute_indicator($crit){
 					array_push($bfed_name_px[$this->get_max_month($deldate)],array($pxid,'Postpartum women initiated breastfeeding','mc',$deldate));
 					$month_stat[$this->get_max_month($deldate)]+=1;
 				}
-			array_push($_SESSION["arr_px_labels"]["mc"],$bfed_name_px); 
 
 			endif;
+
+			array_push($_SESSION["arr_px_labels"]["mc"],$bfed_name_px); 
 
 			break;
 		default:

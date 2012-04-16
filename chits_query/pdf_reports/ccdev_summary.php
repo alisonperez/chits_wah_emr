@@ -466,9 +466,9 @@ function compute_indicators(){
 							endif;
 						}
 
-					array_push($_SESSION["arr_px_labels"]["epi"],$month_stat_px);  //print_r($_SESSION["arr_px_labels"]);	
+
 					endif;
-					
+					array_push($_SESSION["arr_px_labels"]["epi"],$month_stat_px);  //print_r($_SESSION["arr_px_labels"]);						
 					array_push($arr_antigen_px,$month_stat_px);
 					array_push($arr_antigen,$month_stat);
 					//echo '/'.$key.'/'.array_sum($month_stat).'<br>';
@@ -1095,9 +1095,9 @@ function determine_vacc_status(){
 			$ant_date = $antigen_date[$antigens[$j]];
 
 			$q_antigen = mysql_query("SELECT round((TO_DAYS('$ant_date') - TO_DAYS(a.patient_dob))/30,2) month_span FROM m_patient a WHERE a.patient_id='$pxid'") or die("Cannot query: 269");
-			list($month_span) = mysql_fetch_array($q_antigen);
+			list($month_span,$day_span) = mysql_fetch_array($q_antigen);
 
-			if($month_span>12 && $month_span<=23):
+			if($month_span>12.17 && $month_span<=23):
 				$cic=1;
 			endif;
 		}

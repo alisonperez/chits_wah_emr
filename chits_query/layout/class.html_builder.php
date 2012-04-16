@@ -165,7 +165,7 @@ class html_builder{
 
 			endif; */
 
-			foreach($arr_px_labels as $key_prog=>$val_arr){; //print_r($val_arr[$cell_num]); //echo $cell_num.'<br>';
+			foreach($arr_px_labels as $key_prog=>$val_arr){; //echo $cell_num.'<br>'; //print_r($val_arr[$cell_num]); 
 				foreach($val_arr[$cell_num] as $key2=>$val_arr2){ 
 					if($key2>=$this->smonth && $key2<=$this->emonth):
 						foreach($val_arr2 as $key3=>$val_arr3){
