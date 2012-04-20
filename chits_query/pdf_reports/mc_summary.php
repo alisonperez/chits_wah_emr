@@ -471,8 +471,7 @@ function compute_indicator($crit){
 				array_push($ttplus_name_px[$this->get_max_month($vacc_date)],array($pxid,'Pregnant Women given TT2 plus','mc',$vacc_date));
 				$month_stat[$this->get_max_month($vacc_date)]+=1;
 			}
-			
-			
+
 			endif;
 
 			array_push($_SESSION["arr_px_labels"]["mc"],$ttplus_name_px);

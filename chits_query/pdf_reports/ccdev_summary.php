@@ -584,8 +584,8 @@ function compute_indicators(){
 
 						array_push($arr_pneu_seen,$month_stat);
 
-						}					
-					}				
+						}
+					}
 				}
 				return $arr_pneu_seen;
 				break;
