@@ -105,7 +105,7 @@ class alert extends module{
 		echo "<span class='library'>REMINDER AND ALERT ADMINISTRATION</span>";
 		echo "<p align='justify'>The Alert and Reminder administration page will allow the end-user to set necessary messages for the various indicators listed. It also always the user to set the number of days the message will be posted in advance and its duration.</p>";
 		
-		if($_POST[submit_alert]=='Save Reminder/Alert'):		
+		if($_POST[submit_alert]=='Save Reminder/Alert'):
 			$this->verify_form($_POST);
 		elseif($_POST[submit_alert]=='Update Reminder/Alert'):
 			$this->verify_form($_POST);
@@ -1730,15 +1730,24 @@ class alert extends module{
 	function check_sms_alert($date_passed){
 		$alert = new alert;
 		$arr_alert = array();
+		$include_wkend = 0;
 
 		if(isset($date_passed)):
 			$today = $date_passed;
 		else:
 			$today = date('Y-m-d');
+
+			if(date('l',strtotime($today))=='Friday')){
+				$include_wkend = 1;
+			}
 		endif;
 
 		echo $today;
-
+		echo date('l',strtotime($today));
+		for($i=1;$i<=2;$i++){
+			$date = strtotime("+$i day", strtotime($today));
+			echo date("Y-m-d", $date)."<br>";
+		}
 		$q_sms_alert = mysql_query("SELECT sms_id FROM m_lib_sms_alert WHERE alert_date='$today'") or die("Cannot query 732: ".mysql_error());
 
 		$q_fam_id = mysql_query("SELECT DISTINCT a.family_id FROM m_family_address a, m_family_members b, m_lib_barangay c WHERE a.family_id=b.family_id AND a.barangay_id=c.barangay_id ORDER by c.barangay_name ASC") or die("Cannot query 1576: ".mysql_error());
