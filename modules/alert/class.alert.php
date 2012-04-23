@@ -1737,7 +1737,7 @@ class alert extends module{
 		else:
 			$today = date('Y-m-d');
 
-			if(date('l',strtotime($today))=='Friday')){
+			if(date('l',strtotime($today))=='Friday'){
 				$include_wkend = 1;
 			}
 		endif;
@@ -1748,6 +1748,8 @@ class alert extends module{
 			$date = strtotime("+$i day", strtotime($today));
 			echo date("Y-m-d", $date)."<br>";
 		}
+
+		
 		$q_sms_alert = mysql_query("SELECT sms_id FROM m_lib_sms_alert WHERE alert_date='$today'") or die("Cannot query 732: ".mysql_error());
 
 		$q_fam_id = mysql_query("SELECT DISTINCT a.family_id FROM m_family_address a, m_family_members b, m_lib_barangay c WHERE a.family_id=b.family_id AND a.barangay_id=c.barangay_id ORDER by c.barangay_name ASC") or die("Cannot query 1576: ".mysql_error());

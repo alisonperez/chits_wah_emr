@@ -100,11 +100,11 @@ class html_builder{
 				$arr_names = array();
 				//if($this->lookup_ques_for_colspan() && $i<$this->where_to_colspan()):
 				//	echo "<td colspan='2'>";
-				//else:
+			//else:
 					echo "<td>";
 				//endif;
-				if(!empty($arr_px_labels)):
-					if($i!=0 && $value[$i]!=0):
+				if(!empty($arr_px_labels)): 
+					if($i!=0 && $value[$i]!=0): echo $key;
 						if(isset($arr_px_labels["epi"])):
 							$cat = 'epi';
 							$arr_names = $this->return_px_names(((($key*2)+$i)-1),$arr_px_labels,$cat);

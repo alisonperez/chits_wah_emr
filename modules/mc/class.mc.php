@@ -2167,6 +2167,7 @@ class mc extends module {
         print "<option value='A' ".($type_id=="A"?"selected":"").">Type A</option>";
         print "<option value='B' ".($type_id=="B"?"selected":"").">Type B</option>";
         print "<option value='AB' ".($type_id=="AB"?"selected":"").">Type AB</option>";
+	print "<option value='NA' ".($type_id=="NA"?"selected":"").">Not Applicable</option>";
         print "</select>";
     }
 

@@ -230,6 +230,9 @@ function compute_indicator($crit){
 
 		case 1:	//total number of live births
 			$arr_natality = array("M"=>0,"F"=>0,"total"=>0);
+			$arr_natality_lb = array(1=>array(),2=>array(),3=>array(),4=>array(),5=>array(),6=>array(),7=>array(),8=>array(),9=>array(),10=>array(),11=>array(),12=>array());
+
+
 			if(in_array('all',$_SESSION[brgy])):
 				$q_natality = mysql_query("SELECT mc_id, patient_id,delivery_date,outcome_id FROM m_patient_mc WHERE delivery_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' AND outcome_id IN ('NSDF','NSDM','LSCSF','LSCSM')") or die("Cannot query 234: ".mysql_error());
 			else:
@@ -239,8 +242,14 @@ function compute_indicator($crit){
 			
 			while(list($mc_id,$pxid,$delivery_date,$outcome_id) = mysql_fetch_array($q_natality)){
 				$arr_natality[$this->get_px_gender($outcome_id)] += 1;
+				if($this->get_px_gender($outcome_id)=='M'):
+					array_push($arr_natality_lb[$this->get_max_month($delivery_date)],array($pxid,$mc_id,'natality',$delivery_date));
+				else:
+					array_push();
+				endif;
 			}
 
+			array_push($_SESSION["arr_px_labels"]["natality"],$arr_natality_lb);
 			$arr_natality["total"] = $arr_natality["M"] + $arr_natality["F"];			
 			
 			break;
@@ -667,6 +676,7 @@ $pdf->AliasNbPages();
 $pdf->SetFont('Arial','',13);
 $pdf->AddPage();
 
+$_SESSION["arr_px_labels"] = array('natality'=>array());
 
 $natality_content = $pdf->show_natality();
 
