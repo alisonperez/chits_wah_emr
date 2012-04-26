@@ -242,14 +242,14 @@ function compute_indicator($crit){
 			
 			while(list($mc_id,$pxid,$delivery_date,$outcome_id) = mysql_fetch_array($q_natality)){
 				$arr_natality[$this->get_px_gender($outcome_id)] += 1;
-				if($this->get_px_gender($outcome_id)=='M'):
+				/*if($this->get_px_gender($outcome_id)=='M'):
 					array_push($arr_natality_lb[$this->get_max_month($delivery_date)],array($pxid,$mc_id,'natality',$delivery_date));
 				else:
 					array_push();
-				endif;
+				endif;*/
 			}
 
-			array_push($_SESSION["arr_px_labels"]["natality"],$arr_natality_lb);
+			//array_push($_SESSION["arr_px_labels"]["natality"],$arr_natality_lb);
 			$arr_natality["total"] = $arr_natality["M"] + $arr_natality["F"];			
 			
 			break;
@@ -676,7 +676,7 @@ $pdf->AliasNbPages();
 $pdf->SetFont('Arial','',13);
 $pdf->AddPage();
 
-$_SESSION["arr_px_labels"] = array('natality'=>array());
+//$_SESSION["arr_px_labels"] = array('natality'=>array());
 
 $natality_content = $pdf->show_natality();
 

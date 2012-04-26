@@ -311,12 +311,14 @@ function compute_indicator($crit){
 			$anc_name_px = array(1=>array(),2=>array(),3=>array(),4=>array(),5=>array(),6=>array(),7=>array(),8=>array(),9=>array(),10=>array(),11=>array(),12=>array());
 
 //				if(in_array('all',$_SESSION[brgy])):
-			$get_visits = mysql_query("SELECT distinct mc_id,patient_id,MIN(prenatal_date) FROM m_consult_mc_prenatal WHERE visit_sequence >=  4 AND trimester=3 AND prenatal_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' GROUP by mc_id") or die("Cannot query: 186");
+			//$get_visits = mysql_query("SELECT distinct mc_id,patient_id,MIN(prenatal_date) FROM m_consult_mc_prenatal WHERE visit_sequence >=  4 AND trimester=3 AND prenatal_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' GROUP by mc_id") or die("Cannot query: 186");
+
+			$get_visits = mysql_query("SELECT distinct mc_id,patient_id,MIN(prenatal_date) FROM m_consult_mc_prenatal WHERE trimester=3 AND prenatal_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' GROUP by mc_id") or die("Cannot query: 186");
 //				else:
 //					$get_visits = mysql_query("SELECT distinct a.mc_id,a.patient_id,MIN(a.prenatal_date) FROM m_consult_mc_prenatal a ,m_family_members b, m_family_address c WHERE a.visit_sequence >=  4 AND a.trimester=3 AND a.prenatal_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' AND a.patient_id=b.patient_id AND b.family_id=c.family_id AND c.barangay_id IN ($brgy_array) GROUP by a.mc_id") or die(mysql_error());				
 //				endif;
 			
-			if(mysql_num_rows($get_visits)!=0):
+			if(mysql_num_rows($get_visits)>=4):
 		
 			while(list($mcid,$pxid,$predate)=mysql_fetch_array($get_visits)){
 				$banat = 0;
@@ -658,7 +660,7 @@ function compute_indicator($crit){
 				while(list($mcid,$pxid)=mysql_fetch_array($get_vita)){
 					$vit_total = 0;
 					$target_reach = 0;
-						$q_mc = mysql_query("SELECT a.service_qty, a.actual_service_date FROM m_consult_mc_services a,m_patient_mc b WHERE a.mc_id=b.mc_id AND a.mc_id='$mcid' AND a.service_id='VITA' AND a.actual_service_date BETWEEN b.delivery_date AND '$_SESSION[edate2]' AND (TO_DAYS(a.actual_service_date)-TO_DAYS(b.delivery_date))<=28 AND b.delivery_date!='0000-00-00' ORDER by a.actual_service_date ASC") or die("Cannot query; 277 ".mysql_error());
+						$q_mc = mysql_query("SELECT a.service_qty, a.actual_service_date FROM m_consult_mc_services a,m_patient_mc b WHERE a.mc_id=b.mc_id AND a.mc_id='$mcid' AND a.service_id='VITA' AND a.actual_service_date BETWEEN b.delivery_date AND '$_SESSION[edate2]' AND (TO_DAYS(a.actual_service_date)-TO_DAYS(b.delivery_date))<=42 AND b.delivery_date!='0000-00-00' ORDER by a.actual_service_date ASC") or die("Cannot query; 277 ".mysql_error());
 
 					while(list($qty,$serv_date)=mysql_fetch_array($q_mc)){						
 						$vita_total+=$qty;
