@@ -317,10 +317,10 @@ function compute_indicator($crit){
 //				else:
 //					$get_visits = mysql_query("SELECT distinct a.mc_id,a.patient_id,MIN(a.prenatal_date) FROM m_consult_mc_prenatal a ,m_family_members b, m_family_address c WHERE a.visit_sequence >=  4 AND a.trimester=3 AND a.prenatal_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' AND a.patient_id=b.patient_id AND b.family_id=c.family_id AND c.barangay_id IN ($brgy_array) GROUP by a.mc_id") or die(mysql_error());				
 //				endif;
-			
-			if(mysql_num_rows($get_visits)>=4):
+
+			if(mysql_num_rows($get_visits)!=0):
 		
-			while(list($mcid,$pxid,$predate)=mysql_fetch_array($get_visits)){
+			while(list($mcid,$pxid,$predate)=mysql_fetch_array($get_visits)){ 
 				$banat = 0;
 				if(in_array('all',$_SESSION[brgy])):
 					$banat = 1;
@@ -340,7 +340,7 @@ function compute_indicator($crit){
 					
 				for($j=1;$j<=3;$j++){   //traverse for checking the trimester format 1-1-2
 					$get_tri = mysql_query("SELECT consult_id, prenatal_date FROM m_consult_mc_prenatal WHERE trimester='$j' AND mc_id='$mcid' ORDER by prenatal_date DESC") or die("Cannot query: 186");
-										
+									
 					$num = mysql_num_rows($get_tri);
 
 					if($num!=0):
