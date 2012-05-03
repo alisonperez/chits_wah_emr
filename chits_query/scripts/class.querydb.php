@@ -864,7 +864,7 @@ class querydb{
 				array_push($r_fp_px,$pxid);
 				array_push($r_fp_id,$fpid);
 			}
-			print_r($r_fp_px);
+			//print_r($r_fp_px);
 			$_SESSION[fp_px] = $r_fp_px;
 			$_SESSION[fp_method_id] = $r_fp_id;
 
