@@ -230,18 +230,17 @@ function get_current_users(){
             return $cu_prev;            
             break;
 
-    
-        case '3':        
+        case '3':
             $q_na = mysql_query("SELECT fp_px_id,patient_id,date_registered FROM m_patient_fp_method WHERE date_registered BETWEEN '$start' AND '$end' AND client_code='NA' AND method_id='$method'") or die("Cannot query 215 ".mysql_error());
-            
+
             $arr_na_pres = $this->sanitize_brgy($q_na,$brgy);
-            
+
             $cu_na = count($arr_na_pres);
-            
+
             return $cu_na;
-            
+
             break;
-        
+
         case '4': //cu for others
             $q_others = mysql_query("SELECT fp_px_id,patient_id,date_registered FROM m_patient_fp_method WHERE date_registered BETWEEN '$start' AND '$end' AND client_code!='NA' AND method_id='$method'") or die("Cannot query 235 ".mysql_error());
             $arr_others = $this->sanitize_brgy($q_others,$brgy);

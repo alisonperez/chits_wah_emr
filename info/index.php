@@ -122,7 +122,7 @@ small { font-family: verdana, sans serif}
 <body text="black" bgcolor="#FFFFCC" link="black" vlink="black">
 <?php        
 	//echo "Print page module: ";
-	//print_r($_GET);
+	//print_r($_SESSION);
 ?>
 
 <br/>
@@ -131,8 +131,8 @@ small { font-family: verdana, sans serif}
   <tr bgcolor="#006600">
   <tr>
   <tr>
-<!--    <td valign="top"><img src="../images/<?php echo $_SESSION["banner"] ?>" border="0" width="100%" height="50%"></td> -->
-    <td valign="top"><img src="../images/banner.6.jpg" border="0" width="100%" height="100%"></td>
+    <td valign="top"><img src="../images/<?php echo $_SESSION["banner"] ?>" border="0" width="100%" height="100%"></td>
+<!--    <td valign="top"><img src="../images/banner.6.jpg" border="0" width="100%" height="100%"></td> -->
     
   </tr>
   <tr>
