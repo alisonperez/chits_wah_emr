@@ -584,19 +584,20 @@ function compute_indicator($crit){
 			if(mysql_num_rows($q_post)!=0):
 
 			while(list($mcid,$post_date,$del_date,$pxid)=mysql_fetch_array($q_post)){ //check if the mcid(24-hrs) has 1-week (+3/-3) visit
-			   $q_wk = mysql_query("SELECT a.postpartum_date FROM m_consult_mc_postpartum a, m_patient_mc b WHERE a.mc_id='$mcid' AND (TO_DAYS(a.postpartum_date)-TO_DAYS(b.delivery_date)) BETWEEN 4 AND 10 AND a.postpartum_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' ORDER by a.postpartum_date ASC") or die(mysql_error());
-			   
-				if(mysql_num_rows($q_wk)!=0):					
+			   $q_wk = mysql_query("SELECT a.postpartum_date FROM m_consult_mc_postpartum a, m_patient_mc b WHERE a.mc_id='$mcid' AND (TO_DAYS(a.postpartum_date)-TO_DAYS(b.delivery_date)) BETWEEN 4 AND 10 AND a.postpartum_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' AND a.postpartum_date!='$post_date' ORDER by a.postpartum_date ASC") or die(mysql_error());
+				
+				
+				if(mysql_num_rows($q_wk)!=0):
 					list($postdate) = mysql_fetch_array($q_wk);
-					
-					array_push($ppv2_name_px[$this->get_max_month($postdate)],array($pxid,'Postpartum women with at least 2 PPV','mc',$postdate));
 
+					array_push($ppv2_name_px[$this->get_max_month($postdate)],array($pxid,'Postpartum women with at least 2 PPV','mc',$postdate));
+					
 					$month_stat[$this->get_max_month($postdate)]+=1;
 				else:
 
 				endif;
 			
-			}
+			} 
 			endif;
 
 			array_push($_SESSION["arr_px_labels"]["mc"],$ppv2_name_px); 
