@@ -168,9 +168,13 @@ function show_fp_quarterly(){
         $na_pres = $this->get_current_users($_SESSION[sdate2],$_SESSION[edate2],$method_code,$str_brgy,3);
         $other_pres = $this->get_current_users($_SESSION[sdate2],$_SESSION[edate2],$method_code,$str_brgy,4);
         $dropout_pres = $this->get_current_users($_SESSION[sdate2],$_SESSION[edate2],$method_code,$str_brgy,5 );
-        $cu_pres = ($cu_prev + $na_pres + $other_pres) - $dropout_pres;
-        
-                
+
+	$prev_na = $this->get_current_users($_SESSION[sdate2],$_SESSION[edate2],$method_code,$str_brgy,6);
+
+        //$cu_pres = ($cu_prev + $na_pres + $other_pres) - $dropout_pres;
+
+	$cu_pres = ($cu_prev + $prev_na + $other_pres) - $dropout_pres;
+
         $fp_contents = array($col_code.'. '.$method_name,$cu_prev,$na_pres,$other_pres,$dropout_pres,$cu_pres);
 	array_push($arr_consolidate,$fp_contents);
 
@@ -205,8 +209,8 @@ function get_brgy(){
 	}	        
 
 	}                
-    endif;                                                                         
-                                                                          
+    endif;
+
     return $str_brgy;
 }
 
@@ -218,46 +222,66 @@ function get_current_users(){
         $method = $args[2];
         $brgy = $args[3];
         $col_code = $args[4];
+
+	$s_date = strtotime("-1 month", strtotime($start));
+	$s_date = date("Y-m-d",$s_date);
+
+	list($syear,$smonth,$sdate) = explode('-',$s_date);
+	
+	$edate = date("t",$s_date);
+
+	$e_date = $syear.'-'.$smonth.'-'.$edate;
+
+	/* $s_date and $e_date would contain the first and last day of the previous month */
+
     endif;
     
     switch($col_code){
-        
-        
+
         case '2': //this will compute the Current User beginning the Quarter ((NA+Others)-Dropout)prev
-            $q_active_prev = mysql_query("SELECT fp_px_id,patient_id,date_registered FROM m_patient_fp_method WHERE date_registered < '$start' AND method_id='$method'") or die("Cannot query 198: ".mysql_error());
-            $q_dropout_prev = mysql_query("SELECT fp_px_id,patient_id,date_registered FROM m_patient_fp_method WHERE date_dropout < '$start' AND drop_out='Y' AND method_id='$method'") or die("Cannot query: 199". mysql_error());
-            
+            //$q_active_prev = mysql_query("SELECT fp_px_id,patient_id,date_registered FROM m_patient_fp_method WHERE date_registered < '$start' AND method_id='$method' AND NOT EXISTS (SELECT fp_px_id FROM m_patient_fp_method WHERE client_code='NA' AND date_registered BETWEEN '$s_date' AND '$e_date' AND method_id='$method')") or die("Cannot query 198: ".mysql_error());
+	    $q_active_prev = mysql_query("SELECT fp_px_id,patient_id,date_registered FROM m_patient_fp_method WHERE date_registered < '$start' AND method_id='$method'") or die("Cannot query 198: ".mysql_error());
+
+	    $q_dropout_prev = mysql_query("SELECT fp_px_id,patient_id,date_registered FROM m_patient_fp_method WHERE date_dropout < '$start' AND drop_out='Y' AND method_id='$method'") or die("Cannot query: 199". mysql_error());
+
+	    $q_na_prev = mysql_query("SELECT fp_px_id,patient_id,date_registered FROM m_patient_fp_method WHERE date_registered BETWEEN '$s_date' AND '$e_date' AND client_code='NA' AND method_id='$method'") or die("Cannot query 215 ".mysql_error());
+
             //echo mysql_num_rows($q_active_prev);
-            
+
             $arr_active_prev = $this->sanitize_brgy($q_active_prev,$brgy);
             $arr_dropout_prev = $this->sanitize_brgy($q_dropout_prev,$brgy);
-                              
+	    $arr_na_prev = $this->sanitize_brgy($q_na_prev,$brgy);
+
+            $cu_na_prev = count($arr_na_prev);
+
+
             $cu_prev = count($arr_active_prev)-count($arr_dropout_prev);
-            
+	    $cu_prev -= $cu_na_prev;
+
             //echo $method.'/'.count($arr_active_prev).' less '.count($arr_dropout_prev).'='.$diff."<br>";
-            return $cu_prev;            
+            return $cu_prev;
             break;
 
-    
-        case '3':        
+
+        case '3':
             $q_na = mysql_query("SELECT fp_px_id,patient_id,date_registered FROM m_patient_fp_method WHERE date_registered BETWEEN '$start' AND '$end' AND client_code='NA' AND method_id='$method'") or die("Cannot query 215 ".mysql_error());
-            
+
             $arr_na_pres = $this->sanitize_brgy($q_na,$brgy);
-            
+
             $cu_na = count($arr_na_pres);
-            
+
             return $cu_na;
-            
+
             break;
-        
+
         case '4': //cu for others
             $q_others = mysql_query("SELECT fp_px_id,patient_id,date_registered FROM m_patient_fp_method WHERE date_registered BETWEEN '$start' AND '$end' AND client_code!='NA' AND method_id='$method'") or die("Cannot query 235 ".mysql_error());
             $arr_others = $this->sanitize_brgy($q_others,$brgy);
             $cu_others = count($arr_others);
             return $cu_others;
-            
+
             break;
-            
+
         case '5': //dropouts for a given quarter
         
             $q_dropout = mysql_query("SELECT fp_px_id,patient_id,date_registered FROM m_patient_fp_method WHERE date_dropout BETWEEN '$start' AND '$end' AND drop_out='Y' AND method_id='$method'") or die("Cannot query 240 ".mysql_error());
@@ -268,15 +292,20 @@ function get_current_users(){
             
             break;
         
-        
-            
+        case '6': //previous NA of the past period (m/q/a)
+	    $q_na_prev = mysql_query("SELECT fp_px_id,patient_id,date_registered FROM m_patient_fp_method WHERE date_registered BETWEEN '$s_date' AND '$e_date' AND client_code='NA' AND method_id='$method'") or die("Cannot query 215 ".mysql_error());
+		
+	    $arr_na_prev = $this->sanitize_brgy($q_na_prev,$brgy);
+
+            $cu_na_prev = count($arr_na_prev);
+
+	    return $cu_na_prev;
+
         default:
         break;
     
     }
-    
-        
-    
+
 }
 
 function get_cpr(){

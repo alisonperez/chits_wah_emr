@@ -1251,12 +1251,14 @@ class family_planning extends module{
 					
 					if(isset($_GET["service_id"])):
 							$q_service = mysql_query("SELECT date_format(date_service,'%m/%d/%Y'), source_id, remarks, date_format(next_service_date,'%m/%d/%Y'),quantity FROM m_patient_fp_method_service WHERE fp_service_id='$_GET[service_id]'") or die(mysql_error());
-							list($date_service,$source,$remarks,$next_service,$quantity) = mysql_fetch_array($q_service);                                                        
+							list($date_service,$source,$remarks,$next_service,$quantity) = mysql_fetch_array($q_service);
 					endif;
 
 					if($_POST["confirm_del"]==1):
                                                 $this->delete_service_record();
 					endif;
+
+
 
 					echo "<table bgcolor='#66FF66'>";
 					echo "<tr><td valign='top'>";
@@ -1280,8 +1282,6 @@ class family_planning extends module{
 					echo "<a href=\"javascript:show_calendar4('document.form_fp_chart.txt_date_service', document.form_fp_chart.txt_date_service.value);\"><img src='../images/cal.gif' width='16' height='16' border='0' alt='Click here to pick up date'></a>";
 					echo "</input></td></tr>";
 					
-					
-
 					echo "<tr><td class='boxtitle'>SOURCE OF SUPPLY</td><td>";
 					if(mysql_num_rows($q_supplier)!=0):
 						echo "<select name='sel_supply' size='1'>";
