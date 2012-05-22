@@ -301,6 +301,8 @@ function get_current_users(){
 
 	    return $cu_na_prev;
 
+	    break;
+
         default:
         break;
     
