@@ -101,31 +101,31 @@ if($_SESSION["userid"]!=""):
 			$queryconn->querycrit($dbname,$dbname2,$sdate,$edate,$_POST[brgy],0); //the fifth argument when set to zero, means that there is no form present in the query box
 			
                 elseif($_SESSION[filter]==3): //quarterly tables
-                        $arr_start_end = array('1'=>array('01/01','03/31'),'2'=>array('04/30','06/30'),'3'=>array('07/31','09/30'),'4'=>array('10/01','12/31'));                        
+                        $arr_start_end = array('1'=>array('01/01','03/31'),'2'=>array('04/01','06/30'),'3'=>array('07/01','09/30'),'4'=>array('10/01','12/31'));
                         $sdate = $arr_start_end[$_POST[sel_quarter]][0].'/'.$_POST[year];
                         $edate = $arr_start_end[$_POST[sel_quarter]][1].'/'.$_POST[year];
-                        
+
                         $_SESSION[quarter] = $_POST[sel_quarter];
                         $_SESSION[year] = $_POST[year];
-                        //print_r($_POST);                        
+                        //print_r($_POST);
                         //echo $sdate.'/'.$edate;
-                        
+
                         $queryconn->querycrit($dbname,$dbname2,$sdate,$edate,$_POST[brgy],0);
-                        
+
                 elseif($_SESSION[filter]==4): //monthly tables
                         $_SESSION[smonth] = $_POST[smonth];
                         $_SESSION[year] = $_POST[year];
-                        
+
       			$sdate = strftime("%m/%d/%Y",mktime(0,0,0,$_POST[smonth],1,$_POST[year]));
 			$edate = strftime("%m/%d/%Y",mktime(0,0,0,($_POST[smonth]+1),0,$_POST[year]));						
 			
 			$queryconn->querycrit($dbname,$dbname2,$sdate,$edate,$_POST[brgy],0); //the fifth argument when set to zero, means that there is no form present in the query box
-                
+
                 elseif($_SESSION[filter]==5): //weekly reports
                         //print_r($_POST);
                         $_SESSION[week] = $_POST[sel_week];
                         $_SESSION[year] = $_POST[year];
-                        
+
                         $q_cal = mysql_query("SELECT date_format(start_date,'%m/%d/%Y'),date_format(end_date,'%m/%d/%Y') FROM m_lib_weekly_calendar WHERE year='$_POST[year]' AND week='$_POST[sel_week]'") or die("Cannot query: 169".mysql_error());
                         
                         if(mysql_num_rows($q_cal)!=0):

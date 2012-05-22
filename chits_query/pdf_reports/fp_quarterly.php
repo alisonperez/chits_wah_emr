@@ -199,7 +199,7 @@ function get_brgy(){  //returns the barangay is CSV format. to be used in WHERE 
     $str_brgy = implode(',',$arr_brgy);
     
     return $str_brgy;
-        
+
 }       
 
 function get_current_users(){
@@ -210,11 +210,24 @@ function get_current_users(){
         $method = $args[2];
         $brgy = $args[3];
         $col_code = $args[4];
+
+	$s_date = strtotime("-3 months", strtotime($start));
+	$s_date = date("Y-m-d",$s_date);
+
+	list($syear,$smonth,$sdate) = explode('-',$s_date);
+	
+	$edate = strtotime("-93 days", strtotime($end)); 
+	$new_edate = date("Y-m-d",$edate);
+	list($eyear,$emonth,$edate) = explode('-',$new_edate);
+	$edate = date("t",$new_edate);
+
+	$e_date = $eyear.'-'.$emonth.'-'.$edate;
+	//print_r($_SESSION);
+	echo $start.'*'.$s_date.'*'.$end.'*'.$e_date.'<br>';
     endif;
-    
+
     switch($col_code){
-        
-        
+
         case '2': //this will compute the Current User beginning the Quarter ((NA+Others)-Dropout)prev
             $q_active_prev = mysql_query("SELECT fp_px_id,patient_id,date_registered FROM m_patient_fp_method WHERE date_registered < '$start' AND method_id='$method'") or die("Cannot query 198: ".mysql_error());
             $q_dropout_prev = mysql_query("SELECT fp_px_id,patient_id,date_registered FROM m_patient_fp_method WHERE date_dropout < '$start' AND drop_out='Y' AND method_id='$method'") or die("Cannot query: 199". mysql_error());
