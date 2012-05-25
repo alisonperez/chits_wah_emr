@@ -218,7 +218,6 @@ function get_current_users(){
 
 	$s_date = strtotime("-3 months", strtotime($start));
 	$s_date = date("Y-m-d",$s_date);
-
 	list($syear,$smonth,$sdate) = explode('-',$s_date);
 	
 	$edate = strtotime("-93 days", strtotime($end)); 

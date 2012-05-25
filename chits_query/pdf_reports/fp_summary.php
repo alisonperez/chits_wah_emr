@@ -178,10 +178,9 @@ function show_fp_summary(){
         $target_pop = $this->get_target($brgy_pop); //compute for the target of FP        
         $str_brgy = $this->get_brgy(); //return list of barangays in CSV format
         $i = 0;
-        
-	
-	$q_methods = mysql_query("SELECT method_id,method_name FROM m_lib_fp_methods ORDER by report_order ASC") or die("Cannot query: 174".mysql_error());        
-        
+
+	$q_methods = mysql_query("SELECT method_id,method_name FROM m_lib_fp_methods ORDER by report_order ASC") or die("Cannot query: 174".mysql_error());    
+
 	while(list($method_id,$method_name)=mysql_fetch_array($q_methods)){  //push the method_id as index and method_name as the array contents
 		$arr_methods[$method_id] = $method_name;		
 		//$arr_methods[$method_id] = $method_id;		
@@ -202,7 +201,8 @@ function show_fp_summary(){
 	                $arr_method_label = array(); //clean up the label array for each iteration in the method
 	                array_push($arr_method_label,$method_value,''); //push the label for method and a '' for blank target	               	 
                         $arr_row = $this->compute_indicator($client_type,$method_key);
-                        $arr_total_quarter = $this->create_qt_gt($arr_row);
+
+                       	$arr_total_quarter = $this->create_qt_gt($arr_row);
 
 			array_push($arr_consolidate,array_merge($arr_method_label,$arr_total_quarter));
 
@@ -217,6 +217,7 @@ function show_fp_summary(){
 	            array_push($arr_label,$i.'. '.$value);
                     $arr_row = $this->compute_indicator($client_type,'all');
                     array_push($arr_label,$target_pop);
+
                     $arr_total_quarter = $this->create_qt_gt($arr_row);
 
 		    $this->Row(array_merge($arr_label,$arr_total_quarter));
@@ -224,8 +225,8 @@ function show_fp_summary(){
 		    array_push($arr_consolidate,array_merge($arr_label,$arr_total_quarter));
 
                     $this->Row($this->return_blank(19));
-	        endif;	        
-	        
+	        endif;
+
 		//array_push($arr_rows,$arr_indicators[$client_type][0]);
 					
 		}
@@ -279,9 +280,9 @@ function compute_indicator(){   //accepts two parameters. 1st is (NA, OTHERS, DR
             endif;
             
             break;
-            
+
         case 'CU': //use formula (CU (prev period) + (NA + CS + CM + RS)) - DROP OUT = CU (current period)            
-            
+
             if($method=='all'):
                 $arr_cu = $this->get_current_users($_SESSION[sdate2],$_SESSION[edate2],'all',$str_brgy);
                 //$q_methods = mysql_query("SELECT a.fp_px.id,a.date_dropout,a.patient_id FROM m_patient_fp_method WHERE dropout") or die("Cannot query: 277");
@@ -369,18 +370,18 @@ function create_qt_gt($arr_in_months){  //this function receives an array repres
     for($i=1;$i<=count($arr_in_months);$i++){
         if(($i % 3)==0):
             array_push($arr_qt_gt,$arr_in_months[$i]);
-            $qtrly_total = $arr_in_months[$i] + $arr_in_months[$i-1] + $arr_in_months[$i-2];
+            //$qtrly_total = $arr_in_months[$i] + $arr_in_months[$i-1] + $arr_in_months[$i-2];
+		$qtrly_total = $arr_in_months[$i];
             array_push($arr_qt_gt,$qtrly_total);
         else:
             array_push($arr_qt_gt,$arr_in_months[$i]);
         endif;
-        
         $gt = $gt + $arr_in_months[$i];
     }
-    
+
     array_push($arr_qt_gt,$gt);
-    
-    return $arr_qt_gt;   
+
+    return $arr_qt_gt;
 }
 
 function return_blank($cells){
@@ -440,39 +441,53 @@ function get_current_users(){
         $arr_prev_dropout = array();
         $arr_pres_cu = array();
         $arr_pres_dropout = array();
+	$arr_prev_na = array();
         
         $firstday_month = strftime("%Y-%m-%d",(mktime(0,0,0,$i,1,$syr)));
         $lastday_month = strftime("%Y-%m-%d",(mktime(0,0,0,$i+1,0,$syr)));
-                
-//        echo $firstday_month.'/'.$lastday_month."<br>";
+
+	$s_date = strtotime("-1 month", strtotime($firstday_month));
+	$s_date = date("Y-m-d",$s_date);
+
+	list($syear,$smonth,$sdate) = explode('-',$s_date);
+	
+	$edate = date("t",$s_date);
+
+	$e_date = $syear.'-'.$smonth.'-'.$edate;
+
 
         /* $q_prev_cu - get the previous FP Current Users. This will return CU for the previous period (before month)
            $q_pres_cu - get the present FP users (NA + RS + CM + CC)
-           $q_pres_dropout - get the dropout from firstday_month to lastday_month */
+           $q_pres_dropout - get the dropout from firstday_month to lastday_month 
+        */
 
         $str_prev_cu = "SELECT fp_px_id,patient_id,date_registered FROM m_patient_fp_method WHERE date_registered < '$firstday_month'";
         $str_prev_dropout = "SELECT fp_px_id,patient_id,date_registered FROM m_patient_fp_method WHERE date_dropout < '$firstday_month' AND drop_out='Y'";
-        $str_pres_cu = "SELECT fp_px_id,patient_id,date_registered FROM m_patient_fp_method WHERE date_registered BETWEEN '$firstday_month' AND '$lastday_month'";
+        $str_pres_cu = "SELECT fp_px_id,patient_id,date_registered FROM m_patient_fp_method WHERE date_registered BETWEEN '$firstday_month' AND '$lastday_month' AND client_code!='NA'";
         $str_pres_dropout = "SELECT fp_px_id,patient_id,date_registered FROM m_patient_fp_method WHERE date_dropout BETWEEN '$firstday_month' AND '$lastday_month' AND drop_out='Y'";
         $str_method = " AND method_id='$method'";
+	
+	$str_prev_na = "SELECT fp_px_id,patient_id,date_registered FROM m_patient_fp_method WHERE date_registered BETWEEN '$s_date' AND '$e_date' AND client_code='NA'";
 
         $str_prev1 = ($method=='all')?$str_prev_cu:$str_prev_cu.$str_method;
         $str_prev2 = ($method=='all')?$str_prev_dropout:$str_prev_dropout.$str_method;
         $str_pres3 = ($method=='all')?$str_pres_cu:$str_pres_cu.$str_method;
         $str_pres4 = ($method=='all')?$str_pres_dropout:$str_pres_dropout.$str_method;
+        $str_prev5 = ($method=='all')?$str_prev_na:$str_prev_na.$str_method;
 
         $q_prev_cu = mysql_query($str_prev1);
         $q_prev_dropout = mysql_query($str_prev2);
         $q_pres_cu = mysql_query($str_pres3);
         $q_pres_dropout = mysql_query($str_pres4);
-        
+	$q_prev_na = mysql_query($str_prev5);
+
           /*DO AN ARRAY DIFFERENCE BETWEEN $q_prev_cu and $q_pres_dropout to return distinct $fp_px_id's. 
             The remaining $fp_px_id's are to be pushed to array result of $q_pres_cu.           
           */
 
           if(mysql_num_rows($q_prev_cu)!=0):
                while($r_prev = mysql_fetch_array($q_prev_cu)){
-                   if($this->get_px_brgy($r_prev[patient_id],$brgy)):                   
+                   if($this->get_px_brgy($r_prev[patient_id],$brgy)):
                      array_push($arr_prev_cu,$r_prev);
                    endif;
                }
@@ -486,10 +501,10 @@ function get_current_users(){
               }
           endif;
           
-          if(mysql_num_rows($q_pres_cu)!=0):                                
-               while($r_pres = mysql_fetch_array($q_pres_cu)){                                  
-               
-                 if($this->get_px_brgy($r_pres[patient_id],$brgy)):                                                  
+          if(mysql_num_rows($q_pres_cu)!=0):
+               while($r_pres = mysql_fetch_array($q_pres_cu)){
+
+                 if($this->get_px_brgy($r_pres[patient_id],$brgy)):
                    array_push($arr_pres_cu,$r_pres);
                 endif;
                }               
@@ -500,16 +515,32 @@ function get_current_users(){
            
           if(mysql_num_rows($q_pres_dropout)!=0): 
               while($r_dropout = mysql_fetch_array($q_pres_dropout)){
-                if($this->get_px_brgy($r_dropout[patient_id],$brgy)):                  
-                   array_push($arr_pres_dropout,$r_dropout);                      
+                if($this->get_px_brgy($r_dropout[patient_id],$brgy)):
+                   array_push($arr_pres_dropout,$r_dropout);
                 endif;
               } 
-          endif;          
+          endif;
+
+	  if(mysql_num_rows($q_prev_na)!=0):  
+              while($r_prev_na = mysql_fetch_array($q_prev_na)){
+                if($this->get_px_brgy($r_prev_na[patient_id],$brgy)):
+                   array_push($arr_prev_na,$r_prev_na);
+                endif;
+              } 
+
+/*echo $firstday_month.'/'.$s_date.'/'.$lastday_month.'/'.$e_date.' '.$method.' '.count($arr_prev_na)."<br>"; 
+echo 'PREV CU: '.count($arr_prev_cu).' PREV NA: '.count($arr_prev_na)."<br>";
+echo $str_prev1."<br><br>";*/
+
+          endif;
+
+          //$cu_pres = ((count($arr_prev_cu) - count($arr_prev_dropout)) + count($arr_pres_cu)) - count($arr_pres_dropout);
+	  
+	 $cu_pres = ((count($arr_prev_cu) + count($arr_prev_na)) - count($arr_prev_dropout))  + count($arr_pres_cu) - count($arr_pres_dropout);
           
-          $cu_pres = ((count($arr_prev_cu) - count($arr_prev_dropout)) + count($arr_pres_cu)) - count($arr_pres_dropout);                    
-          //echo $method.'/'.$firstday_month.'/'.$lastday_month.'/ PREV -'.count($arr_prev_cu).'/PREV DROPOUT - '.count($arr_prev_dropout).'/ PRES -'.count($arr_pres_cu).'/ DROPOUT -'.count($arr_pres_dropout).'/ CU -'.$cu_pres;          
+	//echo $method.'/'.$firstday_month.'/'.$lastday_month.'/ PREV -'.count($arr_prev_cu).'/PREV DROPOUT - '.count($arr_prev_dropout).'/ PRES -'.count($arr_pres_cu).'/ DROPOUT -'.count($arr_pres_dropout).'/ CU -'.$cu_pres;          
         
-          $arr_cu[$i] = $cu_pres;        
+          $arr_cu[$i] = $cu_pres;
     }
     
     return $arr_cu;
