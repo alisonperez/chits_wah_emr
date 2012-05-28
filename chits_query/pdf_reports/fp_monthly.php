@@ -122,17 +122,16 @@ function NbLines($w,$txt)
 
 function Header()
 {
-    
-    
+
     $q_pop = mysql_query("SELECT SUM(population) FROM m_lib_population WHERE population_year='$_SESSION[year]'") or die("Cannot query: 123". mysql_error());
     list($population)= mysql_fetch_array($q_pop);
-    
+
     $this->q_report_header($population);
     $this->Ln(10);
-    
+
     $this->SetFont('Arial','BI','20');
     $this->Cell(340,10,'F A M I L Y   P L A N N I N G',1,1,C);
-    
+
     $this->SetFont('Arial','B','12');
     $_SESSION["w"] = $w = array(90,50,50,50,50,50);
     $this->SetWidths($w);
@@ -157,13 +156,13 @@ function show_fp_quarterly(){
     $arr_method = array('a'=>'FSTRBTL','b'=>'MSV','c'=>'PILLS','d'=>'IUD','e'=>'DMPA','f'=>'NFPCM','g'=>'NFPBBT','h'=>'NFPLAM','i'=>'NFPSDM','j'=>'NFPSTM','k'=>'CONDOM');
     $w = array(90,50,50,50,50,50);
     $str_brgy = $this->get_brgy();    
-    
+
     //echo $_SESSION[sdate2].'/'.$_SESSION[edate2];
-    
+
     foreach($arr_method as $col_code=>$method_code){
         $q_fp = mysql_query("SELECT method_name FROM m_lib_fp_methods WHERE method_id='$method_code'") or die("Cannot query: 151".mysql_error());    
         list($method_name) = mysql_fetch_array($q_fp);
-        
+
         $cu_prev = $this->get_current_users($_SESSION[sdate2],$_SESSION[edate2],$method_code,$str_brgy,2);
         $na_pres = $this->get_current_users($_SESSION[sdate2],$_SESSION[edate2],$method_code,$str_brgy,3);
         $other_pres = $this->get_current_users($_SESSION[sdate2],$_SESSION[edate2],$method_code,$str_brgy,4);
@@ -192,7 +191,7 @@ function get_brgy(){
     $str_brgy = '';    
 
     if(in_array('all',$_SESSION[brgy])):
-        /*$q_brgy = mysql_query("SELECT barangay_name FROM m_lib_barangay ORDER by barangay_id ASC") or die("Cannot query 252". mysql_error());        
+        /*$q_brgy = mysql_query("SELECT barangay_name FROM m_lib_barangay ORDER by barangay_id ASC") or die("Cannot query 252". mysql_error());
         while(list($brgy_name) = mysql_fetch_array($q_brgy)){            
             array_push($arr_brgy,$brgy_id);
         }*/
@@ -206,9 +205,9 @@ function get_brgy(){
         
 	while(list($brgy) = mysql_fetch_array($q_brgy)){
 		$str_brgy = $str_brgy.'  '.$brgy;
-	}	        
+	}
 
-	}                
+	}
     endif;
 
     return $str_brgy;
@@ -305,7 +304,7 @@ function get_current_users(){
 
         default:
         break;
-    
+
     }
 
 }
@@ -329,8 +328,7 @@ function get_cpr(){
     
         list($tp) = mysql_fetch_array($q_pop);
         $cpr = ($tp!=0)?(($cu/$tp) * $target_pop * $elig_pop * 100):0;
-        
-                
+
     return round($cpr,3);
 }
 

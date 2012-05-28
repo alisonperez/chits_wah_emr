@@ -634,7 +634,6 @@ class alert extends module{
 			elseif($post_arr[submit_alert]=='Delete Reminder/Alert'):
 				$q_delete = mysql_query("DELETE FROM m_lib_alert_type WHERE alert_indicator_id='$post_arr[sel_alert_indicators]'") or die("Cannot query 327 ".mysql_error());
 
-
 				if($alert_transact):
 					echo "<script language='javascript'>";
 					echo "window.alert('Alert was successfully been deleted.')";

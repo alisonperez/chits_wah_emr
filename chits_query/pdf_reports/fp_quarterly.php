@@ -315,8 +315,9 @@ function get_cpr(){
 
 
     list($tp) = mysql_fetch_array($q_pop);
-    $cpr = ($tp!=0)?(($cu/$tp) * $target_pop * $elig_pop * 100):0;         
-             
+    //$cpr = ($tp!=0)?(($cu/$tp) * $target_pop * $elig_pop * 100):0;
+    $cpr = ($tp!=0)?(($cu/($tp * $target_pop * $elig_pop)) * 100):0;
+
     return round($cpr,3);
 }
 
@@ -325,8 +326,8 @@ function sanitize_brgy(){
     if(func_num_args()>0):
         $args = func_get_args();
         $query = $args[0];
-        $brgy = $args[1];        
-        
+        $brgy = $args[1];
+
     endif;
         
     $arr_count = array();
