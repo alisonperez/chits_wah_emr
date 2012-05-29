@@ -157,11 +157,11 @@ function Header()
 function show_fp1(){ //this method shall extract the FP records on page 1 of the TCL. source data will be session of FP patients and method id's
     $r_px_id = $_SESSION[fp_px];
     $r_fp_id = $_SESSION[fp_method_id];
-    
+
     for($i=0;$i<count($r_fp_id);$i++){
         $q_date_reg = mysql_query("SELECT date_format(date_registered,'%m/%d/%Y') as date_reg, TO_DAYS(date_registered) as reg_days,client_code FROM m_patient_fp_method WHERE fp_px_id='$r_fp_id[$i]'") or die("Cannot query (162): mysql_error()");
         list($dreg,$reg_days,$client_code) = mysql_fetch_array($q_date_reg);        
-                
+
         if($_SESSION[brgy]=='all'):
 		//echo $r_px_id.'<br>';
             $q_px_info = mysql_query("SELECT a.patient_id,a.patient_lastname,a.patient_firstname,b.address,c.barangay_name,TO_DAYS(patient_dob) as dob_days,b.family_id FROM m_patient a,m_family_address b,m_lib_barangay c,m_family_members d WHERE a.patient_id='$r_px_id[$i]' AND a.patient_id=d.patient_id AND d.family_id=b.family_id AND b.barangay_id=c.barangay_id") or die("Cannot query(166): mysql_error()");
@@ -172,11 +172,11 @@ function show_fp1(){ //this method shall extract the FP records on page 1 of the
 
         list($pxid,$lname,$fname,$address,$brgy,$dob_days,$family_id) = mysql_fetch_array($q_px_info);                
         $edad = floor(($reg_days - $dob_days)/365);
-    
+
         $q_prev_method = mysql_query("SELECT a.method_id,b.method_name FROM m_patient_fp_method a, m_lib_fp_methods b WHERE a.patient_id='$r_px_id[$i]' AND a.method_id=b.method_id AND '$_SESSION[sdate2]' > a.date_registered ORDER by a.date_registered DESC LIMIT 1") or die("Cannot query(174): ".mysql_error());
-                                
+
         $arr_prev = array();
-        
+
         while(list($method_id,$method_name)=mysql_fetch_array($q_prev_method)){
             array_push($arr_prev,$method_id);
         }
@@ -224,22 +224,22 @@ function followup_visit($fp_id,$px_id){ //returns an associative array with 12 e
     $arr_followup = array();
 
     //$q_service = mysql_query("SELECT a.date_service,a.next_service_date,b.date_registered,TO_DAYS(date_service) as days_service,TO_DAYS(next_service_date) as days_next,TO_DAYS(date_registered) as days_reg FROM m_patient_fp_method_service a,m_patient_fp_method b WHERE a.fp_px_id='$fp_id' AND a.fp_px_id=b.fp_px_id AND a.patient_id='$px_id' ORDER by next_service_date DESC") or die("Cannot query(202): ".mysql_error());
-    
+
     $q_service = mysql_query("SELECT a.fp_service_id,a.date_service,a.next_service_date,b.date_registered FROM m_patient_fp_method_service a,m_patient_fp_method b WHERE a.fp_px_id='$fp_id' AND a.fp_px_id=b.fp_px_id AND a.patient_id='$px_id' ORDER by date_service ASC") or die("Cannot query(202): ".mysql_error()); 
-    
+
     while(list($service_id,$date_service,$next_service_date,$reg_date) = mysql_fetch_array($q_service)){
-                    
+
         list($serv_yr,$serv_month,$serv_date) = explode('-',$date_service);
         list($next_yr,$next_month,$next_date) = explode('-',$next_service_date);
         list($reg_yr,$reg_month,$reg_date) = explode('-',$reg_date);
-        
+
         $arr_service = array('year'=>$serv_yr,'month'=>$serv_month,'day'=>$serv_date);
         $arr_next = array('year'=>$next_yr,'month'=>$next_month,'day'=>$next_date);
         $arr_reg = array('year'=>$reg_yr,'month'=>$reg_month,'day'=>$reg_date);        
 
         $arr_diff_service = $this->date_difference($arr_reg,$arr_service);        
         $arr_diff_next = $this->date_difference($arr_reg,$arr_next);
-        
+
         $arr_followup[$arr_diff_service[months]][serv] = $date_service;
         $arr_followup[$arr_diff_next[months]][next] = $next_service_date;        
     }

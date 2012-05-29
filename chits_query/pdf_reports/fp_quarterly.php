@@ -123,15 +123,22 @@ function NbLines($w,$txt)
 
 function Header()
 {
-    $q_pop = mysql_query("SELECT SUM(population) FROM m_lib_population WHERE population_year='$_SESSION[year]'") or die("Cannot query: 123". mysql_error());
+    if(in_array('all',$_SESSION[brgy])):
+    	$q_pop = mysql_query("SELECT SUM(population) FROM m_lib_population WHERE population_year='$_SESSION[year]'") or die("Cannot query: 123". mysql_error());
+    else:
+	$str_brgy = $this->get_brgy();
+
+	$q_pop = mysql_query("SELECT SUM(population) FROM m_lib_population WHERE population_year='$_SESSION[year]'  AND barangay_id IN ($str_brgy)") or die("Cannot query: 131". mysql_error());
+    endif;
+
     list($population)= mysql_fetch_array($q_pop);
-    
+
     $this->q_report_header($population);
     $this->Ln(10);
-    
+
     $this->SetFont('Arial','BI','20');
     $this->Cell(340,10,'F A M I L Y   P L A N N I N G',1,1,C);
-    
+
     $this->SetFont('Arial','B','12');
     $_SESSION["w"] = $w = array(75,28,28,26,28,28,28,47,52);
     $this->SetWidths($w);
@@ -191,7 +198,7 @@ function show_fp_quarterly(){
 
 function get_brgy(){  //returns the barangay is CSV format. to be used in WHERE clause for determining barangay residence of patient
     $arr_brgy = array();
-     
+
     if(in_array('all',$_SESSION[brgy])):
         $q_brgy = mysql_query("SELECT barangay_id FROM m_lib_barangay ORDER by barangay_id ASC") or die("Cannot query 252". mysql_error());
         while(list($brgy_id) = mysql_fetch_array($q_brgy)){            
@@ -267,17 +274,17 @@ function get_current_users(){
             $arr_others = $this->sanitize_brgy($q_others,$brgy);
             $cu_others = count($arr_others);
             return $cu_others;
-            
+
             break;
-            
+
         case '5': //dropouts for a given quarter
-        
+
             $q_dropout = mysql_query("SELECT fp_px_id,patient_id,date_registered FROM m_patient_fp_method WHERE date_dropout BETWEEN '$start' AND '$end' AND drop_out='Y' AND method_id='$method'") or die("Cannot query 240 ".mysql_error());
             $arr_dropout_pres = $this->sanitize_brgy($q_dropout,$brgy);            
             $dropout_count = count($arr_dropout_pres);
-            
+
             return $dropout_count;
-            
+
             break;
 	case '6':
 		$q_na_prev = mysql_query("SELECT fp_px_id,patient_id,date_registered FROM m_patient_fp_method WHERE date_registered BETWEEN '$s_date' AND '$e_date' AND client_code='NA' AND method_id='$method'") or die("Cannot query 215 ".mysql_error());
@@ -291,11 +298,8 @@ function get_current_users(){
 		break;
         default:
         break;
-    
     }
-    
-        
-    
+
 }
 
 function get_cpr(){
