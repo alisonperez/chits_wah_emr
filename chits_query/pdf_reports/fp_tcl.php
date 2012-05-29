@@ -192,13 +192,13 @@ function show_fp2(){
     
     //print_r($r_fp_id);
     $w = array(252,50,47);
-    
-    for($i=0;$i<count($r_fp_id);$i++){                
+
+    for($i=0;$i<count($r_fp_id);$i++){
         $arr_disp = array();        
         $arr_service = $this->followup_visit($r_fp_id[$i],$r_px_id[$i]);
-       
+
         $q_drop = mysql_query("SELECT a.date_dropout,b.fhsis_code,a.dropout_remarks FROM m_patient_fp_method a,m_lib_fp_dropoutreason b WHERE a.fp_px_id='$r_fp_id[$i]' AND a.patient_id='$r_px_id[$i]' AND a.dropout_reason=b.reason_id") or die("Cannot query (198): ".mysql_error());
-        
+
         list($date_dropout,$fhsis_code,$remarks) = mysql_fetch_array($q_drop);
         
         for($j=0;$j<12;$j++){
@@ -208,15 +208,14 @@ function show_fp2(){
                 array_push($arr_disp,' '."\n".' ');
             endif;
         }
-        
+
         array_push($arr_disp,$fhsis_code);
         array_push($arr_disp,$date_dropout);
         array_push($arr_disp,$remarks);
-                    
-    
-        $this->Row($arr_disp);    
+
+        $this->Row($arr_disp);
     }
-    
+
 }
 
 function followup_visit($fp_id,$px_id){ //returns an associative array with 12 elements representing month 1 to 12
@@ -243,7 +242,7 @@ function followup_visit($fp_id,$px_id){ //returns an associative array with 12 e
         $arr_followup[$arr_diff_service[months]][serv] = $date_service;
         $arr_followup[$arr_diff_next[months]][next] = $next_service_date;        
     }
-    
+
     return $arr_followup;
 }
 
@@ -267,7 +266,7 @@ function date_difference ($first, $second)
     {
         $start = $this->smoothdate ($first['year'], $first['month'], $first['day']);
         $target = $this->smoothdate ($second['year'], $second['month'], $second['day']);
-                            
+
         if ($start <= $target)
         {
             $add_year = 0;
@@ -276,20 +275,20 @@ function date_difference ($first, $second)
                 $add_year++;
                 $first['year']++;
             }
-                                                                                                            
+
             $add_month = 0;
             while ($this->smoothdate ($first['year'], $first['month'] + 1, $first['day']) <= $target)
             {
                 $add_month++;
                 $first['month']++;
-                
+
                 if ($first['month'] > 12)
                 {
                     $first['year']++;
                     $first['month'] = 1;
                 }
             }
-                                                                                                                                                                            
+
             $add_day = 0;
             while ($this->smoothdate ($first['year'], $first['month'], $first['day'] + 1) <= $target)
             {
@@ -304,26 +303,26 @@ function date_difference ($first, $second)
                         $month_lengths[1] = 29;
                     }
                 }
-                
+
                 $add_day++;
                 $first['day']++;
                 if ($first['day'] > $month_lengths[$first['month'] - 1])
                 {
                     $first['month']++;
                     $first['day'] = 1;
-                    
+
                     if ($first['month'] > 12)
                     {
                         $first['month'] = 1;
                     }
                 }
-                
+
             }
-                                                                                                                                                                                                                                                        
+
             $retval = array ('years' => $add_year, 'months' => $add_month, 'days' => $add_day);
         }
     }
-                                                                                                                                                          
+
     return $retval;
 }
 

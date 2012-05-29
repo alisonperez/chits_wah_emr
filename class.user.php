@@ -345,6 +345,9 @@ class User {
         print "<span class='boxtitle'>".LBL_CELLULAR."</span><br> ";
         print "<input type='text' maxlength='20' class='textbox' name='user_cellular' value='".($user["user_cellular"]?$user["user_cellular"]:$post_vars["user_cellular"])."' style='border: 1px solid #000000'><br>";
         print "</td></tr>";
+	print "<tr valign='top'><td>";
+        print "<input type='checkbox' name='chk_sms_report' /><span class='boxtitle'>Yes, I want to receive SMS on basic statistics!</span>";
+        print "</td></tr>";
         print "<tr><td><br>";
         if ($get_vars["user_id"]) {
             print "<input type='hidden' name='user_id' value='".$get_vars["user_id"]."'>";

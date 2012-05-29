@@ -163,9 +163,9 @@ function show_fp_quarterly(){
     $w = array(75,28,28,26,28,28,28,47,52);    
     //$w = array(75,28,28,26,26,28,28,47,52);
     $str_brgy = $this->get_brgy();    
-    
+
     //echo $_SESSION[sdate2].'/'.$_SESSION[edate2];
-    
+
     foreach($arr_method as $col_code=>$method_code){
         $q_fp = mysql_query("SELECT method_name FROM m_lib_fp_methods WHERE method_id='$method_code'") or die("Cannot query: 151".mysql_error());
         list($method_name) = mysql_fetch_array($q_fp);
