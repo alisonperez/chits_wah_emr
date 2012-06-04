@@ -451,7 +451,7 @@ class alert extends module{
 	}
 
 	function _sms_enroll(){
-
+		
 		$this->check_sms_alert();
 
 		echo "<form action='$_SERVER[PHP_SELF]?page=$_GET[page]&menu_id=$_GET[menu_id]#px' name='form_sms' method='POST'>";
@@ -492,7 +492,7 @@ class alert extends module{
 	}
 
 	function _sms_alert(){
-
+$this->send_basic_stat();
 		if($_POST['submit_alert']=='Send Manually'):
 			$arr_config = $this->get_sms_config();
 			foreach($_POST['sms'] as $key=>$sms_id){
@@ -2201,11 +2201,18 @@ class alert extends module{
 		endif;
 	}
 
-	function insert_basic_alert(){
+	function send_basic_stat(){
+		$date_today = date('Y-m-d');
 		$q_user = mysql_query("SELECT user_lastname, user_firstname, user_cellular FROM game_user WHERE user_cellular!='' AND user_receive_sms='Y' AND user_active='Y'") or die("Cannot query: ".mysql_error());
 
 		if(mysql_num_rows($q_user)!=0):
-
+			$q_stats_today = mysql_query("SELECT news_text FROM m_news WHERE date_format(sms_time,'%Y-%m-%d')='$date_today'") or die("Cannot query: ".mysql_error());
+			
+			if(mysql_num_rows($q_stats)!=0):
+				echo 'alison';
+			endif;
+		else:
+			echo "No end-user allowed to receive SMS on basic statistics.<br><br><br>";
 
 		endif;
 	}

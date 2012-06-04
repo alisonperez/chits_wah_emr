@@ -100,6 +100,14 @@ class User {
         } else {
             list($month, $day, $year) = explode("/", $post_vars["user_dob"]);
             $dob = $year."-".str_pad($month, 2, "0", STR_PAD_LEFT)."-".str_pad($day, 2, "0", STR_PAD_LEFT);
+
+	    if($_POST["chk_sms_report"]=='on' && !empty($_POST["user_cellular"])): 
+		$receive_sms = 'Y';
+	    else:
+		$receive_sms = '';
+	    endif;
+
+
             switch ($post_vars["submituser"]) {
             case "Add User":
                 $active = ($post_vars["isactive"]?"Y":"N");
@@ -107,16 +115,17 @@ class User {
 		//$this->move_image();
                 $sql = "insert into game_user (user_firstname, user_lastname, user_middle, user_lang, ".
                        "user_email, user_cellular, user_login, user_password, user_pin, user_dob, user_gender, ".
-                       "user_active, user_admin, user_role) ".
+                       "user_active, user_admin, user_role, user_receive_sms) ".
                        "values ('".ucwords($post_vars["user_firstname"])."', '".ucwords($post_vars["user_lastname"])."', '".ucwords($post_vars["user_middle"])."', ".
                        "'".$post_vars["lang_id"]."', '".strtolower($post_vars["user_email"])."', '".$post_vars["user_cellular"]."', ".
                        "'".strtolower($post_vars["user_login"])."', old_password('".$post_vars["user_password"]."'), '".$post_vars["user_pin"]."', '$dob', '".$post_vars["user_gender"]."', ".
-                       "'$active', '$admin', '".$post_vars["role_id"]."')";
-                if ($result = mysql_query($sql)) {
+                       "'$active', '$admin', '".$post_vars["role_id"]."','".$receive_sms."')";
+
+		if ($result = mysql_query($sql)) {
                     header("location: ".$_SERVER["PHP_SELF"]."?page=ADMIN&method=USER");
                 }
                 break;
-            case "Update User":
+            case "Update User": 
                 $active = ($post_vars["isactive"]?"Y":"N");
                 $admin = ($post_vars["isadmin"]?"Y":"N");
                 list($month, $day, $year) = explode("/", $post_vars["user_dob"]);
@@ -135,7 +144,8 @@ class User {
                            "user_gender = '".$post_vars["user_gender"]."', ".
                            "user_password = old_password('".$post_vars["user_password"]."'), ".
                            "user_active = '$active', ".
-                           "user_admin = '$admin' ".
+                           "user_admin = '$admin', ".
+                           "user_receive_sms = '$receive_sms' ".
                            "where user_id = '".$post_vars["user_id"]."'";
                 } else {
                     print $sql = "update game_user set ".
@@ -152,9 +162,11 @@ class User {
                            "user_gender = '".$post_vars["user_gender"]."', ".
                            "user_password = old_password('".$post_vars["user_password"]."'), ".
                            "user_active = '$active', ".
-                           "user_admin = '$admin' ".
+                           "user_admin = '$admin', ".
+			   "user_receive_sms = '$receive_sms' ".
                            "where user_id = '".$post_vars["user_id"]."'";
                 }
+		
                 if ($result = mysql_query($sql)) {
                     header("location: ".$_SERVER["PHP_SELF"]."?page=ADMIN&method=USER");
                 }
@@ -253,7 +265,7 @@ class User {
             $post_vars = $arg_list[1];
             $get_vars = $arg_list[2];
             if ($get_vars["user_id"]) {
-                $sql = "select user_id, user_lastname, user_firstname, user_lang, user_dob, user_gender, user_email, user_pin, user_login, user_admin, user_active, user_cellular, user_role ".
+                $sql = "select user_id, user_lastname, user_firstname, user_lang, user_dob, user_gender, user_email, user_pin, user_login, user_admin, user_active, user_cellular, user_role, user_receive_sms ".
                        "from game_user where user_id = '".$get_vars["user_id"]."'";
                 if ($result = mysql_query($sql)) {
                     if (mysql_num_rows($result)) {
@@ -346,7 +358,7 @@ class User {
         print "<input type='text' maxlength='20' class='textbox' name='user_cellular' value='".($user["user_cellular"]?$user["user_cellular"]:$post_vars["user_cellular"])."' style='border: 1px solid #000000'><br>";
         print "</td></tr>";
 	print "<tr valign='top'><td>";
-        print "<input type='checkbox' name='chk_sms_report' /><span class='boxtitle'>Yes, I want to receive SMS on basic statistics!</span>";
+        print "<input type='checkbox' name='chk_sms_report' ". (($user["user_receive_sms"]=='Y')?'CHECKED':'')."><span class='boxtitle'>Yes, I want to receive SMS on basic statistics (FOR LCE's and MHO's ONLY)!</span></input>";
         print "</td></tr>";
         print "<tr><td><br>";
         if ($get_vars["user_id"]) {
