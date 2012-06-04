@@ -567,7 +567,8 @@ $this->send_basic_stat();
 
 					$main_indicator = 'user';
 					$sub_indicator = 'basic';
-
+					
+					$pre_msg = "Good day! This is an electronically generated SMS from WAH at ".$_SESSION["datanode"]["name"].".Thank you.";
 
 				else:
 					$q_px_num  = mysql_query("SELECT patient_lastname, patient_firstname FROM m_patient WHERE patient_id='$pxid'") or die("Cannot query 520: ".mysql_error());
@@ -597,7 +598,12 @@ $this->send_basic_stat();
 				echo "<td>$main_indicator</td>";
 				echo "<td>$sub_indicator</td>";
 				echo "<td>$sms_status</td>";
-				echo "<td><a href='#' onclick=\"window.alert('".$sms_message."');return true;\">View</a></td>";
+
+				if($program=='user'):
+					echo "<td><a href='#' onclick=\"window.alert('".$pre_msg.'\n\n'.$sms_message."');return true;\">View</a></td>";
+				else:
+					echo "<td><a href='#' onclick=\"window.alert('".$sms_message."');return true;\">View</a></td>";
+				endif;
 
 				echo "</tr>";
 			}
@@ -2225,10 +2231,12 @@ $this->send_basic_stat();
 		$q_insert_today = mysql_query("SELECT sms_code FROM m_lib_sms_alert WHERE alert_date='$date_today'") or die("Cannot query 2217: ".mysql_error());
 
 		if(mysql_num_rows($q_user)!=0 && mysql_num_rows($q_stats_today)!=0):
+
+			
 			list($stat_txt) = mysql_fetch_array($q_stats_today);
 			$stat_txt = str_replace('<br><br>',',',$stat_txt);
 			$stat_txt = str_replace('<br>',',',$stat_txt);
-
+			
 			while($user = mysql_fetch_array($q_user)){
 
 				if(mysql_num_rows($q_insert_today)==0):
@@ -2240,7 +2248,7 @@ $this->send_basic_stat();
 				endif;
 			}
 		else:
-			echo "No end-user allowed to receive SMS on basic statistics.<br><br><br>";
+			echo "<font color='red'>No end-user allowed to receive SMS on basic statistics.</font><br><br><br>";
 
 		endif;
 	}
