@@ -2048,7 +2048,7 @@ class alert extends module{
 
 		$get_fac_id = mysql_query("SELECT facility_id FROM m_lib_health_facility_barangay WHERE barangay_id='$brgy_id'") or die("Cannot query 1910: ".mysql_error());
 		list($facid) = mysql_fetch_array($get_fac_id);
-		
+
 		$alert_date = date('Y-m-d');
 
 		$insert_sms_alert = mysql_query("INSERT INTO m_lib_sms_alert SET patient_id='$pxid',program_id='$prog_id',alert_id='$alert_id',alert_date='$alert_date',base_date='$base_date',sms_status='$sms_status',last_update=NOW(),barangay_id='$brgy_id',sms_number='$cp',recipient_type='px'") or die("Cannot query 1740: ".mysql_error());
@@ -2092,10 +2092,7 @@ class alert extends module{
 		return $sms_info;
 	}
 
-	
 	function insert_sms_provider($brgy_id, $pxid,$prog_id,$alert_id,$alert_date,$base_date,$sms_status,$sms_code,$sms_message){
-
-
 
 		$q_provider_info = mysql_query("SELECT a.user_lastname,a.user_id,a.user_cellular FROM game_user a,m_lib_bhs b,m_lib_bhs_barangay c WHERE b.bhs_id=c.bhs_id AND c.barangay_id='$brgy_id' AND a.user_id=b.user_id") or die("Cannot query 1984: ".mysql_error());
 		
@@ -2112,7 +2109,6 @@ class alert extends module{
 
 			}
 		endif;
-
 	}
 
 	function check_weekend($date_to_check){
@@ -2201,6 +2197,15 @@ class alert extends module{
 			else: 
 				return false; //a false would mean that the client doesn't have the prereq antigen yet and/or given less than allowance date
 			endif;
+
+		endif;
+	}
+
+	function insert_basic_alert(){
+		$q_user = mysql_query("SELECT user_lastname, user_firstname, user_cellular FROM game_user WHERE user_cellular!='' AND user_receive_sms='Y' AND user_active='Y'") or die("Cannot query: ".mysql_error());
+
+		if(mysql_num_rows($q_user)!=0):
+
 
 		endif;
 	}
