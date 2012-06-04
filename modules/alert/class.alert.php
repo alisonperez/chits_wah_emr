@@ -560,14 +560,27 @@ $this->send_basic_stat();
 
 			while(list($sms_id,$pxid,$brgy_id,$program,$alert,$alert_date,$base_date,$sms_status,$sms_message,$sms_code,$sms_number)=mysql_fetch_array($q_sms_alert)){
 
-				$q_px_num  = mysql_query("SELECT patient_lastname, patient_firstname FROM m_patient WHERE patient_id='$pxid'") or die("Cannot query 520: ".mysql_error());
-				list($lname,$fname) = mysql_fetch_array($q_px_num);
+				if($program=='user'):
+					list($code,$user_id) = explode('-',$pxid);
+					$q_user_name = mysql_query("SELECT user_lastname, user_firstname FROM game_user WHERE user_id='$user_id'") or die("Cannot query 565: ".mysql_error());
+					list($lname,$fname) = mysql_fetch_array($q_user_name);
 
-				$q_brgy = mysql_query("SELECT barangay_name FROM m_lib_barangay WHERE barangay_id='$brgy_id'") or die("Cannot query 523: ".mysql_error());
-				list($brgy_name) = mysql_fetch_array($q_brgy);
+					$main_indicator = 'user';
+					$sub_indicator = 'basic';
 
-				$q_program = mysql_query("SELECT main_indicator,sub_indicator FROM m_lib_alert_indicators WHERE alert_indicator_id='$alert'") or die("Cannot query 526 ".mysql_error());
-				list($main_indicator,$sub_indicator) = mysql_fetch_array($q_program);
+
+				else:
+					$q_px_num  = mysql_query("SELECT patient_lastname, patient_firstname FROM m_patient WHERE patient_id='$pxid'") or die("Cannot query 520: ".mysql_error());
+					list($lname,$fname) = mysql_fetch_array($q_px_num);
+
+					$q_brgy = mysql_query("SELECT barangay_name FROM m_lib_barangay WHERE barangay_id='$brgy_id'") or die("Cannot query 523: ".mysql_error());
+					list($brgy_name) = mysql_fetch_array($q_brgy);
+
+					$q_program = mysql_query("SELECT main_indicator,sub_indicator FROM m_lib_alert_indicators WHERE alert_indicator_id='$alert'") or die("Cannot query 526 ".mysql_error());
+					list($main_indicator,$sub_indicator) = mysql_fetch_array($q_program);
+				endif;
+
+				
 
 				echo "<tr align='center'>";
 				echo "<td>";
@@ -585,6 +598,7 @@ $this->send_basic_stat();
 				echo "<td>$sub_indicator</td>";
 				echo "<td>$sms_status</td>";
 				echo "<td><a href='#' onclick=\"window.alert('".$sms_message."');return true;\">View</a></td>";
+
 				echo "</tr>";
 			}
 
@@ -2208,16 +2222,22 @@ $this->send_basic_stat();
 
 		$q_stats_today = mysql_query("SELECT news_text FROM m_news WHERE DATE(news_timestamp)='$date_today'") or die("Cannot query: ".mysql_error());
 
+		$q_insert_today = mysql_query("SELECT sms_code FROM m_lib_sms_alert WHERE alert_date='$date_today'") or die("Cannot query 2217: ".mysql_error());
+
 		if(mysql_num_rows($q_user)!=0 && mysql_num_rows($q_stats_today)!=0):
 			list($stat_txt) = mysql_fetch_array($q_stats_today);
-			$stat_txt = str_replace('<br>','\n',$stat_txt);
+			$stat_txt = str_replace('<br><br>',',',$stat_txt);
+			$stat_txt = str_replace('<br>',',',$stat_txt);
 
 			while($user = mysql_fetch_array($q_user)){
+
+				if(mysql_num_rows($q_insert_today)==0):
 				$insert_sms_alert = mysql_query("INSERT INTO m_lib_sms_alert SET patient_id='u-$user[user_id]',program_id='user',alert_id='basic',alert_date='$date_today',base_date='$date_today',sms_status='queue',last_update=NOW(),barangay_id='$brgy',sms_number='$user[user_cellular]',sms_message='$stat_txt',recipient_type='user'") or die("Cannot query 2216: ".mysql_error());
 
 				$sms_id = mysql_insert_id();
 
 				$update_sms_code = mysql_query("UPDATE m_lib_sms_alert SET sms_code='$brgy-user-$sms_id' WHERE sms_id='$sms_id'") or die("Cannot query: ".mysql_error());
+				endif;
 			}
 		else:
 			echo "No end-user allowed to receive SMS on basic statistics.<br><br><br>";
