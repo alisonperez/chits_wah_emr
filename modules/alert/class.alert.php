@@ -1923,10 +1923,10 @@ $this->send_basic_stat();
 		$padded_str = str_replace(' ','%20',$post[txt_testmsg]);
 
 		if(exec('nohup curl http://'.$post[txt_midserver].':'.$post[txt_port].'/send/sms/'.$post[txt_testnum].'/'.$padded_str)):
-			echo 'Message/s sent!';
+			echo "<font color='red'>Message/s sent!</font><br>";
 			return true;
 		else:
-			echo 'Message/s not sent! Please check the SMS configuration.';
+			echo "<font color='red'>Message/s not sent! Please check the SMS configuration.</font><br>";
 			return false;
 		
 		endif;
@@ -1945,10 +1945,10 @@ $this->send_basic_stat();
 		$padded_str = str_replace(' ','%20',$sms_message);
 		
 		if(exec('nohup curl http://'.$midserver.':'.$port.'/send/sms/'.$sms_number.'/'.$padded_str)):
-			echo 'Message/s sent!';
+			echo "<font color='red'>Message/s sent!</font><br>";
 			return true;
 		else:
-			echo 'Message/s not sent! Please check the SMS configuration.';
+			echo "<font color='red'>Message/s not sent! Please check the SMS configuration.</font><br>";
 			return false;
 		endif;
 
