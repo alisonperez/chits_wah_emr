@@ -492,7 +492,7 @@ class alert extends module{
 	}
 
 	function _sms_alert(){
-$this->send_basic_stat();
+		$this->send_basic_stat();
 		if($_POST['submit_alert']=='Send Manually'):
 			$arr_config = $this->get_sms_config();
 			foreach($_POST['sms'] as $key=>$sms_id){

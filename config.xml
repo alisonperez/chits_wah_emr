@@ -5,17 +5,20 @@
         <code>036901000</code>
         <telephone>2444284</telephone>
         <level>self</level>
+        <hfid>DOH000000000003678</hfid>
     </node>
     <node>
         <name>PHO</name>
 	<code>036900000</code>
         <telephone>2444284</telephone>
         <level>parent</level>        
+        <hfid>DOH000000000003678</hfid>
     </node>
     <node>
         <name>MAIN RHU 1</name>
 	<code>036900000</code>
         <telephone>2444284</telephone>
         <level>child</level>
+        <hfid>DOH000000000003678</hfid>
     </node>
 </config>

@@ -6,12 +6,13 @@ ob_start();
 
 require('./fpdf/fpdf.php');
 require('../layout/class.html_builder.php');
-
+require('../scripts/class.csv_creator.php');
 
 $db_conn = mysql_connect("localhost","$_SESSION[dbuser]","$_SESSION[dbpass]");
 mysql_select_db($_SESSION[dbname]);
 
 $html_tab = new html_builder();
+$csv_creator = new csv_creator();
 
 class PDF extends FPDF
 {
@@ -790,13 +791,13 @@ function get_brgy(){
 		
 	for($x=0;$x<count($arr_brgy);$x++){
 	
-        $q_brgy = mysql_query("SELECT barangay_name FROM m_lib_barangay WHERE barangay_id = '$arr_brgy[$x]' ORDER by barangay_id ASC") or die("Cannot query 252". mysql_error());        
-        
+        $q_brgy = mysql_query("SELECT barangay_name FROM m_lib_barangay WHERE barangay_id = '$arr_brgy[$x]' ORDER by barangay_id ASC") or die("Cannot query 252". mysql_error());
+
 	while(list($brgy) = mysql_fetch_array($q_brgy)){
 		$str_brgy = $str_brgy.'  '.$brgy;
-	}	        
+	}
 
-	}                
+	}
     endif;
 
     return $str_brgy;
@@ -921,9 +922,14 @@ endif; */
 $_SESSION["arr_px_labels"] = array('mc'=>array());
 $mc_content = $pdf->show_mc_summary();
 
+
+
 if($_GET["type"]=='html'): 
 	$html_tab->create_table($_SESSION["w"],$_SESSION["header"],$mc_content);
+elseif($_GET["type"]=='csv'):
+	$csv_creator->create_csv($_SESSION["ques"],$mc_content);
 else:
 	$pdf->Output();
 endif;
+
 ?>
