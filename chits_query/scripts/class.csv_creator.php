@@ -141,7 +141,7 @@ class csv_creator{
 		$program_name = $this->get_program_name($program_id);
 		$period = $this->get_period($period_type);
 
-		$csv_dir = '../../site/csv/';
+		$csv_dir = '../../site/csv/'; 
 
 
 		$csv_file_name = $rhu_name.'_'.$period.'_'.$program_name.'.csv';
