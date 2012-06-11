@@ -14,10 +14,10 @@ class csv_creator{
  
 	function create_csv($report_type, $arr_stats){
 		/* 	health_facility, region code, prov code, city/mun code, brgy code, date stats
-			
-
 		*/
+
 		$facility_code = $this->get_facility_id();
+
 		$q_psgc_code = mysql_query("SELECT psgc_regcode, psgc_provcode, psgc_citymuncode, psgc_brgycode FROM m_lib_health_facility WHERE doh_class_id='$facility_code'") or die("Cannot query 17: ".mysql_error());
 
 		if(mysql_num_rows($q_psgc_code)!=0): 
@@ -27,11 +27,20 @@ class csv_creator{
 			$q_get_prog = mysql_query("SELECT b.cat_id, b.cat_label,a.report_type FROM question a, ques_cat b WHERE a.cat_id=b.cat_id AND a.ques_id='$report_type'") or die("Cannot query 26: ".mysql_error());
 			
 			list($cat_id,$cat_label,$report_type) = mysql_fetch_array($q_get_prog);
+
 			$str_stat = $this->get_stats_csv($cat_id,$cat_label,$arr_stats,$report_type);
 
 			$str_csv = $facility_code.','.$reg_code.','.$prov_code.','.$citymun_code.','.$brgy_code.','.$_SESSION["edate2"].','.$str_stat;
-			
-			$this->create_file($str_csv,$cat_id,$report_type);
+	
+			if($cat_id!='7'): 
+				$this->create_file($str_csv,$cat_id,$report_type);
+			else: 
+				foreach($arr_stats as $key=>$value){  
+					$str_stat = $this->get_stats_csv($cat_id,$cat_label,$value,$report_type);
+					$str_csv = $facility_code.','.$reg_code.','.$prov_code.','.$citymun_code.','.$brgy_code.','.$_SESSION["edate2"].','.$str_stat;
+					$this->create_file($str_csv,$cat_id,$report_type);
+				}
+			endif;
 			
 			//echo $str_csv;
 
@@ -57,21 +66,21 @@ class csv_creator{
 			case '4':
 				return 'mc';
 				break;
-			case '8':
-				return 'childcare';
-				break;
 			case '7':
 				return 'morbidity';
+				break;
+			case '8':
+				return 'childcare';
 				break;
 			case '9':
 				return 'fp';
 				break;
-			case '15':
-				return 'natality';
-				break;
 			case '12':
 				return 'dhc';
 				break;				
+			case '15':
+				return 'natality';
+				break;
 			default:
 				return '';
 				break;
@@ -80,7 +89,7 @@ class csv_creator{
 
 	}
 
-	function get_stats_csv($cat_id,$cat_label,$arr_stats,$report_type){
+	function get_stats_csv($cat_id,$cat_label,$arr_stats,$report_type){ 
 		$arr_numero = array(); 
 		//print_r($arr_stats);
 		switch($cat_id){
@@ -99,6 +108,16 @@ class csv_creator{
 
 				$str_stat = implode(",",$arr_numero);
 				
+				break;
+
+			case '7': //notifiable diseases data set
+				
+				for($i=1;$i<count($arr_stats);$i++){  
+					array_push($arr_numero,$arr_stats[$i]);
+				}
+				
+
+				$str_stat = implode(",",$arr_numero);
 				break;
 
 			default:
@@ -141,14 +160,14 @@ class csv_creator{
 		$program_name = $this->get_program_name($program_id);
 		$period = $this->get_period($period_type);
 
-		$csv_dir = '../../site/csv/'; 
+		$csv_dir = '../../site/csv/';
 
 
 		$csv_file_name = $rhu_name.'_'.$period.'_'.$program_name.'.csv';
 		$csv_location = $csv_dir.$csv_file_name;
 
 		$fp = fopen($csv_location,'w+'); //read or write the file, create if it is not existing yet
-		fwrite($fp,$csvdata);
+		fwrite($fp,$csvdata.PHP_EOL);
 		fclose($fp);
 
 		header('Content-type: application/csv');

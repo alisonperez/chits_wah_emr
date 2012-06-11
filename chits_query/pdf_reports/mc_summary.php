@@ -922,8 +922,6 @@ endif; */
 $_SESSION["arr_px_labels"] = array('mc'=>array());
 $mc_content = $pdf->show_mc_summary();
 
-
-
 if($_GET["type"]=='html'): 
 	$html_tab->create_table($_SESSION["w"],$_SESSION["header"],$mc_content);
 elseif($_GET["type"]=='csv'):
