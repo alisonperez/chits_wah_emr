@@ -120,6 +120,39 @@ class csv_creator{
 				$str_stat = implode(",",$arr_numero);
 				break;
 
+			case '8': //child care
+				
+				for($i=0;$i<18;$i++){ //first 18 indicators from BCG to Infant referred for NBS
+					foreach($arr_stats[$i] as $key=>$value){ 
+						if($key!=0):
+							array_push($arr_numero,$value);
+						endif;
+					}
+				}
+
+
+				for($i=0;$i<6;$i++){ //provide allowance for the six INF_VITA indicators. place the value of 0 until October
+					array_push($arr_numero,0);
+				}
+
+				for($i=24;$i<34;$i++){ //count for for sick child, sick child with Vit A, infant with LBW
+					foreach($arr_stats[$i] as $key=>$value){ 
+						if($key!=0):
+							array_push($arr_numero,$value);
+						endif;
+					}
+				}
+
+
+				for($i=18;$i<24;$i++){ //count for for sick child, sick child with Vit A, infant with LBW
+					foreach($arr_stats[$i] as $key=>$value){ 
+						if($key!=0):
+							array_push($arr_numero,$value);
+						endif;
+					}
+				}
+				$str_stat = implode(",",$arr_numero);
+				break;
 			default:
 				echo "<font color='red'>No CSV file output yet for this program. Press BACK button from the browser to continue.</font>";
 				break;

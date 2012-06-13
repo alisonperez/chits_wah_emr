@@ -6,11 +6,15 @@ ob_start();
 
 require('./fpdf/fpdf.php');
 require('../layout/class.html_builder.php');
+require('../scripts/class.csv_creator.php');
+
+
 
 $db_conn = mysql_connect("localhost","$_SESSION[dbuser]","$_SESSION[dbpass]");
 mysql_select_db($_SESSION[dbname]);
 
 $html_tab = new html_builder();
+$csv_creator = new csv_creator();
 
 class PDF extends FPDF
 {
@@ -1393,6 +1397,9 @@ $ccdev_rec = $pdf->show_ccdev_summary();
 
 if($_GET["type"]=='html'): 
 	$html_tab->create_table($_SESSION["w"],$_SESSION["header"],$ccdev_rec,$_SESSION["w2"],$_SESSION["subheader"]);
+elseif($_GET["type"]=='csv'):
+	//print_r($ccdev_rec);
+	$csv_creator->create_csv($_SESSION["ques"],$ccdev_rec);
 else:
 	$pdf->Output();
 endif;
