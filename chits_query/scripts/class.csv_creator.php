@@ -124,12 +124,19 @@ class csv_creator{
 				
 				for($i=0;$i<18;$i++){ //first 18 indicators from BCG to Infant referred for NBS
 					foreach($arr_stats[$i] as $key=>$value){ 
+					if($report_type=='M'):
 						if($key!=0):
 							array_push($arr_numero,$value);
 						endif;
+					elseif($report_type=='Q'):
+						if($key==2 || $key==3):
+							array_push($arr_numero,$value);
+						endif;
+					else:
+					endif;
+				
 					}
 				}
-
 
 				for($i=0;$i<6;$i++){ //provide allowance for the six INF_VITA indicators. place the value of 0 until October
 					array_push($arr_numero,0);
@@ -137,18 +144,35 @@ class csv_creator{
 
 				for($i=24;$i<34;$i++){ //count for for sick child, sick child with Vit A, infant with LBW
 					foreach($arr_stats[$i] as $key=>$value){ 
+					
+					if($report_type=='M'):
 						if($key!=0):
 							array_push($arr_numero,$value);
 						endif;
+					elseif($report_type=='Q'):
+						if($key==2 || $key==3):
+							array_push($arr_numero,$value);
+						endif;
+					else:
+					endif;
+					
 					}
 				}
 
 
 				for($i=18;$i<24;$i++){ //count for for sick child, sick child with Vit A, infant with LBW
 					foreach($arr_stats[$i] as $key=>$value){ 
+					if($report_type=='M'):
 						if($key!=0):
 							array_push($arr_numero,$value);
 						endif;
+					elseif($report_type=='Q'):
+						if($key==2 || $key==3):
+							array_push($arr_numero,$value);
+						endif;
+					else:
+					endif;
+
 					}
 				}
 				$str_stat = implode(",",$arr_numero);
