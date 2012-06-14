@@ -177,6 +177,20 @@ class csv_creator{
 				}
 				$str_stat = implode(",",$arr_numero);
 				break;
+
+			case '9':  //fp data sets
+				for($i=1;$i<6;$i++){ //first traversal would be the user type (prev cu, na, other acceptors, drop outs, present cu)
+					for($j=0;$j<count($arr_stats);$j++){  //second traversal will on the 11 methods
+						foreach($arr_stats[$j] as $key=>$value){
+							if($key==$i):
+								array_push($arr_numero,$value);
+							endif;
+						}
+					}
+				}
+				
+				$str_stat = implode(",",$arr_numero);
+				break; 
 			default:
 				echo "<font color='red'>No CSV file output yet for this program. Press BACK button from the browser to continue.</font>";
 				break;
