@@ -37,6 +37,12 @@ class csv_creator{
 			else:
 				$date_reported = $_SESSION["sdate2"];
 			endif;
+		
+			list($yr,$month,$date) = explode('-',$date_reported);
+
+			$date_reported = $month.'/'.$date.'/'.$yr;
+			
+			echo $date_reported;
 
 			$str_csv = $facility_code.','.$reg_code.','.$prov_code.','.$citymun_code.','.$brgy_code.','.$date_reported.','.$str_stat;
 	
