@@ -6,12 +6,13 @@ ob_start();
 
 require('./fpdf/fpdf.php');
 require('../layout/class.html_builder.php');
-
+require('../scripts/class.csv_creator.php');
 
 $db_conn = mysql_connect("localhost","$_SESSION[dbuser]","$_SESSION[dbpass]");
 mysql_select_db($_SESSION[dbname]);
 
 $html_tab = new html_builder();
+$csv_creator = new csv_creator();
 
 class PDF extends FPDF
 {
@@ -701,6 +702,17 @@ if($_GET["type"]=='html'):
 		$html_tab->create_table($_SESSION["w2"],$_SESSION["header2"],$natality_content); //livebirth
 	elseif($_SESSION[ques]>=124 && $_SESSION[ques]<=127):
 		$html_tab->create_table($_SESSION["w"],$_SESSION["header"],$natality_content); //deliveries
+	else:
+
+	endif;
+elseif($_GET["type"]=='csv'):
+
+	print_r($natality_content);
+	if($_SESSION[ques]>=120 && $_SESSION[ques]<=123): //natality livebirth questions	
+		
+	//	$html_tab->create_table($_SESSION["w2"],$_SESSION["header2"],$natality_content); //livebirth
+	elseif($_SESSION[ques]>=124 && $_SESSION[ques]<=127):
+	//	$html_tab->create_table($_SESSION["w"],$_SESSION["header"],$natality_content); //deliveries
 	else:
 
 	endif;

@@ -30,7 +30,15 @@ class csv_creator{
 
 			$str_stat = $this->get_stats_csv($cat_id,$cat_label,$arr_stats,$report_type);
 
-			$str_csv = $facility_code.','.$reg_code.','.$prov_code.','.$citymun_code.','.$brgy_code.','.$_SESSION["edate2"].','.$str_stat;
+			if($report_type=='M'):
+				$date_reported = $_SESSION["sdate2"];
+			elseif($report_type=='Q'):
+				$date_reported = $_SESSION["edate2"];
+			else:
+				$date_reported = $_SESSION["sdate2"];
+			endif;
+
+			$str_csv = $facility_code.','.$reg_code.','.$prov_code.','.$citymun_code.','.$brgy_code.','.$date_reported.','.$str_stat;
 	
 			if($cat_id!='7'): 
 				$this->create_file($str_csv,$cat_id,$report_type);
