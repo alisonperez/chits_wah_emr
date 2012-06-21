@@ -409,7 +409,9 @@ if($_GET["type"]=='html'):
 	$html_tab->create_table($_SESSION["w"],$_SESSION["header"],$fp_rec);	
 elseif($_GET["type"]=='csv'):
 	//print_r($fp_rec);
-	$csv_creator->create_csv($_SESSION["ques"],$fp_rec);
+	$csv_creator->create_csv($_SESSION["ques"],$fp_rec,'csv');
+elseif($_GET["type"]=='efhsis'):
+	$csv_creator->create_csv($_SESSION["ques"],$fp_rec,'efhsis');
 else:
 	$pdf->Output();
 endif;

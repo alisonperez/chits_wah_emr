@@ -12,9 +12,10 @@ class csv_creator{
 		echo 'alison';
 	}
  
-	function create_csv($report_type, $arr_stats){
+	function create_csv($report_type, $arr_stats, $type){
 		/* 	health_facility, region code, prov code, city/mun code, brgy code, date stats
 		*/
+
 
 		$facility_code = $this->get_facility_id();
 
@@ -41,18 +42,29 @@ class csv_creator{
 			list($yr,$month,$date) = explode('-',$date_reported);
 
 			$date_reported = $month.'/'.$date.'/'.$yr;
-			
-			echo $date_reported;
 
-			$str_csv = $facility_code.','.$reg_code.','.$prov_code.','.$citymun_code.','.$brgy_code.','.$date_reported.','.$str_stat;
+			if($type=='csv'):
+				$str_csv = $facility_code.','.$reg_code.','.$prov_code.','.$citymun_code.','.$brgy_code.','.$date_reported.','.$str_stat;
+			elseif($type=='efhsis'): 
+				$str_csv = $brgy_code.','.$date_reported.','.$str_stat;
+			else:
+
+			endif;
 	
-			if($cat_id!='7'): 
-				$this->create_file($str_csv,$cat_id,$report_type);
+			if($cat_id!='7'):
+				$this->create_file($str_csv,$cat_id,$report_type,$type);
 			else: 
 				foreach($arr_stats as $key=>$value){  
 					$str_stat = $this->get_stats_csv($cat_id,$cat_label,$value,$report_type);
-					$str_csv = $facility_code.','.$reg_code.','.$prov_code.','.$citymun_code.','.$brgy_code.','.$_SESSION["edate2"].','.$str_stat;
-					$this->create_file($str_csv,$cat_id,$report_type);
+
+					if($type=='csv'):
+						$str_csv = $facility_code.','.$reg_code.','.$prov_code.','.$citymun_code.','.$brgy_code.','.$date_reported.','.$str_stat;
+					elseif($type=='efhsis'):
+						$str_csv = $brgy_code.','.$date_reported.','.$str_stat;
+					else:
+					endif;
+
+					$this->create_file($str_csv,$cat_id,$report_type,$type);
 				}
 			endif;
 			
@@ -238,18 +250,26 @@ class csv_creator{
 		}
 	}
 
-	function create_file($csvdata,$program_id,$period_type){ 
+	function create_file($csvdata,$program_id,$period_type,$type){ 
 		$rhu_name = $_SESSION["datanode"]["name"];
 		$rhu_name = str_replace(' ','',$rhu_name);
 
 		$program_name = $this->get_program_name($program_id);
 		$period = $this->get_period($period_type);
 
+
 		$csv_dir = '../../site/csv/';
 
+		if($type=='csv'):
+			$csv_file_name = $rhu_name.'_'.$period.'_'.$program_name.'_'.'csv'.'.csv';
+		elseif($type=='efhsis'):
+			$csv_file_name = $rhu_name.'_'.$period.'_'.$program_name.'_'.'efhsis'.'.csv';
+		else:
 
-		$csv_file_name = $rhu_name.'_'.$period.'_'.$program_name.'.csv';
+		endif;
+
 		$csv_location = $csv_dir.$csv_file_name;
+
 
 		$fp = fopen($csv_location,'w+'); //read or write the file, create if it is not existing yet
 		fwrite($fp,$csvdata.PHP_EOL);

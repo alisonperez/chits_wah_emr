@@ -925,7 +925,9 @@ $mc_content = $pdf->show_mc_summary();
 if($_GET["type"]=='html'): 
 	$html_tab->create_table($_SESSION["w"],$_SESSION["header"],$mc_content);
 elseif($_GET["type"]=='csv'):
-	$csv_creator->create_csv($_SESSION["ques"],$mc_content);
+	$csv_creator->create_csv($_SESSION["ques"],$mc_content,'csv');
+elseif($_GET["type"]=='efhsis'):
+	$csv_creator->create_csv($_SESSION["ques"],$mc_content,'efhsis');
 else:
 	$pdf->Output();
 endif;

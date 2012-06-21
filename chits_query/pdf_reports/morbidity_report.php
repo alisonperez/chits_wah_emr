@@ -583,7 +583,9 @@ if($_GET["type"]=='html'):
 	$html_tab->create_table($_SESSION["w"],$_SESSION["header"],$morb_rec,$_SESSION["w2"],$_SESSION["subheader"]);
 
 elseif($_GET["type"]=='csv'): //print_r($morb_rec);
-	$csv_creator->create_csv($_SESSION["ques"],$morb_rec);	
+	$csv_creator->create_csv($_SESSION["ques"],$morb_rec,'csv');	
+elseif($_GET["type"]=='efhsis'):
+	$csv_creator->create_csv($_SESSION["ques"],$morb_rec,'efhsis');
 else:
 	$pdf->Output();
 endif;
