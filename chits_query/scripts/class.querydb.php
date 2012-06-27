@@ -1067,7 +1067,7 @@ class querydb{
 		echo "<tr>";
 		echo "<td><a href='./pdf_reports/$file_to_call?type=pdf' alt='Save/Open in PDF' title='Save/Open as PDF'><img src='../images/pdf_icon.jpg' width='50px' height='50px' /></href></td>";
 		echo "<td><a href='./pdf_reports/$file_to_call?type=csv' alt='Save/Open in PDF' title='Save/Open as CSV (Excel & E-FHSIS compliant)'><img src='../images/doc_csv_icon.png' width='50px' height='50px' /></href></td>";
-		echo "<td><a href='./pdf_reports/$file_to_call?type=efhsis' alt='Save/Open in PDF' title='Send to Email'><img src='../images/email_icon.png' width='50px' height='50px' /></href></td>";
+		echo "<td><a href='./pdf_reports/$file_to_call?type=efhsis' alt='Save/Open in PDF' title='E-FHSIS format'><img src='../images/efhsis_logo.png' width='50px' height='50px' /></href></td>";
 		echo "<td><a href='./pdf_reports/$file_to_call?type=html' alt='Save/Open in PDF' title='Save/Open as XML'><img src='../images/xml_icon.jpeg' width='50px' height='50px' /></href></td>";
 		echo "</tr>";
   		echo "</table>";

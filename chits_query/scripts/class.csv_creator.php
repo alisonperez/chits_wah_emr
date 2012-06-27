@@ -3,7 +3,7 @@
 class csv_creator{
 
 	function csv_creator(){
-		$this->appName="HTML Builder";
+		$this->appName="QB CSV builder";
       		$this->appVersion="0.13";
       		$this->appAuthor="Alison Perez";
 	}
@@ -40,19 +40,23 @@ class csv_creator{
 			endif;
 		
 			list($yr,$month,$date) = explode('-',$date_reported);
-
-			$date_reported = $month.'/'.$date.'/'.$yr;
+			
+			
+			
 
 			if($type=='csv'):
+				$date_reported = $month.'/'.$date.'/'.$yr;
 				$str_csv = $facility_code.','.$reg_code.','.$prov_code.','.$citymun_code.','.$brgy_code.','.$date_reported.','.$str_stat;
 			elseif($type=='efhsis'): 
-				$str_csv = $brgy_code.','.$date_reported.','.$str_stat;
+				
+				$date_reported = $month.'/'.$date.'/'.substr($yr,-2); echo $date_reported;
+				$str_csv = $reg_code.','.$prov_code.','.$citymun_code.','.$brgy_code.','.$date_reported.','.$str_stat;
 			else:
 
 			endif;
 	
 			if($cat_id!='7'):
-				$this->create_file($str_csv,$cat_id,$report_type,$type);
+				//$this->create_file($str_csv,$cat_id,$report_type,$type);
 			else: 
 				foreach($arr_stats as $key=>$value){  
 					$str_stat = $this->get_stats_csv($cat_id,$cat_label,$value,$report_type);
@@ -128,7 +132,7 @@ class csv_creator{
 						$value_to_push = $value[2];
 					else:
 					endif;
-					
+
 					array_push($arr_numero,$value_to_push);
 				}
 
