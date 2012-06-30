@@ -47,16 +47,15 @@ class csv_creator{
 			if($type=='csv'):
 				$date_reported = $month.'/'.$date.'/'.$yr;
 				$str_csv = $facility_code.','.$reg_code.','.$prov_code.','.$citymun_code.','.$brgy_code.','.$date_reported.','.$str_stat;
-			elseif($type=='efhsis'): 
-				
-				$date_reported = $month.'/'.$date.'/'.substr($yr,-2); echo $date_reported;
+			elseif($type=='efhsis'):
+				$date_reported = $month.'/'.$date.'/'.substr($yr,-2);
 				$str_csv = $reg_code.','.$prov_code.','.$citymun_code.','.$brgy_code.','.$date_reported.','.$str_stat;
 			else:
 
 			endif;
 	
 			if($cat_id!='7'):
-				//$this->create_file($str_csv,$cat_id,$report_type,$type);
+				$this->create_file($str_csv,$cat_id,$report_type,$type);
 			else: 
 				foreach($arr_stats as $key=>$value){  
 					$str_stat = $this->get_stats_csv($cat_id,$cat_label,$value,$report_type);

@@ -278,7 +278,7 @@ class notes extends module {
 		if($_POST["submit_consult"]=='Print Consult'):
 			if(count($_POST["consult_rec"])!=0): 
 				$arr_consult_rec = serialize($_POST["consult_rec"]);
-				header("Location: http://localhost/chits/chits_query/pdf_reports/gen_consult.php?pxid=$_POST[patient_id]&consult_rec=$arr_consult_rec");
+				header("Location: ../chits_query/pdf_reports/gen_consult.php?pxid=$_POST[patient_id]&consult_rec=$arr_consult_rec");				
 			else:
 				echo "<script language='Javascript'>";
 				echo "window.alert('Please select at least one consultation record.')";
