@@ -31,29 +31,33 @@ class csv_creator{
 
 			$str_stat = $this->get_stats_csv($cat_id,$cat_label,$arr_stats,$report_type);
 
-			if($report_type=='M'):
+			if($report_type=='M'): 
 				$date_reported = $_SESSION["sdate2"];
 			elseif($report_type=='Q'):
 				$date_reported = $_SESSION["edate2"];
 			else:
 				$date_reported = $_SESSION["sdate2"];
 			endif;
-		
+			
 			list($yr,$month,$date) = explode('-',$date_reported);
-			
-			
-			
+			$reg_code = sprintf("%02s",$reg_code);
+			$prov_code = sprintf("%04s",$prov_code);
+			$citymun_code = sprintf("%06s",$citymun_code);
+			$brgy_code = sprintf("%09s",$brgy_code);
+			$final = "'Y'";
 
 			if($type=='csv'):
 				$date_reported = $month.'/'.$date.'/'.$yr;
-				$str_csv = $facility_code.','.$reg_code.','.$prov_code.','.$citymun_code.','.$brgy_code.','.$date_reported.','.$str_stat;
+				//$str_csv = $this->enclosed_single_quote($facility_code).','.$this->enclosed_single_quote($reg_code).','.$this->enclosed_single_quote($prov_code).','.$this->enclosed_single_quote($citymun_code).','.$this->enclosed_single_quote($brgy_code).','.$date_reported.','.$str_stat;
+				$str_csv = $this->enclosed_single_quote($facility_code).','.$this->enclosed_single_quote($reg_code).','.$this->enclosed_single_quote($prov_code).','.$this->enclosed_single_quote($citymun_code).','.$this->enclosed_single_quote($brgy_code).','.$this->enclosed_single_quote($month).','.$this->enclosed_single_quote($yr).','.$this->enclosed_single_quote_csv($str_stat).','.$final;
+				
 			elseif($type=='efhsis'):
 				$date_reported = $month.'/'.$date.'/'.substr($yr,-2);
 				$str_csv = $reg_code.','.$prov_code.','.$citymun_code.','.$brgy_code.','.$date_reported.','.$str_stat;
 			else:
 
 			endif;
-	
+
 			if($cat_id!='7'):
 				$this->create_file($str_csv,$cat_id,$report_type,$type);
 			else: 
@@ -61,9 +65,12 @@ class csv_creator{
 					$str_stat = $this->get_stats_csv($cat_id,$cat_label,$value,$report_type);
 
 					if($type=='csv'):
-						$str_csv = $facility_code.','.$reg_code.','.$prov_code.','.$citymun_code.','.$brgy_code.','.$date_reported.','.$str_stat;
+						//$str_csv = $facility_code.','.$reg_code.','.$prov_code.','.$citymun_code.','.$brgy_code.','.$date_reported.','.$str_stat;
+
+						$str_csv = $this->enclosed_single_quote($facility_code).','.$this->enclosed_single_quote($reg_code).','.$this->enclosed_single_quote($prov_code).','.$this->enclosed_single_quote($citymun_code).','.$this->enclosed_single_quote($brgy_code).','.$this->enclosed_single_quote($month).','.$this->enclosed_single_quote($yr).','.$this->enclosed_single_quote_csv($str_stat).','.$final;
+
 					elseif($type=='efhsis'):
-						$str_csv = $brgy_code.','.$date_reported.','.$str_stat;
+						$str_csv = $reg_code.','.$prov_code.','.$citymun_code.','.$brgy_code.','.$date_reported.','.$str_stat;
 					else:
 					endif;
 
@@ -81,7 +88,12 @@ class csv_creator{
 	}
 
 	function get_facility_id(){
-		return 'DOH000000000003678';
+		if(isset($_SESSION["doh_facility_code"])):
+			$doh_fac_code = $_SESSION["doh_facility_code"];
+			return $doh_fac_code;
+		else:
+			return ;
+		endif;
 	}
 
 
@@ -281,6 +293,20 @@ class csv_creator{
 		header('Content-type: application/csv');
 		header("Content-Disposition: inline; filename=".$csv_location);
 		readfile($csv_location);
+	}
+
+	function enclosed_single_quote($term){
+		$term = "'".$term."'";
+		return $term;
+	}
+
+	function enclosed_single_quote_csv($csv_term){
+		$arr_csv = explode(',',$csv_term);
+		for($i=0;$i<count($arr_csv);$i++){
+			$arr_csv[$i] = "'".$arr_csv[$i]."'";
+		}
+		$str_term = implode(',',$arr_csv);
+		return $str_term;
 	}
 
 }
