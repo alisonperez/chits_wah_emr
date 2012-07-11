@@ -1886,8 +1886,14 @@ class notes extends module {
         $q_vitals = mysql_query("SELECT vitals_weight,vitals_temp,vitals_systolic,vitals_diastolic,vitals_heartrate,vitals_resprate,vitals_height,vitals_pulse FROM m_consult_vitals WHERE consult_id='$consult_id'") or die("Cannot query: 1696 ".mysql_error());
         
         if(mysql_num_rows($q_vitals)!=0):
+
             list($wt,$temp,$systolic,$diastolic,$heart,$resprate,$ht,$pulse) = mysql_fetch_array($q_vitals);
+
+
             $str_vitals = " <b>WT:</b> ".$wt." kg, <b>TEMP:</b> ".$temp.", <b>BP:</b> ".$systolic."/".$diastolic.", <b>HR:</b> ".$heart.", <b>RR:</b> ".$resprate.", <b>PR:</b> ".$pulse.", <b>HT:</b> ".$ht." cm";
+
+
+	    $str_vitals .= "<br>".$this->compute_bmi($ht,$wt);
             
         else:
             $str_vitals = "<font color='red'>No vitals signs recorded.</font>";
@@ -1984,6 +1990,33 @@ class notes extends module {
 
 	}
     }
+
+	function compute_bmi($height,$weight){
+
+		echo "<b>Body Mass Index: </b>";
+		$ht_cm = $height / 100;			
+		
+		if($ht_cm!=0):		
+			$bmi = round($weight / pow($ht_cm,2),2);
+		if($bmi < 18.5):
+			$status = "Underweight";
+		elseif($bmi >= 18.5 && $bmi < 25):
+			$status = "Normal";
+		elseif($bmi >= 25 && $bmi < 30):
+			$status = "Overweight";
+		else: //obese
+			$status = "Obese";
+		endif;
+
+		echo $bmi.'('.$status.')'.'<br>';		
+		
+		else:
+			print "<font color='red' size='2'>No BMI. Height is 0.</font>";
+		endif;
+
+
+
+	}
 
 }
 // end of class

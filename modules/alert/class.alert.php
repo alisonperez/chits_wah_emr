@@ -1761,11 +1761,11 @@ class alert extends module{
 			}
 		endif;
 
-		echo $today;
-		echo date('l',strtotime($today));
+		//echo $today;
+		//echo date('l',strtotime($today));
 		for($i=1;$i<=2;$i++){
 			$date = strtotime("+$i day", strtotime($today));
-			echo date("Y-m-d", $date)."<br>";
+			//echo date("Y-m-d", $date)."<br>";
 		}
 
 		
