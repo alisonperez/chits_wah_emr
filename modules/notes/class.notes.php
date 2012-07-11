@@ -871,13 +871,16 @@ class notes extends module {
         if ($result = mysql_query($sql)) {
             if (mysql_num_rows($result)) {
                 $notes = mysql_fetch_array($result);
+		list($min,$max,$class) = wtforage::_wtforage($_GET["consult_id"]);
+	    
                 print "<form method='post' action=''>";
                 print "<table width='300' cellpadding='2' style='border: 1px dashed black'><tr><td>";
                 print "<span class='tinylight'>";
                 print "<b>NOTES ID:</b> <font color='red'>".module::pad_zero($notes["notes_id"],7)."</font><br/>";
                 print "<b>DATE/TIME:</b> ".$notes["ts"]."<br/>";					
                 print "<b>TAKEN BY:</b> ".user::get_username($notes["user_id"])."<br/>";
-                print "<b>VITAL SIGNS:</b>".$this->get_vitals($_GET["consult_id"])."<br/>";
+                print "<br><b>VITAL SIGNS:</b><br>".$this->get_vitals($_GET["consult_id"])."<br/>";
+		print "<b>WEIGHT FOR AGE (0-6 yo):</b>".$class."<br/>";
                 print "<hr size='1'/>";
                 print "<b>COMPLAINTS:</b><br/>";
                 notes::show_complaints($menu_id, $post_vars, $get_vars);
@@ -1888,13 +1891,9 @@ class notes extends module {
         if(mysql_num_rows($q_vitals)!=0):
 
             list($wt,$temp,$systolic,$diastolic,$heart,$resprate,$ht,$pulse) = mysql_fetch_array($q_vitals);
+            $str_vitals = "<b>WT:</b> ".$wt." kg, <b>TEMP:</b> ".$temp.", <b>BP:</b> ".$systolic."/".$diastolic.", <b>HR:</b> ".$heart.", <b>RR:</b> ".$resprate.", <b>PR:</b> ".$pulse.", <b>HT:</b> ".$ht." cm";
 
-
-            $str_vitals = " <b>WT:</b> ".$wt." kg, <b>TEMP:</b> ".$temp.", <b>BP:</b> ".$systolic."/".$diastolic.", <b>HR:</b> ".$heart.", <b>RR:</b> ".$resprate.", <b>PR:</b> ".$pulse.", <b>HT:</b> ".$ht." cm";
-
-
-	    $str_vitals .= "<br>".$this->compute_bmi($ht,$wt);
-            
+	    $this->compute_bmi($ht,$wt);
         else:
             $str_vitals = "<font color='red'>No vitals signs recorded.</font>";
         endif;

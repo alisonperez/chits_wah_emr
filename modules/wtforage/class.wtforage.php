@@ -86,6 +86,7 @@ class wtforage extends module {
     // --------------- CUSTOM MODULE FUNCTIONS ------------------
 
     function _wtforage() {
+
     //
     // main method for wtforage
     // caution -> use only for age 5 and below
@@ -106,11 +107,11 @@ class wtforage extends module {
         if (func_num_args()>0) {
             $arg_list = func_get_args();
             $consult_id = $arg_list[0];
-		}
+	}
         $patient_id = healthcenter::get_patient_id($consult_id);
 		$age_month = round((ccdev::get_age_weeks($patient_id))/4.33,0);
 		$gender = patient::get_gender($patient_id);
-		$actual_weight = wtforage::get_body_weight($consult_id);
+		$actual_weight = wtforage::get_body_weight($consult_id); 
         /*
 		print $sql = "select wt_class from m_lib_wtforage where age_month='$age_month' AND gender='$gender' ".
 		 		"AND weight_min <= '$actual_weight' AND weight_max >= '$actual_weight'";
@@ -123,8 +124,11 @@ class wtforage extends module {
         $sql = "select weight_min, weight_max, wt_class ".
                "from m_lib_wtforage ".
                "where age_month = '$age_month' and gender = '$gender'";
-        if ($result = mysql_query($sql)) {
-            if (mysql_num_rows($result)) {
+
+
+
+        if ($result = mysql_query($sql)) { 
+            if (mysql_num_rows($result)) { 
                 while (list($min, $max, $class) = mysql_fetch_array($result)) {
                     if ($max > $min) {
                         if ($actual_weight >= $min && $actual_weight <= $max) {

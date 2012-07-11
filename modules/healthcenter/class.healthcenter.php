@@ -687,14 +687,14 @@ class healthcenter extends module{
             //print_r($arg_list);
         }
         print "<b>".FTITLE_VITAL_SIGNS_RECORD."</b><br/>";
-        $sql = "select consult_id, vitals_timestamp, date_format(vitals_timestamp, '%a %d %b %Y, %h:%i%p') ".
+        $sql = "select consult_id, vitals_timestamp, date_format(vitals_timestamp, '%a %d %b %Y, %h:%i%p'),patient_id ".
                "from m_consult_vitals where consult_id = '".$get_vars["consult_id"]."'";
         if ($result = mysql_query($sql)) {
             if (mysql_num_rows($result)) {
-                while (list($cid, $ts, $date) = mysql_fetch_array($result)) {
+                while (list($cid, $ts, $date,$pxid) = mysql_fetch_array($result)) {
                     print "<img src='../images/arrow_redwhite.gif' border='0'/> $date <a href='".$_SESSION["PHP_SELF"]."?page=".$get_vars["page"]."&menu_id=".$get_vars["menu_id"]."&consult_id=".$get_vars["consult_id"]."&ptmenu=VITALS&timestamp=$ts#detail'><img src='../images/view.png' border='0'/></a><br/>";
                     if ($get_vars["timestamp"]==$ts) {
-                        $this->vitals_detail($menu_id, $post_vars, $get_vars);
+                        $this->vitals_detail($menu_id, $post_vars, $get_vars, $validuser, $isadmin, $pxid, $date);
                     }
                 }
             } else {
@@ -711,6 +711,8 @@ class healthcenter extends module{
             $get_vars = $arg_list[2];
             $validuser = $arg_list[3];
             $isadmin = $arg_list[4];
+	    $pxid = $arg_list[5];
+	    $vitals_date = $arg_list[6];
             //print_r($arg_list);
         }
         // process delete here
@@ -732,10 +734,11 @@ class healthcenter extends module{
             
             
         }
+
         $sql = "select user_id, vitals_weight, vitals_temp, vitals_systolic, vitals_diastolic, vitals_heartrate, vitals_resprate,vitals_height,vitals_pulse ".
                "from m_consult_vitals where consult_id = '".$get_vars["consult_id"]."' and vitals_timestamp = '".$get_vars["timestamp"]."'";
 
-		$edad  = healthcenter::get_patient_age($get_vars["consult_id"]);				
+	$edad  = healthcenter::get_patient_age($get_vars["consult_id"]);				
 
         if ($result = mysql_query($sql)) {
             if (mysql_num_rows($result)) {
@@ -761,6 +764,9 @@ class healthcenter extends module{
 		healthcenter::hypertension_stage($syst, $diast, $edad);
 		print "<br/>";
 		print healthcenter::compute_bmi($ht,$wt);
+		print "<br/>";
+		list($min,$max,$class) = wtforage::_wtforage($get_vars["consult_id"]);
+		echo "Weight for Age(0-6 yo): ".$class;
                 print "</td></tr>";
                 print "<tr><td colspan='2'>";
                 //if ($_SESSION["priv_delete"]) {
