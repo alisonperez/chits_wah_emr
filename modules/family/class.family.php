@@ -733,9 +733,11 @@ class family extends module{
                             print "<input type='hidden' name='family_id' value='$family_id'/>";
                             print "</td></tr>" ;
                         }
-                        print "<tr><td>";
-                        print "<input type='submit' name='submitpatient' value='Add to Family' class='tinylight' style='border: 1px solid black' />";
-                        print "</td></tr>";
+			if(!empty($_GET["family_id"])):
+                        	print "<tr><td align='center'>";
+                        	print "<input type='submit' name='submitpatient' value='Add to Family' class='tinylight' style='border: 1px solid black' />";
+                        	print "</td></tr>";
+			endif;
                         print "</form>";
                         print "<tr><td><br>";
                         print "</td></tr>";
