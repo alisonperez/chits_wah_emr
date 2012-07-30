@@ -499,8 +499,9 @@ class healthcenter extends module{
                 // processes form_patient and immediately
                 // starts consult
                 $patient->process_patient($menu_id, $post_vars, $get_vars);
-                $this->process_consult($menu_id, $post_vars, $get_vars);
-                header("location: ".$_SERVER["PHP_SELF"]."?page=".$get_vars["page"]."&menu_id=".$get_vars["menu_id"]);
+                //$this->process_consult($menu_id, $post_vars, $get_vars);
+                //header("location: ".$_SERVER["PHP_SELF"]."?page=".$get_vars["page"]."&menu_id=".$get_vars["menu_id"]);
+		
             }
             // check if we are loading patient records or validating entry for
             //   an existing patient in today's consult list

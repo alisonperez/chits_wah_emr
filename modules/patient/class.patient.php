@@ -415,7 +415,11 @@ class patient extends module{
 
 			if ($result) {
 			echo "<script language=\"Javascript\">";
-			echo "alert('Patient $post_vars[patient_firstname] $post_vars[patient_lastname] was successfully added!')";
+			echo "if(window.confirm('Patient $post_vars[patient_firstname] $post_vars[patient_lastname] was successfully added! Do you wish to proceed to the creation and assigning of the patient to the Family Folders?')){";
+			echo "window.location = '$_SERVER[PHP_SELF]?page=PATIENTS&menu_id=691'";
+			echo "}";
+			
+			
 			//header("location: ".$_SERVER["PHP_SELF"]."?page=".$get_vars["page"]."&menu_id=".$get_vars["menu_id"]);  
 			echo "</script>";
                     	}
