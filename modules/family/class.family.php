@@ -584,6 +584,12 @@ class family extends module{
                "from m_family_members f, m_patient p where p.patient_id = f.patient_id and f.family_id = '".$get_vars["family_id"]."'".
                "order by p.patient_lastname, p.patient_firstname";
         if ($result = mysql_query($sql)) {
+
+	    if($_POST["submit_cct"]):
+		$this->update_cct();
+	    endif;
+
+	    echo "<a name='family' />";
             print "<table width=270 bgcolor='#FFFFFF' cellpadding='4' cellspacing='0' style='border: 2px solid black'>";
             print "<tr><td>";
             print "<span class='tinylight'>".INSTR_FAMILY_INFO."</span><br/>";
@@ -614,6 +620,9 @@ class family extends module{
                         family::form_assign_role($menu_id, $post_vars, $get_vars);
                     }
                 }
+		
+		$this->form_cct();
+
             } else {
                 print "No members for this family.";
             }
@@ -870,6 +879,7 @@ class family extends module{
                 }
             }
         }
+	echo "<a name='family' />";
         print "<table width='300'>";
         print "<form action = '".$_SERVER["SELF"]."?page=".$get_vars["page"]."&menu_id=$menu_id&patient_id=".$get_vars["patient_id"]."&family_id=".$get_vars["family_id"]."' name='form_patient' method='post'>";
         print "<tr valign='top'><td>";
@@ -920,6 +930,65 @@ class family extends module{
         print "</table><br>";
     }
 
+	function form_cct(){
+		$q_cct = mysql_query("SELECT cct_id,family_id,date_format(date_enroll,'%m/%d/%Y') as date_enroll FROM m_family_cct_member WHERE family_id='$_GET[family_id]'") or die("Cannot query 934: ".mysql_error());
+
+		if(mysql_num_rows($q_cct)!=0):
+			list($cct_id,$family_id,$date_enroll) = mysql_fetch_array($q_cct);
+			$member = "<tr><td align='center'><span class='tinylight'><font color='red'>This household is a 4P/CCT member.</font></span></td></tr>";
+			$chk_value = 'CHECKED';
+		else:
+			$member = "<tr><td align='center'><span class='tinylight'><font color='red'>This household is not a 4P/CCT member.</font></span></td></tr>";
+			$chk_value = '';
+		endif;
+
+		echo "<form action='$_SERVER[PHP_SELF]?page=$_GET[page]&menu_id=$_GET[menu_id]&family_id=$_GET[family_id]#family' method='POST' name='form_cct_family'>";
+		echo "<br>";
+		echo "<hr>";
+		echo $member;
+		echo "<tr><td>";
+		echo "<input type='checkbox' name='chk_cct' $chk_value><span class='tinylight'><b>Check if family is under 4Ps</b></span></input><br>";
+		echo "<span class='tinylight'><b>Date of Enrollment</b>&nbsp;</span><input type='text' name='txt_cct' size='7' maxlength='10' value='$date_enroll'>";
+		echo "<a href=\"javascript:show_calendar4('document.form_cct_family.txt_cct', document.form_cct_family.txt_cct.value);\"><img src='../images/cal.gif' width='16' height='16' border='0' alt='Click here to pick up date'></a>";
+		echo "</input></td></tr>";
+		echo "<tr><td align='center'>";
+		echo "<input type='submit' name='submit_cct' value='Save 4P Membership'>";
+		echo "</input>";
+		echo "</td></tr>";
+		echo "</form>";
+	}
+
+	function update_cct(){
+		$q_family = mysql_query("SELECT cct_id FROM m_family_cct_member WHERE family_id='$_GET[family_id]'") or die("Cannot query 949: ".mysql_error());
+
+		list($m,$d,$y) = explode('/',$_POST["txt_cct"]);
+
+		$date_cct = $y.'-'.$m.'-'.$d;
+		
+		if(mysql_num_rows($q_family)!=0):
+			list($cct_id) = mysql_fetch_array($q_family);
+
+			if($_POST["chk_cct"]=='on'): //update
+				$q_update = mysql_query("UPDATE m_family_cct_member SET family_id='$_GET[family_id]',date_enroll='$date_cct',last_updated=NOW() WHERE cct_id='$cct_id'") or die("Cannot query 963: ".mysql_error());
+			else:
+				$q_delete = mysql_query("DELETE FROM m_family_cct_member WHERE cct_id='$cct_id'") or die("Cannot query 968: ".mysql_error());
+			endif;
+		else:
+			if($_POST["chk_cct"]=='on'): //add or insert
+				$q_insert = mysql_query("INSERT INTO m_family_cct_member SET family_id='$_GET[family_id]',date_enroll='$date_cct',last_updated=NOW()") or die("Cannot query 969: ".mysql_error());
+			else:
+				
+			endif;
+		endif;
+
+		if($q_insert || $q_update):
+			echo "<script language='javascript'>";
+                        echo "alert('4Ps / CCT membership details have been saved!');";
+                        echo "</script>";
+		endif;
+
+
+	}
 // end of class
 }
 ?>
