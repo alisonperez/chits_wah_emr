@@ -701,7 +701,7 @@ class family extends module{
             // query the database and append $index to WHERE
             if (isset($index)) {
                 $sql = "SELECT patient_id, patient_firstname,patient_lastname, patient_gender, patient_dob, round((to_days(now())-to_days(patient_dob))/365 , 1) computed_age ".
-                       "FROM m_patient WHERE $index ";
+                       "FROM m_patient WHERE $index "."ORDER by patient_lastname ASC, patient_firstname ASC";
                 if ($result=mysql_query($sql)) {
                     if ($rows = mysql_num_rows($result)) {
                         print "<span class='module'>SEARCH RESULTS</span><br><br>";
@@ -713,21 +713,21 @@ class family extends module{
                         }
                         print "If you see the ".
                               "<img src='../images/family.gif' border='0'/> icon, click on it to view family members.</b><br><br>";
-                        print "<table width='250' cellspacing='0' cellpadding='3'>";
+                        print "<table width='500' cellspacing='0' cellpadding='3'>";
                         print "<form method='post' action=''>";
                         while(list($id,$first,$last,$gender, $dob, $age)=mysql_fetch_array($result)) {
                             print "<tr bgcolor='#FFFF99'><td>";
                             $fid = $this->search_family($id);
                             if ($fid) {
-                                print "<font color='red'>".module::pad_zero($id,7)."</font> $first $last ($age/$gender) ";
-                                print ($fid?"<a href='".$_SERVER["PHP_SELF"]."?page=".$get_vars["page"]."&menu_id=".$get_vars["menu_id"]."&family_id=$fid'><img src='../images/family.gif' border='0'/></a>":"");
+                                print "<font color='red'>".module::pad_zero($id,7)."</font> $last, $first ($age/$gender/".$this->show_address($fid).", ".$this->barangay_name($fid).") ";
+                                print ($fid?"<a href='".$_SERVER["PHP_SELF"]."?page=".$get_vars["page"]."&menu_id=".$get_vars["menu_id"]."&family_id=$fid#family'.'><img src='../images/family.gif' border='0'/></a>":"");
                             } else {
                                 if ($get_vars["family_id"]) {
                                     print "<input type='checkbox' name='include_patient[]' value='$id'/> ";
                                     //print "<img src='../images/arrow_redwhite.gif' border='0'/> ";
-                                    print "<font color='red'>".module::pad_zero($id,7)."</font> <a href='".$_SERVER["PHP_SELF"]."?page=".$get_vars["page"]."&menu_id=$menu_id&add_id=$id&family_id=".$get_vars["family_id"]."'>$first $last ($age/$gender) </a> ";
+                                    print "<font color='red'>".module::pad_zero($id,7)."</font> <a href='".$_SERVER["PHP_SELF"]."?page=".$get_vars["page"]."&menu_id=$menu_id&add_id=$id&family_id=".$get_vars["family_id"]."'>$last, $first ($age/$gender) </a> ";
                                 } else {
-                                    print "<font color='red'>".module::pad_zero($id,7)."</font> $first $last ($age/$gender) ";
+                                    print "<font color='red'>".module::pad_zero($id,7)."</font> $last, $first ($age/$gender) ";
                                 }
                             }
                             print "<input type='hidden' name='family_id' value='$family_id'/>";
