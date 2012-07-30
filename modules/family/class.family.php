@@ -733,11 +733,13 @@ class family extends module{
                             print "<input type='hidden' name='family_id' value='$family_id'/>";
                             print "</td></tr>" ;
                         }
+
+			print "<tr><td align='center'>";
 			if(!empty($_GET["family_id"])):
-                        	print "<tr><td align='center'>";
                         	print "<input type='submit' name='submitpatient' value='Add to Family' class='tinylight' style='border: 1px solid black' />";
-                        	print "</td></tr>";
 			endif;
+				print "<input type='submit' name='submitpatient' value='New Search' class='tinylight' style='border: 1px solid black' />";
+			print "</td></tr>";
                         print "</form>";
                         print "<tr><td><br>";
                         print "</td></tr>";
@@ -823,6 +825,13 @@ class family extends module{
                 return;
             }
             break;
+	case "New Search":
+		if(empty($_GET["family_id"])):
+			header("Location: $_SERVER[PHP_SELF]?page=$_GET[page]&menu_id=$_GET[menu_id]");
+		else:
+			header("Location: $_SERVER[PHP_SELF]?page=$_GET[page]&menu_id=$_GET[menu_id]&family=$_GET[family_id]"."#family");
+		endif;
+		break;
         }
     }
 
@@ -954,7 +963,7 @@ class family extends module{
 		echo "<a href=\"javascript:show_calendar4('document.form_cct_family.txt_cct', document.form_cct_family.txt_cct.value);\"><img src='../images/cal.gif' width='16' height='16' border='0' alt='Click here to pick up date'></a>";
 		echo "</input></td></tr>";
 		echo "<tr><td align='center'>";
-		echo "<input type='submit' name='submit_cct' value='Save 4P Membership'>";
+		echo "<input type='submit' name='submit_cct' value='Save 4P Membership' style='border: 1px solid #000000'>";
 		echo "</input>";
 		echo "</td></tr>";
 		echo "</form>";
