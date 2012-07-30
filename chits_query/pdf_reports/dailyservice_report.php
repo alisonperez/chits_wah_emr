@@ -109,16 +109,16 @@
           
           $this->SetFont('Arial','B','10');
           $this->Cell(0,5,'D A I L Y   S E R V I C E    R E P O R T ( '.$_SESSION["subtitle"].' ) - '.$municipality_label,0,1,'C');
-          
+
           if($_SESSION[report_date]==$_SESSION[end_report_date]):
               $this->Cell(0,5,$_SESSION[report_date],0,1,'C');
           else:
-              $this->Cell(0,5,$_SESSION[report_date].' to '.$_SESSION[end_report_date],0,1,'C');          
+              $this->Cell(0,5,$_SESSION[report_date].' to '.$_SESSION[end_report_date],0,1,'C');
           endif;
-        
-        $this->Cell(0,5,'Total Number of Records: '.$_SESSION[record_count],0,1,'L');          
-        
-        $this->SetFont('Arial','',11);        
+
+        $this->Cell(0,5,'Total Number of Records: '.$_SESSION[record_count],0,1,'L');
+
+        $this->SetFont('Arial','',11);
         $w = $_SESSION["col_width"];
 	$this->SetWidths($w);
 	$this->Row($_SESSION[tbl_header]);		
@@ -160,7 +160,8 @@
     		//print_r($_SESSION["arr_consult"]);
 		$arr_report = $_SESSION["arr_consult"];
 		//$w = array(14,34,34,34,34,20,34,34,34,34,34);
-		$w = array(14,34,34,29,22,19,29,34,32,30,64);
+		//$w = array(14,34,34,29,22,19,29,34,32,30,64);
+		$w = array(14,34,34,29,22,19,29,20,32,30,34,34);
 		$subtitle = 'GENERAL CONSULTS';
 		break;
 	case 'ccdev':

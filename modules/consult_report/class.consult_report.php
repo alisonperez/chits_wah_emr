@@ -477,7 +477,7 @@ class consult_report extends module {
 	if ($result) {
    	    if (mysql_num_rows($result)) {
                		
-	        $header = array('PATIENT ID','PATIENT NAME/SEX/BDAY/AGE','CONSULT DATE / ELAPSED TIME','ADDRESS','BRGY','FAMILY ID','PHILHEALTH ID','VITAL SIGNS','COMPLAINTS','DIAGNOSIS','TREATMENT');
+	        $header = array('PATIENT ID','PATIENT NAME/SEX/BDAY/AGE','CONSULT DATE / ELAPSED TIME','ADDRESS','BRGY','FAMILY ID','PHILHEALTH ID','CCT/4P RECIPIENT','VITAL SIGNS','COMPLAINTS','DIAGNOSIS','TREATMENT');
 	        $contents = array();
 	        
 	        //print "<a href='../chits_query/pdf_reports/dailyservice_report.php'>PRINTER FRIENDLY VERSION</a><br/>"; 
@@ -485,17 +485,18 @@ class consult_report extends module {
 		print "<b><center>CONSULTS</center></b><br/>";
 		print "<table width='1000' cellspacing='0' cellpadding='2' style='border: 1px solid #000000'>";
 		print "<tr bgcolor='#FFCC33'>";
-		print "<td class='tinylight' valign='middle' align=center><b>$header[0]</b></td>";
-		print "<td class='tinylight' valign='middle' align=center><b>$header[1]</b></td>";
-		print "<td class='tinylight' valign='middle' align=center><b>$header[2]</b></td>";
-		print "<td class='tinylight' valign='middle' align=center><b>$header[3]</b></td>";
-		print "<td class='tinylight' valign='middle' align=center><b>$header[4]</b></td>";
-		print "<td class='tinylight' valign='middle' align=center><b>$header[5]</b></td>";
-		print "<td class='tinylight' valign='middle' align=center><b>$header[6]</b></td>";
-		print "<td class='tinylight' valign='middle' align=center><b>$header[7]</b></td>";
-		print "<td class='tinylight' valign='middle' align=center><b>$header[8]</b></td>";
-		print "<td class='tinylight' valign='middle' align=center><b>$header[9]</b></td>";
-		print "<td class='tinylight' valign='middle' align=center><b>$header[10]</b></td>";
+		print "<td class='tinylight' valign='middle' align=center><b>&nbsp;&nbsp;$header[0]&nbsp;&nbsp;</b></td>";
+		print "<td class='tinylight' valign='middle' align=center><b>&nbsp;&nbsp;$header[1]&nbsp;&nbsp;</b></td>";
+		print "<td class='tinylight' valign='middle' align=center><b>&nbsp;&nbsp;$header[2]&nbsp;&nbsp;</b></td>";
+		print "<td class='tinylight' valign='middle' align=center><b>&nbsp;&nbsp;$header[3]&nbsp;&nbsp;</b></td>";
+		print "<td class='tinylight' valign='middle' align=center><b>&nbsp;&nbsp;$header[4]&nbsp;&nbsp;</b></td>";
+		print "<td class='tinylight' valign='middle' align=center><b>&nbsp;&nbsp;$header[5]&nbsp;&nbsp;</b></td>";
+		print "<td class='tinylight' valign='middle' align=center><b>&nbsp;&nbsp;$header[6]&nbsp;&nbsp;</b></td>";
+		print "<td class='tinylight' valign='middle' align=center><b>&nbsp;&nbsp;$header[7]&nbsp;&nbsp;</b></td>";
+		print "<td class='tinylight' valign='middle' align=center><b>&nbsp;&nbsp;$header[8]&nbsp;&nbsp;</b></td>";
+		print "<td class='tinylight' valign='middle' align=center><b>&nbsp;&nbsp;$header[9]&nbsp;&nbsp;</b></td>";
+		print "<td class='tinylight' valign='middle' align=center><b>&nbsp;&nbsp;$header[10]&nbsp;&nbsp;</b></td>";
+		print "<td class='tinylight' valign='middle' align=center><b>&nbsp;&nbsp;$header[11]&nbsp;&nbsp;</b></td>";
 		print "</tr>";
 
 		while (list($pid,$consult_id,$pname,$age,$sex,$consult_date,$pxdob) = mysql_fetch_array($result)) {
@@ -512,14 +513,15 @@ class consult_report extends module {
                     }
 
                     $phid = philhealth::get_philhealth_id($pid);                    		    
+		    $cct_member = family::check_cct($pid);
 
                     $cc = notes::get_complaints($pid, $consult_date,$consult_id);
 		    $dx = notes::get_diagnosis_list($pid, $consult_date,$consult_id);
-   		    $tx = notes::get_plan($pid, $consult_date);                    
-                                      
-     		    
+   		    $tx = notes::get_plan($pid, $consult_date);
+
+
      		    $q_brgy = mysql_query("SELECT c.barangay_name FROM m_family_members a, m_family_address b, m_lib_barangay c WHERE a.patient_id='$pid' AND a.family_id=b.family_id AND b.barangay_id=c.barangay_id") or die("Cannot query 451 ".mysql_error());		    
-		    list($brgy) = mysql_fetch_array($q_brgy);		    		    
+		    list($brgy) = mysql_fetch_array($q_brgy);
 		
 		    //for displaying the vitals signs
 		    $selvitals = mysql_query("SELECT vitals_weight,vitals_temp,vitals_systolic,vitals_diastolic,vitals_heartrate,
@@ -537,6 +539,8 @@ class consult_report extends module {
 		    $res_vitals = mysql_fetch_array($selvitals);
 		    $bp = (empty($res_vitals[vitals_systolic]) && empty($res_vitals[vitals_diastolic]))?'-':$res_vitals[vitals_systolic].'/'.$res_vitals[vitals_diastolic];
 		    $count = mysql_num_rows($selvitals);
+
+
 		    
 		    $bgcolor=($bgcolor=="#FFFF99"?"white":"#FFFF99");
 		    print "<tr bgcolor='$bgcolor'>";
@@ -548,7 +552,7 @@ class consult_report extends module {
 		    print "<td class='tinylight' align=center>".$brgy."</td>";
 		    print "<td class='tinylight' align=center>".($fid==0?"-":$fid)."</td>";
 		    print "<td class='tinylight' align=center>".($phid==0?"-":$phid)."</td>";		    
-		    
+		    print "<td class='tinylight' align=center>".$cct_member."</td>";		    		    
 		    print "<td class='tinylight' align=center>BP: $bp,
 		    HR: $res_vitals[vitals_heartrate],RR: $res_vitals[vitals_resprate],<br>
 		    Wt: $res_vitals[vitals_weight] kg,Temp: $res_vitals[vitals_temp]</td>"; // display the vital signs
@@ -564,8 +568,8 @@ class consult_report extends module {
 		    //array_push($inner_record,array($pid,$pname." / ".$sex." / ".$pxdob.' / "..$age,$addr,$resbrgy[barangay_name],$brgy,$fid,$phid,'BP: '.$bp.', '.
 		    //'HR: '.$res_vitals[vitals_heartrate].', RR: '. $res_vitals[vitals_resprate].', Wt:' $res_vitals[vitals_weight] kg.', Temp:'. $res_vitals[vitals_temp],$cc,$dx,$tx));
 
-		    array_push($inner_record,array($pid,$pname." / ".$sex." / ".$pxdob." / ".$age,$elapsed_time,$addr,$brgy,$fid,$phid,$vitals_sign,$cc,$dx,$tx));
-		    array_push($contents,$inner_record);		    		    
+		    array_push($inner_record,array($pid,$pname." / ".$sex." / ".$pxdob." / ".$age,$elapsed_time,$addr,$brgy,$fid,$phid,$cct_member,$vitals_sign,$cc,$dx,$tx));
+		    array_push($contents,$inner_record);
 		}
 		print "</table>";
 	

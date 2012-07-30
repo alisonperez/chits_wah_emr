@@ -132,8 +132,9 @@ function Header()
     	    $this->SetFont('Arial','',10);
     	    $this->Cell(0,5,$brgy_label .' ('.$_SESSION["sdate2"]. ' to '. $_SESSION["edate2"].') ',0,1,'C');	
     	    
-    	    $_SESSION["w"] = $w = array(18,34,34,29,22,19,29,34,32,30,60);    	        	    
-    	    $_SESSION["header"] = $header = $arr_consults[0];
+    	    //$_SESSION["w"] = $w = array(18,34,34,29,22,19,29,34,32,30,60);
+	$_SESSION["w"] = $w = array(14,34,34,29,22,19,29,20,32,30,34,34);
+    	$_SESSION["header"] = $header = $arr_consults[0];
     	        	    
 	else:
     	    $this->Cell(0,5,'PhilHealth Enrollees Masterlist - '.$_SESSION[datanode][name],0,1,'C');

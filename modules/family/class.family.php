@@ -989,6 +989,19 @@ class family extends module{
 
 
 	}
+
+	function check_cct($pxid){
+		$q_cct = mysql_query("SELECT a.cct_id,date_format(a.date_enroll,'%m/%d/%Y') as date_enroll FROM m_family_cct_member a,m_family_members b WHERE b.patient_id='$pxid' AND b.family_id=a.family_id") or die("Cannot query 994: ".mysql_error());
+
+		if(mysql_num_rows($q_cct)!=0):
+			list($cct_id,$date_enroll) = mysql_fetch_array($q_cct);
+			return 'Yes ('.$date_enroll.')';
+		else:
+			return '';
+		endif;
+
+	}
+
 // end of class
 }
 ?>
