@@ -1092,7 +1092,7 @@ class querydb{
 				echo "<a href='./pdf_reports/laboratory.php?type=masterlist'>Laboratory Client Masterlist</a>";
 				break;
 			case 157:
-				echo "<a href='./pdf_reports/laboratory.php?type=service'>Laboratory Service Report</a>";
+				echo "<a href='./pdf_reports/laboratory.php?type=service'>Laboratory Service Report (includes only DONE lab exams)</a>";
 				break;
 			default:
 				break;

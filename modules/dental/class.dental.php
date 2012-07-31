@@ -51,12 +51,8 @@
 	function init_deps() {
 		module::set_dep($this->module, "module");
 		module::set_dep($this->module, "healthcenter");
-		module::set_dep($this->module, "patient");                               
+		module::set_dep($this->module, "patient");
    }
-	
-	
-	
-	
 	
 	function init_lang() {
    }	
