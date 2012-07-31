@@ -152,8 +152,8 @@ class csv_creator{
 				break;
 
 			case '7': //notifiable diseases data set
-				
-				for($i=1;$i<count($arr_stats);$i++){  
+				// traverse through the notifiable diseases array but do not include the last 2 values (total m , total f)
+				for($i=1;$i<count($arr_stats)-2;$i++){
 					array_push($arr_numero,$arr_stats[$i]);
 				}
 				
