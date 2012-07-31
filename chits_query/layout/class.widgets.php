@@ -138,7 +138,8 @@
 			$this->disp_filter_form2($query_brgy);
 		endif;
 
-        $this->additional_filter($_SESSION["ques"],"FP Methods");
+        //$this->additional_filter($_SESSION["ques"],"FP Methods");
+	$this->additional_filter($_SESSION["ques"]);
 
         echo "<tr align=\"center\">";
         echo "<td colspan=\"2\"><input type=\"submit\" name=\"q_submit\" value=\"Submit\" target=\"new\"></input>&nbsp;&nbsp;&nbsp;";
@@ -214,13 +215,13 @@
                 $this->checkbox_brgy($q_brgy);				
 	}
 	
-	function additional_filter($ques_id,$label){
+	function additional_filter($ques_id){
 
         if($ques_id==40): //if the query is about FP TCL, display another list showing the FP methods
                 $q_fp_method = mysql_query("SELECT method_name, method_id, fhsis_code FROM m_lib_fp_methods ORDER by method_name ASC") or die("Cannot query: Check FP tables");
 	
                 if(mysql_num_rows($q_fp_method)!=0):
-                        echo "<tr><td style=\"background-color: #666666;color: #FFFF66;text-align: center;\">$label</td>";
+                        echo "<tr><td style=\"background-color: #666666;color: #FFFF66;text-align: center;\">FP Methods</td>";
                         echo "<td><select name='sel_fp_method' size='1'>";
                         while(list($method_name,$method_id,$fhsis_code) = mysql_fetch_array($q_fp_method)){
                                 echo "<option value='$method_id'>$method_name ($fhsis_code)</option>";
@@ -229,7 +230,19 @@
                         echo "</tr>";
                         $this->show_year();
                 endif;
-         endif;        	
+	elseif($ques_id==156): //lab exams
+		echo "<tr>";	
+		echo "<td style='background-color: #666666;color: #FFFF66;text-align: center;'>Laboratory Exams</td><td><select name='sel_lab' size='1'>";
+		echo "<option value='all'>All laboratory exams</option>";
+		echo "<option value='m_consult_lab_fecalysis'>Fecalysis</option>";
+		echo "<option value='m_consult_lab_hematology'>Hematology</option>";
+		echo "<option value='m_consult_lab_sputum'>Sputum Exam</option>";
+		echo "<option value='m_consult_lab_urinalysis'>Urinalysis</option>";
+		echo "</select></td>";
+		echo "</tr>";
+	else:
+
+         endif;
 	}
 	
 	function disp_filter_quarterly($q_brgy){

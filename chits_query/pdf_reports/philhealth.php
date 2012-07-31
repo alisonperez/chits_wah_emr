@@ -191,7 +191,7 @@ function show_philhealth_list(){
 		array_push($arr_philhealth_record,$arr_philhealth);
 	}
 
-	return $arr_philhealth_record;
+	return $arr_philhealth_record; 
 }
 
 function show_philhealth_consults(){

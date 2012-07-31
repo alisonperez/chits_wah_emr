@@ -56,7 +56,7 @@ class querydb{
 	$_SESSION[edate_orig] = $edate_orig;
 	
 	$_SESSION[fp_method] = (isset($misc))?$misc:0; //assign fp method to a session if it exists from the form, otherwise place 0
-
+	$_SESSION[lab_exam] = $_POST["sel_lab"];
 	$this->stat_table($q,$_SESSION[ques]);
       
       endif;
@@ -306,6 +306,8 @@ class querydb{
 			$ret_file = $this->process_natality($quesno);
 		elseif($quesno>=150 && $quesno<=155):
 			$ret_file = $this->process_alert($quesno);
+		elseif($quesno>=156 && $quesno<=160):
+			$ret_file = $this->process_labs($quesno);
 		else:
 			echo "No available query for this indicator.";
 		endif;
@@ -1081,6 +1083,20 @@ class querydb{
 	
 	function process_natality(){
 	        return 'natality.php';
+	}
+
+	function process_labs($quesno){
+		//print_r($_SESSION);
+		switch($quesno){
+			case 156:
+				echo "<a href='./pdf_reports/laboratory.php?type=masterlist'>Laboratory Client Masterlist</a>";
+				break;
+			case 157:
+				echo "<a href='./pdf_reports/laboratory.php?type=service'>Laboratory Service Report</a>";
+				break;
+			default:
+				break;
+		}
 	}
 	
 }
