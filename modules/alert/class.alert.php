@@ -2222,11 +2222,18 @@ class alert extends module{
 	}
 
 	function send_basic_stat(){
-		$date_today = date('Y-m-d');
+
+		if(!empty($_POST["date_alert"])):
+			list($m,$d,$y) = explode('/',$_POST["date_alert"]);
+			$date_today = $y.'-'.sprintf("%02s",$m).'-'.sprintf("%02s",$d);
+		else:
+			$date_today = date('Y-m-d');
+		endif;
+
 		$brgy = $_SESSION["datanode"]["code"];
 		$q_user = mysql_query("SELECT user_id, user_lastname, user_firstname, user_cellular FROM game_user WHERE user_cellular!='' AND user_receive_sms='Y' AND user_active='Y'") or die("Cannot query: ".mysql_error());
 
-		$q_stats_today = mysql_query("SELECT news_text FROM m_news WHERE DATE(news_timestamp)='$date_today'") or die("Cannot query: ".mysql_error());
+		$q_stats_today = mysql_query("SELECT news_text FROM m_news WHERE DATE(news_timestamp) < '$date_today' AND news_title LIKE '%Stat Updates%' ORDER BY news_timestamp DESC") or die("Cannot query: ".mysql_error());
 
 		$q_insert_today = mysql_query("SELECT sms_code FROM m_lib_sms_alert WHERE alert_date='$date_today'") or die("Cannot query 2217: ".mysql_error());
 

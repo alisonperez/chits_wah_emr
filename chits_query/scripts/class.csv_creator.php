@@ -291,7 +291,7 @@ class csv_creator{
 		fclose($fp);
 
 		header('Content-type: application/csv');
-		header("Content-Disposition: inline; filename=".$csv_location);
+		header("Content-Disposition: inline; filename=".basename($csv_location));
 		readfile($csv_location);
 	}
 
