@@ -227,9 +227,7 @@ class news extends module {
 	while(list($class_id,$count)=mysql_fetch_array($q_morb)){
 		$q_class_name = mysql_query("SELECT class_name FROM m_lib_notes_dxclass WHERE class_id='$class_id'") or die("Cannot query 228: ".mysql_error());
 		list($class_name) = mysql_fetch_array($q_class_name);
-
 		array_push($arr_diag,$class_name.'-'.$count);
-		
 	}
 
 	$str_diag = implode(',',$arr_diag);
