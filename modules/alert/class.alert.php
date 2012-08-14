@@ -1951,6 +1951,7 @@ class alert extends module{
 		$padded_str = str_replace(' ','%20',$sms_message);
 		
 		if(exec('nohup curl http://'.$midserver.':'.$port.'/send/sms/'.$sms_number.'/'.$padded_str)):
+		//if(exec('nohup curl http://192.168.1.109:8011/send/sms/09224978259/Total Consultations (08-06-2012): 0, Total Overall Consultations: 10,Total Patients (08-06-2012): 0,Total Overall Patients: 54,All-time Top Visiting Barangay: Ginerbra (8) ,Top Visiting Barangay  (08-06-2012): ,')):
 			echo "<font color='red'>Message/s sent!</font><br>";
 			return true;
 		else:
@@ -2243,7 +2244,10 @@ class alert extends module{
 			list($stat_txt) = mysql_fetch_array($q_stats_today);
 			$stat_txt = str_replace('<br><br>',',',$stat_txt);
 			$stat_txt = str_replace('<br>',',',$stat_txt);
-			
+			$stat_txt = str_replace('/','-',$stat_txt);
+			$stat_txt = str_replace('(','- ',$stat_txt);
+			$stat_txt = str_replace(')','',$stat_txt);
+
 			while($user = mysql_fetch_array($q_user)){
 
 				if(mysql_num_rows($q_insert_today)==0):

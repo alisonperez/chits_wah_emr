@@ -196,6 +196,8 @@ class news extends module {
     }
 
     function update_stats(){
+	$arr_diag = array();
+
 	$title = 'Stat Updates for '.date('m/d/Y');
 	$author = '1';	//1 for admin user
 	$lead = 'This is a daily system-generated stats report. Check the numbers by clicking the VIEW button';
@@ -220,10 +222,23 @@ class news extends module {
 
 	list($brgy_today,$px_count_today) = mysql_fetch_array($top_brgy_today);
 
+	$q_morb = mysql_query("SELECT class_id, COUNT(class_id) as bilang FROM m_consult_notes_dxclass WHERE DATE(diagnosis_date)=CURDATE() GROUP BY class_id ORDER by bilang DESC LIMIT 3") or die("Cannot query 221: ".mysql_error());
+
+	while(list($class_id,$count)=mysql_fetch_array($q_morb)){
+		$q_class_name = mysql_query("SELECT class_name FROM m_lib_notes_dxclass WHERE class_id='$class_id'") or die("Cannot query 228: ".mysql_error());
+		list($class_name) = mysql_fetch_array($q_class_name);
+
+		array_push($arr_diag,$class_name.'-'.$count);
+		
+	}
+
+	$str_diag = implode(',',$arr_diag);
+	
+
 	$text = 'Total Consultations ('.date('m/d/Y').'): '.$consult_today.'<br> Total Overall Consultations: '.$total_consult;
 	$text = $text.'<br><br>Total Patients ('.date('m/d/Y').'): '.$px_today.'<br>Total Overall Patients: '.$total_px.'<br>';
 	$text = $text.'<br>All-time Top Visiting Barangay: '.$brgy.' ('.$px_count.') <br>Top Visiting Barangay  ('.date('m/d/Y').'): '.$brgy_today.'<br>';
-
+	$text = $text.'<br>Top 3 diagnosis: '.$str_diag;
 
 	$q_stat = mysql_query("SELECT news_id FROM m_news WHERE DATE(news_timestamp)=CURDATE()") or die('Cannot query 218 '.mysql_error());
 
