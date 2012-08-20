@@ -57,9 +57,9 @@ class usage extends module {
 		$this->form_usage();
 
 		if($_POST["btn_usage"]):
-			$this->query_stats($_POST["sel_usage"],$_POST["sel_period"]);
+			$this->query_stats($_POST["sel_usage"],$_POST["sel_period"],$_POST["from_date"],$_POST["to_date"]);
 		else:
-			$this->query_stats('0','D');
+			$this->query_stats('0','D','','');
 		endif;
 	}
 
@@ -83,17 +83,23 @@ class usage extends module {
 		echo "</select>";
 
 
-		echo "&nbsp;&nbsp;";
-
-		echo "<select size='1' name='sel_period'>";
+		echo "&nbsp;<b>FROM</b>&nbsp;";
+		
+		
+		/*echo "<select size='1' name='sel_period'>";
 		foreach($arr_period as $key=>$value){
 			echo "<option value='$key' onclick=''>";
 			echo $value;
 			echo "</option>";
 		}		
 		echo "</select>";
+		*/
+
+		echo "<input type='text' name='from_date' size='7' maxlength='12' value=".date("Y-m-d")." />";
+
+		echo "&nbsp;<b>TO</b>&nbsp;";
 		
-		echo "&nbsp;&nbsp;";
+		echo "<input type='text' name='to_date' size='7' maxlength='12' value=".date("Y-m-d")." />";
 
 		echo "<input type='submit' name='btn_usage' value='Set'></input>";
 		
@@ -106,8 +112,13 @@ class usage extends module {
 	}
 	
 	
-	function query_stats($usage_ind,$period){
-		$arr_dates = $this->get_current_period($period);
+	function query_stats($usage_ind,$period,$sdate,$edate){
+		if(empty($sdate) && empty($edate)):
+			$arr_dates = $this->get_current_period($period);
+		else:
+			$arr_dates[0] = $sdate;
+			$arr_dates[1] = $edate;
+		endif;
 		
 		$arr_usage = $this->query_usage($usage_ind,$arr_dates[0],$arr_dates[1]);
 		
