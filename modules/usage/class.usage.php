@@ -12,7 +12,7 @@ class usage extends module {
         	$this->module = "usage";
         	$this->description = "CHITS - Usage Stats and Graph";
 
-		$this->arr_usage_indicator = array("User Logins","Patients Registered","Consultations Logged","Consult Notes Recorded");
+		$this->arr_usage_indicator = array("User Logins","Patients Registered","Consultations Logged","Consult Notes Recorded","Log Record Per User");
 		$this->arr_period = array('D'=>'Daily','W'=>'Weekly','M'=>'Monthly','Q'=>'Quarterly','A'=>'Annual');
 	}
 
@@ -119,7 +119,9 @@ class usage extends module {
 			$arr_dates[0] = $sdate;
 			$arr_dates[1] = $edate;
 		endif;
-		
+		$_SESSION["usage_sdate"] = $arr_dates[0];
+		$_SESSION["usage_edate"] = $arr_dates[1];
+
 		$arr_usage = $this->query_usage($usage_ind,$arr_dates[0],$arr_dates[1]);
 		
 		if(count($arr_usage)!=0):
@@ -245,7 +247,59 @@ class usage extends module {
 					array_push($arr_ind_count,$arr_log_count);
 				}
 				break;
+			
+			case '4':
+				
+				echo "<table bgcolor='FFFF99' style='border: 1px solid #000000'>";
+				echo "<tr><td align='center' colspan='5' bgcolor='#FF9900'><font color='white'><b>USAGE STATS - ".$this->arr_usage_indicator[4]."(".$sdate." to ".$edate.")</b></td></tr>";
+				
+				echo "<tr align='center'>";
+				echo "<td><b>&nbsp;&nbsp;Name&nbsp;&nbsp;</b></td>";
+				echo "<td><b>&nbsp;&nbsp;Number of Logs&nbsp;&nbsp;</b></td>";
+				echo "<td><b>&nbsp;&nbsp;Total Minutes Logged&nbsp;&nbsp;</b></td>";
+				echo "<td><b>&nbsp;&nbsp;Average Minutes Per Log&nbsp;&nbsp;</b></td>";
+				echo "<td><b>&nbsp;&nbsp;View Details&nbsp;&nbsp;</b></td>";
+				echo "</tr>";
+				
+				for($i=0;$i<count($arr_users);$i++){
+					$arr_user_log = array();
+					$arr_user_log_id = array();
+					$gt_elapsed = 0;
+					$q_date_logs = mysql_query("SELECT log_id,login,logout,round((unix_timestamp(logout)-unix_timestamp(login))/60,2) as log_minutes FROM user_logs WHERE userid='$arr_users[$i]' AND login BETWEEN '$sdate' AND '$edate' ORDER BY login ASC") or die("Cannot query 251: ".mysql_error());
+					
+					while(list($log_id,$login,$logout,$time_elapsed)=mysql_fetch_array($q_date_logs)){
+						list($login_date,$login_time) = explode(' ',$login);
+						list($logout_date,$logout_time) = explode(' ',$logout);
+						if($time_elapsed<0):
+							$time_elapsed = 0;
+						endif;
 
+						//echo $arr_users[$i].'/'.$log_id.'/'.$login.'/'.$logout.'/'.$time_elapsed."<br>";
+						
+						$gt_elapsed += $time_elapsed;
+
+						array_push($arr_user_log,array($log_id,$login_date,$login_time,$logout_date,$logout_time,$time_elapsed));
+						array_push($arr_user_log_id,$log_id);
+
+					}
+
+					$q_username = mysql_query("SELECT user_firstname, user_lastname FROM game_user WHERE user_id='$arr_users[$i]'") or die("Cannot query 282: ".mysql_error());
+
+					list($fname,$lname) = mysql_fetch_array($q_username);
+
+					$ave_mins = round(($gt_elapsed / count($arr_user_log)),2);
+					$str_user_log = serialize($arr_user_log_id);
+
+					echo "<tr align='center'>";
+					echo "<td>".$lname.", ".$fname."</td>";
+					echo "<td>".count($arr_user_log)."</td>";
+					echo "<td>".$gt_elapsed."</td>";
+					echo "<td>".$ave_mins."</td>";
+					echo "<td><a href='../chits_query/pdf_reports/user_logs_report.php?user_log=$str_user_log&user_id=$arr_users[$i]'>View</a></td>";
+					echo "</tr>";
+				}
+				echo "</table>";
+				break;
 			default:
 
 				break;

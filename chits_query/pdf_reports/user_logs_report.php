@@ -1,8 +1,12 @@
 <?php
+    session_start();
     ob_start();
     
     require('./fpdf/fpdf.php');
     
+    $db_conn = mysql_connect("localhost","$_SESSION[dbuser]","$_SESSION[dbpass]");
+    mysql_select_db($_SESSION[dbname]);
+
     class PDF extends FPDF{
 	var $widths;
 	var $aligns;
@@ -104,71 +108,73 @@
 	    return $nl;
 	}
       
-      function Header(){
-          $municipality_label = $_SESSION[datanode][name];
-          
+      function Header(){ //print_r($_SESSION);
+          $facility_label = $_SESSION[datanode][name];
+          $municipality_label = $_SESSION[lgu];
+	  $province_label = $_SESSION[province];
+
           $this->SetFont('Arial','B','10');
-          $this->Cell(0,5,'D A I L Y   S E R V I C E    R E P O R T ( '.$_SESSION["subtitle"].' ) - '.$municipality_label,0,1,'C');
-
-          if($_SESSION[report_date]==$_SESSION[end_report_date]):
-              $this->Cell(0,5,$_SESSION[report_date],0,1,'C');
-          else:
-              $this->Cell(0,5,$_SESSION[report_date].' to '.$_SESSION[end_report_date],0,1,'C');
-          endif;
-
-        $this->Cell(0,5,'Total Number of Records: '.$_SESSION[record_count],0,1,'L');
-
-        $this->SetFont('Arial','',11);
-        $w = $_SESSION["col_width"];
-	$this->SetWidths($w);
-	$this->Row($_SESSION[tbl_header]);		
+          $this->Cell(0,5,'USER LOGS REPORT FROM '.$_SESSION[usage_sdate].' to '.$_SESSION[usage_edate].' - '.$facility_label.', '.$municipality_label.', '.$province_label,0,1,'C');
+         
       }    
-      
-      
-      function ShowTable($header,$contents){
-        $w = $_SESSION["col_width"];
-      
-	//$this->SetWidths($w);
-	//$this->Row($header);
-        //$this->Ln();
-        $this->SetFont('Arial','',7);
-	foreach($contents as $key=>$value){
-	    foreach($value as $key2=>$value2){
-	       $this->SetWidths($w);
-	       $this->Row($value2);
-	    }
-	}      
-      }
-      
+
+     function show_usage($arr_user_log){
+	$q_user = mysql_query("SELECT user_firstname, user_lastname FROM game_user WHERE user_id='$_GET[user_id]'")	or die("Cannot query 128: ".mysql_error());
+	list($fname,$lname) = mysql_fetch_array($q_user);
+
+	$w = array(40,40,40,40,40);
+	$header_content = array('No.','Date','Login Time','Logout Time', 'Total Minutes Logged');
+
+	$this->SetFont('Arial','','8');
+        $this->Cell(0,5,'Name of End-User: '.$lname.', '.$fname,0,1,'L');
+
+	$this->SetWidths($w);
+	$this->Row($header_content);
+
+	foreach($arr_user_log as $key=>$value){ 
+		$q_date_logs = mysql_query("SELECT log_id,login,logout,round((unix_timestamp(logout)-unix_timestamp(login))/60,2) as log_minutes FROM user_logs WHERE log_id='$value' ORDER BY login ASC") or die("Cannot query 251: ".mysql_error());
+		list($log_id,$login,$logout,$time_elapsed)=mysql_fetch_array($q_date_logs);
+		list($login_date,$login_time) = explode(' ',$login);
+		list($logout_date,$logout_time) = explode(' ',$logout);
+		
+		if($time_elapsed<0):
+			$time_elapsed = 0;
+		endif;
+				
+		$count += 1;
+		$this->SetFont('Arial','','10');
+		$gt_elapsed += $time_elapsed;
+		$this->SetWidths($w);
+		$this->Row(array($count,$login_date,$login_time,$logout_time,$time_elapsed));
+	}
+
+	$this->SetFont('Arial','','8');
+	$ave_mins = round(($gt_elapsed/count($arr_user_log)),2);
+	$this->Cell(0,5,'Total Logs Made: '.$count.'     Total Minutes Logged: '.$gt_elapsed.'     Average Minutes Per Log: '.$ave_mins,0,1,'L');
+	$this->Cell(0,5,'Date/Time Generated: '.date('Y-m-d H:m:s'),0,1,'L');
+
+     }
 
       function Footer(){
         $this->SetY(-15);
         //Arial italic 8
-        $this->SetFont('Arial','I',8);
+        $this->SetFont('Arial','I',10);
         //Page number
         $this->Cell(0,10,$this->PageNo(),0,0,'C');
       }
-                                  
+
     }
-        
-    $pdf=new PDF('L','mm','Legal');
+
+    $pdf=new PDF('P','mm','Legal');
     //Column titles
     //Data loading
 
-    
-    $header = $_SESSION["tbl_header"] = $arr_report[0];
-    $contents = $arr_report[1];
-    $_SESSION["record_count"] = $arr_report[2];
-    $_SESSION["col_width"] = $w;
-    $_SESSION["subtitle"] = $subtitle;
+    $pdf->SetFont('Arial','',10);
+    $pdf->AddPage();
 
-    $pdf->SetFont('Arial','',8);
-    $pdf->AddPage();
-    $pdf->ShowTable($header,$contents);
-    /*$pdf->AddPage();
-    $pdf->ImprovedTable($header,$data);
-    $pdf->AddPage();
-    $pdf->FancyTable($header,$data);
-    */
+    $arr_user_log = unserialize(stripslashes($_GET["user_log"]));
+
+    $pdf->show_usage($arr_user_log);
+
     $pdf->Output();
 ?>
