@@ -89,6 +89,9 @@ class html_builder{
 	}
 
 	function display_cell_content($cell_contents,$width){
+		$ques = $_SESSION["ques"];
+		$q_report_period = mysql_query("SELECT report_type FROM question WHERE ques_id='$ques'") or die("Cannot query: 93");
+		list($report_period) = mysql_fetch_array($q_report_period);
 		
 
 		$arr_px_labels = $_SESSION["arr_px_labels"];
@@ -118,7 +121,11 @@ class html_builder{
 						endif;
 
 						//echo "<a href='../../site/disp_name.php?id=$ser_arr_names&cat=$value[0]&prog=$cat' target='new'>".$value[$i]."</a>";
-						echo "<a href='../../site/disp_name.php?id=$ser_arr_names&cat=$value[0]&prog=$cat' target='new'>".$value[$i]."</a>"; 
+						if($report_period=='M'):   //show only edqc links in monthly reports
+							echo "<a href='../../site/disp_name.php?id=$ser_arr_names&cat=$value[0]&prog=$cat' target='new'>".$value[$i]."</a>"; 
+						else:
+							echo $value[$i];
+						endif;
 						
 					else:
 						echo $value[$i];
