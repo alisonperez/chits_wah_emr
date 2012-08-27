@@ -232,7 +232,7 @@ function show_ccdev_summary(){
 	$ccdev_rec = array();
 	$arr_consolidate = array();
 
-	$arr_indicators = array(array('Immunization Given < 1 yr'=>array('BCG'=>'BCG','DPT1'=>'DPT1','DPT2'=>'DPT2','DPT3'=>'DPT3','OPV1'=>'OPV1','OPV2'=>'OPV2','OPV3'=>'OPV3','HEPB1<24'=>'Hepa B1 w/ in 24 hrs','HEPB1>24'=>'Hepa B1 > 24 hours','HEPB2'=>'Hepatitis B2','HEPB3'=>'Hepatitis B3','MSL'=>'Measles')),'Fully Immunized Child','Completely Immunized Child (12-23 mos)','Child Protected at Birth','Infant age 6 mo seen','Infant exclusively breastfed until 6 mo','Infant 0-11 mos referred for NBS',array('Diarrhea (0-59 mos)'=>array('num_case'=>'No. of Cases','ort'=>'Given ORT','ors'=>'Given ORS','orswz'=>'Given ORS w/ Zinc')),array('Pneumonia (0-59 mos)'=>array('num_cases'=>'No. of cases','pneumonia_tx'=>'Given Treatment')),array('Sick Children Seen'=>array('6*11'=>'6-11 mos','12*59'=>'12-59 mos','60*71'=>'60-71 mos')),array('Sick Children Given Vit A'=>array('6*11'=>'6-11 mos','12*59'=>'12-59 mos','60*71'=>'60-71 mos')),'Infant 2-6 mos w/ LBW seen','Infant 2-6 mos w/ LBW given iron','Anemic Children 2-59 mos seen','Anemic Children 2-59 mos given iron');
+	$arr_indicators = array(array('Immunization Given < 1 yr'=>array('BCG'=>'BCG','DPT1'=>'DPT1','DPT2'=>'DPT2','DPT3'=>'DPT3','OPV1'=>'OPV1','OPV2'=>'OPV2','OPV3'=>'OPV3','HEPB1<24'=>'Hepa B1 w/ in 24 hrs','HEPB1>24'=>'Hepa B1 > 24 hours','HEPB2'=>'Hepatitis B2','HEPB3'=>'Hepatitis B3','MSL'=>'Measles','ROTA'=>'Rotavirus','PENTA1'=>'Pentavalent 1','PENTA2'=>'Pentavalent 2','PENTA3'=>'Pentavalent 3')),'Fully Immunized Child','Completely Immunized Child (12-23 mos)','Child Protected at Birth','Infant age 6 mo seen','Infant exclusively breastfed until 6 mo','Infant 0-11 mos referred for NBS',array('Diarrhea (0-59 mos)'=>array('num_case'=>'No. of Cases','ort'=>'Given ORT','ors'=>'Given ORS','orswz'=>'Given ORS w/ Zinc')),array('Pneumonia (0-59 mos)'=>array('num_cases'=>'No. of cases','pneumonia_tx'=>'Given Treatment')),array('Sick Children Seen'=>array('6*11'=>'6-11 mos','12*59'=>'12-59 mos','60*71'=>'60-71 mos')),array('Sick Children Given Vit A'=>array('6*11'=>'6-11 mos','12*59'=>'12-59 mos','60*71'=>'60-71 mos')),'Infant 2-6 mos w/ LBW seen','Infant 2-6 mos w/ LBW given iron','Anemic Children 2-59 mos seen','Anemic Children 2-59 mos given iron');
 	$m_index = array('1'=>array('2','3'),'2'=>array('4','5'),'3'=>array('6','7'),'4'=>array('10','11'),'5'=>array('12','13'),'6'=>array('14','15'),'7'=>array('18','19'),'8'=>array('20','21'),'9'=>array('22','23'),'10'=>array('26','27'),'11'=>array('28','29'),'12'=>array('30','31'));
 	$q_index = array('1'=>array('8','9'),'2'=>array('16','17'),'3'=>array('24','25'),'4'=>array('32','33'));
 	
@@ -242,8 +242,8 @@ function show_ccdev_summary(){
             $header = array(200,40,40);
         elseif($_SESSION[ques]==51):
             $header = array(120,30,20,20,20,20,50,55);
-            //$header = array(120,30,60,20,50,55);        
-        else:        
+            //$header = array(120,30,60,20,50,55);
+        else:
         endif;
 	
 	
@@ -256,7 +256,7 @@ function show_ccdev_summary(){
 		$disp_arr = array();
 		
 		if(is_array($arr_indicators[$i])):
-
+			
 			$sub_arr = array_keys($arr_indicators[$i]); //this will return the header title if the content is an array			
 			$counter = 0;
 			$arr_sub_indicators = $this->compute_indicators($i+1,$sub_arr,$arr_indicators[$i]);			
@@ -320,7 +320,7 @@ function show_ccdev_summary(){
                                     }
 
                                     $this->Ln();
-                                    //$this->Row(array($disp_arr[0],$disp_arr[$m_index[$_SESSION[smonth]][0]],$disp_arr[$m_index[$_SESSION[smonth]][1]]));                                
+                                    //$this->Row(array($disp_arr[0],$disp_arr[$m_index[$_SESSION[smonth]][0]],$disp_arr[$m_index[$_SESSION[smonth]][1]]));     
                                 elseif($_SESSION[ques]==51):
                                     $total_q = $disp_arr[$q_index[$_SESSION[quarter]][0]] + $disp_arr[$q_index[$_SESSION[quarter]][1]];
 
@@ -421,7 +421,7 @@ function show_ccdev_summary(){
 	return $arr_consolidate;
 }
 
-function compute_indicators(){
+function compute_indicators(){ 
 	if(func_num_args()>0):
 		$arg_list = func_get_args();
 		$crit = $arg_list[0];
@@ -433,7 +433,7 @@ function compute_indicators(){
 	$arr_gender = array('M','F');
 	$brgy_array = $this->get_brgy_array();
 	$brgy_array = implode(',',$brgy_array);
-	$arr_antigens = array('BCG','DPT1','DPT2','DPT3','HEPB1','HEPB2','HEPB3','MSL','OPV1','OPV2','OPV3');
+	$arr_antigens = array('BCG','DPT1','DPT2','DPT3','HEPB1','HEPB2','HEPB3','MSL','OPV1','OPV2','OPV3','ROTA','PENTA1','PENTA2','PENTA3');
 	$fic_antigens = implode(',',$arr_antigens);
 	
 
@@ -443,8 +443,8 @@ function compute_indicators(){
 			case 1:
 				$arr_antigen = array();
 				$arr_antigen_px = array();
-
-				foreach($sub_arr_crit as $antigen_label=>$antigen_array){
+				
+				foreach($sub_arr_crit as $antigen_label=>$antigen_array){ 
 					
 					foreach($antigen_array as $key=>$value){
 					
@@ -462,7 +462,7 @@ function compute_indicators(){
 						$q_antigen = mysql_query("SELECT a.actual_vaccine_date,a.vaccine_id,b.patient_id FROM m_consult_vaccine a,m_patient b WHERE a.patient_id=b.patient_id AND floor((TO_DAYS(a.actual_vaccine_date)-TO_DAYS(b.patient_dob))/7) < 260 AND a.vaccine_id='$key' AND a.actual_vaccine_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' AND b.patient_gender='$value2'") or die(mysql_error());
 					endif;
 
-					if(mysql_num_rows($q_antigen)!=0):
+					if(mysql_num_rows($q_antigen)!=0): 
 						while(list($actual_vaccine_date,$vaccine_id,$patient_id)=mysql_fetch_array($q_antigen)){
 							if($this->get_px_brgy($patient_id,$brgy_array)):
 								$month_stat[$this->get_max_month($actual_vaccine_date)] += 1;
@@ -1161,7 +1161,7 @@ function disp_arr_indicator(){
 
 	switch($crit){
 		case 0:
-			$r_label = array('BCG','DPT1','DPT2','DPT3','OPV1','OPV2','OPV3','Hepa B1 w/in 24 hrs','Hepa B1 > 24 hrs','Hepatitis B2','Hepatitis B3','Measles'); 
+			$r_label = array('BCG','DPT1','DPT2','DPT3','OPV1','OPV2','OPV3','Hepa B1 w/in 24 hrs','Hepa B1 > 24 hrs','Hepatitis B2','Hepatitis B3','Measles','Rotavirus','Pentavalent 1','Pentavalent 2','Pentavalent 3'); 
 			return $r_label[$sub_crit];
 			break;
 

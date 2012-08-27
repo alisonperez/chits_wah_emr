@@ -128,7 +128,7 @@ class html_builder{
 						endif;
 						
 					else:
-						echo $value[$i];
+						echo $value[$i]; 
 					endif;
 				else:
 					echo $value[$i];
