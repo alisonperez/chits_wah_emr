@@ -1064,7 +1064,6 @@ class querydb{
 
 
 	function display_icons($file_to_call){
-
 		echo "<table>";
 		echo "<tr>";
 		echo "<td><a href='./pdf_reports/$file_to_call?type=pdf' alt='Save/Open in PDF' title='Save/Open as PDF'><img src='../images/pdf_icon.jpg' width='50px' height='50px' /></href></td>";

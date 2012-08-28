@@ -204,7 +204,7 @@ function Header()
 	    $this->Cell(0,5,'MUNICIPALITY/CITY OF: '.$_SESSION[lgu],0,1,L);
             $this->Cell(0,5,'PROVINCE: '.$_SESSION[province].'          PROJECTED POPULATION OF THE YEAR: '.$population,0,1,L);
             $this->Ln(15);    
-            
+
 	else:
 	
 	endif;
@@ -1394,14 +1394,21 @@ $pdf->AddPage();
 
 $_SESSION["arr_px_labels"] = array('epi'=>array());
 $ccdev_rec = $pdf->show_ccdev_summary();
+$arr_csv = array();
+foreach($ccdev_rec as $key=>$value){
+	if($key>=12 && $key<=15):
+
+	else:
+		array_push($arr_csv,$value);
+	endif;
+}
 
 if($_GET["type"]=='html'): 
 	$html_tab->create_table($_SESSION["w"],$_SESSION["header"],$ccdev_rec,$_SESSION["w2"],$_SESSION["subheader"]);
 elseif($_GET["type"]=='csv'):
-	//print_r($ccdev_rec);
-	$csv_creator->create_csv($_SESSION["ques"],$ccdev_rec,'csv');
-elseif($_GET["type"]=='efhsis'):
-	$csv_creator->create_csv($_SESSION["ques"],$ccdev_rec,'efhsis');
+	$csv_creator->create_csv($_SESSION["ques"],$arr_csv,'csv');
+elseif($_GET["type"]=='efhsis'): 
+	$csv_creator->create_csv($_SESSION["ques"],$arr_csv,'efhsis');
 else:
 	$pdf->Output();
 endif;

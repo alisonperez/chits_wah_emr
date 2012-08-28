@@ -1,9 +1,9 @@
 <?php
     session_start();
     ob_start();
-    
+
     require('./fpdf/fpdf.php');
-    
+
     $db_conn = mysql_connect("localhost","$_SESSION[dbuser]","$_SESSION[dbpass]");
     mysql_select_db($_SESSION[dbname]);
 
