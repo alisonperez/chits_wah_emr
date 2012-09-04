@@ -959,7 +959,10 @@ class ccdev extends module {
                     $result = mysql_query($sql);
                 }
             }
-            if ($post_vars["vaccine"]) {
+            if ($post_vars["vaccine"]) { 
+
+		$this->check_vacc_entry();
+
                 foreach($post_vars["vaccine"] as $key=>$value) {
                     $sql = "insert into m_consult_ccdev_vaccine (ccdev_id, consult_id, user_id, patient_id, vaccine_timestamp, actual_vaccine_date, vaccine_id, age_on_vaccine) ".
                            "values ('".$post_vars["ccdev_id"]."', '".$get_vars["consult_id"]."', '".$_SESSION["userid"]."', '$patient_id', sysdate(), sysdate(), '$value', '$age_weeks')";
@@ -1914,7 +1917,33 @@ function determine_vacc_status(){
 	else:
 		return current($antigen_date)."\n".'(FIC)';
 	endif;
-}
+	}
+
+	function check_vacc_entry(){
+		$arr_old_vacc = array('DPT1','DPT2','DPT3','HEPB1','HEPB2','HEPB3');
+		$arr_new_vacc = array('PENTA1','PENTA2','PENTA3');
+		$both = 0;
+
+		foreach($arr_old_vacc as $key=>$value){
+			if(in_array($value,$_POST["vaccine"])){
+				foreach($arr_new_vacc as $key2=>$value2){
+					if(in_array($value2,$_POST["vaccine"])){
+						$both = 1;
+					}
+				}
+			}
+		}
+
+		if($both==1):
+			echo "<script language=\"Javascript\">";
+			echo "alert('DPT and/or HEPA B1 vaccinations cannot be checked together with a Pentavalent vaccination. Please uncheck one.')";
+			echo "</script>";
+			return 1;
+		else:
+			return 0;
+		endif;
+
+	}
 // end of class
 }
 ?>
