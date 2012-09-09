@@ -127,6 +127,21 @@ function Header()
 
     $this->q_report_header();
     
+    if($_SESSION["ques"]==74):
+	$arr_main_header = array();
+	$this->SetFont('Arial','B','15');
+    	$this->Cell(340,8,'M O R B I D I T Y   D I S E A S E   C L I E N T   M A S T E R L I ST',0,1,C);
+    
+    	$this->SetFont('Arial','','10');
+    	$_SESSION["w"] = $w = array(40,40,40,40,40,40,40,40);
+    	array_push($arr_main_header,'Last Name','First Name','Date of Birth','Gender','Date/Time of Diagnosis','Diagnosis','Address');
+	$_SESSION["header"] = $arr_main_header;
+	$_SESSION["subheader"] = '';
+    	$this->SetWidths($w);
+	$this->Row($arr_main_header);
+
+
+    else:
     $arr_gender = array();
     $this->SetFont('Arial','B','15');
     $this->Cell(340,8,'M O R B I D I T Y   D I S E A S E   R E P O R T',1,1,C);
@@ -149,6 +164,7 @@ function Header()
     $_SESSION["subheader"] = $arr_gender;
     $this->SetWidths($w);
     $this->Row($arr_gender);
+    endif;
     
 }
 
@@ -168,6 +184,9 @@ function q_report_header(){
     elseif($_SESSION[ques]==73):
         $freq = 'FHSIS ANNUAL REPORT FOR THE YEAR: ';
         $freq_val = $_SESSION[year];
+    elseif($_SESSION[ques]==74):
+	$freq = 'DATE OF COVERAGE: ';
+	$freq_val = $_SESSION["sdate2"].' to '.$_SESSION["edate2"];
     else:    
     endif;
     
@@ -182,9 +201,16 @@ function q_report_header(){
 
 function show_header_freq($freq,$freq_val){
     if($_SESSION[ques]==73):
-        $this->Cell(0,5,$freq.$freq_val."          YEAR: ".$_SESSION[year],0,1,L);            
+        $this->Cell(0,5,$freq.$freq_val."          YEAR: ".$_SESSION[year],0,1,L);
     else:
-        $this->Cell(0,5,$freq.$freq_val."          YEAR: ".$_SESSION[year],0,1,L);    
+	if($_SESSION[ques]!=74):
+        	$this->Cell(0,5,$freq.$freq_val."          YEAR: ".$_SESSION[year],0,1,L);
+	else: 
+		$q_icd = mysql_query("SELECT class_name,icd10 FROM m_lib_notes_dxclass WHERE class_id='$_SESSION[morbidity_code]'") or die("Cannot query 207: ".mysql_error());
+		list($class_name,$icd10)=mysql_fetch_array($q_icd);
+		
+        	$this->Cell(0,5,$freq.$freq_val."           MORBIDITY DISEASE: ".$class_name ."(".$icd10.")           Level: ".$_SESSION["icd_level"],0,1,L);
+	endif;
     endif;
 }
 
@@ -195,19 +221,19 @@ function show_header_bhs(){
 }
 
 function show_header_rhu(){
-    if($_SESSION[ques]==70 || $_SESSION[ques]==71):   //applies only to W-BHS and M2 reports
+    if($_SESSION[ques]==70 || $_SESSION[ques]==71 || $_SESSION[ques]==74):   //applies only to W-BHS and M2 reports
         $this->Cell(0,5,'CATCHMENT RHU/BHS: '.$_SESSION[datanode][name],0,1,L);        
     endif;
 }
 
 function show_header_lgu(){
-    if($_SESSION[ques]==72 || $_SESSION[ques]==73): //applies only to Q2 and A2 reports
+    if($_SESSION[ques]==72 || $_SESSION[ques]==73 || $_SESSION[ques]==74): //applies only to Q2 and A2 reports
         $this->Cell(0,5,'MUNICIPALITY/CITY OF: '.$_SESSION[lgu],0,1,L);
     endif;
 }
 
 function show_header_province(){
-    if($_SESSION[ques]==72 || $_SESSION[ques]==73): //applies only to Q2 and A2 reports
+    if($_SESSION[ques]==72 || $_SESSION[ques]==73 || $_SESSION[ques]==74): //applies only to Q2 and A2 reports
         $this->Cell(0,5,'PROVINCE: '.$_SESSION[province],0,1,L);
     endif;
 }
@@ -241,9 +267,9 @@ function show_morbidity(){
     //$q_icd10 = mysql_query("SELECT class_id,class_name,icd10 FROM m_lib_notes_dxclass WHERE notifiable='Y'") or die("Cannot query: 226".mysql_error());        
     
     //echo mysql_num_rows($q_diagnosis).'<br>';
-    
+
     if(mysql_num_rows($q_diagnosis)!=0):
-    $bilang = 0;              
+    $bilang = 0;
     $arr_icd = array(); //this will contain the distinct instances of ICD-10 codes in the 1st array, arr_row. To be used for final counting and display
     $arr_main = array();
     
@@ -435,15 +461,15 @@ function show_morbidity(){
              endif;
          }
      }
-     
+
      //print_r($final_arr2);
-     foreach($final_arr2 as $key_final=>$value_final){         
-          $this->SetWidths($w);          
-          $this->Row($value_final);          
+     foreach($final_arr2 as $key_final=>$value_final){
+          $this->SetWidths($w);
+          $this->Row($value_final);
 	
 	array_push($arr_consolidate,$value_final);
      }
-          
+
 
     else: 
           $this->SetWidths(array('340'));
@@ -454,6 +480,43 @@ function show_morbidity(){
     endif;
 
     return $arr_consolidate;
+}
+
+function show_morbidity_masterlist(){
+	$main_arr_morb = array();
+	$w = array(40,40,40,40,40,40,40);
+
+	$q_morb = mysql_query("SELECT icd10 FROM m_lib_notes_dxclass WHERE class_id='$_SESSION[morbidity_code]'") or die("Cannot query 460: ".mysql_error());
+	list($icd10) = mysql_fetch_array($q_morb);
+
+	if($icd_level=='main'):
+		$arr_icd = explode('.',$icd10);
+		$_SESSION["icd_code"] = $icd_code = $arr_icd[1];
+	else:
+		$_SESSION["icd_code"] = $icd_code = $icd10;
+	endif;
+
+	//print_r($_SESSION);
+
+	if($_SESSION["brgy"]=='all'):
+		$q_morb_list = mysql_query("SELECT a.patient_lastname, a.patient_firstname, a.patient_dob, a.patient_gender, b.diagnosis_date, c.class_name, e.address,f.barangay_name FROM m_patient a, m_consult_notes_dxclass b, m_lib_notes_dxclass c,m_family_members d, m_family_address e,m_lib_barangay f WHERE b.diagnosis_date BETWEEN '$_SESSION[sdate]' AND '$_SESSION[edate]' AND a.patient_id=b.patient_id AND b.patient_id=d.patient_id AND d.family_id=e.family_id AND e.barangay_id=f.barangay_id AND b.class_id=c.class_id AND c.icd10 LIKE '%$icd_code%' ORDER by b.diagnosis_date ASC, a.patient_lastname ASC, a.patient_firstname ASC") or die("Cannot query 473: ".mysql_error());
+	else:
+		$q_morb_list = mysql_query("SELECT a.patient_lastname, a.patient_firstname, a.patient_dob, a.patient_gender, b.diagnosis_date, c.class_name, e.address,f.barangay_name FROM m_patient a, m_consult_notes_dxclass b, m_lib_notes_dxclass c,m_family_members d, m_family_address e,m_lib_barangay f WHERE b.diagnosis_date BETWEEN '$_SESSION[sdate]' AND '$_SESSION[edate]' AND a.patient_id=b.patient_id AND b.patient_id=d.patient_id AND d.family_id=e.family_id AND e.barangay_id=f.barangay_id AND f.barangay_id='$_SESSION[brgy]' AND b.class_id=c.class_id AND c.icd10 LIKE '%$icd_code%' ORDER by b.diagnosis_date ASC, a.patient_lastname ASC, a.patient_firstname ASC") or die("Cannot query 475: ".mysql_error());
+	endif;
+
+
+	while(list($lname,$fname,$dob,$gender,$diag_date,$diag_name,$address,$brgy_name)=mysql_fetch_array($q_morb_list)){
+		$arr_morb = array();
+		array_push($arr_morb,$lname,$fname,$dob,$gender,$diag_date,$diag_name,$address.', '.$brgy_name);
+
+		//echo $lname.'/'.$fname.'/'.$dob.'/'.$gender.'/'.$diag_date.'/'.$diag_name.'/'.$address.'/'.$brgy_name;
+		$this->SetWidths($w);
+          	$this->Row($arr_morb);
+		
+		array_push($main_arr_morb,$arr_morb);
+	}
+
+	return $main_arr_morb;
 }
 
 function sort_icd($arr){
@@ -504,11 +567,11 @@ function get_brgy_header(){
         
 	while(list($brgy) = mysql_fetch_array($q_brgy)){
 		$str_brgy = $str_brgy.'  '.$brgy;
-	}	        
+	}
 
-	}                
-    endif;                                                                         
-                                                                          
+	}
+    endif;
+
     return $str_brgy;
 }
 
@@ -516,13 +579,12 @@ function sanitize_brgy(){
     if(func_num_args()>0):
         $args = func_get_args();
         $query = $args[0];
-        $brgy = $args[1];        
-        
+        $brgy = $args[1];
+
     endif;
-        
+
     $arr_count = array();
-        
-    
+
     if(mysql_num_rows($query)!=0): 
         while($r_query = mysql_fetch_array($query)){
             if($this->get_px_brgy($r_query[patient_id],$brgy)):
@@ -542,14 +604,14 @@ function get_px_brgy(){
                 $pxid = $arg_list[0];
                 $str = $arg_list[1];
         endif;
-        
-        
+
+
 	$q_px = mysql_query("SELECT a.barangay_id FROM m_family_address a, m_family_members b WHERE b.patient_id='$pxid' AND b.family_id=a.family_id AND a.barangay_id IN ($str)") or die("cannot query 389: ".mysql_error());
-                
+
         if(mysql_num_rows($q_px)!=0):
-                
+
                 return 1;
-        else:   
+        else:
                 return ;
         endif; 
 }
@@ -575,7 +637,11 @@ $pdf->SetFont('Arial','',10);
 
 $pdf->AddPage();
 
-$morb_rec = $pdf->show_morbidity();
+if($_SESSION["ques"]==74): 
+	$morb_rec = $pdf->show_morbidity_masterlist();
+else:
+	$morb_rec = $pdf->show_morbidity();
+endif;
 
 //$pdf->AddPage();
 //$pdf->show_fp_summary();

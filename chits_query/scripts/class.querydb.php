@@ -12,7 +12,7 @@ class querydb{
 
 	//0.1. Capiz circa 2007. Form structure for filters
 	//0.2 August 2009 --
-    
+
     function querycrit($dbname,$dbname2,$sdate,$edate,$brgy,$misc){   
 	  
 	  $sdate_orig = trim($sdate);
@@ -57,10 +57,12 @@ class querydb{
 	
 	$_SESSION[fp_method] = (isset($misc))?$misc:0; //assign fp method to a session if it exists from the form, otherwise place 0
 	$_SESSION[lab_exam] = $_POST["sel_lab"];
+	$_SESSION[morbidity_code] = $_POST["sel_morbidity"];
+	$_SESSION[icd_level] = $_POST["sel_icd_level"];
 	$this->stat_table($q,$_SESSION[ques]);
-      
+
       endif;
-      
+
       echo "</table>";
     }
 
@@ -292,6 +294,8 @@ class querydb{
 			$this->process_leprosy($quesno);		
 		elseif($quesno>=70 && $quesno<=73):			
 			$ret_file = $this->process_morbidity($quesno);
+		elseif($quesno == 74):
+			$ret_file = $this->show_morbidity_masterlist();
 		elseif($quesno>=90 && $quesno<=99):
 			$ret_file = $this->process_tb($quesno);	
 		elseif($quesno==100):
@@ -1096,6 +1100,10 @@ class querydb{
 			default:
 				break;
 		}
+	}
+
+	function show_morbidity_masterlist(){
+		return "morbidity_report.php";
 	}
 	
 }

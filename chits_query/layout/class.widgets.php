@@ -98,11 +98,11 @@
 		if($set_filter == 1): // start date, end date and barangay dropdown list
 
 
-		echo "<tr><td style=\"background-color: #666666;color: #FFFF66;text-align: center;\">Start Date (yyyy-mm-dd)</td>";
+		echo "<tr><td style=\"background-color: #666666;color: #FFFF66;text-align: center;\">Start Date (mm/dd/yyyy)</td>";
 		echo "<td><input name=\"sdate\" type=\"text\" size=\"12\" maxlength=\"10\" value=\"$psdate\"></input>";		
 		echo "<a href=\"javascript:show_calendar4('document.form_query.sdate', document.form_query.sdate.value);\"><img src='../images/cal.gif' width='16' height='16' border='0' alt='Click Here to Pick up the date'></a>";
 		echo "</td></tr>";
-                echo "<tr><td style=\"background-color: #666666;color: #FFFF66;text-align: center;\">End Date (yyyy-mm-dd)</td>";
+                echo "<tr><td style=\"background-color: #666666;color: #FFFF66;text-align: center;\">End Date (mm/dd/yyyy)</td>";
                 echo "<td><input name=\"edate\" type=\"text\" size=\"12\" maxlength=\"10\" value=\"$pedate\">";
 		echo "<a href=\"javascript:show_calendar4('document.form_query.edate', document.form_query.edate.value);\"><img src='../images/cal.gif' width='16' height='16' border='0' alt='Click Here to Pick up the date'></a>";		
 		echo "</td></tr>";
@@ -240,6 +240,40 @@
 		echo "<option value='m_consult_lab_urinalysis'>Urinalysis</option>";
 		echo "</select></td>";
 		echo "</tr>";
+
+	elseif($ques_id==74): 
+		if($_SESSION["icd_level"]=='main'):
+			$main = 'SELECTED';
+		elseif($_SESSION["icd_level"]=='exact'):
+			$exact = 'SELECTED';
+		else:
+			$main = $exact = '';
+		endif;
+		
+		$q_icd = mysql_query("SELECT class_id, class_name, icd10 FROM m_lib_notes_dxclass WHERE morbidity='Y' ORDER by class_name ASC, icd10 ASC") or die("Cannot query 245: ".mysql_error());
+
+
+		echo "<tr>";
+		echo "<td style='background-color: #666666;color: #FFFF66;text-align: center;'>Select Morbidity Disease</td><td><select name='sel_morbidity' size='1'>";
+		
+		while(list($class_id,$class_name,$icd10)=mysql_fetch_array($q_icd)){
+			if($_SESSION["morbidity_code"]==$class_id):
+				echo "<option value='$class_id' SELECTED>$class_name ($icd10)</option>";
+			else:
+				echo "<option value='$class_id'>$class_name ($icd10)</option>";
+			endif;
+		}
+		
+		echo "</select></td></tr>";
+
+		
+		echo "<tr>";
+		echo "<td style='background-color: #666666;color: #FFFF66;text-align: center;'>ICD10 level</td><td><select name='sel_icd_level' size='1'>";
+		
+		echo "<option value='main' $main>Main ICD10 code (i.e. A09)</option>";
+		echo "<option value='exact' $exact>Specific ICD10 code (i.e. A09.1)</option>";
+		
+		echo "</select></td></tr>";
 	else:
 
          endif;
