@@ -786,7 +786,7 @@ function compute_indicators(){
 				$month_stat = array(1=>0,2=>0,3=>0,4=>0,5=>0,6=>0,7=>0,8=>0,9=>0,10=>0,11=>0,12=>0);
 				$month_stat_px = array(1=>array(),2=>array(),3=>array(),4=>array(),5=>array(),6=>array(),7=>array(),8=>array(),9=>array(),10=>array(),11=>array(),12=>array());
 
-				$q_cic = mysql_query("SELECT DISTINCT a.patient_id, MAX(b.actual_vaccine_date),floor((TO_DAYS(MAX(b.actual_vaccine_date)) - TO_DAYS(a.patient_dob))/30) days_vacc,a.patient_dob FROM m_patient a,m_consult_vaccine b WHERE a.patient_id=b.patient_id AND a.patient_gender='$arr_gender[$sex]' AND b.vaccine_id IN ('BCG','DPT1','DPT2','DPT3','HEPB1','HEPB2','HEPB3','MSL','OPV1','OPV2','OPV3') GROUP by a.patient_id ORDER BY a.patient_dob ASC") or die(mysql_query());
+				$q_cic = mysql_query("SELECT DISTINCT a.patient_id, MAX(b.actual_vaccine_date),floor((TO_DAYS(MAX(b.actual_vaccine_date)) - TO_DAYS(a.patient_dob))/30) days_vacc,a.patient_dob FROM m_patient a,m_consult_vaccine b WHERE a.patient_id=b.patient_id AND a.patient_gender='$arr_gender[$sex]' AND b.vaccine_id IN ('BCG','DPT1','DPT2','DPT3','HEPB1','HEPB2','HEPB3','MSL','OPV1','OPV2','OPV3','PENTA1','PENTA2','PENTA3') GROUP by a.patient_id ORDER BY a.patient_dob ASC") or die(mysql_query());
 				
 					while(list($pxid,$actual_vaccine_date,$day_vacc,$patient_dob)=mysql_fetch_array($q_cic)){
 						list($staon,$sbuwan,$sdate) = explode('-',$_SESSION[sdate2]);
@@ -831,7 +831,7 @@ function compute_indicators(){
 				$month_stat = array(1=>0,2=>0,3=>0,4=>0,5=>0,6=>0,7=>0,8=>0,9=>0,10=>0,11=>0,12=>0);
 				$month_stat_px = array(1=>array(),2=>array(),3=>array(),4=>array(),5=>array(),6=>array(),7=>array(),8=>array(),9=>array(),10=>array(),11=>array(),12=>array());
 
-				$q_cic = mysql_query("SELECT DISTINCT a.patient_id, MAX(b.actual_vaccine_date),floor((TO_DAYS(MAX(b.actual_vaccine_date)) - TO_DAYS(a.patient_dob))/30) days_vacc,a.patient_dob FROM m_patient a,m_consult_vaccine b WHERE a.patient_id=b.patient_id AND a.patient_gender='$arr_gender[$sex]' AND b.vaccine_id IN ('BCG','DPT1','DPT2','DPT3','HEPB1','HEPB2','HEPB3','MSL','OPV1','OPV2','OPV3') GROUP by a.patient_id ORDER BY a.patient_dob ASC ") or die(mysql_query());
+				$q_cic = mysql_query("SELECT DISTINCT a.patient_id, MAX(b.actual_vaccine_date),floor((TO_DAYS(MAX(b.actual_vaccine_date)) - TO_DAYS(a.patient_dob))/30) days_vacc,a.patient_dob FROM m_patient a,m_consult_vaccine b WHERE a.patient_id=b.patient_id AND a.patient_gender='$arr_gender[$sex]' AND b.vaccine_id IN ('BCG','DPT1','DPT2','DPT3','HEPB1','HEPB2','HEPB3','MSL','OPV1','OPV2','OPV3','PENTA1','PENTA2','PENTA3') GROUP by a.patient_id ORDER BY a.patient_dob ASC ") or die(mysql_query());
 				
 					while(list($pxid,$actual_vaccine_date,$day_vacc,$patient_dob)=mysql_fetch_array($q_cic)){ 
 						list($staon,$sbuwan,$sdate) = explode('-',$_SESSION[sdate2]);
@@ -1071,9 +1071,17 @@ function determine_vacc_status(){
 		$arg_list = func_get_args();
 		$pxid = $arg_list[0];
 	endif;
+	
+	$q_penta = mysql_query("SELECT consult_id FROM m_consult_vaccine WHERE vaccine_id IN ( 'PENTA1','PENTA2','PENTA3' ) AND patient_id='$pxid'") or die("Cannot query 165: ".mysql_error());
 
-	$antigens = array('BCG','DPT1','DPT2','DPT3','HEPB1','HEPB2','HEPB3','MSL','OPV1','OPV2','OPV3');
-	$antigen_stat = array('BCG'=>0,'DPT1'=>0,'DPT2'=>0,'DPT3'=>0,'HEPB1'=>0,'HEPB2'=>0,'HEPB3'=>0,'MSL'=>0,'OPV1'=>0,'OPV2'=>0,'OPV3'=>0);
+	if(mysql_num_rows($q_penta)!=0):
+		$antigens = array('BCG','PENTA1','PENTA2','PENTA3','MSL','OPV1','OPV2','OPV3');
+		$antigen_stat = array('BCG'=>0,'PENTA1'=>0,'PENTA2'=>0,'PENTA3'=>0,'MSL'=>0,'OPV1'=>0,'OPV2'=>0,'OPV3'=>0);		
+	else:
+		$antigens = array('BCG','DPT1','DPT2','DPT3','HEPB1','HEPB2','HEPB3','MSL','OPV1','OPV2','OPV3');
+		$antigen_stat = array('BCG'=>0,'DPT1'=>0,'DPT2'=>0,'DPT3'=>0,'HEPB1'=>0,'HEPB2'=>0,'HEPB3'=>0,'MSL'=>0,'OPV1'=>0,'OPV2'=>0,'OPV3'=>0);
+	endif;
+
 	$cic = 0;
 	
 	$antigen_date = array();
