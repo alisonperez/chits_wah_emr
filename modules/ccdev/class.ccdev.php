@@ -961,8 +961,13 @@ class ccdev extends module {
             }
             if ($post_vars["vaccine"]) { 
 
-		$this->check_vacc_entry();
+		if($this->check_vacc_entry()):
+			
+		else:
 
+		if($this->check_if_vacc_exist()==0):
+
+		else:
                 foreach($post_vars["vaccine"] as $key=>$value) {
                     $sql = "insert into m_consult_ccdev_vaccine (ccdev_id, consult_id, user_id, patient_id, vaccine_timestamp, actual_vaccine_date, vaccine_id, age_on_vaccine) ".
                            "values ('".$post_vars["ccdev_id"]."', '".$get_vars["consult_id"]."', '".$_SESSION["userid"]."', '$patient_id', sysdate(), sysdate(), '$value', '$age_weeks')";
@@ -974,6 +979,10 @@ class ccdev extends module {
                     $result_vaccine = mysql_query($sql_vaccine);
 
                 }
+		endif;
+		
+
+		endif;
             }
             break;
         case "For Vaccination":
@@ -1941,6 +1950,72 @@ function determine_vacc_status(){
 			return 1;
 		else:
 			return 0;
+		endif;
+
+	}
+
+	function check_if_vacc_exist(){
+		
+		$arr_old_vacc = array('DPT1','DPT2','DPT3','HEPB1','HEPB2','HEPB3');
+		
+		$arr_new_vacc = array('PENTA1','PENTA2','PENTA3');
+		
+
+		$patient_id = healthcenter::get_patient_id($_GET["consult_id"]);
+		$type = '';
+
+		foreach($_POST["vaccine"] as $key=>$value){
+			if(in_array($value,$arr_old_vacc)):
+				$type = 'old';
+			elseif(in_array($value,$arr_new_vacc)):
+				$type = 'new';
+			else:
+
+			endif;			
+			
+		}
+
+		if($type!=''):
+			if($type=='old'):
+				$arr_new = array();
+				foreach($arr_new_vacc as $key=>$value){
+					array_push($arr_new,"'".$value."'");
+				}
+				$str_new = implode(",",$arr_new);
+
+				$q_vacc = mysql_query("SELECT consult_id FROM m_consult_vaccine WHERE patient_id='$patient_id' AND vaccine_id IN ( $str_new )") or die("Cannot query 1976: ".mysql_error());
+
+				if(mysql_num_rows($q_vacc)!=0):
+					echo "<script language=\"Javascript\">";
+					echo "alert('The client was vaccinated with pentavalent (5 in 1) vaccines already. Please record the succeeding pentavalent vaccine rounds instead.')";
+					echo "</script>";
+					return 0;
+				else: 
+					return 1;
+				endif;
+
+			elseif($type=='new'):
+				$arr_old = array();
+				foreach($arr_old_vacc as $key=>$value){
+					array_push($arr_old,"'".$value."'");
+				}
+				$str_old = implode(",",$arr_old);
+
+
+				$q_vacc = mysql_query("SELECT consult_id FROM m_consult_vaccine WHERE patient_id='$patient_id' AND vaccine_id IN ( $str_old )") or die("Cannot query 1980: ".mysql_error()); 
+				
+				if(mysql_num_rows($q_vacc)!=0):
+					echo "<script language=\"Javascript\">";
+					echo "alert('The client was vaccinated with the traditional set of vaccines (non-pentavalent) already. Please record the succeeding vaccinations (non-pentavalent) according to the regular sequence.')";
+					echo "</script>";
+					return 0;
+				else:
+					return 1;
+				endif;
+
+			endif;
+		else:
+			return 1;
 		endif;
 
 	}
