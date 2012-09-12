@@ -1883,9 +1883,16 @@ function determine_vacc_status(){
 		$arg_list = func_get_args();
 		$pxid = $arg_list[0];
 	endif;
-	
-	$antigens = array('BCG','DPT1','DPT2','DPT3','HEPB1','HEPB2','HEPB3','MSL','OPV1','OPV2','OPV3');
-	$antigen_stat = array('BCG'=>0,'DPT1'=>0,'DPT2'=>0,'DPT3'=>0,'HEPB1'=>0,'HEPB2'=>0,'HEPB3'=>0,'MSL'=>0,'OPV1'=>0,'OPV2'=>0,'OPV3'=>0);
+
+	$q_penta = mysql_query("SELECT consult_id FROM m_consult_vaccine WHERE vaccine_id IN ( 'PENTA1','PENTA2','PENTA3' ) AND patient_id='$pxid'") or die("Cannot query 1887: ".mysql_error());
+
+	if(mysql_num_rows($q_penta)!=0):
+		$antigens = array('BCG','PENTA1','PENTA2','PENTA3','MSL','OPV1','OPV2','OPV3');
+		$antigen_stat = array('BCG'=>0,'PENTA1'=>0,'PENTA2'=>0,'PENTA3'=>0,'MSL'=>0,'OPV1'=>0,'OPV2'=>0,'OPV3'=>0);		
+	else:
+		$antigens = array('BCG','DPT1','DPT2','DPT3','HEPB1','HEPB2','HEPB3','MSL','OPV1','OPV2','OPV3');
+		$antigen_stat = array('BCG'=>0,'DPT1'=>0,'DPT2'=>0,'DPT3'=>0,'HEPB1'=>0,'HEPB2'=>0,'HEPB3'=>0,'MSL'=>0,'OPV1'=>0,'OPV2'=>0,'OPV3'=>0);
+	endif;
 	$cic = 0;
 	
 	$antigen_date = array();
@@ -1912,7 +1919,7 @@ function determine_vacc_status(){
 			$q_antigen = mysql_query("SELECT round((TO_DAYS('$ant_date') - TO_DAYS(a.patient_dob))/7,2) week_span FROM m_patient a WHERE a.patient_id='$pxid'") or die("Cannot query: 269");
 			list($wk_age) = mysql_fetch_array($q_antigen);
 
-			if($wk_age>52):				
+			if($wk_age>52):	
 				$cic=1;
 			endif;
 		}
