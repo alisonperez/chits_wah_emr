@@ -156,7 +156,7 @@ function Header()
     
     $_SESSION["w2"] = $w = array(60,16,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,12,12);        
     array_push($arr_gender,' ',' ');
-    
+
     for($i=0;$i<16;$i++){
         array_push($arr_gender,'M','F');
     }
