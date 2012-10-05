@@ -1,7 +1,7 @@
 <?
   session_start();
   
-  $dbname = 'moncada_core_data_fresh';
+  $dbname = 'chits_server';
   #$dbname2 = 'chitsquery';
   $_SESSION["query"] = $dbname;
   $dbuser = "root";

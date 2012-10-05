@@ -131,7 +131,17 @@ small { font-family: verdana, sans serif}
   <tr bgcolor="#006600">
   <tr>
   <tr>
-    <td valign="top"><img src="../images/<?php echo $_SESSION["banner"] ?>" border="0" width="100%" height="100%"></td>
+    <?php 
+        if((date('Y-m-d') >= date('Y').'-10-29') && (date('Y-m-d') <= date('Y').'-11-02')):
+            echo "<td valign='top'><img src='../images/halloween.png' border='0' width='100%' height='50%'></td>";
+            
+        elseif((date('Y-m-d') >= date('Y').'-12-16') && (date('Y-m-d') <= date('Y').'-12-25')):
+            echo "<td valign='top'><img src='../images/christmas.png' border='0' width='100%' height='50%'></td>";
+        else:            
+            echo "<td valign='top'><img src='../images/$_SESSION[banner]' border='0' width='100%' height='100%'></td>";
+        endif;
+    ?>
+    
 <!--    <td valign="top"><img src="../images/banner.6.jpg" border="0" width="100%" height="100%"></td> -->
     
   </tr>
