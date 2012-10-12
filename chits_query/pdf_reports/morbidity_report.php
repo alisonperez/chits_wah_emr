@@ -489,21 +489,26 @@ function show_morbidity_masterlist(){
 	$q_morb = mysql_query("SELECT icd10 FROM m_lib_notes_dxclass WHERE class_id='$_SESSION[morbidity_code]'") or die("Cannot query 460: ".mysql_error());
 	list($icd10) = mysql_fetch_array($q_morb);
 
-	if($icd_level=='main'):
+	if($_SESSION["icd_level"]=='main'):
 		$arr_icd = explode('.',$icd10);
-		$_SESSION["icd_code"] = $icd_code = $arr_icd[1];
+		$_SESSION["icd_code"] = $icd_code = $arr_icd[0];
 	else:
 		$_SESSION["icd_code"] = $icd_code = $icd10;
 	endif;
 
 	//print_r($_SESSION);
 
-	if($_SESSION["brgy"]=='all'):
+	if($_SESSION["brgy"][0]=='all'):
 		$q_morb_list = mysql_query("SELECT a.patient_lastname, a.patient_firstname, a.patient_dob, a.patient_gender, b.diagnosis_date, c.class_name, e.address,f.barangay_name FROM m_patient a, m_consult_notes_dxclass b, m_lib_notes_dxclass c,m_family_members d, m_family_address e,m_lib_barangay f WHERE b.diagnosis_date BETWEEN '$_SESSION[sdate]' AND '$_SESSION[edate]' AND a.patient_id=b.patient_id AND b.patient_id=d.patient_id AND d.family_id=e.family_id AND e.barangay_id=f.barangay_id AND b.class_id=c.class_id AND c.icd10 LIKE '%$icd_code%' ORDER by b.diagnosis_date ASC, a.patient_lastname ASC, a.patient_firstname ASC") or die("Cannot query 473: ".mysql_error());
-	else:
-		$q_morb_list = mysql_query("SELECT a.patient_lastname, a.patient_firstname, a.patient_dob, a.patient_gender, b.diagnosis_date, c.class_name, e.address,f.barangay_name FROM m_patient a, m_consult_notes_dxclass b, m_lib_notes_dxclass c,m_family_members d, m_family_address e,m_lib_barangay f WHERE b.diagnosis_date BETWEEN '$_SESSION[sdate]' AND '$_SESSION[edate]' AND a.patient_id=b.patient_id AND b.patient_id=d.patient_id AND d.family_id=e.family_id AND e.barangay_id=f.barangay_id AND f.barangay_id='$_SESSION[brgy]' AND b.class_id=c.class_id AND c.icd10 LIKE '%$icd_code%' ORDER by b.diagnosis_date ASC, a.patient_lastname ASC, a.patient_firstname ASC") or die("Cannot query 475: ".mysql_error());
-	endif;
+	else: 
+		$arr_brgy = array();
+		foreach($_SESSION["brgy"] as $key=>$value){
+			array_push($arr_brgy,$value);
+		}
+		$str_brgy = implode($arr_brgy,',');
 
+		$q_morb_list = mysql_query("SELECT a.patient_lastname, a.patient_firstname, a.patient_dob, a.patient_gender, b.diagnosis_date, c.class_name, e.address,f.barangay_name FROM m_patient a, m_consult_notes_dxclass b, m_lib_notes_dxclass c,m_family_members d, m_family_address e,m_lib_barangay f WHERE b.diagnosis_date BETWEEN '$_SESSION[sdate]' AND '$_SESSION[edate]' AND a.patient_id=b.patient_id AND b.patient_id=d.patient_id AND d.family_id=e.family_id AND e.barangay_id=f.barangay_id AND f.barangay_id IN ($str_brgy) AND b.class_id=c.class_id AND c.icd10='$icd_code' ORDER by b.diagnosis_date ASC, a.patient_lastname ASC, a.patient_firstname ASC") or die("Cannot query 475: ".mysql_error());
+	endif;
 
 	while(list($lname,$fname,$dob,$gender,$diag_date,$diag_name,$address,$brgy_name)=mysql_fetch_array($q_morb_list)){
 		$arr_morb = array();
