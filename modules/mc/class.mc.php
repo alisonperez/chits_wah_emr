@@ -4492,8 +4492,26 @@ class mc extends module {
 		echo "</td></tr>";
 
 		echo "</table>";
-	}
+	} 
 
+	/*function compute_edc($lmp){
+		list($m,$d,$y) = explode('/',$lmp);
+		$arr_date_assoc = array();
+
+
+		if(($y >= 4) && ($y<=12)):
+			$new_year = $y + 1;
+		else:
+			$new_year = $y;
+		endif;
+
+		if(($m>=1) && ($m<=3)):
+			
+		else:
+
+		endif;
+		
+	}*/
 
 // end of class
 }
