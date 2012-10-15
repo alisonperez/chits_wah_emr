@@ -157,7 +157,7 @@ function show_fp_quarterly(){
 
     $arr_method = array('a'=>'FSTRBTL','b'=>'MSV','c'=>'PILLS','d'=>'IUD','e'=>'DMPA','f'=>'NFPCM','g'=>'NFPBBT','h'=>'NFPLAM','i'=>'NFPSDM','j'=>'NFPSTM','k'=>'CONDOM');
     $w = array(90,50,50,50,50,50);
-    $str_brgy = $this->get_brgy();    
+    $str_brgy = $this->get_brgy();
 
     //echo $_SESSION[sdate2].'/'.$_SESSION[edate2];
 
@@ -340,9 +340,10 @@ function sanitize_brgy(){
         $args = func_get_args();
         $query = $args[0];
         $brgy = $args[1];        
-        
     endif;
-        
+
+
+
     $arr_count = array();
         
     
@@ -365,17 +366,17 @@ function get_px_brgy(){
                 $pxid = $arg_list[0];
                 $str = $arg_list[1];
         endif;
-        
+
         if($str=='All Barangay'):
 	    $q_px = mysql_query("SELECT a.barangay_id FROM m_family_address a, m_family_members b WHERE b.patient_id='$pxid' AND b.family_id=a.family_id") or die("cannot query 389: ".mysql_error());
         else:
+	    $str = implode(',',$_SESSION[brgy]);
             $q_px = mysql_query("SELECT a.barangay_id FROM m_family_address a, m_family_members b WHERE b.patient_id='$pxid' AND b.family_id=a.family_id AND a.barangay_id IN ($str)") or die("cannot query 389: ".mysql_error());
         endif;
 
         if(mysql_num_rows($q_px)!=0):
-
                 return 1;
-        else:   
+        else:
                 return ;
         endif; 
 }

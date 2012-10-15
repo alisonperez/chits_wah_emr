@@ -357,14 +357,17 @@ function get_px_brgy(){
                 $pxid = $arg_list[0];
                 $str = $arg_list[1];
         endif;
-        
-        
-	$q_px = mysql_query("SELECT a.barangay_id FROM m_family_address a, m_family_members b WHERE b.patient_id='$pxid' AND b.family_id=a.family_id AND a.barangay_id IN ($str)") or die("cannot query 389: ".mysql_error());
-                
+
+        if($_SESSION[brgy][0] == 'all'):
+	    $q_px = mysql_query("SELECT a.barangay_id FROM m_family_address a, m_family_members b WHERE b.patient_id='$pxid' AND b.family_id=a.family_id") or die("cannot query 389: ".mysql_error());
+        else:
+	    $str = implode(',',$_SESSION[brgy]);
+            $q_px = mysql_query("SELECT a.barangay_id FROM m_family_address a, m_family_members b WHERE b.patient_id='$pxid' AND b.family_id=a.family_id AND a.barangay_id IN ($str)") or die("cannot query 389: ".mysql_error());
+        endif;
+
         if(mysql_num_rows($q_px)!=0):
-                
                 return 1;
-        else:   
+        else:
                 return ;
         endif; 
 }
