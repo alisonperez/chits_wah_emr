@@ -830,8 +830,12 @@ class mc extends module {
                 break;
             case "Save Data":
                 if ($post_vars["lmp_date"] && $post_vars["obscore_gp"] && $post_vars["obscore_fpal"] && $post_vars["patient_height"]) {
+		
+		$edc = $this->compute_edc($post_vars["lmp_date"]);
+		
+		//$sql = "INSERT INTO m_patient_mc SET patient_id='$patient_id',consult_id='$get_vars[consult_id]',mc_timestamp=sysdate(),mc_consult_date=sysdate(),patient_lmp='$lmp_date',patient_edc=from_days(to_days('$lmp_date')+280),trimester1_date=from_days(to_days('$lmp_date')+84),trimester2_date=from_days(to_days('$lmp_date')+168),trimester3_date=from_days(to_days('$lmp_date')+280),postpartum_date=from_days(to_days('$lmp_date')+322),obscore_gp='$post_vars[obscore_gp]',obscore_fpal='$post_vars[obscore_fpal]',user_id='$_SESSION[userid]',blood_type='$post_vars[bloodtype]',patient_age='$patient_age',patient_height='$post_vars[patient_height]'";
 
-		$sql = "INSERT INTO m_patient_mc SET patient_id='$patient_id',consult_id='$get_vars[consult_id]',mc_timestamp=sysdate(),mc_consult_date=sysdate(),patient_lmp='$lmp_date',patient_edc=from_days(to_days('$lmp_date')+280),trimester1_date=from_days(to_days('$lmp_date')+84),trimester2_date=from_days(to_days('$lmp_date')+168),trimester3_date=from_days(to_days('$lmp_date')+280),postpartum_date=from_days(to_days('$lmp_date')+322),obscore_gp='$post_vars[obscore_gp]',obscore_fpal='$post_vars[obscore_fpal]',user_id='$_SESSION[userid]',blood_type='$post_vars[bloodtype]',patient_age='$patient_age',patient_height='$post_vars[patient_height]'";
+		$sql = "INSERT INTO m_patient_mc SET patient_id='$patient_id',consult_id='$get_vars[consult_id]',mc_timestamp=sysdate(),mc_consult_date=sysdate(),patient_lmp='$lmp_date',patient_edc='$edc',trimester1_date=from_days(to_days('$lmp_date')+84),trimester2_date=from_days(to_days('$lmp_date')+168),trimester3_date=from_days(to_days('$lmp_date')+280),postpartum_date=from_days(to_days('$lmp_date')+322),obscore_gp='$post_vars[obscore_gp]',obscore_fpal='$post_vars[obscore_fpal]',user_id='$_SESSION[userid]',blood_type='$post_vars[bloodtype]',patient_age='$patient_age',patient_height='$post_vars[patient_height]'";
 
 		$result = mysql_query($sql) or die("Cannot query 845".mysql_error());
 
@@ -884,7 +888,9 @@ class mc extends module {
                 break;
             case "Update Data":
                 if ($post_vars["lmp_date"] && $post_vars["obscore_gp"] && $post_vars["obscore_fpal"] && $post_vars["patient_height"]) {
-                    $sql = "update m_patient_mc set ".
+		    $edc = $this->compute_edc($post_vars["lmp_date"]);
+
+                    /*$sql = "update m_patient_mc set ".
                            "patient_lmp = '$lmp_date', ".
                            "patient_edc = from_days(to_days('$lmp_date')+280), ".
                            "trimester1_date = from_days(to_days('$lmp_date')+84), ".
@@ -897,6 +903,22 @@ class mc extends module {
                            "patient_height = '".$post_vars["patient_height"]."', ".
                            "blood_type = '".$post_vars["bloodtype"]."' ".
                            "where mc_id = '".$post_vars["mc_id"]."'";
+		    */
+
+		    $sql = "update m_patient_mc set ".
+                           "patient_lmp = '$lmp_date', ".
+                           "patient_edc = '".$edc."', ".
+                           "trimester1_date = from_days(to_days('$lmp_date')+84), ".
+                           "trimester2_date = from_days(to_days('$lmp_date')+168), ".
+                           "trimester3_date = from_days(to_days('$lmp_date')+280), ".
+                           "postpartum_date = from_days(to_days('$lmp_date')+322), ".
+                           "mc_timestamp = sysdate(), ".
+                           "obscore_gp = '".$post_vars["obscore_gp"]."', ".
+                           "obscore_fpal = '".$post_vars["obscore_fpal"]."', ".
+                           "patient_height = '".$post_vars["patient_height"]."', ".
+                           "blood_type = '".$post_vars["bloodtype"]."' ".
+                           "where mc_id = '".$post_vars["mc_id"]."'";
+
                     if ($result = mysql_query($sql)) {
                         // delete risk factors first
                         $sql_delete = "delete from m_consult_mc_visit_risk ".
@@ -4494,24 +4516,46 @@ class mc extends module {
 		echo "</table>";
 	} 
 
-	/*function compute_edc($lmp){
+	function compute_edc($lmp){
 		list($m,$d,$y) = explode('/',$lmp);
-		$arr_date_assoc = array();
+		$m = ltrim($m,'0');
+		$d = ltrim($d,'0');
+		$last_day_month = cal_days_in_month(CAL_GREGORIAN,$m,$y);
+		$new_date = ($d+7);
 
+		$arr_date_assoc = array("1"=>"10","2"=>"11","3"=>"12","4"=>"1","5"=>"2","6"=>"3","7"=>"4","8"=>"5","9"=>"6","10"=>"7","11"=>"8","12"=>"9");
 
-		if(($y >= 4) && ($y<=12)):
+		//get the new year value
+		if(($m >= 4) && ($m<=12)):
 			$new_year = $y + 1;
 		else:
 			$new_year = $y;
 		endif;
 
-		if(($m>=1) && ($m<=3)):
-			
-		else:
+		//get the new month value
+		foreach($arr_date_assoc as $key=>$value){
+			if($key==$m):
+				$new_month = $value;
+			endif;
+		}
 
+		//get the new date value
+		if(($last_day_month - $new_date) >= 0): //value of $d is less than or equal the last month. retain the same month
+			$new_date = $new_date;
+		else:  //value exceeded 30 or 31. excess value will be the new_date, increment the new_month 
+			$new_date =  $new_date - $last_day_month;
+			if($new_month!=12):
+				$new_month += 1;
+			else:
+				$new_month = 1;
+			endif;
+	
 		endif;
-		
-	}*/
+
+		$new_month = sprintf("%02d",$new_month); 
+		$new_date = sprintf("%02d",$new_date); 
+		return $new_year.'-'.$new_month.'-'.$new_date;
+	}
 
 // end of class
 }
