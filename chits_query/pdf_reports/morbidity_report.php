@@ -324,7 +324,7 @@ function show_morbidity(){
             
             
             foreach($arr_age as $edad=>$arr_kasarian){            
-                if($edad=='<0'):                                                
+                if($edad=='<0'):                                             
                     $arr_age_group['<0'][$gender] += $arr_age[$edad][$gender];
                 elseif($edad>=1 && $edad<=4):
                     $arr_age_group['1-4'][$gender] += $arr_age[$edad][$gender];
@@ -496,7 +496,7 @@ function show_morbidity_masterlist(){
 		$_SESSION["icd_code"] = $icd_code = $icd10;
 	endif;
 
-	//print_r($_SESSION);
+
 
 	if($_SESSION["brgy"]=='all'):
 		$q_morb_list = mysql_query("SELECT a.patient_lastname, a.patient_firstname, a.patient_dob, a.patient_gender, b.diagnosis_date, c.class_name, e.address,f.barangay_name FROM m_patient a, m_consult_notes_dxclass b, m_lib_notes_dxclass c,m_family_members d, m_family_address e,m_lib_barangay f WHERE b.diagnosis_date BETWEEN '$_SESSION[sdate]' AND '$_SESSION[edate]' AND a.patient_id=b.patient_id AND b.patient_id=d.patient_id AND d.family_id=e.family_id AND e.barangay_id=f.barangay_id AND b.class_id=c.class_id AND c.icd10 LIKE '%$icd_code%' ORDER by b.diagnosis_date ASC, a.patient_lastname ASC, a.patient_firstname ASC") or die("Cannot query 473: ".mysql_error());
