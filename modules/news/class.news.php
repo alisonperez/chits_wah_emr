@@ -231,12 +231,23 @@ class news extends module {
 	}
 
 	$str_diag = implode(',',$arr_diag);
-	
+	$ngayon = date('Y-m-d');
+
+	$q_px_enroll = mysql_query("SELECT DISTINCT patient_id FROM m_lib_sms_px_enroll WHERE last_modified <= 'NOW()'") or die("Cannot query 235: ".mysql_error());
+	$px_enroll_sms = mysql_num_rows($q_px_enroll);
+
+
+	$q_sms_sent = mysql_query("SELECT sms_id FROM m_lib_sms_alert WHERE alert_date <= 'NOW()'") or die("Cannot query 239: ".mysql_error());
+	$count_sms_sent = mysql_num_rows($q_sms_sent);
 
 	$text = 'Total Consultations ('.date('m/d/Y').'): '.$consult_today.'<br> Total Overall Consultations: '.$total_consult;
 	$text = $text.'<br><br>Total Patients ('.date('m/d/Y').'): '.$px_today.'<br>Total Overall Patients: '.$total_px.'<br>';
 	$text = $text.'<br>All-time Top Visiting Barangay: '.$brgy.' ('.$px_count.') <br>Top Visiting Barangay  ('.date('m/d/Y').'): '.$brgy_today.'<br>';
 	$text = $text.'<br>Top 3 diagnosis: '.$str_diag;
+
+
+	$text = $text.'<br>Total Number of Enrolled Clients for SMS Alerts: '.$px_enroll_sms;
+	$text = $text.'<br>Total Number of SMS Alerts Sent: '.$count_sms_sent;
 
 	$q_stat = mysql_query("SELECT news_id FROM m_news WHERE DATE(news_timestamp)=CURDATE()") or die('Cannot query 218 '.mysql_error());
 
