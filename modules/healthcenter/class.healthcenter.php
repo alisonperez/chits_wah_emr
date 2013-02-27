@@ -1018,7 +1018,10 @@ class healthcenter extends module{
 	print "EXPIRATION DATE: <b>";
 	
 	$this->get_expiration_date($ptinfo["patient_id"]);
-	
+
+	echo "<br></b>PHILHEALTH MEMBERSHIP TYPE: ";
+	$this->get_philhealth_member_type($ptinfo["patient_id"]);
+
 	print "</b><br />";
         
 	print LBL_TOTAL_VISITS.": <b>".$this->get_totalvisits($ptinfo["patient_id"])."</b>&nbsp;&nbsp;&nbsp;".LBL_LAST_VISIT." <b>".$this->get_lastvisit($ptinfo["patient_id"])."</b><br/>";
@@ -1884,6 +1887,13 @@ function hypertension_code() {
 
 		return $str_icon;
 	}
+
+	function get_philhealth_member_type($pxid){ 
+		$q_member = mysql_query("SELECT a.member_label FROM m_lib_philhealth_member_type a, m_patient_philhealth b WHERE b.patient_id='$pxid' AND b.member_id=a.member_id");
+		list($member_label) = mysql_fetch_array($q_member);
+		echo "<b>".$member_label;
+	}
+
 // end of class
 }
 ?>
