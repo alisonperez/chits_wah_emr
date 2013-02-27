@@ -183,17 +183,20 @@ class lab extends module {
             $isadmin = $arg_list[4];
             //print_r($arg_list);
         }
-        $sql = "select count(l.request_id), l.consult_id, p.patient_id, p.patient_lastname, p.patient_firstname ".
-               "from m_consult_lab l, m_patient p where l.patient_id = p.patient_id ".
-               "and l.request_done = 'N' group by l.patient_id";
+        $sql = "select count(l.request_id), l.consult_id, p.patient_id, p.patient_lastname, p.patient_firstname, date_format(l.request_timestamp, '%m-%d-%Y'), l.lab_id,l.request_id, a.lab_module from m_consult_lab l, m_patient p,m_lib_laboratory a where l.patient_id = p.patient_id and l.request_done = 'N'  AND l.lab_id=a.lab_id group by l.patient_id  ORDER by l.request_timestamp DESC,l.lab_id DESC";
+
+
         if ($result = mysql_query($sql)) {
             print "<table width=600 bgcolor='#FFFFFF' cellpadding='3' cellspacing='0' style='border: 2px solid black'>";
             print "<tr><td>";
             print "<span class='patient'>LAB REQUESTS</span><br>";
             if (mysql_num_rows($result)) {
                 $i=0;
-                while (list($count, $cid, $pid, $plast, $pfirst) = mysql_fetch_array($result)) {
-                    $consult_array[$i] = "<a href='".$_SERVER["PHP_SELF"]."?page=".$get_vars["page"]."&menu_id=".$get_vars["menu_id"]."&consult_id=$cid'><b>$plast, $pfirst</b></a> [$count]";
+                while (list($count, $cid, $pid, $plast, $pfirst, $date_request, $lab_id, $request_id, $lab_module) = mysql_fetch_array($result)) {
+                    //$consult_array[$i] = "<a href='".$_SERVER["PHP_SELF"]."?page=".$get_vars["page"]."&menu_id=".$get_vars["menu_id"]."&consult_id=$cid'><b>$plast, $pfirst</b></a> [$date_request / $lab_id][$count]";
+					
+					$consult_array[$i] = "<a href='$_SERVER[PHP_SELF]?page=CONSULTS&menu_id=1327&consult_id=$cid&ptmenu=LABS&module=$lab_module&request_id=$request_id'><b>$plast, $pfirst</b></a> [$date_request / $lab_id][$count]";
+
                     $i++;
                 }
                 print $this->columnize_list($consult_array);

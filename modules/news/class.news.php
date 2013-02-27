@@ -237,7 +237,7 @@ class news extends module {
 	$px_enroll_sms = mysql_num_rows($q_px_enroll);
 
 
-	$q_sms_sent = mysql_query("SELECT sms_id FROM m_lib_sms_alert WHERE alert_date <= 'NOW()'") or die("Cannot query 239: ".mysql_error());
+	$q_sms_sent = mysql_query("SELECT sms_id FROM m_lib_sms_alert WHERE alert_date <= 'NOW()' AND sms_status='sent'") or die("Cannot query 239: ".mysql_error());
 	$count_sms_sent = mysql_num_rows($q_sms_sent);
 
 	$text = 'Total Consultations ('.date('m/d/Y').'): '.$consult_today.'<br> Total Overall Consultations: '.$total_consult;

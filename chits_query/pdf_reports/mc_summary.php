@@ -444,7 +444,7 @@ function compute_indicator($crit){
 
 			if(in_array('all',$_SESSION[brgy])):
 				//$get_px_tt = mysql_query("SELECT distinct patient_id, max(vaccine_id), actual_vaccine_date FROM m_consult_mc_vaccine WHERE vaccine_id IN ('TT1','TT2','TT3','TT4','TT5') GROUP by patient_id") or die(mysql_error());
-				$get_px_tt = mysql_query("SELECT distinct patient_id, max(vaccine_id), actual_vaccine_date FROM m_consult_mc_vaccine WHERE vaccine_id IN ('TT3','TT4','TT5') AND actual_vaccine_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' GROUP by patient_id") or die(mysql_error());
+				$get_px_tt = mysql_query("SELECT distinct patient_id, max(vaccine_id), actual_vaccine_date FROM m_consult_mc_vaccine WHERE vaccine_id IN ('TT2','TT3','TT4','TT5') AND actual_vaccine_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' GROUP by patient_id") or die(mysql_error());
 
 			else:
 				//$get_px_tt = mysql_query("SELECT distinct a.patient_id, max(a.vaccine_id), a.actual_vaccine_date FROM m_consult_mc_vaccine a, m_family_members b, m_family_address c WHERE a.vaccine_id IN ('TT1','TT2','TT3','TT4','TT5') AND a.patient_id=b.patient_id AND b.family_id=c.family_id AND c.barangay_id IN ($brgy_array) GROUP by a.patient_id") or die(mysql_error());
@@ -558,7 +558,7 @@ function compute_indicator($crit){
 
 							if($vita_total == 200000 && $target_reach==0 && $s_serv_date>=0 && $e_serv_date>=0):
 								$target_reach = 1;
-					
+					echo 'zerep';
 								array_push($vita_name_px[$this->get_max_month($serv_date)],array($pxid,'Pregnant given Vit. A','mc',$serv_date));
 
 								$month_stat[$this->get_max_month($serv_date)]+=1;
