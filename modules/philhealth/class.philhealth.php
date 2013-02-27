@@ -388,7 +388,7 @@ class philhealth {
             $isadmin = $arg_list[4];
             //print_r($arg_list);
             if ($get_vars["pid"]) {
-                $sql = "select philhealth_id, expiry_date from m_patient_philhealth ".
+                $sql = "select philhealth_id, expiry_date, member_id from m_patient_philhealth ".
                        "where philhealth_id = '".$get_vars["pid"]."'";
                 if ($result = mysql_query($sql)) {
                     if (mysql_num_rows($result)) {
@@ -421,6 +421,23 @@ class philhealth {
         print "<a href=\"javascript:show_calendar4('document.form_philhealth_card.expiry_date', document.form_philhealth_card.expiry_date.value);\"><img src='../images/cal.gif' width='16' height='16' border='0' alt='Click Here to Pick up the date'></a><br>";
         print "<small>Click on the calendar icon to select date. Otherwise use MM/DD/YYYY format.</small><br>";
         print "<br/></td></tr>";
+
+		$q_type_member = mysql_query("SELECT member_id,member_label,member_type FROM m_lib_philhealth_member_type ORDER by member_type ASC, member_label ASC");
+
+		print "<tr valign='top'><td>";
+        print "<span class='boxtitle'>MEMBERSHIP TYPE</span><br/>";
+		echo "<select name='sel_membership' size='1'>";
+		while(list($member_id,$member_label,$member_type)=mysql_fetch_array($q_type_member)){
+			if($card["member_id"]==$member_id):
+				echo "<option value='$member_id' SELECTED>$member_label</option>";
+			else:
+				echo "<option value='$member_id'>$member_label</option>";
+			endif;
+		}
+		echo "</select>";
+
+        print "</td></tr>";
+
         print "<tr><td>";
         if ($get_vars["pid"]||$post_vars["philhealth_id"]) {
             print "<input type='hidden' name='philhealth_id' value='".$get_vars["pid"]."'>";
@@ -450,9 +467,14 @@ class philhealth {
 	    if ($post_vars["philhealth_id"] && $post_vars["patient_id"]) {
                 list($month,$day,$year) = explode("/", $post_vars["expiry_date"]);
                 $expiry_date = $year."-".str_pad($month, 2, "0", STR_PAD_LEFT)."-".str_pad($day, 2, "0", STR_PAD_LEFT);
-                $sql = "insert into m_patient_philhealth (philhealth_id, healthcenter_id, patient_id, philhealth_timestamp, expiry_date) ".
+                
+				/*$sql = "insert into m_patient_philhealth (philhealth_id, healthcenter_id, patient_id, philhealth_timestamp, expiry_date, member_id) ".
                        "values ('".$post_vars["philhealth_id"]."', '".$_SESSION["datanode"]["code"]."', '".$post_vars["patient_id"]."', sysdate(), '$expiry_date')";
-                $result = mysql_query($sql);
+				*/
+
+				$result = mysql_query("INSERT INTO m_patient_philhealth SET philhealth_id='$post_vars[philhealth_id]',healthcenter_id='$_SESSION[datanode][code]',patient_id='$post_vars[patient_id]',philhealth_timestamp='sysdate()',expiry_date='$expiry_date',member_id='$post_vars[sel_membership]'") or die("Cannot query 469: ".mysql_error());
+
+                
                 // save this any way and refresh page
                 header("location: ".$_SERVER["PHP_SELF"]."?page=".$get_vars["page"]."&menu_id=".$get_vars["menu_id"]."&consult_id=".$get_vars["consult_id"]."&ptmenu=".$get_vars["ptmenu"]."&module=".$get_vars["module"]."&philhealth=CARD");
             }
@@ -477,7 +499,7 @@ class philhealth {
                 $sql = "update m_patient_philhealth (philhealth_id, healthcenter_id, patient_id, philhealth_timestamp, expiry_date) ".
                        "values ('".$post_vars["philhealth_id"]."', '".$_SESSION["datanode"]["code"]."', '".$post_vars["patient_id"]."', sysdate(), '$expiry_date')";
 
-		$sql = "update m_patient_philhealth set healthcenter_id='$_SESSION[datanode][code]',patient_id='$post_vars[patient_id]',philhealth_timestamp='sysdate()',expiry_date='$expiry_date' WHERE philhealth_id='$post_vars[philhealth_id]'";
+		$sql = "update m_patient_philhealth set healthcenter_id='$_SESSION[datanode][code]',patient_id='$post_vars[patient_id]',philhealth_timestamp='sysdate()',expiry_date='$expiry_date',member_id='$post_vars[sel_membership]' WHERE philhealth_id='$post_vars[philhealth_id]'";
 
                 $result = mysql_query($sql);
 
