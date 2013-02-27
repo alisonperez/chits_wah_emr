@@ -916,15 +916,26 @@ class notes extends module {
                 print "<b>PLAN:</b><br/>";
                 if (strlen($notes["notes_plan"])>0) {
                     print stripslashes(nl2br($notes["notes_plan"]))."<br/>";
+					
+					$plan = stripslashes(nl2br($notes["notes_plan"]));
+					
+
                     if ($_SESSION["priv_update"]) {
                         print "<br/>";
                         print "<input type='submit' name='submitdetail' value='Update Plan' class='tinylight' style='border: 1px solid black'";
                     }
+					$_SESSION["plan_details"] = $plan;
+
+                    print "<br/>&nbsp;";
+                    print "<input type='submit' name='submitdetail' value='Print Plan' class='tinylight' style='border: 1px solid black'";
+					echo "<br>";
+	                
                 } else {
                     print "<font color='red'>No recorded plan.</font><br/>";
                 }
                 print "<hr size='1'/>";
-				
+
+
 
                 print "<input type='hidden' name='notes_id' value='".$get_vars["notes_id"]."' />";
                 if ($_SESSION["priv_delete"]) {
@@ -1016,6 +1027,13 @@ class notes extends module {
 				header("location: ".$_SERVER["PHP_SELF"]."?page=".$get_vars["page"]."&menu_id=".$get_vars["menu_id"]."&consult_id=".$get_vars["consult_id"]."&ptmenu=NOTES&module=notes&notes=".$get_vars["notes"]."&notes_id=".$get_vars["notes_id"]);
 
 			endif;
+			break;
+
+		case "Print Plan":
+			print $_SESSION["plan_details"];
+			print $_POST["notes_id"];
+			header("Location: ../chits_query/pdf_reports/prescription.php?notes=$_POST[notes_id]");	
+
 			break;
 
 		default:
