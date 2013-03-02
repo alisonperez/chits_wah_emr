@@ -1366,7 +1366,18 @@ class alert extends module{
 						endif;
 
 						break;
-
+					case '41':		//PENTA1
+						$eligibility = $this->check_vaccine_eligibility($patient_id,$dob,'PENTA1');
+						$buffer_day = $this->get_vaccine_min_age_eligibility('PENTA1');
+						break;
+					case '42':		//PENTA2
+						$eligibility = $this->check_vaccine_eligibility($patient_id,$dob,'PENTA2');
+						$buffer_day = $this->get_vaccine_min_age_eligibility('PENTA2');
+						break;
+					case '43':		//PENTA3
+						$eligibility = $this->check_vaccine_eligibility($patient_id,$dob,'OPV1');
+						$buffer_day = $this->get_vaccine_min_age_eligibility('PENTA3');
+						break;
 					default:
 						break;
 				}	//end switch
@@ -1738,6 +1749,11 @@ class alert extends module{
 				$min_age = 274; 		//9 months
 				break;
 
+			case 'PENTA1':
+				$min_age = 42;
+				break;
+			case 'PENTA2':
+				$min_age = xxx
 			default:
 				
 				break; 
