@@ -322,7 +322,7 @@ class User {
         print "<input type='text' size='15' maxlength='15' class='textbox' name='user_pin' value='".($user["user_pin"]?$user["user_pin"]:$post_vars["user_pin"])."' style='border: 1px solid #000000'> <font color='red'>*</font><br>";
         print "</td></tr>";
         print "<tr valign='top'><td>";
-        print "<span class='boxtitle'>".LBL_ROLE."</span><br> ";
+        print "<span class='boxtitle'>".LBL_ROLE."</span><br> "; 
         print $this->show_roles($user["user_role"]?$user["user_role"]:$post_vars["role_id"]);
         print "</td></tr>";
         print "<tr valign='top'><td>";
@@ -397,9 +397,9 @@ class User {
         if (func_num_args()) {
             $arg_list = func_get_args();
             $role_id = $arg_list[0];
-        }
+        } 
         $sql = "select role_id, role_name from role order by role_name";
-        if ($result = mysql_query($sql)) {
+        if ($result = mysql_query($sql)) { 
             if (mysql_num_rows($result)) {
                 $retval .= "<select name='role_id' class='textbox'>";
                     $retval .= "<option value='0'>Select Role</option>";

@@ -1753,7 +1753,7 @@ class alert extends module{
 				$min_age = 42;
 				break;
 			case 'PENTA2':
-				$min_age = xxx
+				//$min_age = 
 			default:
 				
 				break; 

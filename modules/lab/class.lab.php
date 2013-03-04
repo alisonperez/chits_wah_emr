@@ -378,7 +378,7 @@ class lab extends module {
             $validuser = $arg_list[3];
             $isadmin = $arg_list[4];
             //print_r($arg_list);
-        }
+        } print_r($_SESSION);
         print "<table width='300'>";
         print "<form action = '".$_SERVER["SELF"]."?page=".$get_vars["page"]."&menu_id=".$get_vars["menu_id"]."&consult_id=".$get_vars["consult_id"]."&ptmenu=LABS' name='form_send_request' method='post'>";
         print "<tr valign='top'><td>";
@@ -611,6 +611,7 @@ class lab extends module {
         print "</table><br>";
     }
 
+	
 // end of class
 }
 ?>
