@@ -1421,7 +1421,7 @@ $_SESSION["arr_px_labels"] = array('epi'=>array());
 $ccdev_rec = $pdf->show_ccdev_summary();
 $arr_csv = array();
 foreach($ccdev_rec as $key=>$value){
-	if($key>=12 && $key<=15):
+	if($key>=12 && $key<=16): //this will ignore the rows for rota1, rota2, penta 1,penta 2 and penta 3
 
 	else:
 		array_push($arr_csv,$value);

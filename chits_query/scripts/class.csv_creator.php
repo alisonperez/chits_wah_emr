@@ -130,7 +130,7 @@ class csv_creator{
 
 	}
 
-	function get_stats_csv($cat_id,$cat_label,$arr_stats,$report_type){ 
+	function get_stats_csv($cat_id,$cat_label,$arr_stats,$report_type){ print_r($arr_stats);
 		$arr_numero = array(); 
 		//print_r($arr_stats);
 		switch($cat_id){
@@ -162,20 +162,19 @@ class csv_creator{
 				break;
 
 			case '8': //child care
-				
+
 				for($i=0;$i<18;$i++){ //first 18 indicators from BCG to Infant referred for NBS
 					foreach($arr_stats[$i] as $key=>$value){ 
-					if($report_type=='M'):
-						if($key!=0):
-							array_push($arr_numero,$value);
-						endif;
-					elseif($report_type=='Q'):
-						if($key==2 || $key==3):
-							array_push($arr_numero,$value);
-						endif;
-					else:
-					endif;
-				
+						if($report_type=='M'):
+							if($key!=0):
+								array_push($arr_numero,$value);
+							endif;
+						elseif($report_type=='Q'):
+							if($key==2 || $key==3):
+								array_push($arr_numero,$value);
+							endif;
+						else:
+						endif;				
 					}
 				}
 
