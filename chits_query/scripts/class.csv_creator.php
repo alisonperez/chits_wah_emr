@@ -130,7 +130,7 @@ class csv_creator{
 
 	}
 
-	function get_stats_csv($cat_id,$cat_label,$arr_stats,$report_type){ print_r($arr_stats);
+	function get_stats_csv($cat_id,$cat_label,$arr_stats,$report_type){
 		$arr_numero = array(); 
 		//print_r($arr_stats);
 		switch($cat_id){
