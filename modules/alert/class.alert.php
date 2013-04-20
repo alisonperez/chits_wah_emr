@@ -14,7 +14,7 @@ class alert extends module{
 		$this->year = date('Y');
 		$this->morb_wk = $this->get_wk_num();
 
-		$this->arr_dep = array("DPT2"=>array('DPT1','28'),"DPT3"=>array('DPT2','28'),"OPV2"=>array('OPV1','28'),"OPV3"=>array('OPV2','28'),"HEPB2"=>array('HEPB1','42'),"HEPB3"=>array('HEPB2','56')); //first argument contains the antigen and second contains the 
+		$this->arr_dep = array("DPT2"=>array('DPT1','28'),"DPT3"=>array('DPT2','28'),"OPV2"=>array('OPV1','28'),"OPV3"=>array('OPV2','28'),"HEPB2"=>array('HEPB1','42'),"HEPB3"=>array('HEPB2','56'),"PENTA2"=>array('PENTA1','28'),"PENTA3"=>array('PENTA2','28')); //first argument contains the antigen and second contains the 
 	}
 
 
@@ -1372,11 +1372,12 @@ class alert extends module{
 						break;
 					case '42':		//PENTA2
 						$eligibility = $this->check_vaccine_eligibility($patient_id,$dob,'PENTA2');
-						$buffer_day = $this->get_vaccine_min_age_eligibility('PENTA2');
+						$buffer_day = $this->get_vaccine_min_age_eligibility('PENTA2',$patient_id,$dob);
 						break;
 					case '43':		//PENTA3
 						$eligibility = $this->check_vaccine_eligibility($patient_id,$dob,'PENTA3');
-						$buffer_day = $this->get_vaccine_min_age_eligibility('PENTA3');
+						$buffer_day = $this->get_vaccine_min_age_eligibility('PENTA3',$patient_id,$dob);
+
 						break;
 					default:
 						break;
@@ -1632,8 +1633,8 @@ class alert extends module{
 		//query will determine 3 things: 1. determine if the patient is enrolled in ccdev, 2. determine if the patient has a vaccination record, 3. determine if the patient hasn't been vaccinated with $vaccine yet.
 
 		$q_ccdev = mysql_query("SELECT a.ccdev_id FROM m_patient_ccdev a WHERE a.patient_id='$patient_id' ORDER by a.ccdev_timestamp DESC") or die("Cannot query 1149 ".mysql_error()); 
-		$arr_vacc_no_seq = array('BCG','HEPB1','MSL','DPT1','OPV1'); //1st dosages OR vaccine has no series
-		$arr_vacc_seq = array('DPT2','OPV2','HEPB2','DPT3','OPV3','HEPB3');
+		$arr_vacc_no_seq = array('BCG','HEPB1','MSL','DPT1','OPV1','PENTA1'); //1st dosages OR vaccine has no series
+		$arr_vacc_seq = array('DPT2','OPV2','HEPB2','PENTA2','DPT3','OPV3','HEPB3','PENTA3');
 
 		if(mysql_num_rows($q_ccdev)!=0):
 			list($ccdev_id) = mysql_fetch_array($q_ccdev);
@@ -1641,14 +1642,14 @@ class alert extends module{
 			
 			$q_vaccine = mysql_query("SELECT consult_id FROM m_consult_ccdev_vaccine WHERE ccdev_id='$ccdev_id' AND patient_id='$patient_id' AND vaccine_id='$vaccine'") or die("Cannot query 1158 ".mysql_error());
 
-			if(mysql_num_rows($q_vaccine)==0):
-				if($this->get_vaccine_min_age_eligibility($vaccine)<=($this->get_patient_age($patient_id)*12*30.42)): //checks if the client is within the minimum age to have the vaccination
+			if(mysql_num_rows($q_vaccine)==0): 
+				if($this->get_vaccine_min_age_eligibility($vaccine,$patient_id,$dob)<=($this->get_patient_age($patient_id)*12*30.42)): //checks if the client is within the minimum age to have the vaccination
 
-					if(in_array($vaccine,$arr_vacc_no_seq)):
+					if(in_array($vaccine,$arr_vacc_no_seq)): 
 						return true;
 					elseif(in_array($vaccine,$arr_vacc_seq)): //check if the prerequisite vaccine was given to the client 
 						//this would cover only 'DPT2','OPV2','HEPB2','DPT3','OPV3','HEPB3'
-						if($this->check_vaccine_dependency($vaccine,$patient_id)):
+						if($this->check_vaccine_dependency($vaccine,$patient_id)): 
 							return true;
 						else:
 							return false;
@@ -1670,27 +1671,25 @@ class alert extends module{
 
 	function get_vaccine_min_age_eligibility(){
 		//function returns the minimum number of days
-		
+
 		if(func_num_args()>0):
 			$arr = func_get_args();
 			$vaccine = $arr[0];
 			$patient_id = $arr[1];
 			$dob = $arr[2];
 		endif;
-		
+
 		if(array_key_exists($vaccine,$this->arr_dep)): 
 			$prereq_vacc = $this->arr_dep[$vaccine][0];
 			$vacc_allowance = $this->arr_dep[$vaccine][1];
 		endif;
 
-		$get_prereq_vacc = mysql_query("SELECT actual_vaccine_date,(TO_DAYS(actual_vaccine_date) - TO_DAYS('$dob')) FROM m_consult_ccdev_vaccine WHERE vaccine_id='$prereq_vacc' AND (TO_DAYS(NOW()) - TO_DAYS(actual_vaccine_date)) >= '$vacc_allowance' AND patient_id='$patient_id'") or die("Cannot query 1656: ".mysql_error());
-		
+		$get_prereq_vacc = mysql_query("SELECT actual_vaccine_date,(TO_DAYS(actual_vaccine_date) - TO_DAYS('$dob')) ,(TO_DAYS(NOW()) - TO_DAYS(actual_vaccine_date)) FROM m_consult_ccdev_vaccine WHERE vaccine_id='$prereq_vacc' AND (TO_DAYS(NOW()) - TO_DAYS(actual_vaccine_date)) >= '$vacc_allowance' AND patient_id='$patient_id'") or die("Cannot query 1656: ".mysql_error());
+			
 		if(mysql_num_rows($get_prereq_vacc)!=0):
 			//(prereq_vacc_date minus DOB) days + allowance 
-			//echo $prereq_vacc.'/'.$patient_id.'/'.$dob.'/'.$prereq_vacc_date.'/'.$vacc_dob_diff.'<br>';
-			
-			list($prereq_vacc_date,$vacc_dob_diff) = mysql_fetch_array($get_prereq_vacc);			
-			$vacc_elig_from_dob = $vacc_dob_diff + $vacc_allowance; //from DOB to $vacc_elig_from_dob
+			list($prereq_vacc_date,$vacc_dob_diff,$now) = mysql_fetch_array($get_prereq_vacc);			
+			$vacc_elig_from_dob = $vacc_dob_diff + $vacc_allowance; //from DOB to $vacc_elig_from_dob		
 		else:
 			$vacc_elig_from_dob = '';
 		endif;
@@ -1750,13 +1749,14 @@ class alert extends module{
 				break;
 
 			case 'PENTA1':
-				$min_age = ($vacc_elig_from_dob=='')?42:$vacc_elig_from_dob;
+				$min_age = 42;
 				break;
 			case 'PENTA2':
 				$min_age = ($vacc_elig_from_dob=='')?70:$vacc_elig_from_dob;
 				break;
-			case 'PENTA3':
+			case 'PENTA3': 
 				$min_age = ($vacc_elig_from_dob=='')?98:$vacc_elig_from_dob;
+
 				break;
 			default:
 				
