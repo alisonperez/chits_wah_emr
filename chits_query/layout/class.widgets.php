@@ -102,8 +102,8 @@
 		echo "<td><input name=\"sdate\" type=\"text\" size=\"12\" maxlength=\"10\" value=\"$psdate\"></input>";		
 		echo "<a href=\"javascript:show_calendar4('document.form_query.sdate', document.form_query.sdate.value);\"><img src='../images/cal.gif' width='16' height='16' border='0' alt='Click Here to Pick up the date'></a>";
 		echo "</td></tr>";
-                echo "<tr><td style=\"background-color: #666666;color: #FFFF66;text-align: center;\">End Date (mm/dd/yyyy)</td>";
-                echo "<td><input name=\"edate\" type=\"text\" size=\"12\" maxlength=\"10\" value=\"$pedate\">";
+        echo "<tr><td style=\"background-color: #666666;color: #FFFF66;text-align: center;\">End Date (mm/dd/yyyy)</td>";
+        echo "<td><input name=\"edate\" type=\"text\" size=\"12\" maxlength=\"10\" value=\"$pedate\">";
 		echo "<a href=\"javascript:show_calendar4('document.form_query.edate', document.form_query.edate.value);\"><img src='../images/cal.gif' width='16' height='16' border='0' alt='Click Here to Pick up the date'></a>";		
 		echo "</td></tr>";
 		echo "<tr><td style=\"background-color: #666666;color: #FFFF66;text-align: center;\">Barangay</td>";
@@ -175,7 +175,9 @@
 
 	function disp_filter_form2($q_brgy){
 		$buwan_label = array('01'=>'January','02'=>'February','03'=>'March','04'=>'April','05'=>'May','06'=>'June',07=>'July','08'=>'August','09'=>'September','10'=>'October','11'=>'November','12'=>'December');
-                $buwan = array('1'=>'January','2'=>'February','3'=>'March','4'=>'April','5'=>'May','6'=>'June','7'=>'July','8'=>'August','9'=>'September','10'=>'October','11'=>'November','12'=>'December');
+
+		$buwan = array('1'=>'January','2'=>'February','3'=>'March','4'=>'April','5'=>'May','6'=>'June','7'=>'July','8'=>'August','9'=>'September','10'=>'October','11'=>'November','12'=>'December');
+
 		$_SESSION[months] = $buwan_label;
 
 		echo "<tr><td style=\"background-color: #666666;color: #FFFF66;text-align: center;\">Start Month</td>";
@@ -212,7 +214,7 @@
 		}
 		echo "</select></td></tr>";
 		
-                $this->checkbox_brgy($q_brgy);				
+        $this->checkbox_brgy($q_brgy);				
 	}
 	
 	function additional_filter($ques_id){
@@ -330,12 +332,26 @@
 	
 	function disp_filter_annual($q_brgy){
 	        $this->show_year();
-                $this->checkbox_brgy($q_brgy);
+            $this->checkbox_brgy($q_brgy);
 	}
 
 	
 	function checkbox_brgy($q_brgy){
-	        echo "<tr><td valign='top' style=\"background-color: #666666;color: #FFFF66;text-align: center;\">Barangay</td><td>";
+		$q_health_facility = mysql_query("SELECT DISTINCT a.facility_id, b.facility_name,b.doh_class_id FROM m_lib_health_facility_barangay a, m_lib_health_facility b WHERE a.facility_id=b.facility_id ORDER by b.facility_name ASC") or die("Cannot query 340: ".mysql_error());
+
+        echo "<tr><td valign='top' style=\"background-color: #666666;color: #FFFF66;text-align: center;\">Health Facility</td><td>";
+		
+		echo "<select name='sel_facility'>";
+		echo "<option value=''>--- Select Health Facility ---</option>";
+		while(list($facility_id,$facility_name)=mysql_fetch_array($q_health_facility)){
+			echo "<option value='$facility_id'>$facility_name</option>";
+		}
+		echo "</select>";
+
+		echo "</td></tr>";
+				
+
+        echo "<tr><td valign='top' style=\"background-color: #666666;color: #FFFF66;text-align: center;\">Barangay</td><td>";
 		
 		echo "<input type='checkbox' name='brgy[]' value='all' checked>All</input>&nbsp;";
 		$counter = 1;

@@ -42,6 +42,7 @@ function submitQues()
 	}
 }
 
+
 </script> 
 
 <script language="javascript" src="../popups.js"></script>
