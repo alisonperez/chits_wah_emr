@@ -862,7 +862,7 @@ function compute_indicators(){
 
 			case 4:  //cpab
 				$cpab_name_px = array();
-
+                                
 				for($sex=0;$sex<count($arr_gender);$sex++){
 					$month_stat = array(1=>0,2=>0,3=>0,4=>0,5=>0,6=>0,7=>0,8=>0,9=>0,10=>0,11=>0,12=>0);
 					$month_stat_px = array(1=>array(),2=>array(),3=>array(),4=>array(),5=>array(),6=>array(),7=>array(),8=>array(),9=>array(),10=>array(),11=>array(),12=>array());					
@@ -874,7 +874,7 @@ function compute_indicators(){
 
 					//use this code if the basis for cpab reporting is date_registered
 					$q_cpab = mysql_query("SELECT DISTINCT a.patient_id,a.date_registered,b.patient_dob FROM m_patient_ccdev a, m_patient b WHERE a.patient_id=b.patient_id AND a.date_registered BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' AND b.patient_gender='$arr_gender[$sex]'") or die("Cannot query:385");
-
+                                        
 					while(list($pxid,$date_reg,$patient_dob)=mysql_fetch_array($q_cpab)){
 						// kelan matatara ang CPAB? date of ccdev reg, date of birth, date of TT intake of mom
 						

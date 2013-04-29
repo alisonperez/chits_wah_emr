@@ -857,7 +857,7 @@ class ccdev extends module {
 		case "Save Breastfeeding Status":
 			$patient_id = healthcenter::get_patient_id($get_vars["consult_id"]);
 			$q_ccdev = mysql_query("SELECT ccdev_id FROM m_patient_ccdev WHERE patient_id='$patient_id'") or die("Cannot query: 784");
-		
+
 		list($ccdevid) = mysql_fetch_array($q_ccdev);
 		
 		if(isset($_POST[bfed_month])):
@@ -886,8 +886,12 @@ class ccdev extends module {
 
 							endif;
 						else:
-							$bfed_six = '0000-00-00';
-							$update_ccdev = mysql_query("UPDATE m_patient_ccdev SET $field='Y',bfed_month6_date='0000-00-00' WHERE ccdev_id='$ccdevid'") or die(mysql_error());													
+							echo "<script language='Javascript'>";
+							echo "window.alert('The month 6 was checked but no date was indicated. Kindly specify a date.')";
+							echo "</script>";
+
+							/*$bfed_six = '0000-00-00';
+							$update_ccdev = mysql_query("UPDATE m_patient_ccdev SET $field='Y',bfed_month6_date='0000-00-00' WHERE ccdev_id='$ccdevid'") or die(mysql_error());*/											
 						endif;						
 
 					else:

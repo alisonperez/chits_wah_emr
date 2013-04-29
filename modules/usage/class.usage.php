@@ -119,6 +119,7 @@ class usage extends module {
 			$arr_dates[0] = $sdate;
 			$arr_dates[1] = $edate;
 		endif;
+					
 		$_SESSION["usage_sdate"] = $arr_dates[0];
 		$_SESSION["usage_edate"] = $arr_dates[1];
 
@@ -189,7 +190,7 @@ class usage extends module {
 		return $arr_date;
 	}
 
-	function query_usage($usage_ind,$sdate,$edate){
+	function query_usage($usage_ind,$sdate,$edate){ 
 		//"User Logins","Patients Registered","Consultations Logged","User Registered""User Logins","Patients Registered","Consultations Logged","User Registered"
 		$arr_users = $this->get_users();
 		$arr_ind_count = array();
@@ -240,7 +241,7 @@ class usage extends module {
 				for($i=0;$i<count($arr_users);$i++){
 					$arr_log_count = array();
 				
-					$q_notes = mysql_query("SELECT COUNT(notes_id) FROM m_consult_notes WHERE user_id='$arr_users[$i]' AND date_format(notes_timestamp,'%Y-%m-%d') BETWEEN '$sdate' AND '$edate'") or die("Cannot query 222: ".mysql_error());
+					$q_notes = mysql_query("SELECT COUNT(a.notes_id) FROM m_consult_notes a, m_consult b WHERE a.consult_id=b.consult_id AND a.user_id='$arr_users[$i]' AND date_format(b.consult_date,'%Y-%m-%d') BETWEEN '$sdate' AND '$edate'") or die("Cannot query 222: ".mysql_error());
 
 					list($log_count) = mysql_fetch_array($q_notes);
 					array_push($arr_log_count,$arr_users[$i],$log_count);
@@ -249,7 +250,8 @@ class usage extends module {
 				break;
 			
 			case '4':
-				
+				$sdate = $sdate.' 00:00:00';
+				$edate = $edate.' 23:59:59';
 				echo "<table bgcolor='FFFF99' style='border: 1px solid #000000'>";
 				echo "<tr><td align='center' colspan='5' bgcolor='#FF9900'><font color='white'><b>USAGE STATS - ".$this->arr_usage_indicator[4]."(".$sdate." to ".$edate.")</b></td></tr>";
 				
@@ -261,13 +263,13 @@ class usage extends module {
 				echo "<td><b>&nbsp;&nbsp;View Details&nbsp;&nbsp;</b></td>";
 				echo "</tr>";
 				
-				for($i=0;$i<count($arr_users);$i++){
+				for($i=0;$i<count($arr_users);$i++){ 					
 					$arr_user_log = array();
 					$arr_user_log_id = array();
 					$gt_elapsed = 0;
 					$q_date_logs = mysql_query("SELECT log_id,login,logout,round((unix_timestamp(logout)-unix_timestamp(login))/60,2) as log_minutes FROM user_logs WHERE userid='$arr_users[$i]' AND login BETWEEN '$sdate' AND '$edate' ORDER BY login ASC") or die("Cannot query 251: ".mysql_error());
-					
-					while(list($log_id,$login,$logout,$time_elapsed)=mysql_fetch_array($q_date_logs)){
+
+					while(list($log_id,$login,$logout,$time_elapsed)=mysql_fetch_array($q_date_logs)){ 
 						list($login_date,$login_time) = explode(' ',$login);
 						list($logout_date,$logout_time) = explode(' ',$logout);
 						if($time_elapsed<0):
