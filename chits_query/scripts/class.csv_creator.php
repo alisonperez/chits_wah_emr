@@ -269,7 +269,9 @@ class csv_creator{
 
 	function create_file($csvdata,$program_id,$period_type,$type){ 
 		if($_SESSION["new_facility_code"]!=''):
-			$q_facility_name = mysql_query() or die("Cannot query"); xxx
+			$q_facility_name = mysql_query("SELECT facility_name FROM m_lib_health_facility WHERE doh_class_id='$_SESSION[new_facility_code]'") or die("Cannot query 272: ".mysql_error());
+			list($rhu_name) = mysql_fetch_array($q_facility_name);
+			$rhu_name = str_replace(' ','',$rhu_name);			
 		else:
 			$rhu_name = $_SESSION["datanode"]["name"];
 			$rhu_name = str_replace(' ','',$rhu_name);
