@@ -72,7 +72,7 @@
     }  
 
 
-	function query_cat($dbname,$dbname2,$psdate,$pedate,$pbrgy){
+	function query_cat($dbname,$dbname2,$psdate,$pedate,$pbrgy,$facility_id){
 
 	  mysql_select_db($dbname2);
 	  $query_cat = mysql_query("SELECT cat_label FROM ques_cat WHERE cat_id='$_SESSION[cat]'") or die("Cannot query: 77");
@@ -127,15 +127,15 @@
                 echo "</tr>";
 
 		elseif($set_filter=='3'):
-		        $this->disp_filter_quarterly($query_brgy);
+		        $this->disp_filter_quarterly($query_brgy,$facility_id);
                 elseif($set_filter=='4'):
-                        $this->disp_filter_monthly($query_brgy);
+                        $this->disp_filter_monthly($query_brgy,$facility_id);
                 elseif($set_filter=='5'):
-                        $this->disp_filter_weekly($query_brgy);
+                        $this->disp_filter_weekly($query_brgy,$facility_id);
                 elseif($set_filter=='6'):
-                        $this->disp_filter_annual($query_brgy);
+                        $this->disp_filter_annual($query_brgy,$facility_id);
 		else:
-			$this->disp_filter_form2($query_brgy);
+			$this->disp_filter_form2($query_brgy,$facility_id);
 		endif;
 
         //$this->additional_filter($_SESSION["ques"],"FP Methods");
@@ -292,8 +292,8 @@
                         $this->checkbox_brgy($q_brgy);
 	}
 	
-	function disp_filter_monthly($q_brgy){
-	        
+	function disp_filter_monthly($q_brgy,$facility_id){
+
 	        $buwan_label = array('01'=>'January','02'=>'February','03'=>'March','04'=>'April','05'=>'May','06'=>'June',07=>'July','08'=>'August','09'=>'September','10'=>'October','11'=>'November','12'=>'December');
                 $buwan = array('1'=>'January','2'=>'February','3'=>'March','4'=>'April','5'=>'May','6'=>'June','7'=>'July','8'=>'August','9'=>'September','10'=>'October','11'=>'November','12'=>'December');
 		$_SESSION[months] = $buwan_label;
@@ -303,23 +303,27 @@
 		echo "<td>";
 		echo "<select name='smonth' size='1'>";
 		foreach($buwan as $key=>$value){
-			echo "<option value='$key'>$value</option>";	
+			if($key==$_POST["smonth"]):
+				echo "<option value='$key' SELECTED>$value</option>";	
+			else:
+				echo "<option value='$key'>$value</option>";
+			endif;
 		}
 		echo "</select>";
 		echo "</td></tr>";
 
 		$this->show_year();		
-		$this->checkbox_brgy($q_brgy);		
+		$this->checkbox_brgy($q_brgy,$facility_id);		
 	}
 	
-	function disp_filter_weekly($q_brgy){
+	function disp_filter_weekly($q_brgy,$facility_id){
 	        $this->disp_week();
 	        $this->show_year();
-	        $this->checkbox_brgy($q_brgy);
+	        $this->checkbox_brgy($q_brgy,$facility_id);
 	}
 		
 	
-	function disp_week(){
+	function disp_week($q_brgy,$facility_id){
 	        echo "<tr><td style=\"background-color: #666666;color: #FFFF66;text-align: center;\">Week</td>";
                 echo "<td><select name='sel_week' value='1'>";
 	        
@@ -330,21 +334,49 @@
 	        echo "</select></td></tr>";
 	}
 	
-	function disp_filter_annual($q_brgy){
+	function disp_filter_annual($q_brgy,$facility_id){
 	        $this->show_year();
-            $this->checkbox_brgy($q_brgy);
+            $this->checkbox_brgy($q_brgy,$facility_id);
 	}
 
 	
-	function checkbox_brgy($q_brgy){
+	function checkbox_brgy($q_brgy,$facid){		
+		
+		//print_r($_POST);
+
+		if($_POST["sel_facility"]!=''):
+
+			$q_doh = mysql_query("SELECT doh_class_id FROM m_lib_health_facility WHERE facility_id='$_POST[sel_facility]'") or die("Cannot query 342: ".mysql_error());
+			list($doh_facid) = mysql_fetch_array($q_doh);
+
+			$_SESSION["new_facility_code"] = $doh_facid;
+			$arr_brgy = array();
+			$q_brgy_id = mysql_query("SELECT barangay_id FROM m_lib_health_facility_barangay WHERE facility_id='$_POST[sel_hidden_value]'") or die("Cannot query 341: ".mysql_error());
+
+			while(list($brgyid)=mysql_fetch_array($q_brgy_id)){
+				array_push($arr_brgy,$brgyid);
+			}
+		else:
+			$_SESSION["new_facility_code"] = '';
+		endif;
+
+
+
 		$q_health_facility = mysql_query("SELECT DISTINCT a.facility_id, b.facility_name,b.doh_class_id FROM m_lib_health_facility_barangay a, m_lib_health_facility b WHERE a.facility_id=b.facility_id ORDER by b.facility_name ASC") or die("Cannot query 340: ".mysql_error());
 
         echo "<tr><td valign='top' style=\"background-color: #666666;color: #FFFF66;text-align: center;\">Health Facility</td><td>";
 		
-		echo "<select name='sel_facility'>";
+		echo "<input name='sel_hidden_value' type='hidden' value=''></input>";
+		echo "<select name='sel_facility' value='1' onChange='check_facility();'>";
 		echo "<option value=''>--- Select Health Facility ---</option>";
 		while(list($facility_id,$facility_name)=mysql_fetch_array($q_health_facility)){
-			echo "<option value='$facility_id'>$facility_name</option>";
+
+
+			if($_POST["sel_facility"]==$facility_id):
+				echo "<option value='$facility_id' SELECTED>$facility_name</option>";			
+			else:
+				echo "<option value='$facility_id'>$facility_name</option>";
+			endif;
 		}
 		echo "</select>";
 
@@ -353,10 +385,20 @@
 
         echo "<tr><td valign='top' style=\"background-color: #666666;color: #FFFF66;text-align: center;\">Barangay</td><td>";
 		
-		echo "<input type='checkbox' name='brgy[]' value='all' checked>All</input>&nbsp;";
+		if(count($arr_brgy)==0):
+			echo "<input type='checkbox' name='brgy[]' value='all' checked>All</input>&nbsp;";
+		else:
+			echo "<input type='checkbox' name='brgy[]' value='all'>All</input>&nbsp;";
+		endif;
+
 		$counter = 1;
 		while(list($brgyid,$brgyname)=mysql_fetch_array($q_brgy)){
-			echo "<input type='checkbox' name='brgy[]' value='$brgyid'>$brgyname</input>&nbsp;";
+			if(in_array($brgyid,$arr_brgy)):
+				echo "<input type='checkbox' name='brgy[]' value='$brgyid' CHECKED>$brgyname</input>&nbsp;";
+			else:
+				echo "<input type='checkbox' name='brgy[]' value='$brgyid'>$brgyname</input>&nbsp;";
+			endif;
+
 			$counter++;
 			if(($counter%4)==0):
 				echo "<br>";
@@ -371,11 +413,20 @@
 		
 		echo "<td><select name='year' size='1'>";
 
-		for($i = (date('Y')-5);$i< (date('Y')+5);$i++){					
-			if($i==date('Y')):
-				echo "<option value='$i' selected>$i</option>";
+		for($i = (date('Y')-5);$i< (date('Y')+5);$i++){	
+			
+			if($_POST["year"]!=''):
+				if($_POST["year"]==$i):
+					echo "<option value='$i' selected>$i</option>";
+				else:
+					echo "<option value='$i'>$i</option>";
+				endif;
 			else:
-				echo "<option value='$i'>$i</option>";
+				if($i==date('Y')):
+					echo "<option value='$i' selected>$i</option>";
+				else:
+					echo "<option value='$i'>$i</option>";
+				endif;
 			endif;
 		}
 		echo "</select></td></tr>";

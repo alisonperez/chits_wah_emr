@@ -88,7 +88,10 @@ class csv_creator{
 	}
 
 	function get_facility_id(){
-		if(isset($_SESSION["doh_facility_code"])):
+		if($_SESSION["new_facility_code"]!=''):
+			$doh_fac_code = $_SESSION["new_facility_code"];
+			return $doh_fac_code;
+		elseif(isset($_SESSION["doh_facility_code"])):
 			$doh_fac_code = $_SESSION["doh_facility_code"];
 			return $doh_fac_code;
 		else:
@@ -265,8 +268,13 @@ class csv_creator{
 	}
 
 	function create_file($csvdata,$program_id,$period_type,$type){ 
-		$rhu_name = $_SESSION["datanode"]["name"];
-		$rhu_name = str_replace(' ','',$rhu_name);
+		if($_SESSION["new_facility_code"]!=''):
+			$q_facility_name = mysql_query() or die("Cannot query"); xxx
+		else:
+			$rhu_name = $_SESSION["datanode"]["name"];
+			$rhu_name = str_replace(' ','',$rhu_name);
+		endif;
+
 
 		$program_name = $this->get_program_name($program_id);
 		$period = $this->get_period($period_type);

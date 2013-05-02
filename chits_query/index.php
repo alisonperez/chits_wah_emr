@@ -42,7 +42,15 @@ function submitQues()
 	}
 }
 
+function check_facility(){
+	var formSel = document.getElementsByName("sel_facility");
+	var formObject = document.forms['form_query'];
+	var hidden_sel = document.getElementsByName("sel_hidden_value")[0].value;
+	hidden_sel = formSel[0].value;
+	form_query.sel_hidden_value.value = hidden_sel;	
+	formObject.submit();
 
+}
 </script> 
 
 <script language="javascript" src="../popups.js"></script>
@@ -74,7 +82,7 @@ if($_SESSION["userid"]!=""):
 
 	if(isset($_SESSION[ques]) || $_POST[q_submit]):
 		unset($_SESSION["arr_px_labels"]);
-	      $widconn->query_cat($dbname,$dbname2,$_POST[sdate],$_POST[edate],$_POST[sel_brgy]);
+	      $widconn->query_cat($dbname,$dbname2,$_POST[sdate],$_POST[edate],$_POST[sel_brgy],$_POST[sel_hidden_value]);
 	endif;
 
       echo "</td>";
