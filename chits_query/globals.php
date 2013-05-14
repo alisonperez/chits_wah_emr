@@ -1,7 +1,7 @@
 <?
   session_start();
   
-  $dbname = 'camiling_core_data';
+  $dbname = 'paniqui1_05082013';
   #$dbname2 = 'chitsquery';
   $_SESSION["query"] = $dbname;
   $dbuser = "root";

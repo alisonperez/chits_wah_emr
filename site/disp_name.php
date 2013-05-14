@@ -18,6 +18,8 @@
 
    $arr_date_epi = array("BCG"=>"Pertains to the date wherein the BCG vaccine was administered","DPT1"=>"Pertains to the date wherein the DPT1 vaccine was administered","BCG"=>"Pertains to the date wherein the BCG vaccine was administered","DPT2"=>"Pertains to the date wherein the DPT2 vaccine was administered","DPT3"=>"Pertains to the date wherein the DPT3 vaccine was administered","OPV1"=>"Pertains to the date wherein the OPV1 vaccine was administered","OPV2"=>"Pertains to the date wherein the OPV2 vaccine was administered","OPV3"=>"Pertains to the date wherein the OPV3 vaccine was administered","Hepa B1 w/in 24 hrs"=>"Pertains to the date wherein the Hepa B1 w/in 24 hours vaccine was administered. To qualify, Hepa B1 should have been given at the date of birth or the day after.","Hepa B1 > 24 hrs"=>"Pertains to the date wherein the Hepa B1 more than 24 hours vaccine was administered.","Hepatitis B2"=>"Pertains to the date wherein the Hepa B2 vaccine was administered","Hepatitis B3"=>"Pertains to the date wherein the Hepa B3 vaccine was administered","Measles"=>"Pertains to the date wherein the Measles vaccine was administered","Rotavirus"=>"Pertains to the date wherein the Rotavirus vaccine was administered","Rotavirus 2"=>"Pertains to the date wherein the Rotavirus 2 vaccine was administered","Fully Immunized Child"=>"Pertains to the date wherein child was fully immunized. To qualify, all 11 antigens should have been provided before the age of 1. The last antigen that was administered to make the child FIC will be the basis of the FIC date","Completely Immunized Child (12-23 mos)"=>"Pertains to the date wherein child was completely immunized. To qualify, all 11 antigens should have been provided more than the age of 1. The last antigen that was administered to make the child CIC will be the basis of the CIC date");
 
+	$arr_date_fp = array("Date of Registration"=>"Pertains to the date wherein the client was enrolled into the method.");
+
    $i = 1; 
 
    if(!empty($_SESSION["arr_px_labels"])):
@@ -62,6 +64,8 @@
 			$arr_to_display = $arr_date_mc;	
 		elseif($prog=='epi'):
 			$arr_to_display = $arr_date_epi;	
+		elseif($prog=='fp'):
+			$arr_to_display = $arr_date_fp;
 		else:
 
 		endif;

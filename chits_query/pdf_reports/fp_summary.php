@@ -299,7 +299,7 @@ function compute_indicator(){   //accepts two parameters. 1st is (NA, OTHERS, DR
     
     }
     
-    if(isset($q_methods)):
+    if(isset($q_methods)): 
         //echo $cat.'/'.$method.'/'.mysql_num_rows($q_methods).'<br>';
         
         while(list($fp_px_id,$date,$px_id)=mysql_fetch_array($q_methods)){
@@ -311,9 +311,9 @@ function compute_indicator(){   //accepts two parameters. 1st is (NA, OTHERS, DR
         
     elseif(isset($arr_cu)): // computes for the FP CU's of all and per-method    
       $month_stat = $arr_cu;
-      
+	      
     else:
-        
+
     endif;
           
      //print_r($month_stat);

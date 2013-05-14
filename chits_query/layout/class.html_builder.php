@@ -94,35 +94,67 @@ class html_builder{
 		list($report_period) = mysql_fetch_array($q_report_period);
 		
 
-		$arr_px_labels = $_SESSION["arr_px_labels"];
-		//print_r($arr_px_labels);
+		$arr_px_labels = $_SESSION["arr_px_labels"];		
+
 		foreach($cell_contents as $key=>$value){ 
 			echo "<tr style='background-color: #666666; color: #FFFF66; font-weight:bold; white-space: nowrap; font-size: 19px;'>";
 
-			for($i=0;$i<count($value);$i++){
+			for($i=0;$i<count($value);$i++){ 
 				$arr_names = array();
-				//if($this->lookup_ques_for_colspan() && $i<$this->where_to_colspan()):
-				//	echo "<td colspan='2'>";
-			//else:
-					echo "<td>";
-				//endif;
+				
+				echo "<td>";
+
 				if(!empty($arr_px_labels)): 
 					if($i!=0 && $value[$i]!=0):
 						if(isset($arr_px_labels["epi"])):
 							$cat = 'epi';
 							$arr_names = $this->return_px_names(((($key*2)+$i)-1),$arr_px_labels,$cat);
 							$ser_arr_names = serialize($this->return_px_names(((($key*2)+$i)-1),$arr_px_labels,$cat));
+							$label = $value[0];
+
 						elseif(isset($arr_px_labels["mc"])):
 							$cat = 'mc';
 							$arr_names = $this->return_px_names($key,$arr_px_labels,$cat);
 							$ser_arr_names = serialize($this->return_px_names($key,$arr_px_labels,$cat)); 
+							$label = $value[0];
+
+						elseif(isset($arr_px_labels["fp"])): //echo ((($key*2)+$i)-1); //print_r($arr_px_labels); 
+							$cat = 'fp';
+							$range = ((($key*5)+$i)-1);
+							$arr_names = $this->return_px_names($range,$arr_px_labels,$cat);
+							$ser_arr_names = serialize($this->return_px_names($range,$arr_px_labels,$cat)); 
+
+							list($code,$label) = explode(".",$value[0]);
+							$label = trim($label);
+
+							switch(($range % 5)){
+								case 0:
+									$col_type = 'Current User (Begin)';
+									break;
+								case 1:
+									$col_type = 'New Acceptor';
+									break;
+								case 2:
+									$col_type = 'Others (RS,CC,CM)';
+									break;
+								case 3:
+									$col_type = 'Dropout';
+									break;
+								case 4:
+									$col_type = 'Current User (End)';
+									break;
+								case 6:
+									$col_type = '';
+									break;
+							}		
+							$label = $col_type.' '.$label;
 						else: 
-						
+
 						endif;
 
 						//echo "<a href='../../site/disp_name.php?id=$ser_arr_names&cat=$value[0]&prog=$cat' target='new'>".$value[$i]."</a>";
 						if($report_period=='M'):   //show only edqc links in monthly reports
-							echo "<a href='../../site/disp_name.php?id=$ser_arr_names&cat=$value[0]&prog=$cat' target='new'>".$value[$i]."</a>"; 
+							echo "<a href='../../site/disp_name.php?id=$ser_arr_names&cat=$label&prog=$cat' target='new'>".$value[$i]."</a>"; 
 						else:
 							echo $value[$i];
 						endif;
@@ -140,13 +172,11 @@ class html_builder{
 		}
 	}
 
-	function return_px_names($cell_num,$arr_px_labels,$prog){
+	function return_px_names($cell_num,$arr_px_labels,$prog){ 
 		$arr_px_names = array();
-		//print_r($arr_px_labels[$cell_num]);
-		//print_r($arr_px_labels);
 		if(count($arr_px_labels)!=0):
 			/*
-			if($prog=='epi'):
+			if($prog=='epi'):	
 				foreach($arr_px_labels as $key_prog=>$val_arr){
 					foreach($val_arr[$cell_num] as $key2=>$val_arr2){ 
 						if($key2>=$this->smonth && $key2<=$this->emonth): 
@@ -172,19 +202,33 @@ class html_builder{
 
 			endif; */
 
-			foreach($arr_px_labels as $key_prog=>$val_arr){; //echo $cell_num.'<br>'; //print_r($val_arr[$cell_num]); 
-				foreach($val_arr[$cell_num] as $key2=>$val_arr2){ 
-					if($key2>=$this->smonth && $key2<=$this->emonth):
-						foreach($val_arr2 as $key3=>$val_arr3){
-							array_push($arr_px_names,$val_arr3[0].'*'.$val_arr3[3]); //extract the patient ID and push it to the array
-						}
-					endif;
-				}
-					
-			}
 
-		endif; 
+			if($prog=='fp'):
+				foreach($arr_px_labels as $key_prog=>$val_arr){	
+   					foreach($val_arr[$cell_num] as $key2=>$val_arr2){
+
+						array_push($arr_px_names,$val_arr2[0].'*'.$val_arr2[3]); //extract the patient ID and push it to the array
+					}
+				}
+
+			else: //parsing for mc and epi
+
+				foreach($arr_px_labels as $key_prog=>$val_arr){ 
+
+					foreach($val_arr[$cell_num] as $key2=>$val_arr2){
+						if($key2>=$this->smonth && $key2<=$this->emonth): 
+							foreach($val_arr2 as $key3=>$val_arr3){
+								array_push($arr_px_names,$val_arr3[0].'*'.$val_arr3[3]); //extract the patient ID and push it to the array
+							}
+						endif;
+					}					
+				}
+
+			endif; 
+
+		endif;
 		$arr_px_names = array_unique($arr_px_names);
+
 		return $arr_px_names;
 	}
 

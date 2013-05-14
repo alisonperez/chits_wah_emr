@@ -166,23 +166,27 @@ function show_fp_quarterly(){
         list($method_name) = mysql_fetch_array($q_fp);
 
         $cu_prev = $this->get_current_users($_SESSION[sdate2],$_SESSION[edate2],$method_code,$str_brgy,2);
+
+
         $na_pres = $this->get_current_users($_SESSION[sdate2],$_SESSION[edate2],$method_code,$str_brgy,3);
         $other_pres = $this->get_current_users($_SESSION[sdate2],$_SESSION[edate2],$method_code,$str_brgy,4);
         $dropout_pres = $this->get_current_users($_SESSION[sdate2],$_SESSION[edate2],$method_code,$str_brgy,5 );
 
-	$prev_na = $this->get_current_users($_SESSION[sdate2],$_SESSION[edate2],$method_code,$str_brgy,6);
+		$prev_na = $this->get_current_users($_SESSION[sdate2],$_SESSION[edate2],$method_code,$str_brgy,6);
 
         //$cu_pres = ($cu_prev + $na_pres + $other_pres) - $dropout_pres;
 
-	$cu_pres = ($cu_prev + $prev_na + $other_pres) - $dropout_pres;
+		$cu_pres = ($cu_prev + $prev_na + $other_pres) - $dropout_pres;		
 
         $fp_contents = array($col_code.'. '.$method_name,$cu_prev,$na_pres,$other_pres,$dropout_pres,$cu_pres);
-	array_push($arr_consolidate,$fp_contents);
+	
+		array_push($arr_consolidate,$fp_contents);
 
         for($x=0;$x<count($fp_contents);$x++){
             $this->Cell($w[$x],6,$fp_contents[$x],'1',0,'L');
         }
-        $this->Ln();
+        
+		$this->Ln();
     }
 
     return $arr_consolidate;
@@ -241,35 +245,73 @@ function get_current_users(){
 
         case '2': //this will compute the Current User beginning the Quarter ((NA+Others)-Dropout)prev
             //$q_active_prev = mysql_query("SELECT fp_px_id,patient_id,date_registered FROM m_patient_fp_method WHERE date_registered < '$start' AND method_id='$method' AND NOT EXISTS (SELECT fp_px_id FROM m_patient_fp_method WHERE client_code='NA' AND date_registered BETWEEN '$s_date' AND '$e_date' AND method_id='$method')") or die("Cannot query 198: ".mysql_error());
-	    $q_active_prev = mysql_query("SELECT fp_px_id,patient_id,date_registered FROM m_patient_fp_method WHERE date_registered < '$start' AND method_id='$method'") or die("Cannot query 198: ".mysql_error());
+		    $q_active_prev = mysql_query("SELECT fp_px_id,patient_id,date_registered FROM m_patient_fp_method WHERE date_registered < '$start' AND method_id='$method'") or die("Cannot query 198: ".mysql_error());
 
-	    $q_dropout_prev = mysql_query("SELECT fp_px_id,patient_id,date_registered FROM m_patient_fp_method WHERE date_dropout < '$start' AND drop_out='Y' AND method_id='$method'") or die("Cannot query: 199". mysql_error());
+		    $q_dropout_prev = mysql_query("SELECT fp_px_id,patient_id,date_registered FROM m_patient_fp_method WHERE date_dropout < '$start' AND drop_out='Y' AND method_id='$method'") or die("Cannot query: 199". mysql_error());
 
-	    $q_na_prev = mysql_query("SELECT fp_px_id,patient_id,date_registered FROM m_patient_fp_method WHERE date_registered BETWEEN '$s_date' AND '$e_date' AND client_code='NA' AND method_id='$method'") or die("Cannot query 215 ".mysql_error());
+			$q_na_prev = mysql_query("SELECT fp_px_id,patient_id,date_registered FROM m_patient_fp_method WHERE date_registered BETWEEN '$s_date' AND '$e_date' AND client_code='NA' AND method_id='$method'") or die("Cannot query 215 ".mysql_error());
 
             //echo mysql_num_rows($q_active_prev);
 
-            $arr_active_prev = $this->sanitize_brgy($q_active_prev,$brgy);
-            $arr_dropout_prev = $this->sanitize_brgy($q_dropout_prev,$brgy);
-	    $arr_na_prev = $this->sanitize_brgy($q_na_prev,$brgy);
+            $arr_active_prev = $this->sanitize_brgy($q_active_prev,$brgy,$method,$col_code);
+            $arr_dropout_prev = $this->sanitize_brgy($q_dropout_prev,$brgy,$method,$col_code);
+		    $arr_na_prev = $this->sanitize_brgy($q_na_prev,$brgy,$method,$col_code);
 
             $cu_na_prev = count($arr_na_prev);
 
 
             $cu_prev = count($arr_active_prev)-count($arr_dropout_prev);
-	    $cu_prev -= $cu_na_prev;
+		    $cu_prev -= $cu_na_prev;
 
-            //echo $method.'/'.count($arr_active_prev).' less '.count($arr_dropout_prev).'='.$diff."<br>";
-            return $cu_prev;
-            break;
+
+			$arr_cu_prev = $this->get_arr_cu_prev($arr_active_prev,$arr_dropout_prev,$arr_na_prev);
+			
+			$arr_cu_prev2 = array();
+
+			//echo $method.'/'.count($arr_active_prev).' less '.count($arr_dropout_prev).'='.$diff."<br>";
+            //return $cu_prev;
+			foreach($arr_cu_prev as $key=>$fp_px_id){
+				$q_fp_info = mysql_query("SELECT patient_id, date_registered FROM m_patient_fp_method WHERE fp_px_id='$fp_px_id'");
+				list($pxid,$date_reg) = mysql_fetch_array($q_fp_info);
+				array_push($arr_cu_prev2,array($pxid,'Current User (Beginning)'.$method,'fp',$date_reg));
+			}
+
+			array_push($_SESSION["arr_px_labels"]["fp"],$arr_cu_prev2); 
+
+			if(count($arr_cu_prev2)!=0):
+				$_SESSION["fp_cu_prev"] = $arr_cu_prev2; 
+			else:
+				$_SESSION["fp_cu_prev"] = '';
+			endif;
+
+			//return count($arr_cu_prev);
+			return $cu_prev;
+            
+			break;
 
 
         case '3':
             $q_na = mysql_query("SELECT fp_px_id,patient_id,date_registered FROM m_patient_fp_method WHERE date_registered BETWEEN '$start' AND '$end' AND client_code='NA' AND method_id='$method'") or die("Cannot query 215 ".mysql_error());
 
-            $arr_na_pres = $this->sanitize_brgy($q_na,$brgy);
+            $arr_na_pres = $this->sanitize_brgy($q_na,$brgy,$method,$col_code);
+
+			$arr_na_pres2 = array();
+
+			foreach($arr_na_pres as $key=>$value){
+					$q_fp_info = mysql_query("SELECT patient_id, date_registered FROM m_patient_fp_method WHERE fp_px_id='$value[0]'");
+					list($pxid,$date_reg) = mysql_fetch_array($q_fp_info);
+					array_push($arr_na_pres2,array($pxid,'New Acceptor '.$method,'fp',$date_reg));
+			}
+			
+			array_push($_SESSION["arr_px_labels"]["fp"],$arr_na_pres2); 
 
             $cu_na = count($arr_na_pres);
+
+			if(count($arr_na_pres2)!=0):
+				$_SESSION["fp_na_pres"] = $arr_na_pres2; 
+			else:
+				$_SESSION["fp_na_pres"] = '';
+			endif;
 
             return $cu_na;
 
@@ -277,30 +319,112 @@ function get_current_users(){
 
         case '4': //cu for others
             $q_others = mysql_query("SELECT fp_px_id,patient_id,date_registered FROM m_patient_fp_method WHERE date_registered BETWEEN '$start' AND '$end' AND client_code!='NA' AND method_id='$method'") or die("Cannot query 235 ".mysql_error());
-            $arr_others = $this->sanitize_brgy($q_others,$brgy);
+            $arr_others = $this->sanitize_brgy($q_others,$brgy,$method,$col_code);
+
+			$arr_others2 = array();
+
+			foreach($arr_others as $key=>$value){ 
+				$q_fp_info = mysql_query("SELECT patient_id, date_registered FROM m_patient_fp_method WHERE fp_px_id='$value[0]'");
+				
+				list($pxid,$date_reg) = mysql_fetch_array($q_fp_info);
+
+				array_push($arr_others2,array($pxid,'Others (CC,CM,RS) '.$method,'fp',$date_reg));
+			}
+
+
             $cu_others = count($arr_others);
-            return $cu_others;
+
+			array_push($_SESSION["arr_px_labels"]["fp"],$arr_others2); 
+
+			if(count($arr_others2)!=0):
+				$_SESSION["fp_arr_others"] = $arr_others; 
+			else:
+				$_SESSION["fp_arr_others"] = '';
+			endif;
+
+
+			return $cu_others;
 
             break;
 
         case '5': //dropouts for a given quarter
         
             $q_dropout = mysql_query("SELECT fp_px_id,patient_id,date_registered FROM m_patient_fp_method WHERE date_dropout BETWEEN '$start' AND '$end' AND drop_out='Y' AND method_id='$method'") or die("Cannot query 240 ".mysql_error());
-            $arr_dropout_pres = $this->sanitize_brgy($q_dropout,$brgy);            
+            $arr_dropout_pres = $this->sanitize_brgy($q_dropout,$brgy,$method,$col_code);            
+
+			$arr_dropout_pres2 = array();
+
+
+			foreach($arr_dropout_pres as $key=>$value){
+				$q_fp_info = mysql_query("SELECT patient_id, date_registered FROM m_patient_fp_method WHERE fp_px_id='$value[0]'");
+				
+				list($pxid,$date_reg) = mysql_fetch_array($q_fp_info);
+
+				array_push($arr_dropout_pres2,array($pxid,'Dropout for '.$method,'fp',$date_reg));
+			}
+
             $dropout_count = count($arr_dropout_pres);
             
-            return $dropout_count;
+			array_push($_SESSION["arr_px_labels"]["fp"],$arr_dropout_pres2); 
+
+			if(count($arr_dropout_pres2)!=0):
+				$_SESSION["fp_dropout_pres"] = $arr_dropout_pres2; 
+			else:
+				$_SESSION["fp_dropout_pres"] = '';
+			endif;
+
+			
+			return $dropout_count;
             
             break;
         
         case '6': //previous NA of the past period (m/q/a)
 	    $q_na_prev = mysql_query("SELECT fp_px_id,patient_id,date_registered FROM m_patient_fp_method WHERE date_registered BETWEEN '$s_date' AND '$e_date' AND client_code='NA' AND method_id='$method'") or die("Cannot query 215 ".mysql_error());
 		
-	    $arr_na_prev = $this->sanitize_brgy($q_na_prev,$brgy);
+	    $arr_na_prev = $this->sanitize_brgy($q_na_prev,$brgy,$method,$col_code);
 
-            $cu_na_prev = count($arr_na_prev);
+		$arr_na_prev2 = array();
+	
+		foreach($arr_na_prev as $key=>$value){ 
+				$q_fp_info = mysql_query("SELECT patient_id, date_registered FROM m_patient_fp_method WHERE fp_px_id='$value[0]'");
+				
+				list($pxid,$date_reg) = mysql_fetch_array($q_fp_info);
 
-	    return $cu_na_prev;
+				array_push($arr_na_prev2,array($pxid,$col_code.'/'.$method,'fp',$date_reg));
+		}
+
+
+
+        $cu_na_prev = count($arr_na_prev);
+
+		//array_push($_SESSION["arr_px_labels"]["fp"],$arr_na_prev2); 
+
+
+		if(count($arr_na_prev2)!=0):
+			$_SESSION["fp_na_prev"] = $arr_na_prev2; 
+		else:
+			$_SESSION["fp_na_prev"] = '';
+		endif;
+
+
+		
+		$arr_cu_pres = array();
+
+		$arr_cu_pres = $this->get_arr_cu_pres(); // array will contain the fp_px_ids of the CU (Pres)
+		$arr_cu_pres2 = array();
+		
+		foreach($arr_cu_pres as $key=>$value){
+				list($px_id,$date_reg) = explode("*",$value);
+
+				//list($pxid,$date_reg) = mysql_fetch_array($q_fp_info); 
+				array_push($arr_cu_pres2,array($px_id,'Current User (End)'.$method_code,'fp',$date_reg));
+		}
+
+		array_push($_SESSION["arr_px_labels"]["fp"],$arr_cu_pres2);		
+		
+		
+		
+		return $cu_na_prev;
 
 	    break;
 
@@ -339,22 +463,29 @@ function sanitize_brgy(){
     if(func_num_args()>0):
         $args = func_get_args();
         $query = $args[0];
-        $brgy = $args[1];        
+        $brgy = $args[1];    
+		$method = $args[2];
+		$col_code = $args[3];
     endif;
 
 
 
     $arr_count = array();
-        
+
+	$arr_fp = array(1=>array(),2=>array(),3=>array(),4=>array(),5=>array(),6=>array(),7=>array(),8=>array(),9=>array(),10=>array(),11=>array(),12=>array());
     
-    if(mysql_num_rows($query)!=0): 
+    if(mysql_num_rows($query)!=0):
         while($r_query = mysql_fetch_array($query)){
             if($this->get_px_brgy($r_query[patient_id],$brgy)):
                 array_push($arr_count,$r_query);
+				//array_push($arr_fp[$this->get_max_month($r_query[2])],array($r_query[1],$method.' '.$col_code,'fp',$r_query[2]));				
             endif;
         }
-    endif;
+		
+	endif;
     
+	//array_push($_SESSION["arr_px_labels"]["fp"],$arr_fp); 
+
     return $arr_count;
 }
 
@@ -381,6 +512,99 @@ function get_px_brgy(){
         endif; 
 }
 
+function get_max_month($date){
+	list($taon,$buwan,$araw) = explode('-',$date);
+	$max_date = date("n",mktime(0,0,0,$buwan,$araw,$taon)); //get the unix timestamp then return month without trailing 0
+
+	return $max_date;
+}
+
+function get_arr_cu_prev($arr_active_prev,$arr_dropout_prev,$arr_na_prev){
+	$arr_active_prev2 = array();
+	$arr_dropout_prev2 = array();
+	$arr_na_prev2 = array();
+
+	foreach($arr_active_prev as $key=>$value){ 
+		foreach($value as $key2=>$value2){
+			if($key2=='fp_px_id'):
+				array_push($arr_active_prev2,$value2);
+			endif;
+		}
+	}
+
+	foreach($arr_dropout_prev as $key=>$value){
+		foreach($value as $key2=>$value2){
+			if($key2=='fp_px_id'):
+				array_push($arr_dropout_prev2,$value2);
+			endif;
+		}
+	}
+
+	foreach($arr_na_prev as $key=>$value){
+		foreach($value as $key2=>$value2){
+			if($key2=='fp_px_id'): 
+				array_push($arr_na_prev2,$value2);
+			endif;
+		}
+	}
+
+	$arr_active_prev2 = array_unique($arr_active_prev2);
+	$arr_dropout_prev2 = array_unique($arr_dropout_prev2);
+	$cu_na_prev2 = array_unique($arr_na_prev2);
+
+	$arr_diff1 = array_diff($arr_active_prev2,$arr_dropout_prev2);
+	$arr_diff2 = array_diff($arr_diff1, $arr_na_prev2);
+	
+
+
+	return array_unique($arr_diff2);
+}
+
+function get_arr_cu_pres(){
+		/*$_SESSION["fp_cu_prev"]
+		$_SESSION["fp_na_pres"]
+		$_SESSION["fp_arr_others"]
+		$_SESSION["fp_dropout_pres"]
+		$_SESSION["fp_na_prev"]
+
+		make a function that get the CU of pres using these SESSION vars! */
+		
+		$main_arr = array(); //merges fp_px_id's of $cu_prev, $prev_na, $other_pres
+		$dropout_arr = array();
+
+		//$cu_pres = ($cu_prev + $prev_na + $other_pres) - $dropout_pres;
+
+		//echo count($_SESSION["fp_cu_prev"]).'/'.count($_SESSION["fp_na_prev"]).'/'.count($_SESSION["fp_arr_others"]).'/'.count($_SESSION["fp_dropout_pres"])."<br><br>";
+
+		foreach($_SESSION["fp_cu_prev"] as $key=>$value){
+			array_push($main_arr,$value[0].'*'.$value[3]);		
+		}
+
+		foreach($_SESSION["fp_na_prev"] as $key=>$value){
+			array_push($main_arr,$value[0].'*'.$value[3]);
+		}
+
+		foreach($_SESSION["fp_arr_others"] as $key=>$value){
+			array_push($main_arr,$value[0].'*'.$value[3]);
+		}
+
+		foreach($_SESSION["fp_dropout_pres"] as $key=>$value){
+			array_push($dropout_arr,$value[0].'*'.$value[3]);
+		}
+
+		$main_arr = array_unique($main_arr);
+		$dropout_arr = array_unique($dropout_arr);
+
+		$arr_diff = array_diff($main_arr,$dropout_arr);
+	
+		/*print_r($arr_diff);
+		echo "<br><br><br>";
+		echo count($arr_diff);
+		echo "<br><br><br>";*/
+		//echo count($arr_diff);
+		return $arr_diff;
+}
+
 
 
 function Footer(){
@@ -402,6 +626,7 @@ $pdf->SetFont('Arial','',10);
 
 $pdf->AddPage();
 
+$_SESSION["arr_px_labels"] = array('fp'=>array());
 $fp_rec = $pdf->show_fp_quarterly();
 
 //$pdf->AddPage();
