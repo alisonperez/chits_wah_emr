@@ -4,9 +4,11 @@
     include('globals.php');
     include('layout/class.widgets.php');
     include('scripts/class.querydb.php');
+    //include('scripts/dbcleanup.php');
 
     $widconn = new widgets();
     $queryconn = new querydb();
+	//$cleanup = new dbcleanup();
 
 	if($_POST[sel_class]!=0):
 	//	$queryconn->init_set_vars($_POST[sel_class],$_POST[sel_ques]);
@@ -97,6 +99,8 @@ if($_SESSION["userid"]!=""):
 	  //upon setting filters, set the necessary sessions here
 
 	  if($_POST[q_submit]):
+			$queryconn->clean_db();
+
 	        // set the session for start date and end date
 		if($_SESSION[filter]==1):
 			$queryconn->querycrit($dbname,$dbname2,$_POST[sdate],$_POST[edate],$_POST[sel_brgy],$_POST[sel_fp_method]);
