@@ -1131,7 +1131,7 @@ class querydb{
 			}
 	
 			echo "<script language='Javascript'>";
-			echo "window.alert('$count patients have been cleared in the database!')";
+			echo "window.alert('Database cleanup is activated every query. This shall clear untracked and deleted patients in consultation tables. $count patients have been cleared in the database.')";
 			echo "</script>";
 	}
 	
