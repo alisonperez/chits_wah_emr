@@ -232,9 +232,10 @@ function show_ccdev_summary(){
 	$ccdev_rec = array();
 	$arr_consolidate = array();
 
-		$arr_indicators = array(array('Immunization Given < 1 yr'=>array('BCG'=>'BCG','DPT1'=>'DPT1','DPT2'=>'DPT2','DPT3'=>'DPT3','OPV1'=>'OPV1','OPV2'=>'OPV2','OPV3'=>'OPV3','HEPB1<24'=>'Hepa B1 w/ in 24 hrs','HEPB1>24'=>'Hepa B1 > 24 hours','HEPB2'=>'Hepatitis B2','HEPB3'=>'Hepatitis B3','MSL'=>'Measles','ROTA'=>'Rotavirus','ROTA2'=>'Rotavirus 2','PENTA1'=>'Pentavalent 1','PENTA2'=>'Pentavalent 2','PENTA3'=>'Pentavalent 3')),'Fully Immunized Child','Completely Immunized Child (12-23 mos)','Child Protected at Birth','Infant age 6 mo seen','Infant exclusively breastfed until 6 mo','Infant 0-11 mos referred for NBS',array('Diarrhea (0-59 mos)'=>array('num_case'=>'No. of Cases','ort'=>'Given ORT','ors'=>'Given ORS','orswz'=>'Given ORS w/ Zinc')),array('Pneumonia (0-59 mos)'=>array('num_cases'=>'No. of cases','pneumonia_tx'=>'Given Treatment')),array('Sick Children Seen'=>array('6*11'=>'6-11 mos','12*59'=>'12-59 mos','60*71'=>'60-71 mos')),array('Sick Children Given Vit A'=>array('6*11'=>'6-11 mos','12*59'=>'12-59 mos','60*71'=>'60-71 mos')),'Infant 2-6 mos w/ LBW seen','Infant 2-6 mos w/ LBW given iron','Anemic Children 2-59 mos seen','Anemic Children 2-59 mos given iron');
+		$arr_indicators = array(array('Immunization Given < 1 yr'=>array('BCG'=>'BCG','DPT1'=>'DPT1','DPT2'=>'DPT2','DPT3'=>'DPT3','OPV1'=>'OPV1','OPV2'=>'OPV2','OPV3'=>'OPV3','HEPB'=>'Hepa at Birth','HEPB1<24'=>'Hepa B1 w/ in 24 hrs','HEPB1>24'=>'Hepa B1 > 24 hours','HEPB2'=>'Hepatitis B2','HEPB3'=>'Hepatitis B3','MSL'=>'Measles','ROTA'=>'Rotavirus','ROTA2'=>'Rotavirus 2','PENTA1'=>'Pentavalent 1','PENTA2'=>'Pentavalent 2','PENTA3'=>'Pentavalent 3','MMR'=>'MMR')),'Fully Immunized Child','Completely Immunized Child (12-23 mos)','Child Protected at Birth','Infant age 6 mo seen','Infant exclusively breastfed until 6 mo','Infant 0-11 mos referred for NBS',array('Diarrhea (0-59 mos)'=>array('num_case'=>'No. of Cases','ort'=>'Given ORT','ors'=>'Given ORS','orswz'=>'Given ORS w/ Zinc')),array('Pneumonia (0-59 mos)'=>array('num_cases'=>'No. of cases','pneumonia_tx'=>'Given Treatment')),array('Sick Children Seen'=>array('6*11'=>'6-11 mos','12*59'=>'12-59 mos','60*71'=>'60-71 mos')),array('Sick Children Given Vit A'=>array('6*11'=>'6-11 mos','12*59'=>'12-59 mos','60*71'=>'60-71 mos')),'Infant 2-6 mos w/ LBW seen','Infant 2-6 mos w/ LBW given iron','Anemic Children 2-59 mos seen','Anemic Children 2-59 mos given iron');
 		$m_index = array('1'=>array('2','3'),'2'=>array('4','5'),'3'=>array('6','7'),'4'=>array('10','11'),'5'=>array('12','13'),'6'=>array('14','15'),'7'=>array('18','19'),'8'=>array('20','21'),'9'=>array('22','23'),'10'=>array('26','27'),'11'=>array('28','29'),'12'=>array('30','31'));
-	$q_index = array('1'=>array('8','9'),'2'=>array('16','17'),'3'=>array('24','25'),'4'=>array('32','33'));
+	
+		$q_index = array('1'=>array('8','9'),'2'=>array('16','17'),'3'=>array('24','25'),'4'=>array('32','33'));
 	
 	if($_SESSION[ques]==39):
 	    $header = array(30,18,9,9,9,9,9,9,8,7,9,9,9,9,9,9,8,7,9,9,9,9,9,9,8,7,9,9,9,9,9,9,8,7,9,9);	
@@ -260,7 +261,7 @@ function show_ccdev_summary(){
 			$sub_arr = array_keys($arr_indicators[$i]); //this will return the header title if the content is an array			
 			$counter = 0;
 			$arr_sub_indicators = $this->compute_indicators($i+1,$sub_arr,$arr_indicators[$i]);			
-			
+
 			if($_SESSION[ques]==39):
 			    $this->disp_blank_header($sub_arr[0],$target);								
 			endif;
@@ -302,64 +303,60 @@ function show_ccdev_summary(){
 				if($_SESSION[ques]==39):
 				    array_push($arr_consolidate,$disp_arr);
 				    $this->Row($disp_arr);
-                                elseif($_SESSION[ques]==50):
-
-                                    $m_arr = array('     '.$disp_arr[0],$disp_arr[$m_index[$_SESSION[smonth]][0]],$disp_arr[$m_index[$_SESSION[smonth]][1]]);
+                elseif($_SESSION[ques]==50): 
+                     $m_arr = array('     '.$disp_arr[0],$disp_arr[$m_index[$_SESSION[smonth]][0]],$disp_arr[$m_index[$_SESSION[smonth]][1]]);
 
 				    array_push($arr_consolidate,$m_arr);
 
-                                    for($x=0;$x<count($m_arr);$x++){
-                                        if($counter==0):
-                                            $this->Cell($header[0],6,$sub_arr[0],'1',0,'L');
-                                            $this->Cell($header[1],6,' ','1',0,'L');
-                                            $this->Cell($header[2],6,' ','1',0,'L');
-                                            $this->Ln();
-                                            $counter = 1;
-                                        endif;
-                                        $this->Cell($header[$x],6,$m_arr[$x],'1',0,'L');
-                                    }
+                    for($x=0;$x<count($m_arr);$x++){
+                       if($counter==0):
+                           $this->Cell($header[0],6,$sub_arr[0],'1',0,'L');
+                           $this->Cell($header[1],6,' ','1',0,'L');
+                           $this->Cell($header[2],6,' ','1',0,'L');
+                           $this->Ln();
+                           $counter = 1;
+                       endif;
+                       $this->Cell($header[$x],6,$m_arr[$x],'1',0,'L');
+                    }
 
-                                    $this->Ln();
+                        $this->Ln();
                                     //$this->Row(array($disp_arr[0],$disp_arr[$m_index[$_SESSION[smonth]][0]],$disp_arr[$m_index[$_SESSION[smonth]][1]]));     
-                                elseif($_SESSION[ques]==51):
-                                    $total_q = $disp_arr[$q_index[$_SESSION[quarter]][0]] + $disp_arr[$q_index[$_SESSION[quarter]][1]];
+                elseif($_SESSION[ques]==51):
+                       $total_q = $disp_arr[$q_index[$_SESSION[quarter]][0]] + $disp_arr[$q_index[$_SESSION[quarter]][1]];
 
-                                    $q_arr = array('     '.$disp_arr[0],$target,$disp_arr[$q_index[$_SESSION[quarter]][0]],$disp_arr[$q_index[$_SESSION[quarter]][1]],$total_q,$this->compute_ccdev_rate($target,$total_q),' ',' ');
+                       $q_arr = array('     '.$disp_arr[0],$target,$disp_arr[$q_index[$_SESSION[quarter]][0]],$disp_arr[$q_index[$_SESSION[quarter]][1]],$total_q,$this->compute_ccdev_rate($target,$total_q),' ',' ');
 
-				    array_push($arr_consolidate,$q_arr);
+					   array_push($arr_consolidate,$q_arr);
 
-                                    for($x=0;$x<count($q_arr);$x++){
-                                        if($counter==0):
-                                            $this->Cell($header[0],6,$sub_arr[0],'1',0,'L');
-                                            $this->Cell($header[1],6,' ','1',0,'L');
-                                            $this->Cell($header[2],6,' ','1',0,'L');
-                                            $this->Cell($header[3],6,' ','1',0,'L');
-                                            $this->Cell($header[4],6,' ','1',0,'L');
-                                            $this->Cell($header[5],6,' ','1',0,'L');
-                                            $this->Cell($header[6],6,' ','1',0,'L');
-                                            $this->Cell($header[7],6,' ','1',0,'L'); 
-                                            $this->Ln();
-                                            $counter = 1;
-                                        endif;
-                                        $this->Cell($header[$x],6,$q_arr[$x],'1',0,'L');
-                                    }
+                       for($x=0;$x<count($q_arr);$x++){
+                            if($counter==0):
+                                 $this->Cell($header[0],6,$sub_arr[0],'1',0,'L');
+                                 $this->Cell($header[1],6,' ','1',0,'L');
+                                 $this->Cell($header[2],6,' ','1',0,'L');
+                                 $this->Cell($header[3],6,' ','1',0,'L');
+                                 $this->Cell($header[4],6,' ','1',0,'L');
+                                 $this->Cell($header[5],6,' ','1',0,'L');
+                                 $this->Cell($header[6],6,' ','1',0,'L');
+                                 $this->Cell($header[7],6,' ','1',0,'L'); 
+                                 $this->Ln();
+                                 $counter = 1;
+                            endif;
+                            $this->Cell($header[$x],6,$q_arr[$x],'1',0,'L');
+                        }
 
-                                    $this->Ln();
-
-                                else:
-
-                                endif;
+                        $this->Ln();
+                else:
+                endif;
 				
 			}
 			
 
 		else:
-			$load = 0;
+			$load = 0; 
 			$arr_gender_stat = $this->compute_indicators($i+1); //return an array with index 0= array of M count. 1=array of F count
 			$male_monthly = $arr_gender_stat[0];
 			$female_monthly = $arr_gender_stat[1];
 
-			//print_r($arr_gender_stat);
 			$male_quarterly = $this->get_quarterly_total($arr_gender_stat[0],$target);
 			$female_quarterly = $this->get_quarterly_total($arr_gender_stat[1],$target);
 			array_push($disp_arr,$arr_indicators[$i],$target);				
@@ -379,12 +376,12 @@ function show_ccdev_summary(){
 			//$this->Row($disp_arr);
 
                         if($_SESSION[ques]==39):
-			    array_push($arr_consolidate,$disp_arr);
+						    array_push($arr_consolidate,$disp_arr);
                             $this->Row($disp_arr);
                         elseif($_SESSION[ques]==50):
                             $m_arr = array($disp_arr[0],$disp_arr[$m_index[$_SESSION[smonth]][0]],$disp_arr[$m_index[$_SESSION[smonth]][1]]);
 
-			    array_push($arr_consolidate,$m_arr);
+						    array_push($arr_consolidate,$m_arr);
 
                             for($x=0;$x<count($m_arr);$x++){
                                 $this->Cell($header[$x],6,$m_arr[$x],'1',0,'L');
@@ -397,7 +394,7 @@ function show_ccdev_summary(){
 
                             $q_arr = array($disp_arr[0],$target,$disp_arr[$q_index[$_SESSION[quarter]][0]],$disp_arr[$q_index[$_SESSION[quarter]][1]],$total_q,$this->compute_ccdev_rate($target,$total_q),'','');
 
-			    array_push($arr_consolidate,$q_arr);
+						    array_push($arr_consolidate,$q_arr);
 
                             for($x=0;$x<count($q_arr);$x++){
                                 $this->Cell($header[$x],6,$q_arr[$x],'1',0,'L');
@@ -428,12 +425,12 @@ function compute_indicators(){
 		$header = $arg_list[1];
 		$sub_arr_crit = $arg_list[2];
 	endif;
-	
+
 	$month_stat = array(1=>0,2=>0,3=>0,4=>0,5=>0,6=>0,7=>0,8=>0,9=>0,10=>0,11=>0,12=>0);
 	$arr_gender = array('M','F');
 	$brgy_array = $this->get_brgy_array();
 	$brgy_array = implode(',',$brgy_array);
-	$arr_antigens = array('BCG','DPT1','DPT2','DPT3','HEPB1','HEPB2','HEPB3','MSL','OPV1','OPV2','OPV3','ROTA','PENTA1','PENTA2','PENTA3');
+	$arr_antigens = array('BCG','DPT1','DPT2','DPT3','HEPB','HEPB1','HEPB2','HEPB3','MSL','OPV1','OPV2','OPV3','ROTA','PENTA1','PENTA2','PENTA3','MMR');
 	$fic_antigens = implode(',',$arr_antigens);
 	
 
@@ -445,9 +442,9 @@ function compute_indicators(){
 				$arr_antigen_px = array();
 				
 				foreach($sub_arr_crit as $antigen_label=>$antigen_array){ 
-					
+
 					foreach($antigen_array as $key=>$value){
-					
+			
 					foreach($arr_gender as $key2=>$value2){
 
 					$month_stat = array(1=>0,2=>0,3=>0,4=>0,5=>0,6=>0,7=>0,8=>0,9=>0,10=>0,11=>0,12=>0);
@@ -475,6 +472,7 @@ function compute_indicators(){
 					array_push($_SESSION["arr_px_labels"]["epi"],$month_stat_px);  //print_r($_SESSION["arr_px_labels"]);						
 					array_push($arr_antigen_px,$month_stat_px);
 					array_push($arr_antigen,$month_stat);
+
 					//echo '/'.$key.'/'.array_sum($month_stat).'<br>';
 					}
 
@@ -1186,7 +1184,7 @@ function disp_arr_indicator(){
 
 	switch($crit){
 		case 0:
-			$r_label = array('BCG','DPT1','DPT2','DPT3','OPV1','OPV2','OPV3','Hepa B1 w/in 24 hrs','Hepa B1 > 24 hrs','Hepatitis B2','Hepatitis B3','Measles','Rotavirus','Rotavirus 2','Pentavalent 1','Pentavalent 2','Pentavalent 3'); 
+			$r_label = array('BCG','DPT1','DPT2','DPT3','OPV1','OPV2','OPV3','Hepa At Birth','Hepa B1 w/in 24 hrs','Hepa B1 > 24 hrs','Hepatitis B2','Hepatitis B3','Measles','Rotavirus','Rotavirus 2','Pentavalent 1','Pentavalent 2','Pentavalent 3','MMR'); 
 			return $r_label[$sub_crit];
 			break;
 
@@ -1420,8 +1418,8 @@ $pdf->AddPage();
 $_SESSION["arr_px_labels"] = array('epi'=>array());
 $ccdev_rec = $pdf->show_ccdev_summary();
 $arr_csv = array();
-foreach($ccdev_rec as $key=>$value){
-	if($key>=12 && $key<=16): //this will ignore the rows for rota1, rota2, penta 1,penta 2 and penta 3
+foreach($ccdev_rec as $key=>$value){ 
+	if(($key==7) || ($key>=13 && $key<=18)): //this will ignore the rows for hepa at birth, rota1, rota2, penta 1,penta 2 and penta 3
 
 	else:
 		array_push($arr_csv,$value);
