@@ -166,7 +166,7 @@ function show_fp_quarterly(){
         list($method_name) = mysql_fetch_array($q_fp);
 
         $cu_prev = $this->get_current_users($_SESSION[sdate2],$_SESSION[edate2],$method_code,$str_brgy,2);
-
+		
 
         $na_pres = $this->get_current_users($_SESSION[sdate2],$_SESSION[edate2],$method_code,$str_brgy,3);
         $other_pres = $this->get_current_users($_SESSION[sdate2],$_SESSION[edate2],$method_code,$str_brgy,4);
@@ -177,8 +177,10 @@ function show_fp_quarterly(){
         //$cu_pres = ($cu_prev + $na_pres + $other_pres) - $dropout_pres;
 
 		$cu_pres = ($cu_prev + $prev_na + $other_pres) - $dropout_pres;		
+		
+		//echo $cu_prev.'/'.$prev_na.'/'.$other_pres.'/'.$dropout_pres.'/'.$method_code.'/'."<br>";
 
-        $fp_contents = array($col_code.'. '.$method_name,$cu_prev,$na_pres,$other_pres,$dropout_pres,$cu_pres);
+		$fp_contents = array($col_code.'. '.$method_name,$cu_prev,$na_pres,$other_pres,$dropout_pres,$cu_pres);
 	
 		array_push($arr_consolidate,$fp_contents);
 
@@ -277,6 +279,7 @@ function get_current_users(){
 			}
 
 			array_push($_SESSION["arr_px_labels"]["fp"],$arr_cu_prev2); 
+
 
 			if(count($arr_cu_prev2)!=0):
 				$_SESSION["fp_cu_prev"] = $arr_cu_prev2; 
@@ -421,9 +424,8 @@ function get_current_users(){
 		}
 
 		array_push($_SESSION["arr_px_labels"]["fp"],$arr_cu_pres2);		
-		
-		
-		
+
+
 		return $cu_na_prev;
 
 	    break;

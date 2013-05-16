@@ -303,7 +303,7 @@ function compute_indicator($crit){
 	$brgy_array = $this->get_brgy_array();
 	$brgy_array = implode(',',$brgy_array);
 	
-
+	
 	//print_r($brgy_array);
 
 		switch($crit){
@@ -341,14 +341,17 @@ function compute_indicator($crit){
 					
 				for($j=1;$j<=3;$j++){   //traverse for checking the trimester format 1-1-2
 					$get_tri = mysql_query("SELECT consult_id, prenatal_date FROM m_consult_mc_prenatal WHERE trimester='$j' AND mc_id='$mcid' ORDER by prenatal_date DESC") or die("Cannot query: 186");
-									
+
 					$num = mysql_num_rows($get_tri);
+	
+
+
 
 					if($num!=0):
 					   if($j==3):
 
 						$q_min_date = mysql_query("SELECT MIN(prenatal_date) FROM m_consult_mc_prenatal WHERE mc_id='$mcid' AND trimester='$j' AND prenatal_date!=(SELECT MIN(prenatal_date) FROM m_consult_mc_prenatal WHERE mc_id='$mcid' AND trimester='$j')") or die("cannot query: 204");
-						
+
 						  if(mysql_num_rows($q_min_date)!=0):
 
 							list($sec_date) = mysql_fetch_array($q_min_date);						
@@ -358,10 +361,12 @@ function compute_indicator($crit){
 							$max_date = date("n",mktime(0,0,0,$latestm,$latestd,$yr)); //get the unix timestamp then return month without trailing 0
 							$arr[$j] = ($num>=2)?1:0; //check if the third trimester has at least 2 visits
 							
-						  endif;
+						  endif; 
 					   else:
 						  $arr[$j] = 1; //marked trimester 1 and 2 with 1's if $num!=0
-					   endif;
+					   endif; 
+					else: 
+						  $arr[$j] = 0;
 					endif;
 					
 				} //exit 1-1-4 format checking
