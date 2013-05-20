@@ -430,7 +430,14 @@ function compute_indicators(){
 	$arr_gender = array('M','F');
 	$brgy_array = $this->get_brgy_array();
 	$brgy_array = implode(',',$brgy_array);
-	$arr_antigens = array('BCG','DPT1','DPT2','DPT3','HEPB','HEPB1','HEPB2','HEPB3','MSL','OPV1','OPV2','OPV3','ROTA','PENTA1','PENTA2','PENTA3','MMR');
+	$arr_antigens = 
+	
+	// use this array to include HEPB as requirement to FIC
+	//array('BCG','DPT1','DPT2','DPT3','HEPB','HEPB1','HEPB2','HEPB3','MSL','OPV1','OPV2','OPV3','ROTA','PENTA1','PENTA2','PENTA3','MMR');
+	
+	//use this array to not include HEPB as FIC requirement
+	array('BCG','DPT1','DPT2','DPT3','HEPB1','HEPB2','HEPB3','MSL','OPV1','OPV2','OPV3','ROTA','PENTA1','PENTA2','PENTA3');
+
 	$fic_antigens = implode(',',$arr_antigens);
 	
 
@@ -1090,8 +1097,14 @@ function determine_vacc_status(){
 	$q_penta = mysql_query("SELECT consult_id FROM m_consult_vaccine WHERE vaccine_id IN ( 'PENTA1','PENTA2','PENTA3' ) AND patient_id='$pxid'") or die("Cannot query 165: ".mysql_error());
 
 	if(mysql_num_rows($q_penta)!=0):
-		$antigens = array('BCG','HEPB','PENTA1','PENTA2','PENTA3','MSL','OPV1','OPV2','OPV3');
-		$antigen_stat = array('BCG'=>0,'HEPB'=>0,'PENTA1'=>0,'PENTA2'=>0,'PENTA3'=>0,'MSL'=>0,'OPV1'=>0,'OPV2'=>0,'OPV3'=>0);		
+		//enable if HEPB is part of the FIC
+		/*$antigens = array('BCG','HEPB','PENTA1','PENTA2','PENTA3','MSL','OPV1','OPV2','OPV3');
+		$antigen_stat = array('BCG'=>0,'HEPB'=>0,'PENTA1'=>0,'PENTA2'=>0,'PENTA3'=>0,'MSL'=>0,'OPV1'=>0,'OPV2'=>0,'OPV3'=>0);*/
+
+		//enable if HEPB is not part of FIC
+		$antigens = array('BCG','PENTA1','PENTA2','PENTA3','MSL','OPV1','OPV2','OPV3');
+		$antigen_stat = array('BCG'=>0,'PENTA1'=>0,'PENTA2'=>0,'PENTA3'=>0,'MSL'=>0,'OPV1'=>0,'OPV2'=>0,'OPV3'=>0);
+		
 	else:
 		$antigens = array('BCG','DPT1','DPT2','DPT3','HEPB1','HEPB2','HEPB3','MSL','OPV1','OPV2','OPV3');
 		$antigen_stat = array('BCG'=>0,'DPT1'=>0,'DPT2'=>0,'DPT3'=>0,'HEPB1'=>0,'HEPB2'=>0,'HEPB3'=>0,'MSL'=>0,'OPV1'=>0,'OPV2'=>0,'OPV3'=>0);
