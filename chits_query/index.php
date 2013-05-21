@@ -5,7 +5,7 @@
     include('layout/class.widgets.php');
     include('scripts/class.querydb.php');
     //include('scripts/dbcleanup.php');
-print_r($_SESSION);
+
     $widconn = new widgets();
     $queryconn = new querydb();
 	//$cleanup = new dbcleanup();

@@ -131,12 +131,17 @@ function Header()
 	$this->SetWidths($w);
 	//$this->Row(array($_SESSION["datanode"]["name"]."\n".$_SESSION["lgu"].", ".$_SESSION["province"]));
 
-	$this->SetFont('Arial','BI',23);
+	$this->SetFont('Arial','BI',17);
 	$this->Cell(0,5,'Rx',0,1,'L');
 	$this->Cell(0,5,'',0,1,'L');
 
-	$this->SetFont('Arial','B',13);
+	$this->SetFont('Arial','B',14);
+	
 	$this->Row(array($_SESSION["datanode"]["name"]."\n".$_SESSION["barangay_loc"].", ".$_SESSION["lgu"].", ".$_SESSION["province"]));
+
+	$this->Cell(0,5,'',0,1,'L');
+
+	$this->SetFont('Arial','',13);
 
 	$this->Cell(0,5,'Name of Patient: '.$lname.', '.$fname.' '.$str_brgy,0,1,'L');
 	$this->Cell(0,5,'Date Prescribed: '.$date_consult,0,1,'L');

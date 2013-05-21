@@ -349,7 +349,7 @@ class notes extends module {
             if ($result = mysql_query($sql)) {
                 $insert_id = mysql_insert_id();
                 //header("location: ".$_SERVER["PHP_SELF"]."?page=".$get_vars["page"]."&menu_id=".$get_vars["menu_id"]."&consult_id=".$get_vars["consult_id"]."&ptmenu=NOTES&module=notes&notes=NOTES&notes_id=$insert_id#menu");
-		header("location: ".$_SERVER["PHP_SELF"]."?page=".$get_vars["page"]."&menu_id=".$get_vars["menu_id"]."&consult_id=".$get_vars["consult_id"]."&ptmenu=NOTES&module=notes&notes=$note_link&notes_id=$insert_id#menu");
+				header("location: ".$_SERVER["PHP_SELF"]."?page=".$get_vars["page"]."&menu_id=".$get_vars["menu_id"]."&consult_id=".$get_vars["consult_id"]."&ptmenu=NOTES&module=notes&notes=$note_link&notes_id=$insert_id#menu");
             }
             break;
         case "Save Complaint":
@@ -401,11 +401,16 @@ class notes extends module {
             }
 
             break;
-        case "Save Plan":
+        case "Save Treatment Plan":
+			print_r($post_vars);
             if ($post_vars["plan_text"]) {
                 $sql = "update m_consult_notes set ".
-                       "notes_plan = '".addslashes($post_vars["plan_text"])."' ".
+                       "notes_plan = '".addslashes($post_vars["plan_text"])."' ".addslashes($post_vars["plan_px_info"]).
                        "where notes_id = '".$get_vars["notes_id"]."'";
+
+
+
+				
                 if ($result = mysql_query($sql)) {
                     //header("location: ".$_SERVER["PHP_SELF"]."?page=".$get_vars["page"]."&menu_id=".$get_vars["menu_id"]."&consult_id=".$get_vars["consult_id"]."&ptmenu=NOTES&module=notes&notes=TX&notes_id=".$get_vars["notes_id"]."#menu");
 		header("location: ".$_SERVER["PHP_SELF"]."?page=".$get_vars["page"]."&menu_id=".$get_vars["menu_id"]."&consult_id=".$get_vars["consult_id"]."&ptmenu=NOTES&module=notes&notes=$note_link&notes_id=".$get_vars["notes_id"]."#menu");
@@ -708,12 +713,26 @@ class notes extends module {
         }
         print "<br/></td></tr>";
         print "<tr><td>";
-        print "<span class='boxtitle'>".LBL_NOTES_PLAN."</span><br> ";
+        print "<span class='boxtitle'>Rx".LBL_NOTES_PLAN." (Record prescribed medications) </span><br> ";
         print "<textarea rows='10' cols='40' class='tinylight' name='plan_text' style='border: 1px solid black'>".($plan?$plan:$post_vars["plan_text"])."</textarea>";
         print "<br/></td></tr>";
-        print "<tr><td>";
-        print "<input type='submit' name='submitnotes' value='Save Plan' class='textbox' style='border: 1px solid black'/> ";
+
+		print "<tr><td>";
+        print "<span class='boxtitle'>Patient Take Home Information</span><br> ";
+        print "<textarea rows='10' cols='40' class='tinylight' name='plan_px_info' style='border: 1px solid black'></textarea>";
         print "<br/></td></tr>";
+				
+		echo "<tr><td>";
+		echo "<span class='boxtitle'><input type='checkbox' name='chk_px_info'>Check if you want to send take home message</input><br>";
+
+		echo "<span class='boxtitle'>Date to Send&nbsp;&nbsp;&nbsp;&nbsp;<input type='textbox' name='txt_sms_px_info' size='6' />";
+
+		echo "</td></tr>";
+
+        print "<tr><td>";
+        print "<input type='submit' name='submitnotes' value='Save Treatment Plan' class='textbox' style='border: 1px solid black'/> ";
+        print "<br/></td></tr>";
+
         print "</form>";
         print "</table><br/>";
 
