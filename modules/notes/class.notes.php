@@ -402,18 +402,18 @@ class notes extends module {
 
             break;
         case "Save Treatment Plan":
-			print_r($post_vars);
+		
             if ($post_vars["plan_text"]) {
-                $sql = "update m_consult_notes set ".
-                       "notes_plan = '".addslashes($post_vars["plan_text"])."' ".addslashes($post_vars["plan_px_info"]).
-                       "where notes_id = '".$get_vars["notes_id"]."'";
+                /*$sql = "update m_consult_notes set ".
+                       "notes_plan = '".addslashes($post_vars["plan_text"])."' plan_sms_info='".addslashes($post_vars["plan_px_info"]).
+                       "' ".."where notes_id = '".$get_vars["notes_id"]."'"; */
 
-
+				$result = mysql_query("UPDATE m_consult_notes SET notes_plan='".addslashes($post_vars["plan_text"])."', plan_px_info='".addslashes($post_vars["plan_px_info"])."', sms_plan_info='N', sms_send_date='$post_vars[txt_sms_px_info]' WHERE notes_id='$get_vars[notes_id]'") or die("Cannot query: 411: ".mysql_error());
 
 				
-                if ($result = mysql_query($sql)) {
+                if ($result) {
                     //header("location: ".$_SERVER["PHP_SELF"]."?page=".$get_vars["page"]."&menu_id=".$get_vars["menu_id"]."&consult_id=".$get_vars["consult_id"]."&ptmenu=NOTES&module=notes&notes=TX&notes_id=".$get_vars["notes_id"]."#menu");
-		header("location: ".$_SERVER["PHP_SELF"]."?page=".$get_vars["page"]."&menu_id=".$get_vars["menu_id"]."&consult_id=".$get_vars["consult_id"]."&ptmenu=NOTES&module=notes&notes=$note_link&notes_id=".$get_vars["notes_id"]."#menu");
+					//header("location: ".$_SERVER["PHP_SELF"]."?page=".$get_vars["page"]."&menu_id=".$get_vars["menu_id"]."&consult_id=".$get_vars["consult_id"]."&ptmenu=NOTES&module=notes&notes=$note_link&notes_id=".$get_vars["notes_id"]."#menu");
                 }
             }
             break;
@@ -708,9 +708,14 @@ class notes extends module {
             print "<input type='submit' name='submitnotes' value='Add Template' class='tinylight' style='border: 1px solid black; background-color: #CCFF33'/>";
             print "</td></tr></table>";
         }
-        if ($post_vars["submitnotes"]=="Add Template") {
+		$q_plan_px_info = mysql_query("SELECT plan_px_info FROM m_consult_notes WHERE notes_id='$_GET[notes_id]'") or die("Cannot query 715: ".mysql_error());
+
+		list($plan_px_info) = mysql_fetch_array($q_plan_px_info);
+
+		if ($post_vars["submitnotes"]=="Add Template") {
             $plan = $post_vars["plan_text"].$post_vars["template_text"];
         }
+
         print "<br/></td></tr>";
         print "<tr><td>";
         print "<span class='boxtitle'>Rx".LBL_NOTES_PLAN." (Record prescribed medications) </span><br> ";
@@ -719,15 +724,15 @@ class notes extends module {
 
 		print "<tr><td>";
         print "<span class='boxtitle'>Patient Take Home Information</span><br> ";
-        print "<textarea rows='10' cols='40' class='tinylight' name='plan_px_info' style='border: 1px solid black'></textarea>";
+        print "<textarea rows='10' cols='40' class='tinylight' name='plan_px_info' style='border: 1px solid black'>$plan_px_info</textarea>";
         print "<br/></td></tr>";
 				
-		echo "<tr><td>";
+		/*echo "<tr><td>";
 		echo "<span class='boxtitle'><input type='checkbox' name='chk_px_info'>Check if you want to send take home message</input><br>";
 
 		echo "<span class='boxtitle'>Date to Send&nbsp;&nbsp;&nbsp;&nbsp;<input type='textbox' name='txt_sms_px_info' size='6' />";
 
-		echo "</td></tr>";
+		echo "</td></tr>";*/
 
         print "<tr><td>";
         print "<input type='submit' name='submitnotes' value='Save Treatment Plan' class='textbox' style='border: 1px solid black'/> ";
