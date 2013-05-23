@@ -1186,16 +1186,20 @@ class notes extends module {
             $patient_id = $arg_list[0];
             $consult_date = $arg_list[1];
         }
-        $sql = "select n.notes_plan ".
+        $sql = "select n.notes_plan, n.plan_px_info ".
                "from m_consult_notes n, m_consult c ".
                "where n.consult_id = c.consult_id and ".
                "n.patient_id = '$patient_id' and to_days(c.consult_date) = to_days('$consult_date')";
         if ($result = mysql_query($sql)) {
             if (mysql_num_rows($result)) {
-                list($plan) = mysql_fetch_array($result);
+                list($plan,$plan_px_info) = mysql_fetch_array($result);
 		$plan = str_replace("\n",",",$plan);
-
-                return $plan;
+		$plan_px_info = str_replace("\n",",",$plan_px_info);        
+                if(!empty($plan_px_info)):
+                        return $plan.", ".$plan_px_info;
+                else:
+                        return $plan;
+                endif;
             }
         }
 
