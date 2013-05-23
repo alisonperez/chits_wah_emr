@@ -889,7 +889,7 @@ class notes extends module {
         }
         // continue with real task
         $sql = "select notes_id, consult_id, notes_history, ".
-               "notes_physicalexam, notes_plan, user_id, date_format(notes_timestamp, '%a %d %b %Y, %h:%i%p') ts ".
+               "notes_physicalexam, notes_plan, user_id, date_format(notes_timestamp, '%a %d %b %Y, %h:%i%p') ts, plan_px_info ".
                "from m_consult_notes where consult_id = '".$get_vars["consult_id"]."' and ".
                "notes_id = '".$get_vars["notes_id"]."'";
         if ($result = mysql_query($sql)) {
@@ -939,11 +939,11 @@ class notes extends module {
                 print "<br><br><hr size='1'/>";
                 print "<b>PLAN:</b><br/>";
                 if (strlen($notes["notes_plan"])>0) {
-                    print stripslashes(nl2br($notes["notes_plan"]))."<br/>";
-					
+                    print stripslashes(nl2br($notes["notes_plan"]))."<br/><br />";
+					print stripslashes(nl2br($notes["plan_px_info"]))."<br/>";
+
 					$plan = stripslashes(nl2br($notes["notes_plan"]));
 					
-
                     if ($_SESSION["priv_update"]) {
                         print "<br/>";
                         print "<input type='submit' name='submitdetail' value='Update Plan' class='tinylight' style='border: 1px solid black'";
