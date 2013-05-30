@@ -340,7 +340,7 @@ function get_current_users(){
 			array_push($_SESSION["arr_px_labels"]["fp"],$arr_others2); 
 
 			if(count($arr_others2)!=0):
-				$_SESSION["fp_arr_others"] = $arr_others; 
+				$_SESSION["fp_arr_others"] = $arr_others2; 
 			else:
 				$_SESSION["fp_arr_others"] = '';
 			endif;
@@ -598,7 +598,7 @@ function get_arr_cu_pres(){
 		$dropout_arr = array_unique($dropout_arr);
 
 		$arr_diff = array_diff($main_arr,$dropout_arr);
-	
+
 		/*print_r($arr_diff);
 		echo "<br><br><br>";
 		echo count($arr_diff);

@@ -119,6 +119,7 @@ class html_builder{
 							$label = $value[0];
 
 						elseif(isset($arr_px_labels["fp"])): //echo ((($key*2)+$i)-1); //print_r($arr_px_labels); 
+
 							$cat = 'fp';
 							$range = ((($key*5)+$i)-1);
 							$arr_names = $this->return_px_names($range,$arr_px_labels,$cat);
@@ -203,9 +204,9 @@ class html_builder{
 			endif; */
 
 
-			if($prog=='fp'):
-				foreach($arr_px_labels as $key_prog=>$val_arr){	
-   					foreach($val_arr[$cell_num] as $key2=>$val_arr2){
+			if($prog=='fp'): 
+				foreach($arr_px_labels as $key_prog=>$val_arr){
+   					foreach($val_arr[$cell_num] as $key2=>$val_arr2){ 
 
 						array_push($arr_px_names,$val_arr2[0].'*'.$val_arr2[3]); //extract the patient ID and push it to the array
 					}

@@ -1,7 +1,7 @@
 <?php
 // Rename this file to _dbselect.php and update the values below to match your own database username/password
 session_start();
-$_SESSION["dbname"] = "paniqui1_05082013"; // Name of the database (probably chits)
+$_SESSION["dbname"] = "chc_05132013"; // Name of the database (probably chits)
 //$_SESSION["dbname"] = "camiling_core_data"; // Name of the database (probably chits)
 $_SESSION["dbuser"] = "root"; // mysql username that you are using to connect to the database
 $_SESSION["dbpass"] = "root"; // mysql password that you are using to connect to the database
