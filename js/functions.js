@@ -172,3 +172,13 @@ function add_bhs(facid){
 	//window.open("../site/process_bhs.php?facid="+ facid,"Process Barangay Health Station","location=1,status=0,scrollbars=0,width=800,height=400,resizable=0,menubar=0,toolbars=0");
 	window.open("../site/process_bhs.php?facid="+ facid,"Process Barangay Health Station");
 }
+
+function check_ncd_tia(ques_num,sel){
+	var sel_value = sel.options[sel.selectedIndex].value;
+
+	if(ques_num=='1' || ques_num=='2'){
+		if(sel_value=='N'){
+			window.alert("Please proceed to Question 8 to determine if the client have had stroke or TIA.");
+		}
+	}
+}

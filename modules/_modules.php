@@ -600,6 +600,18 @@ if (file_exists('../modules/wtforage/class.wtforage.php')) {
 	}
 }
 
+if (file_exists('../modules/ncd/class.ncd.php')) {
+	include '../modules/ncd/class.ncd.php';
+	$ncd = new ncd;
+	if (!$module->activated('ncd') && $initmod) {
+		$ncd->init_sql();
+		$ncd->init_menu();
+		$ncd->init_deps();
+		$ncd->init_lang();
+		$ncd->init_help();
+	}
+}
+
 // END SERVER CODE
 
 ?>

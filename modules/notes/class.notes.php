@@ -403,7 +403,6 @@ class notes extends module {
             break;
         case "Save Treatment Plan":
 		
-            if ($post_vars["plan_text"]) {
                 /*$sql = "update m_consult_notes set ".
                        "notes_plan = '".addslashes($post_vars["plan_text"])."' plan_sms_info='".addslashes($post_vars["plan_px_info"]).
                        "' ".."where notes_id = '".$get_vars["notes_id"]."'"; */
@@ -415,7 +414,7 @@ class notes extends module {
                     //header("location: ".$_SERVER["PHP_SELF"]."?page=".$get_vars["page"]."&menu_id=".$get_vars["menu_id"]."&consult_id=".$get_vars["consult_id"]."&ptmenu=NOTES&module=notes&notes=TX&notes_id=".$get_vars["notes_id"]."#menu");
 					//header("location: ".$_SERVER["PHP_SELF"]."?page=".$get_vars["page"]."&menu_id=".$get_vars["menu_id"]."&consult_id=".$get_vars["consult_id"]."&ptmenu=NOTES&module=notes&notes=$note_link&notes_id=".$get_vars["notes_id"]."#menu");
                 }
-            }
+				
             break;
         } 
     }
