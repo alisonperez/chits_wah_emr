@@ -445,6 +445,8 @@ class consult_report extends module {
 	print "<a href='../chits_query/pdf_reports/philhealth.php?type=consult' target='new'>PHILHEALTH CONSULTS</a>&nbsp;&nbsp;&nbsp;";
 	print "<a href='../chits_query/pdf_reports/dailyservice_report.php?arr=ccdev' target='new'>CHILD CARE</a>&nbsp;&nbsp;&nbsp;";
 	print "<a href='../chits_query/pdf_reports/dailyservice_report.php?arr=mc' target='new'>MATERNAL CARE</a><br />";
+	
+	print "<a href='../chits_query/pdf_reports/nhts.php' target='new'>List NHTS Households</a><br />";
 
 	$_SESSION["arr_consult"] = $this->display_consults($report_date,"patient_id",$end_report_date); //pass the report_date and patient_id
 	$_SESSION["arr_ccdev"] = $this->display_ccdev($report_date,$end_report_date);

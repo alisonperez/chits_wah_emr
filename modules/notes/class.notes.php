@@ -937,7 +937,7 @@ class notes extends module {
                 notes::show_diagnosis($menu_id, $post_vars, $get_vars);
                 print "<br><br><hr size='1'/>";
                 print "<b>PLAN:</b><br/>";
-                if (strlen($notes["notes_plan"])>0) {
+                if (strlen($notes["notes_plan"])>=0) {
                     print stripslashes(nl2br($notes["notes_plan"]))."<br/><br />";
 					print stripslashes(nl2br($notes["plan_px_info"]))."<br/>";
 
