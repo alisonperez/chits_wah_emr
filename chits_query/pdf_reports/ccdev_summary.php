@@ -914,22 +914,88 @@ function compute_indicators(){
 				break;
 
 			case 5: //infants seen at 6 mos
+				$arr_px = array(); //repository for pxid's to avoid duplicate names
+
 				for($sex=0;$sex<count($arr_gender);$sex++){
 					$month_stat = array(1=>0,2=>0,3=>0,4=>0,5=>0,6=>0,7=>0,8=>0,9=>0,10=>0,11=>0,12=>0);
 
 					$infant_name_px = array(1=>array(),2=>array(),3=>array(),4=>array(),5=>array(),6=>array(),7=>array(),8=>array(),9=>array(),10=>array(),11=>array(),12=>array());
+
+
+					//check EBF
+
+					$q_sixth_ebf = mysql_query("SELECT DISTINCT a.patient_id,date_format(c.bfed_month6_date,'%Y-%m-%d'),a.patient_dob  FROM m_patient a, m_consult b,m_patient_ccdev c WHERE a.patient_id=b.patient_id AND b.patient_id=c.patient_id AND round((TO_DAYS(date_format(c.bfed_month6_date,'%Y-%m-%d')) - TO_DAYS(a.patient_dob))/30,2) BETWEEN 6 AND 6.999 AND a.patient_gender='$arr_gender[$sex]' AND c.bfed_month6_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' GROUP BY a.patient_id") or die("Cannot query:396".mysql_error());
+
+						if(mysql_num_rows($q_sixth_ebf)!=0):
+
+							while(list($pxid,$ebf_date,$px_dob)=mysql_fetch_array($q_sixth_ebf)){
+								//echo $pxid.'/'.$ebf_date.'/'.$px_dob.'<br>';
+								if($this->get_px_brgy($pxid,$brgy_array)):  
+									if(!(in_array($pxid,$arr_px))):
+										$month_stat[$this->get_max_month($ebf_date)] += 1;
+										array_push($infant_name_px[$this->get_max_month($ebf_date)],array($pxid,'Infant seen at 6mos','epi',$ebf_date.' (EBF)'));
+										array_push($arr_px,$pxid);
+									endif;
+								endif;
+							}
+						endif;
+
+
+					//check services, vaccines and EBF if the child was seen. Get the earliest date
+
+					$q_sixth_vaccines = mysql_query("SELECT DISTINCT a.patient_id,date_format(d.actual_vaccine_date,'%Y-%m-%d'),a.patient_dob,d.vaccine_id FROM m_patient a, m_consult b,m_patient_ccdev c, m_consult_ccdev_vaccine d WHERE a.patient_id=b.patient_id AND b.patient_id=c.patient_id AND c.ccdev_id=d.ccdev_id AND round((TO_DAYS(date_format(d.actual_vaccine_date,'%Y-%m-%d')) - TO_DAYS(a.patient_dob))/30,2) BETWEEN 6 AND 6.999 AND a.patient_gender='$arr_gender[$sex]' AND d.actual_vaccine_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' GROUP BY a.patient_id") or die("Cannot query:396".mysql_error());
+
+						if(mysql_num_rows($q_sixth_vaccines)!=0):
+
+							while(list($pxid,$vaccine_date,$px_dob,$vaccine_id)=mysql_fetch_array($q_sixth_vaccines)){ 
+								//echo $pxid.'/'.$vaccine_date.'/'.$px_dob.'<br>';
+								if($this->get_px_brgy($pxid,$brgy_array)): 
+									if(!(in_array($pxid,$arr_px))):
+										$month_stat[$this->get_max_month($vaccine_date)] += 1;
+										array_push($infant_name_px[$this->get_max_month($vaccine_date)],array($pxid,'Infant seen at 6mos','epi',$vaccine_date.' ('.$vaccine_id.')'));
+										array_push($arr_px,$pxid);
+									endif;
+								endif;
+							}
+						endif;
+
+
+					//check services
+
+					$q_sixth_service = mysql_query("SELECT DISTINCT a.patient_id,date_format(d.ccdev_service_date,'%Y-%m-%d'),a.patient_dob,d.service_id  FROM m_patient a, m_consult b,m_patient_ccdev c, m_consult_ccdev_services d WHERE a.patient_id=b.patient_id AND b.patient_id=c.patient_id AND c.ccdev_id=d.ccdev_id AND round((TO_DAYS(date_format(d.ccdev_service_date,'%Y-%m-%d')) - TO_DAYS(a.patient_dob))/30,2) BETWEEN 6 AND 6.999 AND a.patient_gender='$arr_gender[$sex]' AND d.ccdev_service_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' GROUP BY a.patient_id") or die("Cannot query:396".mysql_error());
+
+						if(mysql_num_rows($q_sixth_service)!=0):
+
+							while(list($pxid,$service_date,$px_dob,$service_id)=mysql_fetch_array($q_sixth_service)){ 
+								//echo $pxid.'/'.$service_date.'/'.$px_dob.'<br>';
+								if($this->get_px_brgy($pxid,$brgy_array)): 
+									if(!(in_array($pxid,$arr_px))):
+										$month_stat[$this->get_max_month($service_date)] += 1;
+										array_push($infant_name_px[$this->get_max_month($service_date)],array($pxid,'Infant seen at 6mos','epi',$service_date.' ('.$service_id.')'));
+										array_push($arr_px,$pxid);
+									endif;
+								endif;
+							}
+						endif;
 
 					$q_sixth = mysql_query("SELECT DISTINCT a.patient_id,date_format(b.consult_date,'%Y-%m-%d'),a.patient_dob  FROM m_patient a, m_consult b,m_patient_ccdev c WHERE a.patient_id=b.patient_id AND b.patient_id=c.patient_id AND round((TO_DAYS(date_format(b.consult_date,'%Y-%m-%d')) - TO_DAYS(a.patient_dob))/30,2) BETWEEN 6 AND 6.999 AND a.patient_gender='$arr_gender[$sex]' AND b.consult_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' GROUP BY a.patient_id") or die("Cannot query:396");
 
 					if(mysql_num_rows($q_sixth)!=0):
 						while(list($pxid,$consult_date,$px_dob)=mysql_fetch_array($q_sixth)){
 							//echo $pxid.'/'.$consult_date.'/'.$px_dob.'<br>';
-							if($this->get_px_brgy($pxid,$brgy_array)):
-								$month_stat[$this->get_max_month($consult_date)] += 1;
-								array_push($infant_name_px[$this->get_max_month($consult_date)],array($pxid,'Infant seen at 6mos','epi',$consult_date));
+							if($this->get_px_brgy($pxid,$brgy_array)): 
+								if(!(in_array($pxid,$arr_px))):
+									$month_stat[$this->get_max_month($consult_date)] += 1;
+									array_push($infant_name_px[$this->get_max_month($consult_date)],array($pxid,'Infant seen at 6mos','epi',$consult_date.' (General Consult)'));
+									array_push($arr_px,$pxid);
+								endif;
 							endif;
 						}
-					endif;
+
+					endif;	
+					
+					
+				
 
 					if($sex<2):
 						array_push($_SESSION["arr_px_labels"]["epi"],$infant_name_px);
