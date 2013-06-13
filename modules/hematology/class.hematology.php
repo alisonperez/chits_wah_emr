@@ -304,6 +304,41 @@ class hematology extends module{
     echo "<tr><td class='boxtitle'>STABS</td><td class='tinylight'>$stabs</td><td colspan='2'>&nbsp;</td></tr>";
     echo "</table>";
 
+
+	$_SESSION["lab_print"] = "HEMATOLOGY RESULTS FOR ".strtoupper(patient::get_name($pxid))."<br/>".
+		"DATE REQUESTED: ".$date_request."<br/>".
+		"REQUESTED BY: ".user::get_username($request_user_id)."<br/>".
+		"DATE COMPLETED: ".$date_done."<br/>".
+		"PROCESSED BY: ".($done_user_id?user::get_username($done_user_id):"NA")."<br/>".
+		"<br/><br/>".
+
+		"HEMOGLOBIN: $hemo<br/>PLATELET: $platelet<br/>".
+		
+		"HEMATOCRIT: $hema<br/>RETICULOCYTES: $reticulocytes<br/>".
+		"RBC: $rbc<br/>ESR: $esr<br/>".
+		
+		"MCV: $mcv<br/>CLOTING TIME: $clotting_time<br/>".
+
+		"MCHC: $mchc<br/>BLEEDING TIME: $bleeding_time<br/>".
+
+		"MCH: $mch<br/>MALARIA: $malaria<br/>".
+		
+		"WBC: $wbc<br/>SLIT SMEAR: $slit_smear<br/>".
+		
+		"POLYS: $polys<br/>FBS: $fbs<br/>".
+		
+		"LYMPHO: $lympho<br/>".
+    
+		"BLOOD TYPE: $blood_type".
+		"<br/>".
+		
+		"RH: $rh<br/>".
+	    "MXD: $mxd<br/>".
+	    "MONO: $mono<br/>".
+	    "EOSIN: $eosin<br/>".
+	    "BASO: $baso<br/>".
+	    "STABS: $stabs";
+  
   }
 }
 ?>
