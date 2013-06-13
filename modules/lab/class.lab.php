@@ -318,7 +318,7 @@ class lab extends module {
 			    
 			    print "<center><input type='submit' value = 'Edit Lab Exam' class='textbox' name='submitlab' style='border: 1px solid #000000'></center>&nbsp;&nbsp;";
     			    
-			    
+			    print "<center><input type='submit' value = 'Print Lab Result' class='textbox' name='submitlab' style='border: 1px solid #000000'></center>&nbsp;&nbsp;";
 			    echo '</form>';
 
                         } else {
@@ -363,6 +363,9 @@ class lab extends module {
 	case "Edit Lab Exam":	        
 	    	$q_lab = mysql_query("UPDATE m_consult_lab SET request_done='N' WHERE request_id='$_GET[request_id]'") or die("Cannot query: 362 ".mysql_error());
 	    	break;
+	case "Print Lab Result":
+			header("Location: ../chits_query/pdf_reports/lab_result.php");	
+			break;
 	default:
 		
 		break;

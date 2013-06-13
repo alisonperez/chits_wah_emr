@@ -244,6 +244,63 @@
             
       echo "</table>";
       
+
+	  $_SESSION["lab_print"] = "URINALYSIS RESULTS FOR ".strtoupper(patient::get_name($pxid))."<br/>".
+      "DATE REQUESTED: ".$date_request."<br/>".
+      "REQUESTED BY: ".user::get_username($request_user_id)."<br/>".
+      "DATE COMPLETED: ".$date_done."<br/>".
+      "PROCESSED BY: ".($done_user_id?user::get_username($done_user_id):"NA")."<br/>".
+      "RELEASED: ".$request_done."<br/>".           
+      "URINALYSIS EXAM DATE: $date_lab_exam<br/>". 
+
+      "<br/>".
+      "PHYSICAL APPEARANCE <br/>".
+      
+      "COLOR: $color<br/>".
+      "REACTION: $reaction<br/>".
+      "TRANSPARENCY: $transparency<br/>".
+      "SPECIFIC GRAVITY: $gravity<br/>".     
+      "pH: $ph<br/>".
+
+	  "<br/>".
+
+	  "QUANT. CHEMICAL TEST<br/>".           
+      "ALBUMIN: $albumin<br/>".
+      "SUGAR: $sugar<br/>".               
+      "PREGNANCY TEST: $pregnancy<br/>". 
+	  
+	  "<br/>".
+      
+	  "SEDIMENTS<br/>".
+      "PUS CELLS: $pus<br/>".
+      "RED BLOOD CELLS: $rbc<br/>".
+      "EPHITHELIAL CELLS: $epithelial<br/>".
+      "AMORPHOUS URATES: $urates<br/>".            
+      "CALCIUM OXALATES: $calcium<br/>".
+      "FAT GLOBULES: $fat<br/>".
+	  "TRIPLE PHOSPHATES: $phosphate<br/>".
+      "URIC ACID CRYSTALS: $uric<br/>".
+      "AMORPHOUS PHOSPATES: $amorphous<br/>".
+      "BACTERIA: $bacteria<br/>".
+      "MUCUS THREADS:$mucus<br/>".   
+	  
+	  "<br/>".
+	  
+	  "CASTS<br/>".
+      
+      "COARSELY GRANULAR CAST:$cast_coarsely<br/>".
+      "PUS CELLS CAST:$cast_pus<br/>".
+      "HYALINE CAST: $cast_hyaline<br/>".
+   
+      "FINELY GRANULAR CAST:<br/>".
+      "RED CELL CAST: $cast_redcell<br/>".
+      "WAXY CAST: $cast_waxy<br/>".
+
+	  "<br/>".
+      "MISCELLANEOUS<br/>". 
+      "GRAVINDEX: $gravindex<br/>".
+      "OTHERS: $others";            
+
     }
     
     function form_consult_lab_urinalysis(){

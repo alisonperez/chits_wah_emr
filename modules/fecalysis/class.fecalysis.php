@@ -174,7 +174,32 @@
       print "<b>STARCH GRANULES: </b>".$starch."<br/>";
       print "<b>OTHERS: </b>".$others."<br/>";      
       print "</span>";      
-                
+      
+				
+	  $_SESSION["lab_print"] = "Name of Patient: ".strtoupper(patient::get_name($pxid))."<br/>".
+      "DATE REQUESTED: ".$date_request."<br/>".
+      "REQUESTED BY: ".user::get_username($request_user_id)."<br/>".
+      "DATE COMPLETED: ".$date_done."<br/>".
+      "PROCESSED BY: ".($done_user_id?user::get_username($done_user_id):"NA")."<br/>".
+      "RELEASED: ".$request_done."<br/>".      
+      "FECALYSIS EXAM DATE: ".$date_lab_exam."<br/> ".
+	  "<br/>".
+      "MACROSCOPIC<br/>PHYSICAL<br/>".
+      "COLOR: ".$color."<br/>".
+      "CONSISTENCY: ".$consistency."<br/>".
+      "CHEMICAL<br/>".
+      "OCCULT BLOOD: ".$blood."<br/>".      
+	  "<br/>".
+      "MICROSCOPIC <br/>".
+      "OVA OR PARASITE: ".$ova."<br/>".
+      "WBC: ".$wbc."<br/>".
+      "RBC: ".$rbc."<br/>".      
+      "BACTERIA: ".$bacteria."<br/>".
+      "FAT GLOBULES: ".$fat."<br/>".
+      "STARCH GRANULES: ".$starch."<br/>".
+      "OTHERS: ".$others."<br/>";      
+      
+
       echo "</td></tr></table>";
     }    
     

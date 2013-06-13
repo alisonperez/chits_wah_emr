@@ -1053,8 +1053,8 @@ class notes extends module {
 			break;
 
 		case "Print Plan":
-			print $_SESSION["plan_details"];
-			print $_POST["notes_id"];
+			//print $_SESSION["plan_details"];
+			//print $_POST["notes_id"];
 			header("Location: ../chits_query/pdf_reports/prescription.php?notes=$_POST[notes_id]");	
 
 			break;
