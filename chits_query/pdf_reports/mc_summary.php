@@ -497,7 +497,7 @@ function compute_indicator($crit){
 			endif;
 
 			if(mysql_num_rows($get_iron_mc)!=0): 
-				while(list($mcid,$pxid)=mysql_fetch_array($get_iron_mc)){
+				while(list($mcid,$pxid)=mysql_fetch_array($get_iron_mc)){ 
 					$iron_total = 0;
 					$target_reach = 0; //reset the flag target reach for every mc_id
 
@@ -506,14 +506,14 @@ function compute_indicator($crit){
 
 					while(list($qty,$serv_date,$delivery_date)=mysql_fetch_array($q_mc)){
 
-						if($delivery_date=='0000-00-00' || ((strtotime($delivery_date) - strtotime($serv_date)) > 0)):
+						if($delivery_date=='0000-00-00' || ((strtotime($delivery_date) - strtotime($serv_date)) > 0)): 							
 						//echo $mcid.'/'.$pxid.'/'.$qty.'/'.$serv_date.'<br>';
 							$iron_total+=$qty;
 							$s_serv_date = strtotime($serv_date) - strtotime($_SESSION["sdate2"]); //from date of service - minus start date of range
 							$e_serv_date = strtotime($_SESSION["edate2"]) - strtotime($serv_date); //from end date minus date of service
 
 							if($iron_total == 180 && $target_reach==0 && $s_serv_date>=0 && $e_serv_date>=0):
-							
+
 								$target_reach = 1;
 								list($taon,$buwan,$araw) = explode('-',$serv_date);
 								$max_date = date("n",mktime(0,0,0,$buwan,$araw,$taon)); //get the unix timestamp then return month without trailing 0

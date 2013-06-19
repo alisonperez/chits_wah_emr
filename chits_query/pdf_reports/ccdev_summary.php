@@ -993,10 +993,7 @@ function compute_indicators(){
 						}
 
 					endif;	
-					
-					
-				
-
+														
 					if($sex<2):
 						array_push($_SESSION["arr_px_labels"]["epi"],$infant_name_px);
 					endif;
@@ -1038,12 +1035,13 @@ function compute_indicators(){
 			case 7: //referred to the NBS
 				for($sex=0;$sex<count($arr_gender);$sex++){
 					$month_stat = array(1=>0,2=>0,3=>0,4=>0,5=>0,6=>0,7=>0,8=>0,9=>0,10=>0,11=>0,12=>0);
+					$month_stat_px = array(1=>array(),2=>array(),3=>array(),4=>array(),5=>array(),6=>array(),7=>array(),8=>array(),9=>array(),10=>array(),11=>array(),12=>array());
 
 					$q_nbs = mysql_query("SELECT DISTINCT a.patient_id, MIN(b.ccdev_service_date),b.service_id FROM m_patient a, m_consult_ccdev_services b WHERE a.patient_id=b.patient_id AND b.service_id='NBS' AND a.patient_gender='$arr_gender[$sex]' AND round((TO_DAYS(b.ccdev_service_date)-TO_DAYS(a.patient_dob))/30,2) BETWEEN 0 AND 11 GROUP by a.patient_id") or die(mysql_error());
 
 					if(mysql_num_rows($q_nbs)!=0):
 
-						while(list($pxid,$ccdev_service_date,$service_id)=mysql_fetch_array($q_nbs)){
+						while(list($pxid,$ccdev_service_date,$service_id)=mysql_fetch_array($q_nbs)){ 
 							list($staon,$smonth,$sdate) = explode('-',$_SESSION[sdate2]);
 							list($etaon,$emonth,$edate) = explode('-',$_SESSION[edate2]);
 							list($vtaon,$vmonth,$vdate) = explode('-',$ccdev_service_date);
@@ -1054,13 +1052,19 @@ function compute_indicators(){
 
 							if($serv_date>=$start && $serv_date<=$end):
 								if($this->get_px_brgy($pxid,$brgy_array)):
-									$month_stat[$this->get_max_month($ccdev_service_date)] += 1;
+									$month_stat[$this->get_max_month($ccdev_service_date)] += 1; 
+									array_push($month_stat_px[$this->get_max_month($ccdev_service_date)],array($pxid,'NBS','epi',$ccdev_service_date));
 								endif;
 							endif;
 						}
 					endif;
 
+					if($sex<2):
+						array_push($_SESSION["arr_px_labels"]["epi"],$month_stat_px);
+					endif;
+
 					array_push($arr_gender_stat,$month_stat);
+
 				}
 				
 				break;
