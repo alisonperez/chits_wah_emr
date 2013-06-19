@@ -1074,6 +1074,8 @@ function compute_indicators(){
 				for($sex=0;$sex<count($arr_gender);$sex++){
 					$month_stat = array(1=>0,2=>0,3=>0,4=>0,5=>0,6=>0,7=>0,8=>0,9=>0,10=>0,11=>0,12=>0);
 
+					$month_stat_px = array(1=>array(),2=>array(),3=>array(),4=>array(),5=>array(),6=>array(),7=>array(),8=>array(),9=>array(),10=>array(),11=>array(),12=>array());
+
 					$q_lbw = mysql_query("SELECT a.patient_id,b.ccdev_id,b.date_registered FROM m_patient a,m_patient_ccdev b WHERE a.patient_id=b.patient_id AND round((TO_DAYS(b.date_registered) - TO_DAYS(a.patient_dob))/30,2) BETWEEN 2 AND 6 AND b.date_registered BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' AND a.patient_gender='$arr_gender[$sex]'") or die("Cannot query: 715");
 
 					if(mysql_num_rows($q_lbw)!=0):
@@ -1081,11 +1083,15 @@ function compute_indicators(){
 							if($this->get_lbw($ccdevid)=='lbw'):
 								if($this->get_px_brgy($pxid,$brgy_array)):
 									$month_stat[$this->get_max_month($ccdev_date)] += 1;
+									array_push($month_stat_px[$this->get_max_month($ccdev_date)],array($pxid,'Infants 2-6 mos with LBW','epi',$ccdev_date));
 								endif;
 							endif;
 						}
 					endif;
 
+				if($sex<2):
+					array_push($_SESSION["arr_px_labels"]["epi"],$month_stat_px);
+				endif;
 
 				array_push($arr_gender_stat,$month_stat);
 				}
