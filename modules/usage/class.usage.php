@@ -12,7 +12,7 @@ class usage extends module {
         	$this->module = "usage";
         	$this->description = "CHITS - Usage Stats and Graph";
 
-		$this->arr_usage_indicator = array("User Logins","Patients Registered","Consultations Logged","Consult Notes Recorded","Log Record Per User");
+		$this->arr_usage_indicator = array("User Logins","Patients Registered","Consultations Logged","Consult Notes Recorded","Log Record Per User","Diagnosis Recorded");
 		$this->arr_period = array('D'=>'Daily','W'=>'Weekly','M'=>'Monthly','Q'=>'Quarterly','A'=>'Annual');
 	}
 
@@ -301,6 +301,18 @@ class usage extends module {
 					echo "</tr>";
 				}
 				echo "</table>";
+				break;
+
+			case '5':
+				for($i=0;$i<count($arr_users);$i++){
+					$arr_log_count = array();
+				
+					$q_notes = mysql_query("SELECT COUNT(a.notes_id) FROM m_consult_notes a, m_consult b, m_consult_notes_dxclass c WHERE a.consult_id=b.consult_id AND a.notes_id=c.notes_id AND c.user_id='$arr_users[$i]' AND date_format(c.diagnosis_date,'%Y-%m-%d') BETWEEN '$sdate' AND '$edate'") or die("Cannot query 222: ".mysql_error());
+
+					list($log_count) = mysql_fetch_array($q_notes);
+					array_push($arr_log_count,$arr_users[$i],$log_count);
+					array_push($arr_ind_count,$arr_log_count);
+				}				
 				break;
 			default:
 
