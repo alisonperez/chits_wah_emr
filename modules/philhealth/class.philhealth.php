@@ -459,8 +459,9 @@ class philhealth {
             $get_vars = $arg_list[2];
             $validuser = $arg_list[3];
             $isadmin = $arg_list[4];
+			$healthcenter_id = $_SESSION["datanode"]["code"];
             //print_r($arg_list);
-        }
+        } 
         switch ($post_vars["submitcard"]) {
         case "Add Card":
             //if ($post_vars["philhealth_id"] && $post_vars["expiry_date"] && $post_vars["patient_id"]) {
@@ -472,7 +473,7 @@ class philhealth {
                        "values ('".$post_vars["philhealth_id"]."', '".$_SESSION["datanode"]["code"]."', '".$post_vars["patient_id"]."', sysdate(), '$expiry_date')";
 				*/
 
-				$result = mysql_query("INSERT INTO m_patient_philhealth SET philhealth_id='$post_vars[philhealth_id]',healthcenter_id='$_SESSION[datanode][code]',patient_id='$post_vars[patient_id]',philhealth_timestamp='sysdate()',expiry_date='$expiry_date',member_id='$post_vars[sel_membership]'") or die("Cannot query 469: ".mysql_error());
+				$result = mysql_query("INSERT INTO m_patient_philhealth SET philhealth_id='$post_vars[philhealth_id]',healthcenter_id='$healthcenter_id',patient_id='$post_vars[patient_id]',philhealth_timestamp=NOW(),expiry_date='$expiry_date',member_id='$post_vars[sel_membership]'") or die("Cannot query 469: ".mysql_error());
 
                 
                 // save this any way and refresh page
@@ -492,14 +493,14 @@ class philhealth {
             }
             break;
 
-	case "Update Card":
+	case "Update Card": 
 	    if ($post_vars["philhealth_id"] && $post_vars["patient_id"]) {
                 list($month,$day,$year) = explode("/", $post_vars["expiry_date"]);
                 $expiry_date = $year."-".str_pad($month, 2, "0", STR_PAD_LEFT)."-".str_pad($day, 2, "0", STR_PAD_LEFT);
                 $sql = "update m_patient_philhealth (philhealth_id, healthcenter_id, patient_id, philhealth_timestamp, expiry_date) ".
                        "values ('".$post_vars["philhealth_id"]."', '".$_SESSION["datanode"]["code"]."', '".$post_vars["patient_id"]."', sysdate(), '$expiry_date')";
 
-		$sql = "update m_patient_philhealth set healthcenter_id='$_SESSION[datanode][code]',patient_id='$post_vars[patient_id]',philhealth_timestamp='sysdate()',expiry_date='$expiry_date',member_id='$post_vars[sel_membership]' WHERE philhealth_id='$post_vars[philhealth_id]'";
+				$sql = "update m_patient_philhealth set healthcenter_id='$healthcenter_id',patient_id='$post_vars[patient_id]',philhealth_timestamp=NOW(),expiry_date='$expiry_date',member_id='$post_vars[sel_membership]' WHERE philhealth_id='$post_vars[philhealth_id]'";
 
                 $result = mysql_query($sql);
 
