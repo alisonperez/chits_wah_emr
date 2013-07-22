@@ -203,7 +203,7 @@ function show_mc_summary(){
 	$arr_csv = array();
 	$arr_consolidate = array();
 	
-	$criteria = array('Pregnant Women with 4 or more prenatal visits','Pregnant Women given 2 doses of TT','Pregnant Women given TT2 plus','Pregnant given complete iron with folic acid','Pregnant given Vit. A','Postpartum women with at least 2 PPV','Postpartum women given complete iron','Postpartum women given Vit. A','Postpartum women initiated breastfeeding');			
+	$criteria = array('Pregnant Women with 4 or more prenatal visits','Pregnant Women given 2 doses of TT','Pregnant Women given TT2 plus','Pregnant given complete iron with folic acid','Pregnant given Vit. A','Postpartum women with at least 2 PPV','Postpartum women given complete iron','Postpartum women given Vit. A','Postpartum women initiated breastfeeding','Women 10-49 years old women given iron supplementation','Number of deliveries');			
     	
 	$q_brgy = mysql_query("SELECT barangay_name from m_lib_barangay LIMIT 1") or die("Cannot query: 202");
 	list($csv_brgy) = mysql_fetch_array($q_brgy);
@@ -235,7 +235,7 @@ function show_mc_summary(){
 		$q_array = $this->get_quarterly_total($mstat,$target);
 		$gt = array_sum($mstat);
 
-		array_push($arr_csv,$q_array[$_SESSION["quarter"]]);
+			array_push($arr_csv,$q_array[$_SESSION["quarter"]]);
 
                 if($_SESSION[ques]==36):
                     $w = array(30,18,18,18,18,15,18,18,18,15,18,18,18,15,18,18,18,15,18); //340
@@ -709,6 +709,36 @@ function compute_indicator($crit){
 			array_push($_SESSION["arr_px_labels"]["mc"],$bfed_name_px); 
 
 			break;
+
+		case 10: //10-49 year old women given vitamin A supplementation
+
+			$vita_name_px = array(1=>array(),2=>array(),3=>array(),4=>array(),5=>array(),6=>array(),7=>array(),8=>array(),9=>array(),10=>array(),11=>array(),12=>array());
+
+			array_push($_SESSION["arr_px_labels"]["mc"],$vita_name_px);			
+
+			break;
+
+		case 11:   //number of deliveries, assuming that delivery is via NSD
+			
+			if(in_array('all',$_SESSION[brgy])):
+				$q_delivery = mysql_query("SELECT mc_id,patient_id,delivery_date,outcome_id FROM m_patient_mc WHERE delivery_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' AND outcome_id IN ('NSDM','NSDF') ORDER by delivery_date ASC") or die("Cannot query 434: ".mysql_error());
+			else:
+				$q_delivery = mysql_query("SELECT a.mc_id, a.patient_id,a.delivery_date,a.outcome_id FROM m_patient_mc a,m_family_members b, m_family_address c WHERE a.delivery_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' AND outcome_id IN ('NSDM','NSDF') AND a.patient_id=b.patient_id AND b.family_id=c.family_id AND c.barangay_id IN ($brgy_array) ORDER by delivery_date ASC") or die("Cannot query 436: ".mysql_error());
+			endif;
+
+			$delivery_name_px = array(1=>array(),2=>array(),3=>array(),4=>array(),5=>array(),6=>array(),7=>array(),8=>array(),9=>array(),10=>array(),11=>array(),12=>array());
+
+			if(mysql_num_rows($q_delivery)!=0): 
+				while(list($mc_id,$pxid,$delivery_date,$outcome_id)=mysql_fetch_array($q_delivery)){
+					array_push($delivery_name_px[$this->get_max_month($delivery_date)],array($pxid,'Number of Deliveries','mc',$delivery_date));
+					$month_stat[$this->get_max_month($delivery_date)]+=1;					
+				}
+			endif;
+
+			array_push($_SESSION["arr_px_labels"]["mc"],$delivery_name_px); 
+			
+			break;
+
 		default:
 			//echo 'hohohoh';		
 			break;

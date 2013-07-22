@@ -835,7 +835,7 @@ class mc extends module {
 		
 		//$sql = "INSERT INTO m_patient_mc SET patient_id='$patient_id',consult_id='$get_vars[consult_id]',mc_timestamp=sysdate(),mc_consult_date=sysdate(),patient_lmp='$lmp_date',patient_edc=from_days(to_days('$lmp_date')+280),trimester1_date=from_days(to_days('$lmp_date')+84),trimester2_date=from_days(to_days('$lmp_date')+168),trimester3_date=from_days(to_days('$lmp_date')+280),postpartum_date=from_days(to_days('$lmp_date')+322),obscore_gp='$post_vars[obscore_gp]',obscore_fpal='$post_vars[obscore_fpal]',user_id='$_SESSION[userid]',blood_type='$post_vars[bloodtype]',patient_age='$patient_age',patient_height='$post_vars[patient_height]'";
 
-		$sql = "INSERT INTO m_patient_mc SET patient_id='$patient_id',consult_id='$get_vars[consult_id]',mc_timestamp=sysdate(),mc_consult_date=sysdate(),patient_lmp='$lmp_date',patient_edc='$edc',trimester1_date=from_days(to_days('$lmp_date')+84),trimester2_date=from_days(to_days('$lmp_date')+168),trimester3_date=from_days(to_days('$lmp_date')+280),postpartum_date=from_days(to_days('$lmp_date')+322),obscore_gp='$post_vars[obscore_gp]',obscore_fpal='$post_vars[obscore_fpal]',user_id='$_SESSION[userid]',blood_type='$post_vars[bloodtype]',patient_age='$patient_age',patient_height='$post_vars[patient_height]'";
+		$sql = "INSERT INTO m_patient_mc SET patient_id='$patient_id',consult_id='$get_vars[consult_id]',mc_timestamp=sysdate(),mc_consult_date=sysdate(),patient_lmp='$lmp_date',patient_edc='$edc',trimester1_date=from_days(to_days('$lmp_date')+84),trimester2_date=from_days(to_days('$lmp_date')+189),trimester3_date=from_days(to_days('$lmp_date')+280),postpartum_date=from_days(to_days('$lmp_date')+322),obscore_gp='$post_vars[obscore_gp]',obscore_fpal='$post_vars[obscore_fpal]',user_id='$_SESSION[userid]',blood_type='$post_vars[bloodtype]',patient_age='$patient_age',patient_height='$post_vars[patient_height]'";
 
 		$result = mysql_query($sql) or die("Cannot query 845".mysql_error());
 
@@ -909,7 +909,7 @@ class mc extends module {
                            "patient_lmp = '$lmp_date', ".
                            "patient_edc = '".$edc."', ".
                            "trimester1_date = from_days(to_days('$lmp_date')+84), ".
-                           "trimester2_date = from_days(to_days('$lmp_date')+168), ".
+                           "trimester2_date = from_days(to_days('$lmp_date')+189), ".
                            "trimester3_date = from_days(to_days('$lmp_date')+280), ".
                            "postpartum_date = from_days(to_days('$lmp_date')+322), ".
                            "mc_timestamp = sysdate(), ".

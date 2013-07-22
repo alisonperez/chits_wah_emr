@@ -458,12 +458,12 @@ function compute_indicators(){
 					$month_stat_px = array(1=>array(),2=>array(),3=>array(),4=>array(),5=>array(),6=>array(),7=>array(),8=>array(),9=>array(),10=>array(),11=>array(),12=>array());
 
 					if($key=='HEPB1<24'):
-						$q_antigen = mysql_query("SELECT a.actual_vaccine_date,a.vaccine_id,b.patient_id FROM m_consult_vaccine a,m_patient b WHERE a.patient_id=b.patient_id AND (TO_DAYS(a.actual_vaccine_date)-TO_DAYS(b.patient_dob)) <= 1 AND a.vaccine_id='HEPB1' AND a.actual_vaccine_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' AND b.patient_gender='$value2'") or die(mysql_error());
+						$q_antigen = mysql_query("SELECT a.actual_vaccine_date,a.vaccine_id,b.patient_id FROM m_consult_vaccine a,m_patient b WHERE a.patient_id=b.patient_id AND (TO_DAYS(a.actual_vaccine_date)-TO_DAYS(b.patient_dob)) <= 1 AND a.vaccine_id='HEPB1' AND a.actual_vaccine_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' AND b.patient_gender='$value2' ORDER by b.patient_dob ASC") or die(mysql_error());
 					elseif($key=='HEPB1>24'):
 						//$q_antigen = mysql_query("SELECT (TO_DAYS(a.actual_vaccine_date)-TO_DAYS(b.patient_dob)) days,a.actual_vaccine_date,a.vaccine_id,b.patient_id FROM m_consult_vaccine a,m_patient b WHERE a.patient_id=b.patient_id AND (TO_DAYS(a.actual_vaccine_date)-TO_DAYS(b.patient_dob)) > 1 AND a.vaccine_id='HEPB1' AND a.actual_vaccine_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' AND b.patient_gender='$value2'") or die(mysql_error());						
-						$q_antigen = mysql_query("SELECT a.actual_vaccine_date,a.vaccine_id,b.patient_id FROM m_consult_vaccine a,m_patient b WHERE a.patient_id=b.patient_id AND (TO_DAYS(a.actual_vaccine_date)-TO_DAYS(b.patient_dob)) > 1 AND a.vaccine_id='HEPB1' AND a.actual_vaccine_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' AND b.patient_gender='$value2'") or die(mysql_error());						
+						$q_antigen = mysql_query("SELECT a.actual_vaccine_date,a.vaccine_id,b.patient_id FROM m_consult_vaccine a,m_patient b WHERE a.patient_id=b.patient_id AND (TO_DAYS(a.actual_vaccine_date)-TO_DAYS(b.patient_dob)) > 1 AND a.vaccine_id='HEPB1' AND a.actual_vaccine_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' AND b.patient_gender='$value2' ORDER by b.patient_dob ASC") or die(mysql_error());						
 					else:
-						$q_antigen = mysql_query("SELECT a.actual_vaccine_date,a.vaccine_id,b.patient_id FROM m_consult_vaccine a,m_patient b WHERE a.patient_id=b.patient_id AND floor((TO_DAYS(a.actual_vaccine_date)-TO_DAYS(b.patient_dob))/7) < 260 AND a.vaccine_id='$key' AND a.actual_vaccine_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' AND b.patient_gender='$value2'") or die(mysql_error());
+						$q_antigen = mysql_query("SELECT a.actual_vaccine_date,a.vaccine_id,b.patient_id FROM m_consult_vaccine a,m_patient b WHERE a.patient_id=b.patient_id AND floor((TO_DAYS(a.actual_vaccine_date)-TO_DAYS(b.patient_dob))/7) < 260 AND a.vaccine_id='$key' AND a.actual_vaccine_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' AND b.patient_gender='$value2' ORDER by b.patient_dob ASC") or die(mysql_error());
 					endif;
 
 					if(mysql_num_rows($q_antigen)!=0): 
