@@ -203,7 +203,7 @@ function show_mc_summary(){
 	$arr_csv = array();
 	$arr_consolidate = array();
 	
-	$criteria = array('Pregnant Women with 4 or more prenatal visits','Pregnant Women given 2 doses of TT','Pregnant Women given TT2 plus','Pregnant given complete iron with folic acid','Pregnant given Vit. A','Postpartum women with at least 2 PPV','Postpartum women given complete iron','Postpartum women given Vit. A','Postpartum women initiated breastfeeding','Women 10-49 years old women given iron supplementation','Number of deliveries','Number of pregnant women','Number of pregnant women tested for syphilis','Number of pregnant women positive for syphilis','Number of pregnant women given penicillin');
+	$criteria = array('Pregnant Women with 4 or more prenatal visits','Pregnant Women given 2 doses of TT','Pregnant Women given TT2 plus','Pregnant given complete iron with folic acid','Pregnant given Vit. A','Postpartum women with at least 2 PPV','Postpartum women given complete iron','Postpartum women given Vit. A','Postpartum women initiated breastfeeding'); //'Women 10-49 years old women given iron supplementation','Number of deliveries','Number of pregnant women','Number of pregnant women tested for syphilis','Number of pregnant women positive for syphilis','Number of pregnant women given penicillin');
     	
 	$q_brgy = mysql_query("SELECT barangay_name from m_lib_barangay LIMIT 1") or die("Cannot query: 202");
 	list($csv_brgy) = mysql_fetch_array($q_brgy);
@@ -634,11 +634,11 @@ function compute_indicator($crit){
 						//echo $mcid.'/'.$qty.'/'.$serv_date.'<br>';
 						if((strtotime($serv_date) - strtotime($delivery_date)) >= 0):
 							$iron_total+=$qty;
-							if($iron_total >= 90 && $target_reach==0):	
+							if($iron_total >= 12 && $target_reach==0):	
 								//echo $pxid.'/'.$delivery_date.'/'.$serv_date.'/'.$_SESSION["edate2"].'<br>';
 								$target_reach = 1;
 
-								array_push($iron_name_px[$this->get_max_month($serv_date)],array($pxid,'Postpartum women with at least 2 PPV','mc',$serv_date));
+								array_push($iron_name_px[$this->get_max_month($serv_date)],array($pxid,'Postpartum mothers wih complete iron w/ folic acid intake','mc',$serv_date));
 
 								$month_stat[$this->get_max_month($serv_date)]+=1;
 							//echo $max_date.'<br>'.$mcid;
