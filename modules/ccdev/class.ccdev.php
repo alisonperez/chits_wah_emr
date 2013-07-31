@@ -881,7 +881,6 @@ class ccdev extends module {
 							if($araw<180):
 								echo "<font color='red'>Cannot add. Date for the sixth month should be at least six months after patient's birth</font>";
 							else:
-	
 								$update_ccdev = mysql_query("UPDATE m_patient_ccdev SET $field='Y',bfed_month6_date='$bfed_six' WHERE ccdev_id='$ccdevid'") or die(mysql_error());	
 
 							endif;
@@ -898,7 +897,12 @@ class ccdev extends module {
 						$update_ccdev = mysql_query("UPDATE m_patient_ccdev SET $field='Y' WHERE ccdev_id='$ccdevid'") or die(mysql_error());					
 					endif;
 				else:
-					$update_ccdev = mysql_query("UPDATE m_patient_ccdev SET $field='N' WHERE ccdev_id='$ccdevid'") or die(mysql_error());
+					if($i==6):
+						$update_ccdev = mysql_query("UPDATE m_patient_ccdev SET $field='N',bfed_month6_date='' WHERE ccdev_id='$ccdevid'") or die(mysql_error());
+					else:
+						$update_ccdev = mysql_query("UPDATE m_patient_ccdev SET $field='N' WHERE ccdev_id='$ccdevid'") or die(mysql_error());						
+					endif;
+					
 				endif;
 			}
 			break;

@@ -2028,7 +2028,7 @@ class alert extends module{
 		return $diff_days;
 	}
 
-	function get_message(){
+	function get_message(){ print_r($arr_alert_msg);
 		//function checks the number of days from the actual date then selects and return the appropriate message content based in the query. Function will pad the key variable $date in the message with the base date */
 		if(func_num_args()>0){
 			$arr = func_get_args();
