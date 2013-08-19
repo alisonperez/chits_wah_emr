@@ -1380,11 +1380,16 @@ class alert extends module{
 
 						break;
 
-					case '44':
+					case '44':	//MMR
 						$eligibility = $this->check_vaccine_eligibility($patient_id,$dob,'MMR');
 						$buffer_day = $this->get_vaccine_min_age_eligibility('MMR');
 						break;
 
+					case '45':	//ROTA 1
+						$eligibility = $this->check_vaccine_eligibility($patient_id,$dob,'ROTA');
+						$buffer_day = $this->get_vaccine_min_age_eligibility('ROTA');
+						break;
+					
 					default:
 						break;
 				}	//end switch
@@ -1639,7 +1644,7 @@ class alert extends module{
 		//query will determine 3 things: 1. determine if the patient is enrolled in ccdev, 2. determine if the patient has a vaccination record, 3. determine if the patient hasn't been vaccinated with $vaccine yet.
 
 		$q_ccdev = mysql_query("SELECT a.ccdev_id FROM m_patient_ccdev a WHERE a.patient_id='$patient_id' ORDER by a.ccdev_timestamp DESC") or die("Cannot query 1149 ".mysql_error()); 
-		$arr_vacc_no_seq = array('BCG','HEPB1','MSL','DPT1','OPV1','PENTA1','MMR'); //1st dosages OR vaccine has no series
+		$arr_vacc_no_seq = array('BCG','HEPB1','MSL','DPT1','OPV1','PENTA1','MMR','ROTA'); //1st dosages OR vaccine has no series
 		$arr_vacc_seq = array('DPT2','OPV2','HEPB2','PENTA2','DPT3','OPV3','HEPB3','PENTA3');
 
 		if(mysql_num_rows($q_ccdev)!=0):
@@ -1764,7 +1769,10 @@ class alert extends module{
 				$min_age = ($vacc_elig_from_dob=='')?98:$vacc_elig_from_dob;
 				break;
 			case 'MMR':
-				$min_age = '365';
+				$min_age = 365;
+				break;
+			case 'ROTA':
+				$min_age = 42;
 				break;
 			default:
 				
