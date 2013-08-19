@@ -1,24 +1,24 @@
 <?xml version="1.0"?>
 <config>
     <node>
-        <name>Moncada RHU 1</name>
+        <name>Ipil RHU</name>
         <code>036915000</code>
         <telephone>2444284</telephone>
         <level>self</level>
-        <hfid>DOH000000000007151</hfid>
+        <hfid>DOH000000000007320</hfid>
     </node>
     <node>
-        <name>Moncada RHU 1</name>
+        <name>Ipil RHU</name>
 	<code>036900000</code>
         <telephone>2444284</telephone>
         <level>parent</level>        
-        <hfid>DOH000000000003678</hfid>
+        <hfid>DOH000000000007320</hfid>
     </node>
     <node>
-        <name>Moncada RHU 1</name>
+        <name>Ipil RHU</name>
 	<code>036915000</code>
         <telephone>2444284</telephone>
         <level>child</level>
-        <hfid>DOH000000000007151</hfid>
+        <hfid>DOH000000000007320</hfid>
     </node>
 </config>

@@ -14,7 +14,7 @@ class alert extends module{
 		$this->year = date('Y');
 		$this->morb_wk = $this->get_wk_num();
 
-		$this->arr_dep = array("DPT2"=>array('DPT1','30'),"DPT3"=>array('DPT2','30'),"OPV2"=>array('OPV1','30'),"OPV3"=>array('OPV2','30'),"HEPB2"=>array('HEPB1','42'),"HEPB3"=>array('HEPB2','56')); //first argument contains the antigen and second contains the 
+		$this->arr_dep = array("DPT2"=>array('DPT1','28'),"DPT3"=>array('DPT2','28'),"OPV2"=>array('OPV1','28'),"OPV3"=>array('OPV2','28'),"HEPB2"=>array('HEPB1','42'),"HEPB3"=>array('HEPB2','56')); //first argument contains the antigen and second contains the 
 	}
 
 
@@ -1375,7 +1375,7 @@ class alert extends module{
 						$buffer_day = $this->get_vaccine_min_age_eligibility('PENTA2');
 						break;
 					case '43':		//PENTA3
-						$eligibility = $this->check_vaccine_eligibility($patient_id,$dob,'OPV1');
+						$eligibility = $this->check_vaccine_eligibility($patient_id,$dob,'PENTA3');
 						$buffer_day = $this->get_vaccine_min_age_eligibility('PENTA3');
 						break;
 					default:
@@ -1750,10 +1750,14 @@ class alert extends module{
 				break;
 
 			case 'PENTA1':
-				$min_age = 42;
+				$min_age = ($vacc_elig_from_dob=='')?42:$vacc_elig_from_dob;
 				break;
 			case 'PENTA2':
-				//$min_age = 
+				$min_age = ($vacc_elig_from_dob=='')?70:$vacc_elig_from_dob;
+				break;
+			case 'PENTA3':
+				$min_age = ($vacc_elig_from_dob=='')?98:$vacc_elig_from_dob;
+				break;
 			default:
 				
 				break; 
@@ -2209,7 +2213,7 @@ class alert extends module{
 
 	function check_vaccine_dependency(){
 		//this function would apply only on antigens that are given in dosages and dependent to a prior antigen. all except hepa B2 and B3 has 1 month of allowance in between
-		//$arr_dep = array("DPT2"=>array('DPT1','30'),"DPT3"=>array('DPT2','30'),"OPV2"=>array('OPV1','30'),"OPV3"=>array('OPV2','30'),"HEPAB2"=>array('HEPAB1','42'),"HEPAB3"=>array('HEPAB2','56')); //first argument contains the antigen and second contains the 
+		//$arr_dep = array("DPT2"=>array('DPT1','28'),"DPT3"=>array('DPT2','28'),"OPV2"=>array('OPV1','28'),"OPV3"=>array('OPV2','28'),"HEPAB2"=>array('HEPAB1','42'),"HEPAB3"=>array('HEPAB2','56')); //first argument contains the antigen and second contains the distance between the two antigens
 
 		if(func_num_args()>0):
 			$arg_list = func_get_args();
@@ -2226,12 +2230,17 @@ class alert extends module{
 		//check first if the actual vaccination has been given 
 		$q_vacc = mysql_query("SELECT ccdev_id, consult_id, patient_id, actual_vaccine_date FROM m_consult_ccdev_vaccine WHERE patient_id='$patient_id' AND vaccine_id='$vaccine'") or die("Cannot query 2148: ".mysql_error());
 
-		if(mysql_num_rows($q_vacc)==0): //echo $patient_id.' / '.$vaccine.' / '.$arr_dep[$vaccine][0].' / '.$arr_dep[$vaccine][1].'<br>';			//check if the client has the prereq vaccination. if it has, check if the date today and its vaccine date is equal or more than the 2nd argument in days. if not, check the prerequisites
+		if(mysql_num_rows($q_vacc)==0): 
+			
+		//echo $patient_id.' / '.$vaccine.'/ '.$prereq_vacc.'/'.$vacc_allowance.'<br>';			
+		
+		//check if the client has the prereq vaccination. if it has, check if the date today and its vaccine date is equal or more than the 2nd argument in days. if not, check the prerequisites
+
 			$q_prereq_vacc = mysql_query("SELECT actual_vaccine_date FROM m_consult_ccdev_vaccine WHERE vaccine_id='$prereq_vacc' AND patient_id='$patient_id' AND (TO_DAYS(NOW()) - TO_DAYS(actual_vaccine_date)) >= '$vacc_allowance'") or die("Cannot query 2156: ".mysql_error());
 
-			if(mysql_num_rows($q_prereq_vacc)!=0):
+			if(mysql_num_rows($q_prereq_vacc)!=0):;
 				return true; //a true would mean that the client is OK to be alerted for the vaccination
-			else: 
+			else:
 				return false; //a false would mean that the client doesn't have the prereq antigen yet and/or given less than allowance date
 			endif;
 
@@ -2265,14 +2274,27 @@ class alert extends module{
 			$stat_txt = str_replace(')','',$stat_txt);
 
 			while($user = mysql_fetch_array($q_user)){
-
+				
 				if(mysql_num_rows($q_insert_today)==0):
-				$insert_sms_alert = mysql_query("INSERT INTO m_lib_sms_alert SET patient_id='u-$user[user_id]',program_id='user',alert_id='basic',alert_date='$date_today',base_date='$date_today',sms_status='queue',last_update=NOW(),barangay_id='$brgy',sms_number='$user[user_cellular]',sms_message='$stat_txt',recipient_type='user'") or die("Cannot query 2216: ".mysql_error());
+				
+					$insert_sms_alert = mysql_query("INSERT INTO m_lib_sms_alert SET patient_id='u-$user[user_id]',program_id='user',alert_id='basic',alert_date='$date_today',base_date='$date_today',sms_status='queue',last_update=NOW(),barangay_id='$brgy',sms_number='$user[user_cellular]',sms_message='$stat_txt',recipient_type='user'") or die("Cannot query 2216: ".mysql_error());
 
-				$sms_id = mysql_insert_id();
+					$sms_id = mysql_insert_id();
 
-				$update_sms_code = mysql_query("UPDATE m_lib_sms_alert SET sms_code='$brgy-user-$sms_id' WHERE sms_id='$sms_id'") or die("Cannot query: ".mysql_error());
+					$update_sms_code = mysql_query("UPDATE m_lib_sms_alert SET sms_code='$brgy-user-$sms_id' WHERE sms_id='$sms_id'") or die("Cannot query: ".mysql_error());
+
+				else:
+
+					$insert_sms_alert = mysql_query("INSERT INTO m_lib_sms_alert SET patient_id='u-$user[user_id]',program_id='user',alert_id='basic',alert_date='$date_today',base_date='$date_today',sms_status='queue',last_update=NOW(),barangay_id='$brgy',sms_number='$user[user_cellular]',sms_message='$stat_txt',recipient_type='user'") or die("Cannot query 2216: ".mysql_error());
+
+					$sms_id = mysql_insert_id();
+
+					$update_sms_code = mysql_query("UPDATE m_lib_sms_alert SET sms_code='$brgy-user-$sms_id' WHERE sms_id='$sms_id'") or die("Cannot query: ".mysql_error());					
 				endif;
+
+
+
+
 			}
 		else:
 			echo "<font color='red'>No end-user allowed to receive SMS on basic statistics.</font><br><br><br>";
