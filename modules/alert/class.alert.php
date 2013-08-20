@@ -1090,13 +1090,15 @@ class alert extends module{
 					case '22': 			//pill intake reminder
 						$q_fp = $this->check_active_user($patient_id,'PILLS');
 
-						if(mysql_num_rows($q_fp)!=0):
+						if(mysql_num_rows($q_fp)!=0): 
 							list($fp_px_id,$date_registered) = mysql_fetch_array($q_fp);
+
+							//echo $patient_id.'/'.$date_registered.'/'.$days_before.'/'.$fp_px_id."<br>";
 							
-							$arr_fp_details = $this->get_fp_pre_reminder($date_today,$fp_px_id,$patient_id,$days_before,'PILLS');
+							$arr_fp_details = $this->get_fp_pre_reminder($date_today,$fp_px_id,$patient_id,$days_before,'PILLS');							
 
 							$fp_service_id = $arr_fp_details[0];
-							$fp_next_service_date = $arr_fp_details[1];
+							$fp_next_service_date = $arr_fp_details[1];					
 							
 							if($fp_service_id!=0):
 								array_push($arr_case_id,$fp_service_id,$fp_next_service_date);
@@ -1460,6 +1462,8 @@ class alert extends module{
 	}
 
 	function get_fp_pre_reminder($date_today,$fp_px_id,$patient_id,$days_before,$method_id){   //performs a query by getting the reference date, compares it with $days_before and returns true if the reference date is within the range of the 0 and $days_before.
+	
+		$arr_fp_details = array();
 
 		$q_next_service_date = mysql_query("SELECT date_service,next_service_date FROM m_patient_fp_method_service WHERE fp_px_id='$fp_px_id' AND patient_id='$patient_id' ORDER by date_service DESC") or die("Cannot query 877 ".mysql_error());
 
@@ -1467,8 +1471,10 @@ class alert extends module{
 
 			list($service_date, $next_service_date) = mysql_fetch_array($q_next_service_date);
 
-			if($next_service_date!='0000-00-00'):
+			if($next_service_date!='0000-00-00'): 
 				$q_fp_method = mysql_query("SELECT fp_service_id,(to_days(next_service_date)-to_days('$date_today')) as sum_date FROM m_patient_fp_method_service WHERE fp_px_id='$fp_px_id' AND patient_id='$patient_id' AND (to_days(next_service_date)-to_days('$date_today')) BETWEEN 0 AND '$days_before' ORDER by date_service DESC") or die("Cannot query 714 ".mysql_error());	
+				
+				$proj_next_service_date = $next_service_date;
 
 			else:   //create a projected service date once the 
 
@@ -1478,8 +1484,9 @@ class alert extends module{
 				$q_fp_method = mysql_query("SELECT fp_service_id,(to_days('$proj_next_service_date')-to_days('$date_today')) as sum_date FROM m_patient_fp_method_service WHERE fp_px_id='$fp_px_id' AND patient_id='$patient_id' AND (to_days('$proj_next_service_date')-to_days('$date_today')) BETWEEN 0 AND '$days_before' ORDER by date_service DESC") or die("Cannot query 714 ".mysql_error());
 			endif;
 
-			if(mysql_num_rows($q_fp_method)!=0):
-				list($fp_service_id,$sum_date) = mysql_fetch_array($q_fp_method);
+			if(mysql_num_rows($q_fp_method)!=0):  
+				list($fp_service_id,$sum_date) = mysql_fetch_array($q_fp_method); 
+
 				array_push($arr_fp_details,$fp_service_id,$proj_next_service_date);
 
 				return $arr_fp_details;
@@ -1542,7 +1549,7 @@ class alert extends module{
 
 		switch($method_id){
 			case 'PILLS':
-				$buffer = 30;
+				$buffer = 28;
 				break;
 			case 'DMPA':
 				$buffer = 90;
