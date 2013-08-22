@@ -66,7 +66,7 @@ foreach($arr as $key1=>$value1){
 						echo "<tr>";
 
 						$case_date = $case_date.$case_id[1].'<br>';
-						
+
 						$q_alert = mysql_query("SELECT sub_indicator FROM m_lib_alert_indicators WHERE alert_indicator_id='$ind_id'") or die("Cannot query 60 ".mysql_error());
 						
 						
@@ -79,13 +79,13 @@ foreach($arr as $key1=>$value1){
 						echo "</td>";
 						
 						if(mysql_num_rows($q_alert_msg)!=0):
-							list($pre,$after, $during) = mysql_fetch_array($q_alert_msg);
+							list($pre,$after, $during) = mysql_fetch_array($q_alert_msg); 
 							if(date('Y-m-d')==$case_date):
 								//$alerto = $alert_msg.' '.$alert_action.' '.'<b>'.$case_id[1].'</b>';
 								$alerto = $during;
 							elseif(date('Y-m-d') < $case_date):
 								$alerto = $pre;
-							else:
+							else: 
 								$alerto = $after;
 							endif;
 

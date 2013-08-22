@@ -1165,20 +1165,23 @@ class alert extends module{
 						break;
 
 					case '26':		//pills drop-out alert
-						$q_fp = $this->check_active_user($patient_id,'PILLS');
-						if(mysql_num_rows($q_fp)!=0):
+						$q_fp = $this->check_active_user($patient_id,'PILLS'); 
+						if(mysql_num_rows($q_fp)!=0): 
 							list($fp_px_id,$date_registered) = mysql_fetch_array($q_fp);
 
-							$fp_service_id = $this->get_post_reminder($fp_px_id,$date_registered,$patient_id,'PILLS');
-							
+							$arr_fp_details = $this->get_post_reminder($fp_px_id,$date_registered,$patient_id,'PILLS');
+
+							$fp_service_id = $arr_fp_details[0];
+							$fp_next_service_date = $arr_fp_details[1];					
+
 							if($fp_service_id!=0):
-								array_push($arr_case_id,$fp_service_id);
+								array_push($arr_case_id,$fp_service_id,$fp_next_service_date);
 							endif;
 
 						endif;
 
 						break;
-
+													
 					case '27':		//condom dropout alert
 						$q_fp = $this->check_active_user($patient_id,'CONDOM');
 
@@ -1500,6 +1503,7 @@ class alert extends module{
 	}
 
 	function get_post_reminder(){
+		$arr_fp_details = array();
 
 		if(func_num_args()>0):
 			$arr = func_get_args();
@@ -1515,9 +1519,13 @@ class alert extends module{
 		if(mysql_num_rows($q_fp_service)!=0):
 			list($fp_service_id,$date_service,$next_service_date) = mysql_fetch_array($q_fp_service);
 
-			if($next_service_date!='0000-00-00'):
-				if($this->compare_date(date('Y-m-d'),$next_service_date)):	
-					return $fp_service_id;
+			if($next_service_date!='0000-00-00'):  
+				if($this->compare_date(date('Y-m-d'),$next_service_date)):
+
+					$next_service_date = date('Y-m-d',strtotime("+1 days",strtotime($next_service_date))); //the post reminder will always be set one day after the date of re-visit for FP service
+
+					array_push($arr_fp_details,$fp_service_id,$next_service_date); 
+					return $arr_fp_details;
 				else:
 					return 0;
 				endif;
@@ -1525,7 +1533,11 @@ class alert extends module{
 				$proj_next = $this->get_proj_service_date($date_service,$method_id,$fp_px_id,$patient_id);
 
 				if($this->compare_date(date('Y-m-d'),$proj_next)):
-					return $fp_service_id;
+
+					$proj_next = date('Y-m-d',strtotime("+1 days",strtotime($proj_next))); //the post reminder will always be set one day after the date of re-visit for FP service
+
+					array_push($arr_fp_details,$fp_service_id,$proj_next);
+					return $arr_fp_details;
 				else:
 					return 0;
 				endif;
