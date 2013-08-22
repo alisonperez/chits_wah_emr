@@ -79,11 +79,11 @@ foreach($arr as $key1=>$value1){
 						echo "</td>";
 						
 						if(mysql_num_rows($q_alert_msg)!=0):
-							list($pre,$after, $during) = mysql_fetch_array($q_alert_msg); 
-							if(date('Y-m-d')==$case_date):
+							list($pre,$after, $during) = mysql_fetch_array($q_alert_msg);
+							if(strtotime(date('Y-m-d'))==strtotime($case_date)): 
 								//$alerto = $alert_msg.' '.$alert_action.' '.'<b>'.$case_id[1].'</b>';
 								$alerto = $during;
-							elseif(date('Y-m-d') < $case_date):
+							elseif(strtotime(date('Y-m-d')) < strtotime($case_date)):
 								$alerto = $pre;
 							else: 
 								$alerto = $after;
