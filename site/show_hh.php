@@ -77,13 +77,15 @@ foreach($arr as $key1=>$value1){
 						echo "<td bgcolor='#ffffff'>";				
 						echo $sub_ind.(empty($case_id[1])?' ':' ('.$case_id[1].') ').'<br>';
 						echo "</td>";
-						
+
+						$case_date = (empty($case_id[1])?' ':$case_id[1]);
+
 						if(mysql_num_rows($q_alert_msg)!=0):
 							list($pre,$after, $during) = mysql_fetch_array($q_alert_msg);
-							if(strtotime(date('Y-m-d'))==strtotime($case_date)): 
+							if(strtotime(date('Y-m-d'))==strtotime($case_date)):
 								//$alerto = $alert_msg.' '.$alert_action.' '.'<b>'.$case_id[1].'</b>';
 								$alerto = $during;
-							elseif(strtotime(date('Y-m-d')) < strtotime($case_date)):
+							elseif(strtotime(date('Y-m-d')) < strtotime($case_date)): 
 								$alerto = $pre;
 							else: 
 								$alerto = $after;

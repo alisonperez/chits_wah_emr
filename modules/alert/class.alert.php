@@ -1137,9 +1137,10 @@ class alert extends module{
 							$arr_fp_details = $this->get_fp_pre_reminder($date_today,$fp_px_id,$patient_id,$days_before,'IUD');
 
 							$fp_service_id = $arr_fp_details[0]; 
-							
+							$fp_next_service_date = $arr_fp_details[1];					
+
 							if($fp_service_id!=0):
-								array_push($arr_case_id,$fp_service_id);
+								array_push($arr_case_id,$fp_service_id,$fp_next_service_date);
 							endif;
 
 						endif;
