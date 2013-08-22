@@ -1118,7 +1118,6 @@ class alert extends module{
 							
 							$fp_service_id = $arr_fp_details[0];
 							$fp_next_service_date = $arr_fp_details[1];
-
 							
 							if($fp_service_id!=0):
 								array_push($arr_case_id,$fp_service_id,$fp_next_service_date);
