@@ -2307,7 +2307,7 @@ class alert extends module{
 
 		$q_stats_today = mysql_query("SELECT news_text FROM m_news WHERE DATE(news_timestamp) < '$date_today' AND news_title LIKE '%Stat Updates%' ORDER BY news_timestamp DESC") or die("Cannot query: ".mysql_error());
 
-		$q_insert_today = mysql_query("SELECT sms_code FROM m_lib_sms_alert WHERE alert_date='$date_today'") or die("Cannot query 2217: ".mysql_error());
+		$q_insert_today = mysql_query("SELECT sms_code FROM m_lib_sms_alert WHERE alert_date='$date_today' AND alert_id='basic'") or die("Cannot query 2217: ".mysql_error());
 
 		if(mysql_num_rows($q_user)!=0 && mysql_num_rows($q_stats_today)!=0):
 
@@ -2321,8 +2321,8 @@ class alert extends module{
 
 			while($user = mysql_fetch_array($q_user)){
 				
-				if(mysql_num_rows($q_insert_today)==0):
-				
+				if((mysql_num_rows($q_insert_today)==0)):
+
 					$insert_sms_alert = mysql_query("INSERT INTO m_lib_sms_alert SET patient_id='u-$user[user_id]',program_id='user',alert_id='basic',alert_date='$date_today',base_date='$date_today',sms_status='queue',last_update=NOW(),barangay_id='$brgy',sms_number='$user[user_cellular]',sms_message='$stat_txt',recipient_type='user'") or die("Cannot query 2216: ".mysql_error());
 
 					$sms_id = mysql_insert_id();
@@ -2330,12 +2330,12 @@ class alert extends module{
 					$update_sms_code = mysql_query("UPDATE m_lib_sms_alert SET sms_code='$brgy-user-$sms_id' WHERE sms_id='$sms_id'") or die("Cannot query: ".mysql_error());
 
 				else:
-
-					$insert_sms_alert = mysql_query("INSERT INTO m_lib_sms_alert SET patient_id='u-$user[user_id]',program_id='user',alert_id='basic',alert_date='$date_today',base_date='$date_today',sms_status='queue',last_update=NOW(),barangay_id='$brgy',sms_number='$user[user_cellular]',sms_message='$stat_txt',recipient_type='user'") or die("Cannot query 2216: ".mysql_error());
+   
+					/*$insert_sms_alert = mysql_query("INSERT INTO m_lib_sms_alert SET patient_id='u-$user[user_id]',program_id='user',alert_id='basic',alert_date='$date_today',base_date='$date_today',sms_status='queue',last_update=NOW(),barangay_id='$brgy',sms_number='$user[user_cellular]',sms_message='$stat_txt',recipient_type='user'") or die("Cannot query 2216: ".mysql_error());
 
 					$sms_id = mysql_insert_id();
 
-					$update_sms_code = mysql_query("UPDATE m_lib_sms_alert SET sms_code='$brgy-user-$sms_id' WHERE sms_id='$sms_id'") or die("Cannot query: ".mysql_error());					
+					$update_sms_code = mysql_query("UPDATE m_lib_sms_alert SET sms_code='$brgy-user-$sms_id' WHERE sms_id='$sms_id'") or die("Cannot query: ".mysql_error());*/
 				endif;
 
 
