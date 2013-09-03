@@ -528,7 +528,32 @@ class appointment extends module {
                 print "<font color='red'>No records</font><br/>";
             }
         }
+
+
+		print "</br>";
+		print "<b>SMS SCHEDULER</b><br/>";
+		echo "<a href='../site/send_sms.php?pxid=$patient_id&consult_id=$get_vars[consult_id]' target='new'>Create SMS Schedule</a>";
+
+		echo "</br>";
+		echo "<table border='1'>";
+		echo "<tr><td colspan='3'>List of Scheduled SMS</td></tr>";
+		echo "<tr><td>Sending Date</td>";
+		echo "<td>Type</td>";
+		echo "<td>Action</td>";		
+		echo "</tr>";
+
+
+		echo "<tr></td>";
+
+
+		echo "</tr><>";
+		echo "</table>";
+
     }
+
+	function show_sms_appointments(){
+		//$q_appt_sms = mysql_query("SELECT appointment_date_sending, ") or die("Cannot query 555: ".mysql_error()); 
+	}
 
     function show_details() {
         if (func_num_args()>0) {

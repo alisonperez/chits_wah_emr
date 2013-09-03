@@ -849,8 +849,12 @@ class alert extends module{
 			case 'epi': 
 				$arr_px = $this->epi_alarms($family_id,$arr_members,'epi');
 				break;
+
+			case 'philhealth':
+				$arr_px = $this->philhealth_alarms($family_id,$arr_members,'philhealth');
+				break;
 			default:
-				
+
 				break;
 		}
 
@@ -1285,7 +1289,7 @@ class alert extends module{
 		$arr_px = array(); //will contain patient id of family_members with any of the cases under indicators
 		$arr_fam = array();
 
-		foreach($members as $key=>$patient_id){
+		foreach($members as $key=>$patient_id){ 
 			$arr_px = array();	
 			$arr_indicator = array();   //this will contain indicator_id and array of consult_id
 
@@ -1379,8 +1383,7 @@ class alert extends module{
 						break;
 					case '42':		//PENTA2
 						$eligibility = $this->check_vaccine_eligibility($patient_id,$dob,'PENTA2');
-						$buffer_day = $this->get_vaccine_min_age_eligibility('PENTA2',$patient_id,$dob);
-						break;
+						$buffer_day = $this->get_vaccine_min_age_eligibility('PENTA2',$patient_id,$dob);		break;
 					case '43':		//PENTA3
 						$eligibility = $this->check_vaccine_eligibility($patient_id,$dob,'PENTA3');
 						$buffer_day = $this->get_vaccine_min_age_eligibility('PENTA3',$patient_id,$dob);
@@ -1423,6 +1426,57 @@ class alert extends module{
 		} //end for each
 
 		return $arr_fam;
+	}
+
+
+	function philhealth_alarms(){
+		/*if(func_num_args()>0):
+			$arr = func_get_args();
+			$family_id = $arr[0];
+			$members = $arr[1];
+			$program_id = $arr[2];
+		endif;
+	
+		$arr_px = array(); //will contain patient id of family_members with any of the cases under indicators
+		$arr_fam = array();
+
+		foreach($members as $key=>$patient_id){	
+			$arr_px = array();	
+			$arr_indicator = array();   //this will contain indicator_id and array of consult_id
+
+			$q_dob = mysql_query("SELECT patient_dob, round((TO_DAYS(b.consult_date) - TO_DAYS(a.patient_dob))/365 ,2) FROM m_patient WHERE patient_id='$patient_id'") or die("Cannot query: 1517");
+			list($dob,$px_age) = mysql_fetch_array($q_dob);
+			
+	
+			$q_philhealth_indicators = mysql_query("SELECT alert_indicator_id,sub_indicator FROM m_lib_alert_indicators WHERE main_indicator='$program_id' ORDER by sub_indicator ASC") or die("Cannot query 1448: ".mysql_error());
+
+			while(list($indicator_id,$sub_indicator)=mysql_fetch_array($q_philhealth_indicators)){
+				$arr_case_id = array();
+
+				$arr_definition = $this->get_alert_definition($indicator_id);
+				$alert_id = $arr_definition[0];
+				$days_before = $arr_definition[1];
+				$days_after = $arr_definition[2];
+				$date_today = date('Y-m-d');
+
+				switch($indicator_id){
+				
+					case '30':	//membership eligibility alert (for those who are turning 21 years old
+						//if(($px_age=='21)' && (strtotime($date_today)==strtotime($dob))):
+							
+						break;					
+				
+					default:
+
+							break;
+				
+				}
+
+
+			
+			}			
+		}
+		*/
 	}
 
 	function get_family_members($family_id){
@@ -1645,10 +1699,12 @@ class alert extends module{
 	}
 
 	function check_ccdev_enrollment($patient_id){
-		$q_ccdev = mysql_query("SELECT ccdev_id,ccdev_dob FROM m_patient_ccdev WHERE patient_id='$patient_id'") or die("Cannot query 1123 ".mysql_error());
+		$q_ccdev = mysql_query("SELECT a.ccdev_id,b.patient_dob b FROM m_patient_ccdev a, m_patient b WHERE a.patient_id='$patient_id' AND a.patient_id=b.patient_id") or die("Cannot query 1123 ".mysql_error());
 
 		return $q_ccdev;
 	}
+
+
 
 	function check_vaccine_eligibility(){
 		/*	to check for the eligbility of patient_id:
@@ -1676,9 +1732,9 @@ class alert extends module{
 			
 			
 			$q_vaccine = mysql_query("SELECT consult_id FROM m_consult_ccdev_vaccine WHERE ccdev_id='$ccdev_id' AND patient_id='$patient_id' AND vaccine_id='$vaccine'") or die("Cannot query 1158 ".mysql_error());
-
+			
 			if(mysql_num_rows($q_vaccine)==0): 
-				if($this->get_vaccine_min_age_eligibility($vaccine,$patient_id,$dob)<=($this->get_patient_age($patient_id)*12*30.42)): //checks if the client is within the minimum age to have the vaccination
+				if($this->get_vaccine_min_age_eligibility($vaccine,$patient_id,$dob)<=round(($this->get_patient_age($patient_id)*12*30.42),0)): //checks if the client is within the minimum age to have the vaccination
 
 					if(in_array($vaccine,$arr_vacc_no_seq)): 
 						return true;
@@ -1864,7 +1920,7 @@ class alert extends module{
 										//echo $key7.'<br>';
 										//print_r($value6).'<br><br>';
 										foreach($alert_details as $alert_id=>$arr_alert){ //arr_alert[0] is the program_id, arr_alert[1] is the base date
-											if($alert->determine_px_enrollment($key6,$alert_id)):
+											if($alert->determine_px_enrollment($key6,$alert_id)): 
 												$arr_alert_msg = $alert->check_alert_msg($alert_id,$arr_alert[1],$key6);
 												if(count($arr_alert_msg)!=0): 
 													//print_r($arr_alert_msg);
@@ -1972,13 +2028,13 @@ class alert extends module{
 
 		$arr_alert = array();
 		
-		foreach($this->mods as $program_id=>$program_arr){
+		foreach($this->mods as $program_id=>$program_arr){ 
 			$arr_prog = array();
 			$arr_prog = $this->get_indicator_instance($program_id,$fam_id);	
 			if(!empty($arr_prog)):
 				array_push($arr_alert,$arr_prog);
 			endif;
-		}
+		} 
 		/*echo $fam_id;
 		print_r($arr_alert);
 		echo "<br><br><br>";*/
@@ -2120,6 +2176,7 @@ class alert extends module{
 		/* $key6: patient_id, $arr_alert[0]: program_id, $arr_alert[1]: base date, $alert_id: id for alert, 'queue': sms_status, $mensahe: alert message
 		$alert->queue_sms($key6,$arr_alert[0],$arr_alert[1],$alert_id,date('Y-m-d'),'queue',$mensahe); */
 		}
+
 
 
 		$q_px_cp  = mysql_query("SELECT patient_cellphone FROM m_patient WHERE patient_id='$pxid'") or die("Cannot query 520: ".mysql_error());
@@ -2347,6 +2404,8 @@ class alert extends module{
 
 		endif;
 	}
+
+
 
 } //end of class
 ?>

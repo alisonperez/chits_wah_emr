@@ -151,6 +151,9 @@ class appointment extends module {
             $validuser = $arg_list[3];
             $isadmin = $arg_list[4];
         }
+        
+        mysql_query("ALTER TABLE `m_consult_appointments` DROP PRIMARY KEY, ADD PRIMARY KEY(`schedule_id`)");
+        
         if ($post_vars["submitsked"]) {
             appointment::process_appointment_record($menu_id, $post_vars, $get_vars);
         }
@@ -525,7 +528,32 @@ class appointment extends module {
                 print "<font color='red'>No records</font><br/>";
             }
         }
+
+
+		print "</br>";
+		print "<b>SMS SCHEDULER</b><br/>";
+		echo "<a href='../site/send_sms.php?pxid=$patient_id&consult_id=$get_vars[consult_id]' target='new'>Create SMS Schedule</a>";
+
+		echo "</br>";
+		echo "<table border='1'>";
+		echo "<tr><td colspan='3'>List of Scheduled SMS</td></tr>";
+		echo "<tr><td>Sending Date</td>";
+		echo "<td>Type</td>";
+		echo "<td>Action</td>";		
+		echo "</tr>";
+
+
+		echo "<tr></td>";
+
+
+		echo "</tr><>";
+		echo "</table>";
+
     }
+
+	function show_sms_appointments(){
+		$q_appt_sms = mysql_query("SELECT date_sending, ") or die("Cannot query 555: ".mysql_error()); 
+	}
 
     function show_details() {
         if (func_num_args()>0) {
@@ -609,22 +637,6 @@ class appointment extends module {
 			}
 
 
-		/*switch($post_vars["submitsked"]) {
-        case "Save Schedule":
-            if ($post_vars["appointment_date"] && $post_vars["appointment"]) {
-                list($month,$day,$year) = explode("/", $post_vars["appointment_date"]);
-                $appt_date = $year."-".str_pad($month, 2, "0", STR_PAD_LEFT)."-".str_pad($day, 2, "0", STR_PAD_LEFT);
-                foreach($post_vars["appointment"] as $key=>$value) {
-                    $sql = "insert into m_consult_appointments (visit_date, consult_id, ".
-                           "schedule_timestamp, user_id, patient_id, appointment_id, reminder_flag) ".
-                           "values ('$appt_date', '".$get_vars["consult_id"]."', sysdate(), '".$_SESSION["userid"]."', ".
-                           "'$patient_id', '$value', '$reminder_flag')";
-                    $result = mysql_query($sql);
-                }
-                header("location: ".$_SERVER["PHP_SELF"]."?page=".$get_vars["page"]."&menu_id=".$get_vars["menu_id"]."&consult_id=".$get_vars["consult_id"]."&ptmenu=APPTS");
-            }
-            break;
-        }*/
 
 		endif;
 		

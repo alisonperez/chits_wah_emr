@@ -933,7 +933,6 @@ class ccdev extends module {
             break;
         case "Save Data":
 
-
             if ($post_vars["mother_name"] && $post_vars["mother_occup"] &&
                 $post_vars["mother_educ"] && $post_vars["delivery_location"] && isset($_POST["ccdev_date_reg"])) {
                 $patient_id = healthcenter::get_patient_id($get_vars["consult_id"]);

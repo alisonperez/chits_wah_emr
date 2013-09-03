@@ -691,17 +691,22 @@ function compute_indicator($crit){
 
 		case 9: //postpartum women initiated breadstfeeding after giving birth
 			if(in_array('all',$_SESSION[brgy])):
-				$get_post_bfeed = mysql_query("SELECT mc_id, delivery_date, patient_id FROM m_patient_mc WHERE breastfeeding_asap='Y' AND delivery_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' AND delivery_date=date_breastfed ORDER by delivery_date") or die("cannot query: 350");
+				$get_post_bfeed = mysql_query("SELECT a.mc_id, a.delivery_date, a.patient_id FROM m_patient_mc a WHERE a.breastfeeding_asap='Y' AND a.delivery_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' AND a.delivery_date=a.date_breastfed ORDER by a.delivery_date") or die("cannot query: 350");
 			else:
-				$get_post_bfeed = mysql_query("SELECT a.mc_id, a.delivery_date, a.patient_id FROM m_patient_mc a,m_family_members b, m_family_address c WHERE a.breastfeeding_asap='Y' AND  a.patient_id=b.patient_id AND b.family_id=c.family_id AND c.barangay_id IN ($brgy_array) AND a.delivery_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' AND a.delivery_date=a.date_breastfed ORDER by a.delivery_date") or die(mysql_error());			
+				$get_post_bfeed = mysql_query("SELECT a.mc_id, a.delivery_date, a.patient_id FROM m_patient_mc a,m_family_members b, m_family_address c WHERE a.breastfeeding_asap='Y' AND  a.patient_id=b.patient_id AND b.family_id=c.family_id AND c.barangay_id IN ($brgy_array) AND a.delivery_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' AND a.delivery_date=a.date_breastfed ORDER by a.delivery_date") or die(mysql_error());
 			endif;
 
 			$bfed_name_px = array(1=>array(),2=>array(),3=>array(),4=>array(),5=>array(),6=>array(),7=>array(),8=>array(),9=>array(),10=>array(),11=>array(),12=>array());
 
 			if(mysql_num_rows($get_post_bfeed)!=0):
+				$arr_px_id = array();
 				while(list($mcid,$deldate,$pxid)=mysql_fetch_array($get_post_bfeed)){ //echo $deldate;
-					array_push($bfed_name_px[$this->get_max_month($deldate)],array($pxid,'Postpartum women initiated breastfeeding','mc',$deldate));
-					$month_stat[$this->get_max_month($deldate)]+=1;
+						
+						if(!(in_array($pxid,$arr_px_id))):
+							array_push($bfed_name_px[$this->get_max_month($deldate)],array($pxid,'Postpartum women initiated breastfeeding','mc',$deldate));
+							$month_stat[$this->get_max_month($deldate)]+=1;
+							array_push($arr_px_id,$pxid);
+						endif;
 				}
 
 			endif;
