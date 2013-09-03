@@ -400,7 +400,7 @@ function compute_indicator($crit){
 			endif;
 			
 			if(mysql_num_rows($q_px_tt)!=0):
-
+				$arr_px_id = array();
 			while(list($pxid,$vacc_date)=mysql_fetch_array($q_px_tt)){			
 				//condition 1: prenatal is the base date
 				//$q_t2 = mysql_query("SELECT a.patient_id,a.actual_vaccine_date FROM m_consult_mc_vaccine a,m_consult_mc_prenatal b WHERE a.vaccine_id='TT2' AND a.patient_id='$pxid' AND a.patient_id=b.patient_id AND b.prenatal_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' AND b.visit_sequence='1'") or die(mysql_error());
@@ -423,8 +423,11 @@ function compute_indicator($crit){
 							//$month_stat[$this->get_max_month($vacc_date)]+=1;
 							$month_stat[$i]+=1;
 						}*/
-						array_push($tt2_name_px[$this->get_max_month($vacc_date)],array($pxid,'Pregnant Women given 2 doses of TT','mc',$vacc_date));
-						$month_stat[$this->get_max_month($vacc_date)]+=1;
+						if(!(in_array($pxid,$arr_px_id))):
+							array_push($tt2_name_px[$this->get_max_month($vacc_date)],array($pxid,'Pregnant Women given 2 doses of TT','mc',$vacc_date));
+							$month_stat[$this->get_max_month($vacc_date)]+=1;
+							array_push($arr_px_id,$pxid);
+						endif;
 					}
 				endif;
 			}
@@ -447,16 +450,17 @@ function compute_indicator($crit){
 			
 			$ttplus_name_px = array(1=>array(),2=>array(),3=>array(),4=>array(),5=>array(),6=>array(),7=>array(),8=>array(),9=>array(),10=>array(),11=>array(),12=>array());
 
-			if(in_array('all',$_SESSION[brgy])):
-				//$get_px_tt = mysql_query("SELECT distinct patient_id, max(vaccine_id), actual_vaccine_date FROM m_consult_mc_vaccine WHERE vaccine_id IN ('TT1','TT2','TT3','TT4','TT5') GROUP by patient_id") or die(mysql_error());
+			if(in_array('all',$_SESSION[brgy])):				
 				$get_px_tt = mysql_query("SELECT distinct patient_id, max(vaccine_id), actual_vaccine_date FROM m_consult_mc_vaccine WHERE vaccine_id IN ('TT2','TT3','TT4','TT5') AND actual_vaccine_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' GROUP by patient_id") or die(mysql_error());
 
 			else:
-				//$get_px_tt = mysql_query("SELECT distinct a.patient_id, max(a.vaccine_id), a.actual_vaccine_date FROM m_consult_mc_vaccine a, m_family_members b, m_family_address c WHERE a.vaccine_id IN ('TT1','TT2','TT3','TT4','TT5') AND a.patient_id=b.patient_id AND b.family_id=c.family_id AND c.barangay_id IN ($brgy_array) GROUP by a.patient_id") or die(mysql_error());
 				$get_px_tt = mysql_query("SELECT distinct a.patient_id, max(a.vaccine_id), a.actual_vaccine_date FROM m_consult_mc_vaccine a, m_family_members b, m_family_address c WHERE a.vaccine_id IN ('TT2','TT3','TT4','TT5') AND a.patient_id=b.patient_id AND b.family_id=c.family_id AND c.barangay_id IN ($brgy_array) AND a.actual_vaccine_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' GROUP by a.patient_id") or die(mysql_error());
 			endif;
 			
 			if(mysql_num_rows($get_px_tt)!=0):
+			
+				$arr_px_id = array();
+
 			while(list($pxid,$vacc_id,$vacc_date)=mysql_fetch_array($get_px_tt)){ 
 				//check if the patient is in the active maternal cases for the time span
 				//echo $pxid.'/'.$vacc_id.'/'.$vacc_date.'<br>';
@@ -476,8 +480,12 @@ function compute_indicator($crit){
 				/*	endif;
 					
 				endif; */
-				array_push($ttplus_name_px[$this->get_max_month($vacc_date)],array($pxid,'Pregnant Women given TT2 plus','mc',$vacc_date));
-				$month_stat[$this->get_max_month($vacc_date)]+=1;
+
+				if(!(in_array($pxid,$arr_px_id))):
+					array_push($ttplus_name_px[$this->get_max_month($vacc_date)],array($pxid,'Pregnant Women given TT2 plus','mc',$vacc_date));
+					$month_stat[$this->get_max_month($vacc_date)]+=1;
+					array_push($arr_px_id,$pxid);
+				endif;
 			}
 
 			endif;
@@ -497,6 +505,7 @@ function compute_indicator($crit){
 			endif;
 
 			if(mysql_num_rows($get_iron_mc)!=0): 
+					$arr_px_id = array();
 				while(list($mcid,$pxid)=mysql_fetch_array($get_iron_mc)){ 
 					$iron_total = 0;
 					$target_reach = 0; //reset the flag target reach for every mc_id
@@ -514,14 +523,16 @@ function compute_indicator($crit){
 
 							if($iron_total == 180 && $target_reach==0 && $s_serv_date>=0 && $e_serv_date>=0):
 
-								$target_reach = 1;
-								list($taon,$buwan,$araw) = explode('-',$serv_date);
-								$max_date = date("n",mktime(0,0,0,$buwan,$araw,$taon)); //get the unix timestamp then return month without trailing 0
+								if(!(in_array($pxid,$arr_px_id))):
+									$target_reach = 1;
+									list($taon,$buwan,$araw) = explode('-',$serv_date);
+									$max_date = date("n",mktime(0,0,0,$buwan,$araw,$taon)); //get the unix timestamp then return month without trailing 0
 
-								array_push($iron_name_px[$this->get_max_month($serv_date)],array($pxid,'Pregnant given complete iron with folic acid','mc',$serv_date));
+									array_push($iron_name_px[$this->get_max_month($serv_date)],array($pxid,'Pregnant given complete iron with folic acid','mc',$serv_date));
 
-								$month_stat[$max_date]+=1;
-								//echo $max_date.'<br>'.$mcid;
+									$month_stat[$max_date]+=1;
+								endif;
+			
 							endif;
 						endif;
 					}
@@ -547,6 +558,8 @@ function compute_indicator($crit){
 			$vita_name_px = array(1=>array(),2=>array(),3=>array(),4=>array(),5=>array(),6=>array(),7=>array(),8=>array(),9=>array(),10=>array(),11=>array(),12=>array());
 
 			if(mysql_num_rows($get_vita)!=0):
+				$arr_px_id = array();
+
 				while(list($mcid,$pxid)=mysql_fetch_array($get_vita)){
 					$vit_total = 0;
 					$target_reach = 0;
@@ -562,12 +575,13 @@ function compute_indicator($crit){
 							$e_serv_date = strtotime($_SESSION["edate2"]) - strtotime($serv_date); //from end date minus date of service
 
 							if($vita_total == 200000 && $target_reach==0 && $s_serv_date>=0 && $e_serv_date>=0):
-								$target_reach = 1;
-					echo 'zerep';
-								array_push($vita_name_px[$this->get_max_month($serv_date)],array($pxid,'Pregnant given Vit. A','mc',$serv_date));
 
-								$month_stat[$this->get_max_month($serv_date)]+=1;
-								//echo $max_date.'<br>'.$mcid;
+								if(!(in_array($pxid,$arr_px_id))):
+									$target_reach = 1;
+									array_push($vita_name_px[$this->get_max_month($serv_date)],array($pxid,'Pregnant given Vit. A','mc',$serv_date));
+									$month_stat[$this->get_max_month($serv_date)]+=1;
+									array_push($arr_px_id,$pxid);
+								endif;
 							endif;
 						endif;
 					}
@@ -589,6 +603,7 @@ function compute_indicator($crit){
 			$ppv2_name_px = array(1=>array(),2=>array(),3=>array(),4=>array(),5=>array(),6=>array(),7=>array(),8=>array(),9=>array(),10=>array(),11=>array(),12=>array());
 
 			if(mysql_num_rows($q_post)!=0):
+				$arr_px_id = array();
 
 			while(list($mcid,$post_date,$del_date,$pxid)=mysql_fetch_array($q_post)){ //check if the mcid(24-hrs) has 1-week (+3/-3) visit
 			   $q_wk = mysql_query("SELECT a.postpartum_date FROM m_consult_mc_postpartum a, m_patient_mc b WHERE a.mc_id='$mcid' AND (TO_DAYS(a.postpartum_date)-TO_DAYS(b.delivery_date)) BETWEEN 4 AND 10 AND a.postpartum_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' AND a.postpartum_date!='$post_date' ORDER by a.postpartum_date ASC") or die(mysql_error());
@@ -597,9 +612,11 @@ function compute_indicator($crit){
 				if(mysql_num_rows($q_wk)!=0):
 					list($postdate) = mysql_fetch_array($q_wk);
 
-					array_push($ppv2_name_px[$this->get_max_month($postdate)],array($pxid,'Postpartum women with at least 2 PPV','mc',$postdate));
-					
-					$month_stat[$this->get_max_month($postdate)]+=1;
+					if(!(in_array($pxid,$arr_px_id))):
+						array_push($ppv2_name_px[$this->get_max_month($postdate)],array($pxid,'Postpartum women with at least 2 PPV','mc',$postdate));					
+						$month_stat[$this->get_max_month($postdate)]+=1;
+						array_push($arr_px_id,$pxid);
+					endif;
 				else:
 
 				endif;
@@ -623,6 +640,8 @@ function compute_indicator($crit){
 			$iron_name_px = array(1=>array(),2=>array(),3=>array(),4=>array(),5=>array(),6=>array(),7=>array(),8=>array(),9=>array(),10=>array(),11=>array(),12=>array());
 
 			if(mysql_num_rows($get_iron_mc)):
+				$arr_px_id = array();
+
 				while(list($mcid,$pxid)=mysql_fetch_array($get_iron_mc)){
 
 					$iron_total = 0;
@@ -636,12 +655,14 @@ function compute_indicator($crit){
 							$iron_total+=$qty;
 							if($iron_total >= 12 && $target_reach==0):	
 								//echo $pxid.'/'.$delivery_date.'/'.$serv_date.'/'.$_SESSION["edate2"].'<br>';
+
+							if(!(in_array($pxid,$arr_px_id))):
 								$target_reach = 1;
-
 								array_push($iron_name_px[$this->get_max_month($serv_date)],array($pxid,'Postpartum mothers wih complete iron w/ folic acid intake','mc',$serv_date));
-
 								$month_stat[$this->get_max_month($serv_date)]+=1;
-							//echo $max_date.'<br>'.$mcid;
+								array_push($arr_px_id,$px_id);
+							endif;
+
 							endif;
 						endif;
 					}
@@ -665,6 +686,9 @@ function compute_indicator($crit){
 			$vita_name_px = array(1=>array(),2=>array(),3=>array(),4=>array(),5=>array(),6=>array(),7=>array(),8=>array(),9=>array(),10=>array(),11=>array(),12=>array());
 
 			if(mysql_num_rows($get_vita)!=0):
+			
+				$arr_px_id = array();
+
 				while(list($mcid,$pxid)=mysql_fetch_array($get_vita)){
 					$vit_total = 0;
 					$target_reach = 0;
@@ -675,10 +699,12 @@ function compute_indicator($crit){
 
 						if($vita_total >= 200000 && $target_reach==0): 
 							$target_reach = 1;
-
-							array_push($vita_name_px[$this->get_max_month($serv_date)],array($pxid,'Postpartum women given Vit. A','mc',$serv_date));
-
-							$month_stat[$this->get_max_month($serv_date)]+=1;
+							
+							if(!(in_array($pxid,$arr_px_id))):
+								array_push($vita_name_px[$this->get_max_month($serv_date)],array($pxid,'Postpartum women given Vit. A','mc',$serv_date));
+								$month_stat[$this->get_max_month($serv_date)]+=1;
+								array_push($arr_px_id,$pxid);
+							endif;
 							//echo $max_date.'<br>'.$mcid;
 						endif;
 					}
@@ -734,6 +760,8 @@ function compute_indicator($crit){
 			$delivery_name_px = array(1=>array(),2=>array(),3=>array(),4=>array(),5=>array(),6=>array(),7=>array(),8=>array(),9=>array(),10=>array(),11=>array(),12=>array());
 
 			if(mysql_num_rows($q_delivery)!=0): 
+				$arr_px_id = array();
+
 				while(list($mc_id,$pxid,$delivery_date,$outcome_id)=mysql_fetch_array($q_delivery)){
 					array_push($delivery_name_px[$this->get_max_month($delivery_date)],array($pxid,'Number of Deliveries','mc',$delivery_date));
 					$month_stat[$this->get_max_month($delivery_date)]+=1;					
