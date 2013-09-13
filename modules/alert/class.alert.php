@@ -493,6 +493,8 @@ class alert extends module{
 
 	function _sms_alert(){
 		$this->send_basic_stat();
+		$this->check_sms_appt();
+
 		if($_POST['submit_alert']=='Send Manually'):
 			$arr_config = $this->get_sms_config();
 			foreach($_POST['sms'] as $key=>$sms_id){
@@ -2403,6 +2405,31 @@ class alert extends module{
 			echo "<font color='red'>No end-user allowed to receive SMS on basic statistics.</font><br><br><br>";
 
 		endif;
+	}
+
+
+	function check_sms_appt(){
+		if(!empty($_POST["date_alert"])):
+			list($m,$d,$y) = explode('/',$_POST["date_alert"]);
+			$date_today = $y.'-'.sprintf("%02s",$m).'-'.sprintf("%02s",$d);
+		else:
+			$date_today = date('Y-m-d');
+		endif;
+
+
+		$q_appt = mysql_query("SELECT patient_id,cp_number,appt_code,sms_message FROM m_lib_sms_appointment WHERE date_sending='$date_today'") or die("Cannot query 2418: ".mysql_error());
+
+		while(list($pxid,$cp_number,$appt_code,$sms_message)=mysql_fetch_array($q_appt)){
+			$q_brgy = mysql_query("SELECT a.barangay_id FROM m_family_address a, m_family_members b WHERE b.patient_id='$pxid' AND b.family_id=a.family_id") or die("Cannot query 2421: ".mysql_error());
+			list($brgy) = mysql_fetch_array($q_brgy);
+
+			$insert_sms_alert = mysql_query("INSERT INTO m_lib_sms_alert SET patient_id='$pxid',program_id='appointment',alert_id='$appt_code',alert_date='$date_today',base_date='$date_today',sms_status='queue',last_update=NOW(),barangay_id='$brgy',sms_number='$cp_number',sms_message='$sms_message',recipient_type='px'") or die("Cannot query 2216: ".mysql_error());
+
+			$sms_id = mysql_insert_id();
+
+			$update_sms_code = mysql_query("UPDATE m_lib_sms_alert SET sms_code='$brgy-appointment-$sms_id' WHERE sms_id='$sms_id'") or die("Cannot query: ".mysql_error());
+		}
+									
 	}
 
 

@@ -320,7 +320,8 @@ function compute_indicator($crit){
 //				endif;
 
 			if(mysql_num_rows($get_visits)!=0):
-		
+				$arr_px_id = array();
+			
 			while(list($mcid,$pxid,$predate)=mysql_fetch_array($get_visits)){ 
 				$banat = 0;
 				if(in_array('all',$_SESSION[brgy])):
@@ -373,9 +374,13 @@ function compute_indicator($crit){
 
 				
 				if($arr[1]==1 && $arr[2]==1 && $arr[3]==1):
-					array_push($anc_name_px[$max_date],array($pxid,'Pregnant women with 4 or more prenatal visits','mc',$latestdate));
-					//array_push($anc_name_px,$pxid,'Pregnant women with 4 or more prenatal visits','mc');
-					$month_stat[$max_date]+=1;
+
+					if(!(in_array($pxid,$arr_px_id))):
+						array_push($anc_name_px[$max_date],array($pxid,'Pregnant women with 4 or more prenatal visits','mc',$latestdate));
+						//array_push($anc_name_px,$pxid,'Pregnant women with 4 or more prenatal visits','mc');
+						$month_stat[$max_date]+=1;
+						array_push($arr_px_id,$pxid);
+					endif;
 				endif;				
 				
 			

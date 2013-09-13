@@ -532,27 +532,37 @@ class appointment extends module {
 
 		print "</br>";
 		print "<b>SMS SCHEDULER</b><br/>";
+
+		appointment::delete_sms_appt();
+
 		echo "<a href='../site/send_sms.php?pxid=$patient_id&consult_id=$get_vars[consult_id]' target='new'>Create SMS Schedule</a>";
 
-		echo "</br>";
-		echo "<table border='1'>";
-		echo "<tr><td colspan='3'>List of Scheduled SMS</td></tr>";
-		echo "<tr><td>Sending Date</td>";
-		echo "<td>Type</td>";
-		echo "<td>Action</td>";		
+		echo "</br></br>";
+		echo "<table bgcolor='ffccff'>";
+		echo "<tr class='alert_table_header'><td colspan='4'>List of Scheduled SMS</td></tr>";
+		echo "<tr><td class='alert_table_row'>&nbsp;Sending Date&nbsp;</td>";
+		echo "<td class='alert_table_row'>&nbsp;Type&nbsp;</td>";
+		echo "<td class='alert_table_row'>&nbsp;Sending Status&nbsp;</td>";
+		echo "<td class='alert_table_row'>&nbsp;Action&nbsp;</td>";
 		echo "</tr>";
-
-
-		echo "<tr></td>";
-
-
-		echo "</tr><>";
+		appointment::show_sms_appointments($patient_id);
 		echo "</table>";
 
     }
 
-	function show_sms_appointments(){
-		$q_appt_sms = mysql_query("SELECT date_sending, ") or die("Cannot query 555: ".mysql_error()); 
+	function show_sms_appointments($patient_id){  
+		$q_appt = mysql_query("SELECT appointment_id, appt_code, date_sending,sending_status FROM m_lib_sms_appointment WHERE patient_id='$patient_id' ORDER by date_sending") or die("Cannot query 551: ".mysql_error());
+
+		while(list($appt_id,$appt_code,$date_send,$sending_status)=mysql_fetch_array($q_appt)){
+			
+			echo "<tr>";
+			echo "<td>".$date_send."</td>";
+			echo "<td>".appointment::get_alert_type($appt_code)."</td>";
+			echo "<td>".$sending_status."</td>";
+			echo "<td><a href='../site/send_sms.php?pxid=$patient_id&consult_id=$_GET[consult_id]&action=update&appt_id=$appt_id' target='new'>Update</a>&nbsp;&nbsp;";
+			echo "<a href='$_SERVER[PHP_SELF]?page=$_GET[page]&menu_id=$_GET[menu_id]&consult_id=$_GET[consult_id]&ptmenu=$_GET[ptmenu]&action=delete&appt_id=$appt_id'>Delete</a>";
+			echo "</tr>";
+		}
 	}
 
     function show_details() {
@@ -972,6 +982,35 @@ class appointment extends module {
 		endif;		
 		
 		$q_patient = mysql_query("UPDATE m_patient SET patient_cellphone='$pxcp' WHERE patient_id='$pxid'") or die("Cannot query: 954");
+	}
+
+	function get_alert_type($appt_code){
+		$q_get_appt = mysql_query("SELECT sub_indicator FROM m_lib_alert_indicators WHERE alert_indicator_id='$appt_code'") or die("Cannot query 983: ".mysql_error());
+
+		list($appt_name) = mysql_fetch_array($q_get_appt);
+		return $appt_name;
+	}
+
+	function delete_sms_appt(){
+		if(!empty($_GET["appt_id"]) && $_GET["action"]=='delete'):
+
+			if($_GET["resp"]!='Y'):
+				echo "<font color='red'><b>Are you sure you want to delete?</b></font>&nbsp;&nbsp;&nbsp;";
+				echo "<a href='$_SERVER[PHP_SELF]?page=$_GET[page]&menu_id=$_GET[menu_id]&consult_id=$_GET[consult_id]&ptmenu=$_GET[ptmenu]&action=delete&appt_id=$_GET[appt_id]&resp=Y'>Yes</a><br><br>";
+			else:
+				$del_appt = mysql_query("DELETE FROM m_lib_sms_appointment WHERE appointment_id='$_GET[appt_id]'") or die("Cannot query 1002: ".mysql_error());
+				
+				if($del_appt):
+					echo "<script language='javascript'>";
+					echo "window.alert('The appointment was successfully been deleted.')";
+					echo "</script>";
+				endif;
+			endif;
+
+
+
+		endif;
+	
 	}
 
 }
