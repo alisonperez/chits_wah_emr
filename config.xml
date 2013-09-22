@@ -1,24 +1,24 @@
 <?xml version="1.0"?>
 <config>
     <node>
-        <name>Ipil RHU</name>
-        <code>036915000</code>
+        <name>Victoria RHU 2</name>
+        <code>036917009</code>
         <telephone>2444284</telephone>
         <level>self</level>
-        <hfid>DOH000000000007320</hfid>
+        <hfid>DOH000000000002522</hfid>
     </node>
     <node>
-        <name>Ipil RHU</name>
+        <name>Victoria RHU 2</name>
 	<code>036900000</code>
         <telephone>2444284</telephone>
         <level>parent</level>        
-        <hfid>DOH000000000007320</hfid>
+        <hfid>DOH000000000002522</hfid>
     </node>
     <node>
-        <name>Ipil RHU</name>
+        <name>Victoria RHU 2</name>
 	<code>036915000</code>
         <telephone>2444284</telephone>
         <level>child</level>
-        <hfid>DOH000000000007320</hfid>
+        <hfid>DOH000000000002522</hfid>
     </node>
 </config>
