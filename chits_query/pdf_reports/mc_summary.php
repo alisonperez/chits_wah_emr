@@ -818,6 +818,7 @@ function compute_indicator($crit){
 
 			endif; 
 
+			$_SESSION["preggy"] = $arr_px_id;
 			array_push($_SESSION["arr_px_labels"]["mc"],$pregnant_name_px);
 
 			break;
@@ -825,41 +826,28 @@ function compute_indicator($crit){
 		case 13:	//number of pregnant women tested for syphilis
 			$syphilis_test_name_px = array(1=>array(),2=>array(),3=>array(),4=>array(),5=>array(),6=>array(),7=>array(),8=>array(),9=>array(),10=>array(),11=>array(),12=>array());
 
+			$arr_px_preg = $_SESSION["preggy"];
+			$str_px_preg = implode(',',$arr_px_preg);
 			
 			if(in_array('all',$_SESSION[brgy])):
-				$q_pregnant = mysql_query("SELECT mc_id, patient_id, patient_edc, delivery_date FROM m_patient_mc WHERE patient_lmp <= '$_SESSION[sdate2]'") or die("Cannot query 434: ".mysql_error());
+				$q_pregnant = mysql_query("SELECT mc_id, patient_id, patient_edc, delivery_date FROM m_patient_mc WHERE patient_id IN ($str_px_preg) ORDER by patient_edc, delivery_date ASC") or die("Cannot query 434: ".mysql_error());
 			else:
-				$q_pregnant = mysql_query("SELECT a.mc_id, a.patient_id,a.patient_edc,a.delivery_date FROM m_patient_mc a,m_family_members b, m_family_address c WHERE a.patient_lmp <= '$_SESSION[sdate2]' AND a.patient_id=b.patient_id AND b.family_id=c.family_id AND c.barangay_id IN ($brgy_array) ORDER by delivery_date ASC") or die("Cannot query 436: ".mysql_error());
+				$q_pregnant = mysql_query("SELECT a.mc_id, a.patient_id,a.patient_edc,a.delivery_date FROM m_patient_mc a,m_family_members b, m_family_address c WHERE a.patient_id=b.patient_id AND a.patient_id IN ($str_px_preg) AND b.family_id=c.family_id AND c.barangay_id IN ($brgy_array) ORDER by a.patient_edc, a.delivery_date ASC") or die("Cannot query 436: ".mysql_error());
 
 			endif;
 
 			if(mysql_num_rows($q_pregnant)!=0): 
 				while(list($mc_id,$pxid,$edc,$delivery_date)=mysql_fetch_array($q_pregnant)){ 
-					$end_mc_date = '';
-
-					if($delivery_date!='0000-00-00'): 
-						$end_mc_date = $delivery_date;
-					else: 
-						$end_mc_date = $edc;
+					$q_syphilis = mysql_query("SELECT actual_service_date FROM m_consult_mc_services WHERE patient_id='$pxid' AND service_id='SYP' AND actual_service_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]'") or die("Cannot query 839: ".mysql_error());
+					
+					if(mysql_num_rows($q_syphilis)!=0):
+						list($actual_service_date) = mysql_fetch_array($q_syphilis);
+						array_push($syphilis_test_name_px[$this->get_max_month($actual_service_date)],array($pxid,'Number of Pregnant Women Tested for Syphilis','mc',$actual_service_date));
+						$month_stat[$this->get_max_month($actual_service_date)]+=1;
 					endif;
-						
-					if($end_mc_date >= $_SESSION["edate2"]):
-
-						$q_syphilis = mysql_query("SELECT actual_service_date FROM m_consult_mc_services WHERE patient_id='$pxid' AND service_id='SYP' AND actual_service_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]'") or die("Cannot query 839: ".mysql_error());
-						
-						if(mysql_num_rows($q_syphilis)!=0):
-							list($actual_service_date) = mysql_fetch_array($q_syphilis);
-							array_push($pregnant_name_px[$this->get_max_month($_SESSION["edate2"])],array($pxid,'Number of Pregnant Women Tested for Syphilis','mc',$end_mc_date));
-							$month_stat[$this->get_max_month($_SESSION["edate2"])]+=1;
-						endif;
-					else:
-
-					endif;					
 				}
 
 			endif; 
-
-			//print_r($pregnant_name_px);
 
 			array_push($_SESSION["arr_px_labels"]["mc"],$syphilis_test_name_px);
 	
