@@ -3112,7 +3112,12 @@ class mc extends module {
 				
 				print "<a href=\"javascript:show_calendar4('document.form_service_detail.actual_service_date', document.form_service_detail.actual_service_date.value);\"><img src='../images/cal.gif' width='16' height='16' border='0' alt='Click Here to Pick up the date'></a><br><br>";
 				
-				print "QUANTITY&nbsp;<input type='text' size='10' class='tinylight' name='service_qty' value='$qty' style='border: 1px solid #000000'></input><br><br>";
+				
+				if($_GET["service_id"]=='SYP'):
+					echo "<input type='checkbox' name='chk_syphilis_result'>Check if result is POSITIVE for syphilis</input><br><br>";
+				else:
+					print "QUANTITY&nbsp;<input type='text' size='10' class='tinylight' name='service_qty' value='$qty' style='border: 1px solid #000000'></input><br><br>";
+				endif;
 
                 print "<input type='hidden' name='service' value='$sid'/>";
                 print "<input type='hidden' name='sts' value='$cstamp'/>";
