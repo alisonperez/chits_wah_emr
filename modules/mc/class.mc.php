@@ -3047,11 +3047,14 @@ class mc extends module {
         if ($result = mysql_query($sql)) {
             if (mysql_num_rows($result)) {
                 while (list($cid, $service, $sdate, $ts, $actual_service_date, $actual_sdate, $qty, $syphilis) = mysql_fetch_array($result)) {
+
+					$val_qty_result = ($service=='SYP')?$syphilis:$qty;
+
                     print "<img src='../images/arrow_redwhite.gif' border='0'/> ";
 					
 					$disp_date = ($actual_service_date=='0000-00-00')?$sdate:$actual_sdate;
 
-                    print "<a href='".$_SERVER["PHP_SELF"]."?page=".$get_vars["page"]."&menu_id=".$get_vars["menu_id"]."&consult_id=".$get_vars["consult_id"]."&ptmenu=".$get_vars["ptmenu"]."&module=mc&mc=SVC&service_id=$service&sts=$ts&mc_id=$cid&actual_vdate=$actual_service_date#service' name='service'>".mc::get_service_name($service)." ($qty)</a> $disp_date<br/>";
+                    print "<a href='".$_SERVER["PHP_SELF"]."?page=".$get_vars["page"]."&menu_id=".$get_vars["menu_id"]."&consult_id=".$get_vars["consult_id"]."&ptmenu=".$get_vars["ptmenu"]."&module=mc&mc=SVC&service_id=$service&sts=$ts&mc_id=$cid&actual_vdate=$actual_service_date#service' name='service'>".mc::get_service_name($service)." ($val_qty_result)</a> $disp_date<br/>";
 					
 					if ($get_vars["service_id"]==$service && $get_vars["actual_vdate"]==$actual_service_date && $get_vars["sts"]==$ts) {
                         mc::display_service_record_details($menu_id, $post_vars, $get_vars);
