@@ -1,7 +1,7 @@
 <?
 // BEGIN SERVER CODE: DO NOT EDIT
 // Server generated code
-// Generated 2012-03-10 11:18:15
+// Generated 2013-09-23 21:50:46
 // Module: _module.php
 // Author: Herman Tolentino MD
 //
@@ -212,6 +212,17 @@ if (file_exists('../modules/fecalysis/class.fecalysis.php')) {
 		$fecalysis->init_deps();
 		$fecalysis->init_lang();
 		$fecalysis->init_help();
+	}
+}
+if (file_exists('../modules/gen_services/class.gen_services.php')) {
+	include '../modules/gen_services/class.gen_services.php';
+	$gen_services = new gen_services;
+	if (!$module->activated('gen_services') && $initmod) {
+		$gen_services->init_sql();
+		$gen_services->init_menu();
+		$gen_services->init_deps();
+		$gen_services->init_lang();
+		$gen_services->init_help();
 	}
 }
 if (file_exists('../modules/graph/class.graph.php')) {
@@ -597,18 +608,6 @@ if (file_exists('../modules/wtforage/class.wtforage.php')) {
 		$wtforage->init_deps();
 		$wtforage->init_lang();
 		$wtforage->init_help();
-	}
-}
-
-if (file_exists('../modules/ncd/class.ncd.php')) {
-	include '../modules/ncd/class.ncd.php';
-	$ncd = new ncd;
-	if (!$module->activated('ncd') && $initmod) {
-		$ncd->init_sql();
-		$ncd->init_menu();
-		$ncd->init_deps();
-		$ncd->init_lang();
-		$ncd->init_help();
 	}
 }
 

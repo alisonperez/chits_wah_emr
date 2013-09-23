@@ -5,7 +5,7 @@ class alert extends module{
 	function alert(){
 		$this->description = "Automated Reminder and Alert Module";
 		$this->version = "0.95-".date('Y-m-d');
-		$this->authod = "darth_ali";
+		$this->author = "darth_ali";
 		$this->module = "alert";
 		
 		$this->mods = array('mc'=>array("Maternal Care"),'sick'=>array("Sick Children Under 5"),'epi'=>array("Expanded Program for Immunization"),'fp'=>array("Birth Spacing / Family Planning"),'notifiable'=>array("Notifiable Diseases"),'philhealth'=>array("PhilHealth"),'tb'=>array("Tuberculosis"));
