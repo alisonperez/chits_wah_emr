@@ -808,7 +808,7 @@ class mc extends module {
             case "Update Services":
                 if ($post_vars["services"]) {
                     foreach($post_vars["services"] as $key=>$value) {
-												
+						
                         $sql = "insert into m_consult_mc_services (mc_id, consult_id, user_id, patient_id, mc_timestamp, service_id, visit_type) ".
                                "values ('".$post_vars["mc_id"]."', '".$get_vars["consult_id"]."', '".$_SESSION["userid"]."', '$patient_id', sysdate(), '$value', '".$post_vars["visit_type"]."')";
                         $result = mysql_query($sql);
@@ -2836,7 +2836,7 @@ class mc extends module {
         switch($post_vars["submitdetail"]) {
 
 		case "Update Service":
-			if(isset($_POST[actual_service_date]) && isset($_POST[service_qty])):
+			if(isset($_POST[actual_service_date])):
 				list($month,$date,$year) = explode('/',$_POST[actual_service_date]);
 				$serv_date = $year.'-'.$month.'-'.$date;
 				/*
@@ -2850,7 +2850,11 @@ class mc extends module {
 				
 				if(mysql_num_rows($q_service)==0):
 				*/
-						$update_service = mysql_query("UPDATE m_consult_mc_services SET actual_service_date='$serv_date',service_qty='$_POST[service_qty]' WHERE service_id='$_POST[service]' AND mc_id='$_POST[mc_id]' AND mc_timestamp='$_POST[sts]'") or die("Cannot query: 2193");
+						if(isset($_POST["chk_syphilis_result"])): 
+							$update_service = mysql_query("UPDATE m_consult_mc_services SET actual_service_date='$serv_date',syphilis_result='Y' WHERE service_id='$_POST[service]' AND mc_id='$_POST[mc_id]' AND mc_timestamp='$_POST[sts]'") or die("Cannot query: 2856".mysql_error());
+						else:
+							$update_service = mysql_query("UPDATE m_consult_mc_services SET actual_service_date='$serv_date',service_qty='$_POST[service_qty]',syphilis_result='' WHERE service_id='$_POST[service]' AND mc_id='$_POST[mc_id]' AND mc_timestamp='$_POST[sts]'") or die("Cannot query: 2856".mysql_error());
+						endif;
 					
 						echo "<script language='Javascript'>";
 						
@@ -3039,12 +3043,10 @@ class mc extends module {
         print "<br/>";
         print "<b>".FTITLE_SERVICE_RECORD."</b><br/>";
         $patient_id = healthcenter::get_patient_id($get_vars["consult_id"]);
-        $sql = "select mc_id, service_id, date_format(mc_timestamp,'%a %d %b %Y') service_date, mc_timestamp,actual_service_date, date_format(actual_service_date,'%a %d %b %Y') actual_sdate, service_qty ".
-               "from m_consult_mc_services ".
-               "where patient_id = '$patient_id' order by service_id, actual_service_date desc";
+        $sql = "select mc_id, service_id, date_format(mc_timestamp,'%a %d %b %Y') service_date, mc_timestamp,actual_service_date, date_format(actual_service_date,'%a %d %b %Y') actual_sdate, service_qty, syphilis_result "."from m_consult_mc_services "."where patient_id = '$patient_id' order by service_id, actual_service_date desc";
         if ($result = mysql_query($sql)) {
             if (mysql_num_rows($result)) {
-                while (list($cid, $service, $sdate, $ts, $actual_service_date, $actual_sdate, $qty) = mysql_fetch_array($result)) {
+                while (list($cid, $service, $sdate, $ts, $actual_service_date, $actual_sdate, $qty, $syphilis) = mysql_fetch_array($result)) {
                     print "<img src='../images/arrow_redwhite.gif' border='0'/> ";
 					
 					$disp_date = ($actual_service_date=='0000-00-00')?$sdate:$actual_sdate;
@@ -3072,7 +3074,7 @@ class mc extends module {
             //print_r($arg_list);
         }
         $sql = "select mc_id, consult_id, user_id, patient_id, mc_timestamp, date_format(mc_timestamp, '%a %d %b %Y, %h:%i%p'), ".
-               "service_id, visit_type, actual_service_date, service_qty ".
+               "service_id, visit_type, actual_service_date, service_qty, syphilis_result ".
                "from m_consult_mc_services where ".
                "mc_id = '".$get_vars["mc_id"]."' and service_id = '".$get_vars["service_id"]."' and ".
                "mc_timestamp = '".$get_vars["sts"]."'";
@@ -3084,7 +3086,7 @@ class mc extends module {
             if (mysql_num_rows($result)) {							
 				
 
-                while(list($cdid, $cid, $uid, $pid, $cstamp, $sdate, $sid, $vtype, $actual_date, $qty) = mysql_fetch_array($result))
+                while(list($cdid, $cid, $uid, $pid, $cstamp, $sdate, $sid, $vtype, $actual_date, $qty, $syphilis) = mysql_fetch_array($result))
 				{
 				
                 print "<a name='detail'>";
@@ -3092,7 +3094,7 @@ class mc extends module {
                 print "<form name='form_service_detail' method='post' action='".$_SERVER["PHP_SELF"]."?page=".$get_vars["page"]."&menu_id=".$get_vars["menu_id"]."&consult_id=".$get_vars["consult_id"]."&ptmenu=".$get_vars["ptmenu"]."&module=".$get_vars["module"]."&mc=".$get_vars["mc"]."&mc_id=".$get_vars["mc_id"]."&sts=".$get_vars["sts"]."&service_id=".$get_vars["service_id"].'#detail'."'>";
                 print "<span class='tinylight'>";
 				
-		print "REGISTRY ID: <font color='red'>".module::pad_zero($cdid,7)."</font><br/>";
+				print "REGISTRY ID: <font color='red'>".module::pad_zero($cdid,7)."</font><br/>";
                 print "SERVICE: ".mc::get_service_name($sid)."<br/>";
                 print "VISIT TYPE: $vtype<br/>";
                 print "REPORT DATE: $sdate<br/>";
@@ -3114,7 +3116,8 @@ class mc extends module {
 				
 				
 				if($_GET["service_id"]=='SYP'):
-					echo "<input type='checkbox' name='chk_syphilis_result'>Check if result is POSITIVE for syphilis</input><br><br>";
+					$val_syp = ($syphilis=='Y')?'CHECKED':'';
+					echo "<input type='checkbox' name='chk_syphilis_result' $val_syp>Check if result is POSITIVE for syphilis</input><br><br>";
 				else:
 					print "QUANTITY&nbsp;<input type='text' size='10' class='tinylight' name='service_qty' value='$qty' style='border: 1px solid #000000'></input><br><br>";
 				endif;
