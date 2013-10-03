@@ -754,7 +754,7 @@ function compute_indicator($crit){
 
 			break;
 
-		case 11:   //number of deliveries, assuming that delivery is via NSD
+		case 11:   //number of deliveries, all types
 			
 			if(in_array('all',$_SESSION[brgy])):
 				$q_delivery = mysql_query("SELECT mc_id,patient_id,delivery_date,outcome_id FROM m_patient_mc WHERE delivery_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' AND outcome_id IN ('NSDM','NSDF') ORDER by delivery_date ASC") or die("Cannot query 434: ".mysql_error());

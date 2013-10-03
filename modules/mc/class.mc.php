@@ -1422,7 +1422,7 @@ class mc extends module {
 			}		
 			echo "</select></td></tr>";
 
-			echo "<tr><td style='font-size: 13px; font-weight: bold;'><b>Date Risk Factor was Detected</b> &nbsp;<input name='risk_date' type='text' size='11' maxlength='10' readonly></input>&nbsp;";
+			echo "<tr><td style='font-size: 13px; font-weight: bold;'><b>Date Risk Factor was Detected</b> &nbsp;<input name='risk_date' type='text' size='11' maxlength='10'></input>&nbsp;";
 			print "<a href=\"javascript:show_calendar4('document.form_riskcode.risk_date', document.form_riskcode.risk_date.value);\"><img src='../images/cal.gif' width='16' height='16' border='0' alt='Click Here to Pick up the date'></a>";			
 			echo "</td></tr>";
 
@@ -2118,7 +2118,7 @@ class mc extends module {
 			
 		echo "<tr><td>";
 		print "<span class='boxtitle'>DATE OF BREASTFEEDING</span>&nbsp;";
-		echo "<input type='text' name='date_breastfed' id='bfeed' size='6'  value='$bfeed_date' maxlength='10' value='$mc[date_breastfed]' style='border: 1px solid #000000' readonly></input>&nbsp;";
+		echo "<input type='text' name='date_breastfed' id='bfeed' size='6'  value='$bfeed_date' maxlength='10' value='$mc[date_breastfed]' style='border: 1px solid #000000'></input>&nbsp;";
 		print "<a href=\"javascript:show_calendar4('document.form_mc_postpartum.date_breastfed', document.form_mc_postpartum.date_breastfed.value);\"><img src='../images/cal.gif' width='16' height='16' border='0' alt='Click Here to Pick up the date'></a>";
 		echo "</td></tr>";
 
@@ -3122,7 +3122,7 @@ class mc extends module {
 
 				echo $actual.'<br>';
 				
-				print "SET DATE&nbsp;<input type='text' size='10' class='tinylight' name='actual_service_date' value='$disp' style='border: 1px solid #000000' readonly></input>";
+				print "SET DATE&nbsp;<input type='text' size='10' class='tinylight' name='actual_service_date' value='$disp' style='border: 1px solid #000000'></input>";
 				
 				print "<a href=\"javascript:show_calendar4('document.form_service_detail.actual_service_date', document.form_service_detail.actual_service_date.value);\"><img src='../images/cal.gif' width='16' height='16' border='0' alt='Click Here to Pick up the date'></a><br><br>";
 				
