@@ -658,7 +658,7 @@ function compute_indicator($crit){
 						//echo $mcid.'/'.$qty.'/'.$serv_date.'<br>';
 						if((strtotime($serv_date) - strtotime($delivery_date)) >= 0):
 							$iron_total+=$qty;
-							if($iron_total >= 12 && $target_reach==0):	
+							if($iron_total >= 90 && $target_reach==0):	
 								//echo $pxid.'/'.$delivery_date.'/'.$serv_date.'/'.$_SESSION["edate2"].'<br>';
 
 							if(!(in_array($pxid,$arr_px_id))):
@@ -746,7 +746,7 @@ function compute_indicator($crit){
 
 			break;
 
-		case 10: //10-49 year old women given vitamin A supplementation
+		case 10: //10-49 year old women given vitamin A supplementation. As of per aggrement with Ms. Pinky, 0 this
 
 			$vita_name_px = array(1=>array(),2=>array(),3=>array(),4=>array(),5=>array(),6=>array(),7=>array(),8=>array(),9=>array(),10=>array(),11=>array(),12=>array());
 
@@ -757,9 +757,9 @@ function compute_indicator($crit){
 		case 11:   //number of deliveries, all types
 			
 			if(in_array('all',$_SESSION[brgy])):
-				$q_delivery = mysql_query("SELECT mc_id,patient_id,delivery_date,outcome_id FROM m_patient_mc WHERE delivery_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' AND outcome_id IN ('NSDM','NSDF') ORDER by delivery_date ASC") or die("Cannot query 434: ".mysql_error());
+				$q_delivery = mysql_query("SELECT mc_id,patient_id,delivery_date,outcome_id FROM m_patient_mc WHERE delivery_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' ORDER by delivery_date ASC") or die("Cannot query 434: ".mysql_error());
 			else:
-				$q_delivery = mysql_query("SELECT a.mc_id, a.patient_id,a.delivery_date,a.outcome_id FROM m_patient_mc a,m_family_members b, m_family_address c WHERE a.delivery_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' AND outcome_id IN ('NSDM','NSDF') AND a.patient_id=b.patient_id AND b.family_id=c.family_id AND c.barangay_id IN ($brgy_array) ORDER by delivery_date ASC") or die("Cannot query 436: ".mysql_error());
+				$q_delivery = mysql_query("SELECT a.mc_id, a.patient_id,a.delivery_date,a.outcome_id FROM m_patient_mc a,m_family_members b, m_family_address c WHERE a.delivery_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' AND a.patient_id=b.patient_id AND b.family_id=c.family_id AND c.barangay_id IN ($brgy_array) ORDER by delivery_date ASC") or die("Cannot query 436: ".mysql_error());
 			endif;
 
 			$delivery_name_px = array(1=>array(),2=>array(),3=>array(),4=>array(),5=>array(),6=>array(),7=>array(),8=>array(),9=>array(),10=>array(),11=>array(),12=>array());
@@ -785,9 +785,9 @@ function compute_indicator($crit){
 			$arr_px_id = array();
 
 			if(in_array('all',$_SESSION[brgy])):
-				$q_pregnant = mysql_query("SELECT DISTINCT a.patient_id, a.mc_id, a.patient_edc, a.delivery_date FROM m_patient_mc a, m_patient b WHERE a.patient_id=b.patient_id AND a.patient_lmp <= '$_SESSION[sdate2]' ORDER by a.patient_edc,a.delivery_date ASC") or die("Cannot query 434: ".mysql_error());
+				$q_pregnant = mysql_query("SELECT DISTINCT a.patient_id, a.mc_id, a.patient_edc, a.delivery_date FROM m_patient_mc a, m_patient b WHERE a.patient_id=b.patient_id AND a.patient_lmp <= '$_SESSION[sdate2]' ORDER by a.patient_edc,a.delivery_date ASC") or die("Cannot query 788: ".mysql_error());
 			else:
-				$q_pregnant = mysql_query("SELECT DISTINCT a.patient_id, a.mc_id, a.patient_edc,a.delivery_date FROM m_patient_mc a,m_family_members b, m_family_address c,m_patient d WHERE a.patient_id=d.patient_id AND a.patient_lmp <= '$_SESSION[sdate2]' AND a.patient_id=d.patient_id AND b.family_id=c.family_id AND c.barangay_id IN ($brgy_array) ORDER by a.patient_edc,a.delivery_date ASC") or die("Cannot query 436: ".mysql_error());
+				$q_pregnant = mysql_query("SELECT DISTINCT a.patient_id, a.mc_id, a.patient_edc,a.delivery_date FROM m_patient_mc a,m_family_members b, m_family_address c,m_patient d WHERE a.patient_id=d.patient_id AND a.patient_lmp <= '$_SESSION[sdate2]' AND a.patient_id=d.patient_id AND b.family_id=c.family_id AND c.barangay_id IN ($brgy_array) ORDER by a.patient_edc,a.delivery_date ASC") or die("Cannot query 790: ".mysql_error());
 
 			endif;
 
@@ -828,11 +828,14 @@ function compute_indicator($crit){
 			$syphilis_test_name_px = array(1=>array(),2=>array(),3=>array(),4=>array(),5=>array(),6=>array(),7=>array(),8=>array(),9=>array(),10=>array(),11=>array(),12=>array());
 			$arr_preg_syp_test = array();
 
-			$arr_px_preg = $_SESSION["preggy"];
-			$str_px_preg = implode(',',$arr_px_preg);
-			
+print_r($_SESSION["preggy"]);
+			if(count($_SESSION["preggy"])!=0):
+				$arr_px_preg = $_SESSION["preggy"];
+				$str_px_preg = implode(',',$arr_px_preg);
+
+
 			if(in_array('all',$_SESSION[brgy])):
-				$q_pregnant = mysql_query("SELECT mc_id, patient_id, patient_edc, delivery_date FROM m_patient_mc WHERE patient_id IN ($str_px_preg) ORDER by patient_edc, delivery_date ASC") or die("Cannot query 434: ".mysql_error());
+				$q_pregnant = mysql_query("SELECT mc_id, patient_id, patient_edc, delivery_date FROM m_patient_mc WHERE patient_id IN ($str_px_preg) ORDER by patient_edc, delivery_date ASC") or die("Cannot query 835: ".mysql_error());
 			else:
 				$q_pregnant = mysql_query("SELECT a.mc_id, a.patient_id,a.patient_edc,a.delivery_date FROM m_patient_mc a,m_family_members b, m_family_address c WHERE a.patient_id=b.patient_id AND a.patient_id IN ($str_px_preg) AND b.family_id=c.family_id AND c.barangay_id IN ($brgy_array) ORDER by a.patient_edc, a.delivery_date ASC") or die("Cannot query 436: ".mysql_error());
 
@@ -852,6 +855,8 @@ function compute_indicator($crit){
 				}
 
 			endif; 
+			
+			endif;
 
 			$_SESSION["preg_syp_test"] = $arr_preg_syp_test; 
 			array_push($_SESSION["arr_px_labels"]["mc"],$syphilis_test_name_px);
@@ -885,7 +890,7 @@ function compute_indicator($crit){
 			$arr_preg = $_SESSION["preggy"];
 
 			foreach($arr_preg as $key=>$value){
-				$q_penicillin = mysql_query("SELECT actual_service_date FROM m_consult_mc_services WHERE patient_id='$value' AND service_id='PEN' AND actual_service_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]'") or die("Cannot query 839: ".mysql_error());
+				$q_penicillin = mysql_query("SELECT actual_service_date FROM m_consult_mc_services WHERE patient_id='$value' AND service_id='SYP' AND intake_penicillin='Y' AND actual_service_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]'") or die("Cannot query 839: ".mysql_error());
 
 				if(mysql_num_rows($q_penicillin)!=0):
 					list($actual_service_date) = mysql_fetch_array($q_penicillin);
