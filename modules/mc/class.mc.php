@@ -2850,20 +2850,29 @@ class mc extends module {
 				
 				if(mysql_num_rows($q_service)==0):
 				*/
-						if(isset($_POST["chk_syphilis_result"])): 
-							$update_service = mysql_query("UPDATE m_consult_mc_services SET actual_service_date='$serv_date',syphilis_result='Y' WHERE service_id='$_POST[service]' AND mc_id='$_POST[mc_id]' AND mc_timestamp='$_POST[sts]'") or die("Cannot query: 2856".mysql_error());
-						else:
-							$update_service = mysql_query("UPDATE m_consult_mc_services SET actual_service_date='$serv_date',service_qty='$_POST[service_qty]',syphilis_result='' WHERE service_id='$_POST[service]' AND mc_id='$_POST[mc_id]' AND mc_timestamp='$_POST[sts]'") or die("Cannot query: 2856".mysql_error());
-						endif;
-					
-						echo "<script language='Javascript'>";
-						
-						if($update_service):
-							echo "window.alert('Service was successfully been updated!')";
-						else:
-							echo "window.alert('Service was not update.\n Maaring kulang ang date o quantity.')";			
-						endif;
+
+
+				if(isset($_POST["chk_syphilis_result"])): 
+					$penicillin_intake = (isset($_POST["chk_penicillin"]))?'Y':'';
+					$update_service = mysql_query("UPDATE m_consult_mc_services SET actual_service_date='$serv_date',syphilis_result='Y',intake_penicillin='$penicillin_intake' WHERE service_id='$_POST[service]' AND mc_id='$_POST[mc_id]' AND mc_timestamp='$_POST[sts]'") or die("Cannot query: 2856".mysql_error());
+				else:
+					if(isset($_POST["chk_penicillin"])):
+						echo "<script language='Javascript'>";	
+						echo "window.alert('Check only the PENICILLIN intake box if the patient is also tested POSITIVE for syphillis')";					
 						echo "</script>";
+					else:
+						$update_service = mysql_query("UPDATE m_consult_mc_services SET actual_service_date='$serv_date',service_qty='$_POST[service_qty]',syphilis_result='',intake_penicillin='' WHERE service_id='$_POST[service]' AND mc_id='$_POST[mc_id]' AND mc_timestamp='$_POST[sts]'") or die("Cannot query: 2856".mysql_error());
+					endif;
+				endif;
+					
+				echo "<script language='Javascript'>";
+						
+				if($update_service):
+					echo "window.alert('Service was successfully been updated!')";
+				else:
+					echo "window.alert('Service was not update.\n Maaring kulang ang date o quantity.')";			
+				endif;
+				echo "</script>";
 
 				/*				else:
 			
@@ -3043,7 +3052,7 @@ class mc extends module {
         print "<br/>";
         print "<b>".FTITLE_SERVICE_RECORD."</b><br/>";
         $patient_id = healthcenter::get_patient_id($get_vars["consult_id"]);
-        $sql = "select mc_id, service_id, date_format(mc_timestamp,'%a %d %b %Y') service_date, mc_timestamp,actual_service_date, date_format(actual_service_date,'%a %d %b %Y') actual_sdate, service_qty, syphilis_result "."from m_consult_mc_services "."where patient_id = '$patient_id' order by service_id, actual_service_date desc";
+        $sql = "select mc_id, service_id, date_format(mc_timestamp,'%a %d %b %Y') service_date, mc_timestamp,actual_service_date, date_format(actual_service_date,'%a %d %b %Y') actual_sdate, service_qty, syphilis_result,intake_penicillin "."from m_consult_mc_services "."where patient_id = '$patient_id' order by service_id, actual_service_date desc";
         if ($result = mysql_query($sql)) {
             if (mysql_num_rows($result)) {
                 while (list($cid, $service, $sdate, $ts, $actual_service_date, $actual_sdate, $qty, $syphilis) = mysql_fetch_array($result)) {
@@ -3077,7 +3086,7 @@ class mc extends module {
             //print_r($arg_list);
         }
         $sql = "select mc_id, consult_id, user_id, patient_id, mc_timestamp, date_format(mc_timestamp, '%a %d %b %Y, %h:%i%p'), ".
-               "service_id, visit_type, actual_service_date, service_qty, syphilis_result ".
+               "service_id, visit_type, actual_service_date, service_qty, syphilis_result, intake_penicillin ".
                "from m_consult_mc_services where ".
                "mc_id = '".$get_vars["mc_id"]."' and service_id = '".$get_vars["service_id"]."' and ".
                "mc_timestamp = '".$get_vars["sts"]."'";
@@ -3089,7 +3098,7 @@ class mc extends module {
             if (mysql_num_rows($result)) {							
 				
 
-                while(list($cdid, $cid, $uid, $pid, $cstamp, $sdate, $sid, $vtype, $actual_date, $qty, $syphilis) = mysql_fetch_array($result))
+                while(list($cdid, $cid, $uid, $pid, $cstamp, $sdate, $sid, $vtype, $actual_date, $qty, $syphilis,$penicillin) = mysql_fetch_array($result))
 				{
 				
                 print "<a name='detail'>";
@@ -3120,7 +3129,11 @@ class mc extends module {
 				
 				if($_GET["service_id"]=='SYP'):
 					$val_syp = ($syphilis=='Y')?'CHECKED':'';
-					echo "<input type='checkbox' name='chk_syphilis_result' $val_syp>Check if result is POSITIVE for syphilis</input><br><br>";
+					$val_pen = ($penicillin=='Y')?'CHECKED':'';
+
+					echo "<input type='checkbox' name='chk_syphilis_result' $val_syp>Check if result is POSITIVE for syphilis</input><br>";
+
+					echo "<input type='checkbox' name='chk_penicillin' $val_pen>Check if patient had taken PENICILLIN</input><br><br>";
 				else:
 					print "QUANTITY&nbsp;<input type='text' size='10' class='tinylight' name='service_qty' value='$qty' style='border: 1px solid #000000'></input><br><br>";
 				endif;
