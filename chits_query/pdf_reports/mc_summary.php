@@ -828,7 +828,7 @@ function compute_indicator($crit){
 			$syphilis_test_name_px = array(1=>array(),2=>array(),3=>array(),4=>array(),5=>array(),6=>array(),7=>array(),8=>array(),9=>array(),10=>array(),11=>array(),12=>array());
 			$arr_preg_syp_test = array();
 
-print_r($_SESSION["preggy"]);
+
 			if(count($_SESSION["preggy"])!=0):
 				$arr_px_preg = $_SESSION["preggy"];
 				$str_px_preg = implode(',',$arr_px_preg);

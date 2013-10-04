@@ -925,7 +925,7 @@ class mc extends module {
                                       "where consult_id = '".$get_vars["consult_id"]."' and mc_id = '".$post_vars["mc_id"]."'";
                         $result_delete = mysql_query($sql_delete);
                         // ...then update from form
-			$date_ngayon = date('Y-m-d');
+							$date_ngayon = date('Y-m-d');
 
                         foreach($post_vars["risk"] as $key=>$value) {
                             $sql_risk = "insert into m_consult_mc_visit_risk (consult_id , ".
@@ -4557,27 +4557,28 @@ class mc extends module {
 		endif;
 
 		//get the new month value
-		foreach($arr_date_assoc as $key=>$value){
-			if($key==$m):
-				$new_month = $value;
+		foreach($arr_date_assoc as $key=>$value){ 
+			if($key==$m):  
+				$new_month = $value; 
 			endif;
 		}
 
 		//get the new date value
 		if(($last_day_month - $new_date) >= 0): //value of $d is less than or equal the last month. retain the same month
-			$new_date = $new_date;
+			$new_date = $new_date; 
 		else:  //value exceeded 30 or 31. excess value will be the new_date, increment the new_month 
 			$new_date =  $new_date - $last_day_month;
 			if($new_month!=12):
 				$new_month += 1;
 			else:
 				$new_month = 1;
+				$new_year += 1;
 			endif;
 	
 		endif;
 
 		$new_month = sprintf("%02d",$new_month); 
-		$new_date = sprintf("%02d",$new_date); 
+		$new_date = sprintf("%02d",$new_date);
 		return $new_year.'-'.$new_month.'-'.$new_date;
 	}
 
