@@ -769,8 +769,8 @@
 		$loc_consult_id = $_GET['consult_id'];
 		print "<table border=3 bordercolor='red' align='center'>";
 			print "<tr>";
-                        	print "<th colspan=16 align='left' bgcolor='CC9900'><a name='set_teeth_conditions'>Set Patient's Teeth Conditions</a></th>";
-                        print "</tr>";
+            print "<th colspan=16 align='left' bgcolor='CC9900'><a name='set_teeth_conditions'>Set Patient's Teeth Conditions</a></th>";
+            print "</tr>";
 
 			print "<tr>";
 				print "<td colspan=16><a href='#condition_legends'>Tooth Condition Legends</a></td>";
