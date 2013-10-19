@@ -799,11 +799,11 @@ function compute_indicator($crit){
 					$end_mc_date = '';
 
 					if($delivery_date!='0000-00-00'): 
-						$end_mc_date = $delivery_date;
-					else: 
+						$end_mc_date = $delivery_date; 
+					else: 						
 						$end_mc_date = $edc;
 					endif;
-						
+
 					if($end_mc_date >= $_SESSION["edate2"]):
 						$q_px = mysql_query("SELECT patient_id FROM m_patient WHERE patient_id='$pxid'") or die("Cannot query 806: ".mysql_error());
 							if(mysql_num_rows($q_px)!=0):
@@ -813,7 +813,7 @@ function compute_indicator($crit){
 							endif;
 					else:
 
-					endif;		
+					endif;
 				endif;
 				}
 
@@ -1126,6 +1126,9 @@ $mc_content = $pdf->show_mc_summary();
 if($_GET["type"]=='html'):
 	$html_tab->create_table($_SESSION["w"],$_SESSION["header"],$mc_content);
 elseif($_GET["type"]=='csv'):
+	$arr_csv = array(); //
+
+
 	$csv_creator->create_csv($_SESSION["ques"],$mc_content,'csv');
 elseif($_GET["type"]=='efhsis'):
 	$csv_creator->create_csv($_SESSION["ques"],$mc_content,'efhsis');

@@ -140,7 +140,7 @@ class csv_creator{
 
 			case '4': //maternal care data set
 				foreach($arr_stats as $key=>$value){ 
-					if($report_type=='M'):
+					if($report_type=='M'): 
 						$value_to_push = $value[1];
 					elseif($report_type=='Q'):
 						$value_to_push = $value[2];

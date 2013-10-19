@@ -129,7 +129,7 @@ if($_SESSION["userid"]!=""):
                         $_SESSION[smonth] = $_POST[smonth];
                         $_SESSION[year] = $_POST[year];
 
-      			$sdate = strftime("%m/%d/%Y",mktime(0,0,0,$_POST[smonth],1,$_POST[year]));
+      		$sdate = strftime("%m/%d/%Y",mktime(0,0,0,$_POST[smonth],1,$_POST[year]));
 			$edate = strftime("%m/%d/%Y",mktime(0,0,0,($_POST[smonth]+1),0,$_POST[year]));						
 			
 			$queryconn->querycrit($dbname,$dbname2,$sdate,$edate,$_POST[brgy],0); //the fifth argument when set to zero, means that there is no form present in the query box

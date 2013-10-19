@@ -151,13 +151,16 @@ function Header()
     
     $this->SetWidths($w);
     
-    $_SESSION["header"] = $label = array('DISEASE','ICD CODE','Under 1','1-4','5-9','10-14','15-19','20-24','25-29','30-34','35-39','40-44','45-49','50-54','55-59','60-64','65&above','TOTAL');
+    //$_SESSION["header"] = $label = array('DISEASE','ICD CODE','Under 1','1-4','5-9','10-14','15-19','20-24','25-29','30-34','35-39','40-44','45-49','50-54','55-59','60-64','65&above','TOTAL');
+
+	$_SESSION["header"] = $label = array('DISEASE','ICD CODE','Under 1','1-4','5-9','10-14','15-19','20-24','25-29','30-34','35-39','40-44','45-49','50-54','55-59','60-64','65&above','65-69','70&above','TOTAL');
+
     $this->Row($label);
     
-    $_SESSION["w2"] = $w = array(60,16,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,12,12);        
+    $_SESSION["w2"] = $w = array(60,16,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,12,12);
     array_push($arr_gender,' ',' ');
 
-    for($i=0;$i<16;$i++){
+    for($i=0;$i<18;$i++){
         array_push($arr_gender,'M','F');
     }
 
@@ -295,8 +298,7 @@ function show_morbidity(){
                     
         //initialize arr_age_group and arr_age for every diagnosis iteration
         
-        $arr_age_group = array('<0'=>array('M'=>0,'F'=>0),'1-4'=>array('M'=>0,'F'=>0),'5-9'=>array('M'=>0,'F'=>0),'10-14'=>array('M'=>0,'F'=>0),'15-19'=>array('M'=>0,'F'=>0),'20-24'=>array('M'=>0,'F'=>0),'25-29'=>array('M'=>0,'F'=>0),'30-34'=>array('M'=>0,'F'=>0),'35-39'=>array('M'=>0,'F'=>0),
-                    '40-44'=>array('M'=>0,'F'=>0),'45-49'=>array('M'=>0,'F'=>0),'50-54'=>array('M'=>0,'F'=>0),'55-59'=>array('M'=>0,'F'=>0),'60-64'=>array('M'=>0,'F'=>0),'>65'=>array('M'=>0,'F'=>0));
+        $arr_age_group = array('<0'=>array('M'=>0,'F'=>0),'1-4'=>array('M'=>0,'F'=>0),'5-9'=>array('M'=>0,'F'=>0),'10-14'=>array('M'=>0,'F'=>0),'15-19'=>array('M'=>0,'F'=>0),'20-24'=>array('M'=>0,'F'=>0),'25-29'=>array('M'=>0,'F'=>0),'30-34'=>array('M'=>0,'F'=>0),'35-39'=>array('M'=>0,'F'=>0),'40-44'=>array('M'=>0,'F'=>0),'45-49'=>array('M'=>0,'F'=>0),'50-54'=>array('M'=>0,'F'=>0),'55-59'=>array('M'=>0,'F'=>0),'60-64'=>array('M'=>0,'F'=>0),'>65'=>array('M'=>0,'F'=>0),'65-69'=>array('M'=>0,'F'=>0),'>70'=>array('M'=>0,'F'=>0));
         $arr_age = array();
         $arr_row = array();
         $total_male = $total_female = 0;  
@@ -306,7 +308,7 @@ function show_morbidity(){
 
         //$q_px_id = mysql_query("SELECT a.patient_id,round((to_days(a.diagnosis_date)-to_days(b.patient_dob))/365,0) as computed_age FROM m_consult_notes_dxclass a, m_patient b, m_lib_notes_dxclass c, m_consult d WHERE a.diagnosis_date BETWEEN '$_SESSION[sdate]' AND '$_SESSION[edate]' AND a.class_id=c.class_id AND c.icd10 LIKE '%$icd10_orig%' AND c.morbidity='Y' AND a.patient_id=b.patient_id AND b.patient_gender='$gender'") or die("Cannot query 164 ".mysql_error());
 
-	$q_px_id = mysql_query("SELECT a.patient_id,round((to_days(d.consult_date)-to_days(b.patient_dob))/365,0) as computed_age FROM m_consult_notes_dxclass a, m_patient b, m_lib_notes_dxclass c, m_consult d WHERE a.consult_id=d.consult_id AND d.consult_date BETWEEN '$_SESSION[sdate]' AND '$_SESSION[edate]' AND a.class_id=c.class_id AND c.icd10 LIKE '%$icd10_orig%' AND c.morbidity='Y' AND a.patient_id=b.patient_id AND b.patient_gender='$gender'") or die("Cannot query 164 ".mysql_error());
+		$q_px_id = mysql_query("SELECT a.patient_id,round((to_days(d.consult_date)-to_days(b.patient_dob))/365,0) as computed_age FROM m_consult_notes_dxclass a, m_patient b, m_lib_notes_dxclass c, m_consult d WHERE a.consult_id=d.consult_id AND d.consult_date BETWEEN '$_SESSION[sdate]' AND '$_SESSION[edate]' AND a.class_id=c.class_id AND c.icd10 LIKE '%$icd10_orig%' AND c.morbidity='Y' AND a.patient_id=b.patient_id AND b.patient_gender='$gender'") or die("Cannot query 164 ".mysql_error());
 
 
             while(list($pxid,$computed_age) = mysql_fetch_array($q_px_id)){
@@ -341,11 +343,11 @@ function show_morbidity(){
                 elseif($edad>=30 && $edad<=34):
                     $arr_age_group['30-34'][$gender] += $arr_age[$edad][$gender];                    
                 elseif($edad>=35 && $edad<=39):
-                    $arr_age_group['35-39'][$gender] += $arr_age[$edad][$gender];                                        
+                    $arr_age_group['35-39'][$gender] += $arr_age[$edad][$gender];     
                 elseif($edad>=40 && $edad<=44):
                     $arr_age_group['40-44'][$gender] += $arr_age[$edad][$gender];
                 elseif($edad>=45 && $edad<=49):
-                    $arr_age_group['45-49'][$gender] += $arr_age[$edad][$gender];                                                            
+                    $arr_age_group['45-49'][$gender] += $arr_age[$edad][$gender];                  
                 elseif($edad>=50 && $edad<=54):
                     $arr_age_group['50-54'][$gender] += $arr_age[$edad][$gender];
                 elseif($edad>=55 && $edad<=59):
@@ -353,16 +355,21 @@ function show_morbidity(){
                 elseif($edad>=60 && $edad<=64):
                     $arr_age_group['60-64'][$gender] += $arr_age[$edad][$gender];
                 elseif($edad>=65):
-                    $arr_age_group['>65'][$gender] += $arr_age[$edad][$gender];                    
+                    $arr_age_group['>65'][$gender] += $arr_age[$edad][$gender]; 
                 else:
                 
                 endif;     
+
+				if($edad>=65 && $edad<=69):
+					$arr_age_group['65-69'][$gender] += $arr_age[$edad][$gender];                  
+                elseif($edad>=70):
+	                $arr_age_group['>70'][$gender] += $arr_age[$edad][$gender];                    
+				else:
+				endif;
             }            
-            
-        
-            
+                                
         } 
-        //after this foreach loop, arr_age_group will contain count per age group, per gender. array size is 32 (0-31)
+        //after this foreach loop, arr_age_group will contain count per age group, per gender. array size is 33 (0-32)
       
         //array_push($arr_row,$diag_name,' ');
           
@@ -392,7 +399,7 @@ function show_morbidity(){
 
           array_push($arr_row,$total_male,$total_female);
           $this->SetFont('Arial','','7');          
-          
+
           //print_r($arr_row).'<br>';
           
           /*for($x=0;$x<count($arr_row);$x++){              
@@ -413,29 +420,27 @@ function show_morbidity(){
           array_push($arr_main,$arr_row);
      
      }
-     
+
      $arr_icd = array_unique($arr_icd);          
      //print_r($arr_icd);     
-     
+
      //this foreach loop will going to merge diagnosis with similar ICD-10 code header (i.e. A09, A09.1)
      foreach($arr_icd as $icd_index=>$icd_value){         
          foreach($arr_main as $main_index=>$main_arr){
             if($main_arr[1]==$icd_value):
-                for($j=2;$j<34;$j++){
-                    $final_arr[$icd_value][$j] = $final_arr[$icd_value][$j] + $main_arr[$j];
+                for($j=2;$j<38;$j++){ 
+	                    $final_arr[$icd_value][$j] = $final_arr[$icd_value][$j] + $main_arr[$j];
                 }
+				$final_arr[$icd_value][37] = $final_arr[$icd_value][37]-$final_arr[$icd_value][31];
+				$final_arr[$icd_value][36] = $final_arr[$icd_value][36]-$final_arr[$icd_value][30];
             endif;
          }
      }
     
-     //print_r($arr_main).'<br>';
+
      
-     //print_r($final_arr);
-     
-     $arr_sorted_icd = $this->sort_icd($final_arr);
-     
-     //print_r($arr_sorted_icd);
-     
+     $arr_sorted_icd = $this->sort_icd($final_arr);     
+
      $final_arr2 = array(); 
      $bilang = 1;
      foreach($arr_sorted_icd as $key_icd=>$value_icd){
@@ -466,8 +471,8 @@ function show_morbidity(){
      foreach($final_arr2 as $key_final=>$value_final){
           $this->SetWidths($w);
           $this->Row($value_final);
-	
-	array_push($arr_consolidate,$value_final);
+
+		  array_push($arr_consolidate,$value_final);
      }
 
 
@@ -656,7 +661,7 @@ endif;
 //$pdf->show_fp_summary();
 if($_GET["type"]=='html'):
 	$html_tab->create_table($_SESSION["w"],$_SESSION["header"],$morb_rec,$_SESSION["w2"],$_SESSION["subheader"]);
-elseif($_GET["type"]=='csv'): //print_r($morb_rec);
+elseif($_GET["type"]=='csv'):
 	$csv_creator->create_csv($_SESSION["ques"],$morb_rec,'csv');	
 elseif($_GET["type"]=='efhsis'):
 	$csv_creator->create_csv($_SESSION["ques"],$morb_rec,'efhsis');
