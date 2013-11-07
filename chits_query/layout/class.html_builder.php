@@ -93,7 +93,6 @@ class html_builder{
 		$q_report_period = mysql_query("SELECT report_type FROM question WHERE ques_id='$ques'") or die("Cannot query: 93");
 		list($report_period) = mysql_fetch_array($q_report_period);
 		
-		
 		$arr_px_labels = $_SESSION["arr_px_labels"];		
 
 		foreach($cell_contents as $key=>$value){ 
@@ -121,19 +120,20 @@ class html_builder{
 						elseif(isset($arr_px_labels["fp"])): //echo ((($key*2)+$i)-1); //print_r($arr_px_labels); 
 
 							$cat = 'fp';
-							$range = ((($key*5)+$i)-1);
+							//$range = ((($key*5)+$i)-1);
+							$range = ((($key*6)+$i)-1);
 							$arr_names = $this->return_px_names($range,$arr_px_labels,$cat);
 							$ser_arr_names = serialize($this->return_px_names($range,$arr_px_labels,$cat)); 
 
 							list($code,$label) = explode(".",$value[0]);
 							$label = trim($label);
 
-							switch(($range % 5)){
+							switch(($range % 6)){
 								case 0:
 									$col_type = 'Current User (Begin)';
 									break;
 								case 1:
-									$col_type = 'New Acceptor';
+									$col_type = 'New Acceptor (Previous Month)';
 									break;
 								case 2:
 									$col_type = 'Others (RS,CC,CM)';
@@ -143,6 +143,9 @@ class html_builder{
 									break;
 								case 4:
 									$col_type = 'Current User (End)';
+									break;
+								case 5:
+									$col_type = 'New Acceptor (Present Month)';
 									break;
 								case 6:
 									$col_type = '';

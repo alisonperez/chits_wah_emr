@@ -135,9 +135,12 @@ function Header()
     $this->Cell(340,10,'F A M I L Y   P L A N N I N G',1,1,C);
 
     $this->SetFont('Arial','B','12');
-    $_SESSION["w"] = $w = array(90,50,50,50,50,50);
+    $w = array(88,42,42,42,42,42,42);
     $this->SetWidths($w);
-    $_SESSION["header"] = $label = array('Indicators','Current User '."\n".'(Begin Mo)','New Acceptors','Others','Dropout','Current User'."\n".'(End Mo)');
+    //$_SESSION["header"] = $label = array('Indicators','Current User '."\n".'(Begin Mo)','New Acceptors','Others','Dropout','Current User'."\n".'(End Mo)');
+
+	$_SESSION["header"] = $label = array('Indicators','Current User '."\n".'(Begin Mo)','New Acceptors'."\n".'(Prev Month)','Others','Dropout','Current User'."\n".'(End Mo)','New Acceptors'."\n".'(Present Month)');
+
     $this->Row($label);
 }
 
@@ -145,7 +148,7 @@ function q_report_header($population){
     $this->SetFont('Arial','B','12');
     $this->Cell(0,5,'FHSIS REPORT FOR THE MONTH: '.date('F',mktime(0,0,0,$_SESSION[smonth],1,0))."          YEAR: ".$_SESSION[year],0,1,L);
     $this->Cell(0,5, 'NAME OF BHS: '.$this->get_brgy(),0,1,L);    
-    $this->Cell(0,5, 'MUNICAPLITY/CITY NAME: '.$_SESSION[datanode][name],0,1,L);
+    $this->Cell(0,5, 'MUNICIPALITY/CITY NAME: '.$_SESSION[datanode][name],0,1,L);
     $this->Cell(0,5,'PROVINCE: '.$_SESSION[province],0,1,L);
     $this->Cell(0,5, 'PROJECTED POPULATION OF THE YEAR: '.$population,0,1,L);
 }
@@ -156,7 +159,7 @@ function show_fp_quarterly(){
     $arr_consolidate = array();
 
     $arr_method = array('a'=>'FSTRBTL','b'=>'MSV','c'=>'PILLS','d'=>'IUD','e'=>'DMPA','f'=>'NFPCM','g'=>'NFPBBT','h'=>'NFPLAM','i'=>'NFPSDM','j'=>'NFPSTM','k'=>'CONDOM','l'=>'IMPLANT');
-    $w = array(90,50,50,50,50,50);
+    $w = array(88,42,42,42,42,42,42);
     $str_brgy = $this->get_brgy();
 
     //echo $_SESSION[sdate2].'/'.$_SESSION[edate2];
@@ -166,21 +169,19 @@ function show_fp_quarterly(){
         list($method_name) = mysql_fetch_array($q_fp);
 
         $cu_prev = $this->get_current_users($_SESSION[sdate2],$_SESSION[edate2],$method_code,$str_brgy,2);
-		
-
-        $na_pres = $this->get_current_users($_SESSION[sdate2],$_SESSION[edate2],$method_code,$str_brgy,3);
+		$true_prev_na = $this->get_current_users($_SESSION[sdate2],$_SESSION[edate2],$method_code,$str_brgy,7);		
         $other_pres = $this->get_current_users($_SESSION[sdate2],$_SESSION[edate2],$method_code,$str_brgy,4);
         $dropout_pres = $this->get_current_users($_SESSION[sdate2],$_SESSION[edate2],$method_code,$str_brgy,5 );
-
 		$prev_na = $this->get_current_users($_SESSION[sdate2],$_SESSION[edate2],$method_code,$str_brgy,6);
+        $na_pres = $this->get_current_users($_SESSION[sdate2],$_SESSION[edate2],$method_code,$str_brgy,3);
 
         //$cu_pres = ($cu_prev + $na_pres + $other_pres) - $dropout_pres;
 
-		$cu_pres = ($cu_prev + $prev_na + $other_pres) - $dropout_pres;		
-		
-		//echo $cu_prev.'/'.$prev_na.'/'.$other_pres.'/'.$dropout_pres.'/'.$method_code.'/'."<br>";
+		$cu_pres = ($cu_prev + $prev_na + $other_pres) - $dropout_pres;				
 
-		$fp_contents = array($col_code.'. '.$method_name,$cu_prev,$na_pres,$other_pres,$dropout_pres,$cu_pres);
+		//$fp_contents = array($col_code.'. '.$method_name,$cu_prev,$na_pres,$other_pres,$dropout_pres,$cu_pres);
+		
+		$fp_contents = array($col_code.'. '.$method_name,$cu_prev,$prev_na,$other_pres,$dropout_pres,$cu_pres,$na_pres);
 	
 		array_push($arr_consolidate,$fp_contents);
 
@@ -397,7 +398,6 @@ function get_current_users(){
 		}
 
 
-
         $cu_na_prev = count($arr_na_prev);
 
 		//array_push($_SESSION["arr_px_labels"]["fp"],$arr_na_prev2); 
@@ -423,12 +423,33 @@ function get_current_users(){
 				array_push($arr_cu_pres2,array($px_id,'Current User (End)'.$method_code,'fp',$date_reg));
 		}
 
-		array_push($_SESSION["arr_px_labels"]["fp"],$arr_cu_pres2);		
-
+		array_push($_SESSION["arr_px_labels"]["fp"],$arr_cu_pres2);
 
 		return $cu_na_prev;
 
 	    break;
+
+
+		case 7: //true previous NA. purpose is just to save the names in the array arr_px_labels
+		    $q_na_prev = mysql_query("SELECT fp_px_id,patient_id,date_registered FROM m_patient_fp_method WHERE date_registered BETWEEN '$s_date' AND '$e_date' AND client_code='NA' AND method_id='$method'") or die("Cannot query 215 ".mysql_error());
+		
+		    $arr_na_prev = $this->sanitize_brgy($q_na_prev,$brgy,$method,$col_code);
+
+			$arr_na_prev2 = array();
+	
+			foreach($arr_na_prev as $key=>$value){ 
+				$q_fp_info = mysql_query("SELECT patient_id, date_registered FROM m_patient_fp_method WHERE fp_px_id='$value[0]'");
+				
+				list($pxid,$date_reg) = mysql_fetch_array($q_fp_info);
+				array_push($arr_na_prev2,array($pxid,'New Acceptor (Prev Month)'.$method,'fp',$date_reg));
+			}
+			
+			$na_prev_count = count($arr_na_prev2);
+			array_push($_SESSION["arr_px_labels"]["fp"],$arr_na_prev2);
+			
+			return $na_prev_count;
+
+			break;
 
         default:
         break;

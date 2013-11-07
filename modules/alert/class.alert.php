@@ -3,7 +3,7 @@
 class alert extends module{
 
 	function alert(){
-		$this->description = "Automated Reminder and Alert Module";
+		$this->description = "Automated Reminder and Alert Module / SPASMS";
 		$this->version = "0.95-".date('Y-m-d');
 		$this->author = "darth_ali";
 		$this->module = "alert";
