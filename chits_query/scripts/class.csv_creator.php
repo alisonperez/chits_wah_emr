@@ -60,7 +60,7 @@ class csv_creator{
 
 			if($cat_id!='7'):
 				$this->create_file($str_csv,$cat_id,$report_type,$type);
-			else: 
+			else:
 				foreach($arr_stats as $key=>$value){  
 					$str_stat = $this->get_stats_csv($cat_id,$cat_label,$value,$report_type);
 
@@ -232,7 +232,7 @@ class csv_creator{
 					}
 				}
 				
-				$str_stat = implode(",",$arr_numero);
+				$str_stat = implode(",",$arr_numero); 
 				break; 
 			default:
 				echo "<font color='red'>No CSV file output yet for this program. Press BACK button from the browser to continue.</font>";
