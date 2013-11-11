@@ -232,7 +232,7 @@ function show_ccdev_summary(){
 	$ccdev_rec = array();
 	$arr_consolidate = array();
 
-		$arr_indicators = array(array('Immunization Given < 1 yr'=>array('BCG'=>'BCG','DPT1'=>'DPT1','DPT2'=>'DPT2','DPT3'=>'DPT3','OPV1'=>'OPV1','OPV2'=>'OPV2','OPV3'=>'OPV3','HEPB'=>'Hepa at Birth','HEPB1<24'=>'Hepa B1 w/ in 24 hrs','HEPB1>24'=>'Hepa B1 > 24 hours','HEPB2'=>'Hepatitis B2','HEPB3'=>'Hepatitis B3','MSL'=>'Measles','ROTA'=>'Rotavirus','ROTA2'=>'Rotavirus 2','PENTA1'=>'Pentavalent 1','PENTA2'=>'Pentavalent 2','PENTA3'=>'Pentavalent 3','MMR'=>'MMR','PCV1'=>'PCV 1','PCV2'=>'PCV 2','PCV3'=>'PCV 3')),'Fully Immunized Child','Completely Immunized Child (12-23 mos)','Child Protected at Birth','Infant age 6 mo seen','Infant exclusively breastfed until 6 mo','Infant 0-11 mos referred for NBS',array('Diarrhea (0-59 mos)'=>array('num_case'=>'No. of Cases','ort'=>'Given ORT','ors'=>'Given ORS','orswz'=>'Given ORS w/ Zinc')),array('Pneumonia (0-59 mos)'=>array('num_cases'=>'No. of cases','pneumonia_tx'=>'Given Treatment')),array('Sick Children Seen'=>array('6*11'=>'6-11 mos','12*59'=>'12-59 mos','60*71'=>'60-71 mos')),array('Sick Children Given Vit A'=>array('6*11'=>'6-11 mos','12*59'=>'12-59 mos','60*71'=>'60-71 mos')),'Infant 2-6 mos w/ LBW seen','Infant 2-6 mos w/ LBW given iron','Anemic Children 2-59 mos seen','Anemic Children 2-59 mos given iron','Total Livebirths');
+		$arr_indicators = array(array('Immunization Given < 1 yr'=>array('BCG'=>'BCG','DPT1'=>'DPT1','DPT2'=>'DPT2','DPT3'=>'DPT3','OPV1'=>'OPV1','OPV2'=>'OPV2','OPV3'=>'OPV3','HEPB'=>'Hepa at Birth','HEPB1<24'=>'Hepa B1 w/ in 24 hrs','HEPB1>24'=>'Hepa B1 > 24 hours','HEPB2'=>'Hepatitis B2','HEPB3'=>'Hepatitis B3','MSL'=>'Measles','ROTA'=>'Rotavirus','ROTA2'=>'Rotavirus 2','PENTA1'=>'Pentavalent 1','PENTA2'=>'Pentavalent 2','PENTA3'=>'Pentavalent 3','MMR'=>'MMR','PCV1'=>'PCV 1','PCV2'=>'PCV 2','PCV3'=>'PCV 3')),'Fully Immunized Child','Completely Immunized Child (12-23 mos)','Child Protected at Birth','Infant age 6 mo seen','Infant exclusively breastfed until 6 mo','Infant 0-11 mos referred for NBS',array('Diarrhea (0-59 mos)'=>array('num_case'=>'No. of Cases','ort'=>'Given ORT','ors'=>'Given ORS','orswz'=>'Given ORS w/ Zinc')),array('Pneumonia (0-59 mos)'=>array('num_cases'=>'No. of cases','pneumonia_tx'=>'Given Treatment')),array('Sick Children Seen'=>array('6*11'=>'6-11 mos','12*59'=>'12-59 mos','60*71'=>'60-71 mos')),array('Sick Children Given Vit A'=>array('6*11'=>'6-11 mos','12*59'=>'12-59 mos','60*71'=>'60-71 mos')),'Infant 2-6 mos w/ LBW seen','Infant 2-6 mos w/ LBW given iron','Anemic Children 2-59 mos seen','Anemic Children 2-59 mos given iron','Total Livebirths','Infant given complimentary food from 6-8 months');
 		$m_index = array('1'=>array('2','3'),'2'=>array('4','5'),'3'=>array('6','7'),'4'=>array('10','11'),'5'=>array('12','13'),'6'=>array('14','15'),'7'=>array('18','19'),'8'=>array('20','21'),'9'=>array('22','23'),'10'=>array('26','27'),'11'=>array('28','29'),'12'=>array('30','31'));
 	
 		$q_index = array('1'=>array('8','9'),'2'=>array('16','17'),'3'=>array('24','25'),'4'=>array('32','33'));
@@ -1168,7 +1168,33 @@ function compute_indicators(){
 							endif;
 						}
 					endif; 
-				array_push($arr_gender_stat,$month_stat);
+				
+					array_push($arr_gender_stat,$month_stat);
+
+				}
+				break;
+
+			case 17:	//infants given complimentary food from 6-8 months
+				for($sex=0;$sex<count($arr_gender);$sex++){
+					$month_stat = array(1=>0,2=>0,3=>0,4=>0,5=>0,6=>0,7=>0,8=>0,9=>0,10=>0,11=>0,12=>0);
+
+					$q_complimentary_feed = mysql_query("SELECT DISTINCT a.patient_id, a.ccdev_service_date, round((TO_DAYS(a.ccdev_service_date) - TO_DAYS(b.patient_dob))/30 ,2) age, b.patient_dob FROM m_consult_ccdev_services a, m_patient b WHERE a.service_id='COMP' AND a.ccdev_service_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' AND a.patient_id=b.patient_id AND b.patient_gender='$arr_gender[$sex]' ORDER BY a.ccdev_service_date") or die("Cannot query 1181: ".mysql_error());
+
+					if(mysql_num_rows($q_complimentary_feed)!=0):
+						while(list($patient_id,$service_date,$edad,$dob)=mysql_fetch_array($q_complimentary_feed)){
+							//echo $patient_id.'/'.$service_date.'/'.$edad.'/'.$dob."<br>";
+							if($edad>=6 AND $edad<=8): //in months
+								if($this->get_px_brgy($patient_id,$brgy_array)):
+									$month_stat[$this->get_max_month($delivery_date)] += 1;
+								endif;
+							endif;
+						}
+					else:
+
+					endif;
+
+					array_push($arr_gender_stat,$month_stat);
+
 				}
 				break;
 

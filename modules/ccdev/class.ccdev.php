@@ -959,10 +959,11 @@ class ccdev extends module {
         case "Update Record":
             $patient_id = healthcenter::get_patient_id($get_vars["consult_id"]);
             $age_weeks = ccdev::get_age_weeks($patient_id);
-            if ($post_vars["services"]) {
+            if ($post_vars["services"]) { 
+					$date_today = date('Y-m-d');
                 foreach($post_vars["services"] as $key=>$value) {
-                    $sql = "insert into m_consult_ccdev_services (ccdev_id, consult_id, user_id, patient_id, ccdev_timestamp, service_id, age_on_service) ".
-                           "values ('".$post_vars["ccdev_id"]."', '".$get_vars["consult_id"]."', '".$_SESSION["userid"]."', '$patient_id', sysdate(), '$value', '$age_weeks')";
+                    $sql = "insert into m_consult_ccdev_services (ccdev_id, consult_id, user_id, patient_id, ccdev_timestamp, service_id, age_on_service, ccdev_service_date) ".
+                           "values ('".$post_vars["ccdev_id"]."', '".$get_vars["consult_id"]."', '".$_SESSION["userid"]."', '$patient_id', sysdate(), '$value', '$age_weeks', '$date_today')";
                     $result = mysql_query($sql);
                 }
             }
