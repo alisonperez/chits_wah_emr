@@ -232,7 +232,7 @@ function show_ccdev_summary(){
 	$ccdev_rec = array();
 	$arr_consolidate = array();
 
-		$arr_indicators = array(array('Immunization Given < 1 yr'=>array('BCG'=>'BCG','DPT1'=>'DPT1','DPT2'=>'DPT2','DPT3'=>'DPT3','OPV1'=>'OPV1','OPV2'=>'OPV2','OPV3'=>'OPV3','HEPB'=>'Hepa at Birth','HEPB1<24'=>'Hepa B1 w/ in 24 hrs','HEPB1>24'=>'Hepa B1 > 24 hours','HEPB2'=>'Hepatitis B2','HEPB3'=>'Hepatitis B3','MSL'=>'Measles','ROTA'=>'Rotavirus','ROTA2'=>'Rotavirus 2','PENTA1'=>'Pentavalent 1','PENTA2'=>'Pentavalent 2','PENTA3'=>'Pentavalent 3','MMR'=>'MMR','PCV1'=>'PCV 1','PCV2'=>'PCV 2','PCV3'=>'PCV 3')),'Fully Immunized Child','Completely Immunized Child (12-23 mos)','Child Protected at Birth','Infant age 6 mo seen','Infant exclusively breastfed until 6 mo','Infant 0-11 mos referred for NBS',array('Diarrhea (0-59 mos)'=>array('num_case'=>'No. of Cases','ort'=>'Given ORT','ors'=>'Given ORS','orswz'=>'Given ORS w/ Zinc')),array('Pneumonia (0-59 mos)'=>array('num_cases'=>'No. of cases','pneumonia_tx'=>'Given Treatment')),array('Sick Children Seen'=>array('6*11'=>'6-11 mos','12*59'=>'12-59 mos','60*71'=>'60-71 mos')),array('Sick Children Given Vit A'=>array('6*11'=>'6-11 mos','12*59'=>'12-59 mos','60*71'=>'60-71 mos')),'Infant 2-6 mos w/ LBW seen','Infant 2-6 mos w/ LBW given iron','Anemic Children 2-59 mos seen','Anemic Children 2-59 mos given iron','Total Livebirths','Infant given complimentary food from 6-8 months','Infants for Newborn Screening (Done)','Infant 12-23 months old received Vitamin A','Infant 24-35 months old received Vitamin A','Infant 36-47 months old received Vitamin A','Infant 48-59 months old received Vitamin A','Infant 2-5 months received Iron','Infant 6-11 months received Iron','Infant 22-23 months received Iron','Infant 24-35 months received Iron','Infant 36-47 months received Iron','Infant 48-59 months received Iron','Infant 6-11 months received MNP','Infant 12-23 months received MNP','Children 12-59 months old given de-worming tablet');
+		$arr_indicators = array(array('Immunization Given < 1 yr'=>array('BCG'=>'BCG','DPT1'=>'DPT1','DPT2'=>'DPT2','DPT3'=>'DPT3','OPV1'=>'OPV1','OPV2'=>'OPV2','OPV3'=>'OPV3','HEPB'=>'Hepa at Birth','HEPB1<24'=>'Hepa B1 w/ in 24 hrs','HEPB1>24'=>'Hepa B1 > 24 hours','HEPB2'=>'Hepatitis B2','HEPB3'=>'Hepatitis B3','MSL'=>'Measles','ROTA'=>'Rotavirus','ROTA2'=>'Rotavirus 2','PENTA1'=>'Pentavalent 1','PENTA2'=>'Pentavalent 2','PENTA3'=>'Pentavalent 3','MMR'=>'MMR','PCV1'=>'PCV 1','PCV2'=>'PCV 2','PCV3'=>'PCV 3')),'Fully Immunized Child','Completely Immunized Child (12-23 mos)','Child Protected at Birth','Infant age 6 mo seen','Infant exclusively breastfed until 6 mo','Infant 0-11 mos referred for NBS',array('Diarrhea (0-59 mos)'=>array('num_case'=>'No. of Cases','ort'=>'Given ORT','ors'=>'Given ORS','orswz'=>'Given ORS w/ Zinc')),array('Pneumonia (0-59 mos)'=>array('num_cases'=>'No. of cases','pneumonia_tx'=>'Given Treatment')),array('Sick Children Seen'=>array('6*11'=>'6-11 mos','12*59'=>'12-59 mos','60*71'=>'60-71 mos')),array('Sick Children Given Vit A'=>array('6*11'=>'6-11 mos','12*59'=>'12-59 mos','60*71'=>'60-71 mos')),'Infant 2-6 mos w/ LBW seen','Infant 2-6 mos w/ LBW given iron','Anemic Children 2-59 mos seen','Anemic Children 2-59 mos given iron','Total Livebirths','Infant given complimentary food from 6-8 months','Infants for Newborn Screening (Done)','Infant 12-23 months old received Vitamin A','Infant 24-35 months old received Vitamin A','Infant 36-47 months old received Vitamin A','Infant 48-59 months old received Vitamin A','Infant 2-5 months received Iron','Infant 6-11 months received Iron','Infant 22-23 months received Iron','Infant 24-35 months received Iron','Infant 36-47 months received Iron','Infant 48-59 months received Iron','Infant 6-11 months received MNP','Infant 12-23 months received MNP','Children 12-59 months old given de-worming tablet','Anemic Children 6-11 months old seen','Anemic Children 6-11 months old received full dose of Iron','Anemic Children 12-59 months old seen','Anemic Children 12-59 months old received full dose of Iron');
 
 		$m_index = array('1'=>array('2','3'),'2'=>array('4','5'),'3'=>array('6','7'),'4'=>array('10','11'),'5'=>array('12','13'),'6'=>array('14','15'),'7'=>array('18','19'),'8'=>array('20','21'),'9'=>array('22','23'),'10'=>array('26','27'),'11'=>array('28','29'),'12'=>array('30','31'));
 	
@@ -1118,39 +1118,53 @@ function compute_indicators(){
 				}
 				
 				break;
-			case 14:
+
+			case 14:	//Anemic Children 2-59 mos seen
 				for($sex=0;$sex<count($arr_gender);$sex++){
 					$month_stat = array(1=>0,2=>0,3=>0,4=>0,5=>0,6=>0,7=>0,8=>0,9=>0,10=>0,11=>0,12=>0);			
 					
-					$q_anemia = mysql_query("SELECT DISTINCT b.consult_id,date_format(b.consult_date,'%Y-%m-%d'),a.patient_id,a.patient_dob,c.notes_id FROM m_patient a, m_consult b,m_consult_notes c,m_consult_notes_dxclass d,m_lib_notes_dxclass e WHERE a.patient_id=b.patient_id AND b.consult_id=c.consult_id AND c.notes_id=d.notes_id AND d.class_id=e.class_id AND e.class_name LIKE '%anemia%' AND a.patient_gender='$arr_gender[$sex]' AND round((TO_DAYS(date_format(b.consult_date,'%Y-%m-%d'))-TO_DAYS(a.patient_dob))/30,2) BETWEEN 0 AND 59 AND b.consult_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]'") or die("Cannot query: 753");
+					$q_anemia = mysql_query("SELECT DISTINCT b.consult_id,date_format(b.consult_date,'%Y-%m-%d'),a.patient_id,a.patient_dob,c.notes_id,round((TO_DAYS(date_format(b.consult_date,'%Y-%m-%d'))-TO_DAYS(a.patient_dob))/7,2) as age_wks FROM m_patient a, m_consult b,m_consult_notes c,m_consult_notes_dxclass d,m_lib_notes_dxclass e WHERE a.patient_id=b.patient_id AND b.consult_id=c.consult_id AND c.notes_id=d.notes_id AND d.class_id=e.class_id AND e.class_name LIKE '%anemia%' AND a.patient_gender='$arr_gender[$sex]' AND b.consult_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]'") or die("Cannot query: 753");
 					
+									
 					if(mysql_num_rows($q_anemia)!=0):
-						while(list($consult_id,$consult_date,$pxid,$pxdob,$notes_id) = mysql_fetch_array($q_anemia)){
-							if($this->get_px_brgy($pxid,$brgy_array)):
-								$month_stat[$this->get_max_month($consult_date)] += 1;
+						while(list($consult_id,$consult_date,$pxid,$pxdob,$notes_id,$age_wks) = mysql_fetch_array($q_anemia)){							
+
+							$age_months = round(($age_wks/52)*12,2);
+							
+							if($age_months>=2 && $age_months<60):
+								if($this->get_px_brgy($pxid,$brgy_array)):
+									$month_stat[$this->get_max_month($consult_date)] += 1;
+								endif;
 							endif;
 						}
 					endif;
 				
-				array_push($arr_gender_stat,$month_stat);
-				
+					array_push($arr_gender_stat,$month_stat);
+
 				}
-				break;
-			
-			case 15:
+
+				break;			
+			case 15:	//Anemic Children 2-59 mos given iron
 				for($sex=0;$sex<count($arr_gender);$sex++){
 					$month_stat = array(1=>0,2=>0,3=>0,4=>0,5=>0,6=>0,7=>0,8=>0,9=>0,10=>0,11=>0,12=>0);
 
-					$q_anemia = mysql_query("SELECT DISTINCT b.consult_id,date_format(b.consult_date,'%Y-%m-%d'),a.patient_id,a.patient_dob,c.notes_id,f.anemia_completed_date FROM m_patient a, m_consult b,m_consult_notes c,m_consult_notes_dxclass d,m_lib_notes_dxclass e,m_consult_notes f WHERE a.patient_id=b.patient_id AND b.consult_id=c.consult_id AND c.notes_id=d.notes_id AND d.class_id=e.class_id AND e.class_name LIKE '%anemia%' AND a.patient_gender='$arr_gender[$sex]' AND round((TO_DAYS(date_format(b.consult_date,'%Y-%m-%d'))-TO_DAYS(a.patient_dob))/30,2) BETWEEN 0 AND 59 AND b.consult_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' AND b.consult_id=f.consult_id AND f.anemia_completed_date!='0000-00-00'") or die("Cannot queru: 770");
+					$q_anemia = mysql_query("SELECT DISTINCT b.consult_id,date_format(b.consult_date,'%Y-%m-%d'),a.patient_id,a.patient_dob,c.notes_id,f.anemia_completed_date,round((TO_DAYS(date_format(f.anemia_completed_date,'%Y-%m-%d'))-TO_DAYS(a.patient_dob))/7,2) as age_wks  FROM m_patient a, m_consult b,m_consult_notes c,m_consult_notes_dxclass d,m_lib_notes_dxclass e,m_consult_notes f WHERE a.patient_id=b.patient_id AND b.consult_id=c.consult_id AND c.notes_id=d.notes_id AND d.class_id=e.class_id AND e.class_name LIKE '%anemia%' AND a.patient_gender='$arr_gender[$sex]' AND f.anemia_completed_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' AND b.consult_id=f.consult_id AND f.anemia_completed_date!='0000-00-00'") or die("Cannot query: 1516");
 
 					if(mysql_num_rows($q_anemia)!=0):
-						while(list($consult_id,$consult_date,$pxid,$pxdob,$notes_id,$anemia_completed)=mysql_fetch_array($q_anemia)){	
-							if($this->get_px_brgy($pxid,$brgy_array)):
-								$month_stat[$this->get_max_month($consult_date)] += 1;
+
+						while(list($consult_id,$consult_date,$pxid,$pxdob,$notes_id,$anemia_iron_completed,$age_wks)=mysql_fetch_array($q_anemia)){	
+
+							$age_months = round(($age_wks/52)*12,2);
+							
+							if($age_months>=2 && $age_months<60):
+								if($this->get_px_brgy($pxid,$brgy_array)):
+									$month_stat[$this->get_max_month($anemia_iron_completed)] += 1;
+								endif;
 							endif;
 						}
 					endif;
-				array_push($arr_gender_stat,$month_stat);
+					
+					array_push($arr_gender_stat,$month_stat);
 				}
 
 				break;			
@@ -1483,7 +1497,105 @@ function compute_indicators(){
 					array_push($arr_gender_stat,$month_stat);
 				}				
 				break;		
+			
+			case 32:	//Anemic Children 6-11 months old seen
+				for($sex=0;$sex<count($arr_gender);$sex++){
+					$month_stat = array(1=>0,2=>0,3=>0,4=>0,5=>0,6=>0,7=>0,8=>0,9=>0,10=>0,11=>0,12=>0);			
+					
+					$q_anemia = mysql_query("SELECT DISTINCT b.consult_id,date_format(b.consult_date,'%Y-%m-%d'),a.patient_id,a.patient_dob,c.notes_id,round((TO_DAYS(date_format(b.consult_date,'%Y-%m-%d'))-TO_DAYS(a.patient_dob))/7,2) as age_wks FROM m_patient a, m_consult b,m_consult_notes c,m_consult_notes_dxclass d,m_lib_notes_dxclass e WHERE a.patient_id=b.patient_id AND b.consult_id=c.consult_id AND c.notes_id=d.notes_id AND d.class_id=e.class_id AND e.class_name LIKE '%anemia%' AND a.patient_gender='$arr_gender[$sex]' AND b.consult_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]'") or die("Cannot query: 753");
+					
+									
+					if(mysql_num_rows($q_anemia)!=0):
+						while(list($consult_id,$consult_date,$pxid,$pxdob,$notes_id,$age_wks) = mysql_fetch_array($q_anemia)){							
 
+							$age_months = round(($age_wks/52)*12,2);
+							
+							if($age_months>=6 && $age_months<12):
+								if($this->get_px_brgy($pxid,$brgy_array)):
+									$month_stat[$this->get_max_month($consult_date)] += 1;
+								endif;
+							endif;
+						}
+					endif;
+				
+					array_push($arr_gender_stat,$month_stat);
+
+				}
+				break;
+
+			case 33:	//Anemic Children 6-11 months old received complete Iron
+				for($sex=0;$sex<count($arr_gender);$sex++){
+					$month_stat = array(1=>0,2=>0,3=>0,4=>0,5=>0,6=>0,7=>0,8=>0,9=>0,10=>0,11=>0,12=>0);
+
+					$q_anemia = mysql_query("SELECT DISTINCT b.consult_id,date_format(b.consult_date,'%Y-%m-%d'),a.patient_id,a.patient_dob,c.notes_id,f.anemia_completed_date,round((TO_DAYS(date_format(f.anemia_completed_date,'%Y-%m-%d'))-TO_DAYS(a.patient_dob))/7,2) as age_wks  FROM m_patient a, m_consult b,m_consult_notes c,m_consult_notes_dxclass d,m_lib_notes_dxclass e,m_consult_notes f WHERE a.patient_id=b.patient_id AND b.consult_id=c.consult_id AND c.notes_id=d.notes_id AND d.class_id=e.class_id AND e.class_name LIKE '%anemia%' AND a.patient_gender='$arr_gender[$sex]' AND f.anemia_completed_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' AND b.consult_id=f.consult_id AND f.anemia_completed_date!='0000-00-00'") or die("Cannot query: 1516");
+
+					if(mysql_num_rows($q_anemia)!=0):
+
+						while(list($consult_id,$consult_date,$pxid,$pxdob,$notes_id,$anemia_iron_completed,$age_wks)=mysql_fetch_array($q_anemia)){	
+
+							$age_months = round(($age_wks/52)*12,2);
+							
+							if($age_months>=6 && $age_months<12):
+								if($this->get_px_brgy($pxid,$brgy_array)):
+									$month_stat[$this->get_max_month($anemia_iron_completed)] += 1;
+								endif;
+							endif;
+						}
+					endif;
+				array_push($arr_gender_stat,$month_stat);
+				}
+
+				break;			
+			
+			case 34:	//Anemic Children 12-59 months old seen
+				for($sex=0;$sex<count($arr_gender);$sex++){
+					$month_stat = array(1=>0,2=>0,3=>0,4=>0,5=>0,6=>0,7=>0,8=>0,9=>0,10=>0,11=>0,12=>0);			
+					
+					$q_anemia = mysql_query("SELECT DISTINCT b.consult_id,date_format(b.consult_date,'%Y-%m-%d'),a.patient_id,a.patient_dob,c.notes_id,round((TO_DAYS(date_format(b.consult_date,'%Y-%m-%d'))-TO_DAYS(a.patient_dob))/7,2) as age_wks FROM m_patient a, m_consult b,m_consult_notes c,m_consult_notes_dxclass d,m_lib_notes_dxclass e WHERE a.patient_id=b.patient_id AND b.consult_id=c.consult_id AND c.notes_id=d.notes_id AND d.class_id=e.class_id AND e.class_name LIKE '%anemia%' AND a.patient_gender='$arr_gender[$sex]' AND b.consult_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]'") or die("Cannot query: 753");
+					
+									
+					if(mysql_num_rows($q_anemia)!=0):
+						while(list($consult_id,$consult_date,$pxid,$pxdob,$notes_id,$age_wks) = mysql_fetch_array($q_anemia)){							
+
+							$age_months = round(($age_wks/52)*12,2);
+							
+							if($age_months>=12 && $age_months<60):
+								if($this->get_px_brgy($pxid,$brgy_array)):
+									$month_stat[$this->get_max_month($consult_date)] += 1;
+								endif;
+							endif;
+						}
+					endif;
+				
+					array_push($arr_gender_stat,$month_stat);
+
+				}
+					
+				break;
+
+			case 35:	//Anemic Children 12-59 months old received complete Iron
+				for($sex=0;$sex<count($arr_gender);$sex++){
+					$month_stat = array(1=>0,2=>0,3=>0,4=>0,5=>0,6=>0,7=>0,8=>0,9=>0,10=>0,11=>0,12=>0);
+
+					$q_anemia = mysql_query("SELECT DISTINCT b.consult_id,date_format(b.consult_date,'%Y-%m-%d'),a.patient_id,a.patient_dob,c.notes_id,f.anemia_completed_date,round((TO_DAYS(date_format(f.anemia_completed_date,'%Y-%m-%d'))-TO_DAYS(a.patient_dob))/7,2) as age_wks  FROM m_patient a, m_consult b,m_consult_notes c,m_consult_notes_dxclass d,m_lib_notes_dxclass e,m_consult_notes f WHERE a.patient_id=b.patient_id AND b.consult_id=c.consult_id AND c.notes_id=d.notes_id AND d.class_id=e.class_id AND e.class_name LIKE '%anemia%' AND a.patient_gender='$arr_gender[$sex]' AND f.anemia_completed_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' AND b.consult_id=f.consult_id AND f.anemia_completed_date!='0000-00-00'") or die("Cannot query: 1516");
+
+					if(mysql_num_rows($q_anemia)!=0):
+
+						while(list($consult_id,$consult_date,$pxid,$pxdob,$notes_id,$anemia_iron_completed,$age_wks)=mysql_fetch_array($q_anemia)){	
+
+							$age_months = round(($age_wks/52)*12,2);
+							
+							if($age_months>=12 && $age_months<60):
+								if($this->get_px_brgy($pxid,$brgy_array)):
+									$month_stat[$this->get_max_month($anemia_iron_completed)] += 1;
+								endif;
+							endif;
+						}
+					endif;
+				array_push($arr_gender_stat,$month_stat);
+				}
+
+				break;
 
 			default:	
 			
