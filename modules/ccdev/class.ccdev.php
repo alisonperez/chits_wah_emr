@@ -722,9 +722,9 @@ class ccdev extends module {
 
 		$q_wt = mysql_query("SELECT round(birth_weight*1000,0) bwt_wks FROM m_patient_ccdev WHERE ccdev_id='$ccdev_id'") or die("Cannot query; 549");
 
-		if(mysql_num_rows($q_wt)!=0):
+		if(mysql_num_rows($q_wt)!=0): 
 			list($bwt_wks) = mysql_fetch_array($q_wt);
-			if($bwt_wks<250):
+			if($bwt_wks<2500):
 				$bwt_status = 'Yes'; //mark as low birth weight
 			else:
 				$bwt_status = 'No';

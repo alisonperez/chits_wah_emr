@@ -35,7 +35,7 @@ class html_builder{
 			$subheader = $args[4];
 		endif;
 		
-		
+
 		if(sizeof($cell_contents)!=0):
 			echo "<table style='font-family: arial; width: 100%; background-color: #CCCCCC'>";
 			$this->display_col_header($header,$width);
@@ -94,7 +94,7 @@ class html_builder{
 		list($report_period) = mysql_fetch_array($q_report_period);
 		
 		$arr_px_labels = $_SESSION["arr_px_labels"];		
-
+echo count($arr_px_labels["epi"]);
 		foreach($cell_contents as $key=>$value){ 
 			echo "<tr style='background-color: #666666; color: #FFFF66; font-weight:bold; white-space: nowrap; font-size: 19px;'>";
 
@@ -104,11 +104,11 @@ class html_builder{
 				echo "<td>";
 
 				if(!empty($arr_px_labels)): 
-					if($i!=0 && $value[$i]!=0):
-						if(isset($arr_px_labels["epi"])):
-							$cat = 'epi';
+					if($i!=0 && $value[$i]!=0): echo $key."<br>";
+						if(isset($arr_px_labels["epi"])): 
+							$cat = 'epi'; 
 							$arr_names = $this->return_px_names(((($key*2)+$i)-1),$arr_px_labels,$cat);
-							$ser_arr_names = serialize($this->return_px_names(((($key*2)+$i)-1),$arr_px_labels,$cat));
+							$ser_arr_names = serialize($this->return_px_names(((($key*2)+$i)-1),$arr_px_labels,$cat)); 
 							$label = $value[0];
 
 						elseif(isset($arr_px_labels["mc"])):
@@ -117,7 +117,7 @@ class html_builder{
 							$ser_arr_names = serialize($this->return_px_names($key,$arr_px_labels,$cat)); 
 							$label = $value[0];
 
-						elseif(isset($arr_px_labels["fp"])): //echo ((($key*2)+$i)-1); //print_r($arr_px_labels); 
+						elseif(isset($arr_px_labels["fp"])):
 
 							$cat = 'fp';
 							//$range = ((($key*5)+$i)-1);
@@ -157,10 +157,8 @@ class html_builder{
 						endif;
 
 						//echo "<a href='../../site/disp_name.php?id=$ser_arr_names&cat=$value[0]&prog=$cat' target='new'>".$value[$i]."</a>";
-						if($report_period=='M'):   //show only edqc links in monthly reports
+						if($report_period=='M'):  //show only edqc links in monthly reports
 							echo "<a href='../../site/disp_name.php?id=$ser_arr_names&cat=$label&prog=$cat' target='new'>".$value[$i]."</a>";
-						else:
-							echo $value[$i];
 						endif;
 						
 					else:
@@ -176,7 +174,7 @@ class html_builder{
 		}
 	}
 
-	function return_px_names($cell_num,$arr_px_labels,$prog){
+	function return_px_names($cell_num,$arr_px_labels,$prog){ 
 		$arr_px_names = array();
 		if(count($arr_px_labels)!=0):
 			/*
@@ -218,10 +216,9 @@ class html_builder{
 			else: //parsing for mc and epi
 
 				foreach($arr_px_labels as $key_prog=>$val_arr){ 
-
-					foreach($val_arr[$cell_num] as $key2=>$val_arr2){ 
+					foreach($val_arr[$cell_num] as $key2=>$val_arr2){
 						if($key2>=$this->smonth && $key2<=$this->emonth): 
-							foreach($val_arr2 as $key3=>$val_arr3){
+							foreach($val_arr2 as $key3=>$val_arr3){ 
 								array_push($arr_px_names,$val_arr3[0].'*'.$val_arr3[3]); //extract the patient ID and push it to the array
 							}
 						endif;
