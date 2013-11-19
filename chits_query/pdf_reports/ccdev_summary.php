@@ -599,7 +599,7 @@ function compute_indicators(){
 						
 						else:
 						endif;
-
+						array_push($_SESSION["arr_px_labels"]["epi"],$pneumonia_stat_px);  
 						array_push($arr_pneu_seen,$month_stat);
 
 						}
@@ -614,7 +614,7 @@ function compute_indicators(){
 				$r_sick1 = array();
 				$r_sick2 = array();
 				$r_sick3 = array();
-				$arr_sakit = array('measles','severe pneumonia','persistent diarrhea','malnutrition','xerophthalmia','night		blindness','bitot','corneal xerosis','corneal ulcerations','keratomalacia');
+				$arr_sakit = array('measles','severe pneumonia','persistent diarrhea','malnutrition','xerophthalmia','night blindness','bitot','corneal xerosis','corneal ulcerations','keratomalacia');
 
 				for($x=0;$x<count($arr_sakit);$x++){
 					$str_sakit = "SELECT a.consult_id FROM m_consult a, m_consult_notes_dxclass b,m_lib_notes_dxclass c WHERE a.consult_id=b.consult_id AND b.class_id=c.class_id";
@@ -645,25 +645,27 @@ function compute_indicators(){
 
 				foreach($arr_gender as $sex_key=>$sex_label){
 					$month_stat = array(1=>0,2=>0,3=>0,4=>0,5=>0,6=>0,7=>0,8=>0,9=>0,10=>0,11=>0,12=>0);
+
 					$sick_stat_px = array(1=>array(),2=>array(),3=>array(),4=>array(),5=>array(),6=>array(),7=>array(),8=>array(),9=>array(),10=>array(),11=>array(),12=>array());
 
 					for($m=0;$m<=count($r_consult);$m++){
 
 					if($sick_key=='6*11'):
-						$q_sick = mysql_query("SELECT a.patient_id, date_format(b.consult_date,'%Y-%m-%d'),b.consult_id,round((TO_DAYS(date_format(b.consult_date,'%Y-%m-%d'))-TO_DAYS(a.patient_dob))/30,2) FROM m_patient a,m_consult b WHERE a.patient_id=b.patient_id AND b.consult_id='$r_consult[$m]' AND b.consult_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' AND a.patient_gender='$sex_label' AND round((TO_DAYS(date_format(b.consult_date,'%Y-%m-%d'))-TO_DAYS(a.patient_dob))/30,2) BETWEEN 6 AND 11") or die("Cannot query: 440");
+						$q_sick = mysql_query("SELECT a.patient_id, date_format(b.consult_date,'%Y-%m-%d'),b.consult_id,round((TO_DAYS(date_format(b.consult_date,'%Y-%m-%d'))-TO_DAYS(a.patient_dob))/30,2) FROM m_patient a,m_consult b WHERE a.patient_id=b.patient_id AND b.consult_id='$r_consult[$m]' AND b.consult_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' AND a.patient_gender='$sex_label' AND round((TO_DAYS(date_format(b.consult_date,'%Y-%m-%d'))-TO_DAYS(a.patient_dob))/30,2) BETWEEN 6 AND 11.9999") or die("Cannot query: 440");
 
 					if(mysql_num_rows($q_sick)!=0):
 						array_push($r_sick1,$r_consult[$m]);
 						while(list($pxid,$consult_date,$consult_id,$range)=mysql_fetch_array($q_sick)){							
 							if($this->get_px_brgy($pxid,$brgy_array)):
 								$month_stat[$this->get_max_month($consult_date)] += 1;
+								array_push($sick_stat_px[$this->get_max_month($consult_date)],array($pxid,'Sick Children Seen 6-11 mos','epi',$consult_date));
 							endif;
 						}
 					endif;
 
 					elseif($sick_key=='12*59'):
 
-						$q_sick = mysql_query("SELECT a.patient_id, date_format(b.consult_date,'%Y-%m-%d'),b.consult_id,round((TO_DAYS(date_format(b.consult_date,'%Y-%m-%d'))-TO_DAYS(a.patient_dob))/30,2) FROM m_patient a,m_consult b WHERE a.patient_id=b.patient_id AND b.consult_id='$r_consult[$m]' AND b.consult_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' AND a.patient_gender='$sex_label' AND round(((TO_DAYS(date_format(b.consult_date,'%Y-%m-%d'))-TO_DAYS(a.patient_dob))/30),2) BETWEEN 12 AND 59") or die("Cannot query: 440");
+						$q_sick = mysql_query("SELECT a.patient_id, date_format(b.consult_date,'%Y-%m-%d'),b.consult_id,round((TO_DAYS(date_format(b.consult_date,'%Y-%m-%d'))-TO_DAYS(a.patient_dob))/30,2) FROM m_patient a,m_consult b WHERE a.patient_id=b.patient_id AND b.consult_id='$r_consult[$m]' AND b.consult_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' AND a.patient_gender='$sex_label' AND round(((TO_DAYS(date_format(b.consult_date,'%Y-%m-%d'))-TO_DAYS(a.patient_dob))/30),2) BETWEEN 12 AND 59.9999") or die("Cannot query: 440");
 						
 
 
@@ -674,18 +676,20 @@ function compute_indicators(){
 								if($this->get_px_brgy($pxid,$brgy_array)):
 									array_push($r_sick2,$r_consult[$m]);
 									$month_stat[$this->get_max_month($consult_date)] += 1;
+									array_push($sick_stat_px[$this->get_max_month($consult_date)],array($pxid,'Sick Children Seen 12-59 mos','epi',$consult_date));
 								endif;
 							}
 						endif;
 
 					elseif($sick_key=='60*71'):
-						$q_sick = mysql_query("SELECT a.patient_id, date_format(b.consult_date,'%Y-%m-%d'),b.consult_id FROM m_patient a,m_consult b WHERE a.patient_id=b.patient_id AND b.consult_id='$r_consult[$m]' AND b.consult_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' AND a.patient_gender='$sex_label' AND round(((TO_DAYS(date_format(b.consult_date,'%Y-%m-%d'))-TO_DAYS(a.patient_dob))/30),2) BETWEEN 50 AND 71") or die("Cannot query: 440");
+						$q_sick = mysql_query("SELECT a.patient_id, date_format(b.consult_date,'%Y-%m-%d'),b.consult_id FROM m_patient a,m_consult b WHERE a.patient_id=b.patient_id AND b.consult_id='$r_consult[$m]' AND b.consult_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' AND a.patient_gender='$sex_label' AND round(((TO_DAYS(date_format(b.consult_date,'%Y-%m-%d'))-TO_DAYS(a.patient_dob))/30),2) BETWEEN 50 AND 71.9999") or die("Cannot query: 440");
 						
 						if(mysql_num_rows($q_sick)!=0):
 							while(list($pxid,$consult_date,$consult_id,$range)=mysql_fetch_array($q_sick)){
 								if($this->get_px_brgy($pxid,$brgy_array)):
 									array_push($r_sick3,$r_consult[$m]);
-									$month_stat[$this->get_max_month($consult_date)] += 1;
+									$month_stat[$this->get_max_month($consult_date)] += 1;\
+									array_push($sick_stat_px[$this->get_max_month($consult_date)],array($pxid,'Sick Children Seen 60-71 mos','epi',$consult_date));
 								endif;
 							}
 						endif;
@@ -694,6 +698,7 @@ function compute_indicators(){
 					endif;
 
 					}					
+					array_push($_SESSION["arr_px_labels"]["epi"],$sick_stat_px);  
 					array_push($arr_sick,$month_stat);
 				}
 
@@ -718,17 +723,20 @@ function compute_indicators(){
 				foreach($sub_arr_crit as $arr_key=>$arr_label){
 					foreach($arr_label as $vita_key=>$vita_label){
 						foreach($arr_gender as $sex_key=>$sex_label){
-							$month_stat = array(1=>0,2=>0,3=>0,4=>0,5=>0,6=>0,7=>0,8=>0,9=>0,10=>0,11=>0,12=>0);					
+							$month_stat = array(1=>0,2=>0,3=>0,4=>0,5=>0,6=>0,7=>0,8=>0,9=>0,10=>0,11=>0,12=>0);	
+							
+							$sick_stat_px = array(1=>array(),2=>array(),3=>array(),4=>array(),5=>array(),6=>array(),7=>array(),8=>array(),9=>array(),10=>array(),11=>array(),12=>array());				
 							
 							if($vita_key=='6*11'):
 								foreach($r_consult[0] as $consult_key=>$consult_id){
-									$q_vita = mysql_query("SELECT a.vita_date,b.patient_id FROM m_consult_notes a,m_patient b WHERE a.patient_id=b.patient_id AND a.consult_id='$consult_id' AND b.patient_gender='$sex_label'") or die("Cannot query 520");
+										$q_vita = mysql_query("SELECT a.vita_date,b.patient_id FROM m_consult_notes a,m_patient b WHERE a.patient_id=b.patient_id AND a.consult_id='$consult_id' AND b.patient_gender='$sex_label' AND a.vita_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]'") or die("Cannot query: 732");
 
-									if(mysql_num_rows($q_vita)!=0):
+									if(mysql_num_rows($q_vita)!=0): 
 										list($vita_date,$pxid) = mysql_fetch_array($q_vita);
 										
 										if($this->get_px_brgy($pxid,$brgy_array)):
 											$month_stat[$this->get_max_month($vita_date)] += 1;
+											array_push($sick_stat_px[$this->get_max_month($vita_date)],array($pxid,'Sick Children Seen 6-11 mos Given Vit. A','epi',$vita_date));
 										endif;
 									endif;
 								}
@@ -737,7 +745,7 @@ function compute_indicators(){
 								
 								
 								foreach($r_consult[1] as $consult_key=>$consult_id){																
-									$q_vita = mysql_query("SELECT a.vita_date,b.patient_id FROM m_consult_notes a,m_patient b WHERE a.patient_id=b.patient_id AND a.consult_id='$consult_id' AND b.patient_gender='$sex_label'") or die("Cannot query: 530");
+									$q_vita = mysql_query("SELECT a.vita_date,b.patient_id FROM m_consult_notes a,m_patient b WHERE a.patient_id=b.patient_id AND a.consult_id='$consult_id' AND b.patient_gender='$sex_label'  AND a.vita_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]'") or die("Cannot query: 530");
 								}
 								
 								if($q_vita):		
@@ -746,6 +754,7 @@ function compute_indicators(){
 									
 									if($this->get_px_brgy($pxid,$brgy_array)):
 										$month_stat[$this->get_max_month($vita_date)] += 1;
+										array_push($sick_stat_px[$this->get_max_month($vita_date)],array($pxid,'Sick Children Seen 12-59 mos Given Vit. A','epi',$vita_date));
 									endif;
 								endif;
 								
@@ -755,7 +764,7 @@ function compute_indicators(){
 
 							elseif($vita_key=='60*71'):
 								foreach($r_consult[2] as $consult_key=>$consult_id){
-									$q_vita = mysql_query("SELECT a.vita_date,b.patient_id FROM m_consult_notes a,m_patient b WHERE a.patient_id=b.patient_id AND a.consult_id='$consult_id' AND b.patient_gender='$sex_label'") or die("Cannot query: 530");								
+									$q_vita = mysql_query("SELECT a.vita_date,b.patient_id FROM m_consult_notes a,m_patient b WHERE a.patient_id=b.patient_id AND a.consult_id='$consult_id' AND b.patient_gender='$sex_label'  AND a.vita_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]'") or die("Cannot query: 530");								
 								}
 
 								if($q_vita):
@@ -765,13 +774,17 @@ function compute_indicators(){
 
 										if($this->get_px_brgy($pxid,$brgy_array)):
 											$month_stat[$this->get_max_month($vita_date)] += 1;
+											array_push($sick_stat_px[$this->get_max_month($vita_date)],array($pxid,'Sick Children Seen 60-71 mos Given Vit. A','epi',$vita_date));
 										endif;
 								endif;
 
 								endif;
 							else:
 							endif;
+
+						array_push($_SESSION["arr_px_labels"]["epi"],$sick_stat_px);  
 						array_push($arr_sick_vita,$month_stat);
+						
 						}
 
 
@@ -1206,6 +1219,8 @@ function compute_indicators(){
 				for($sex=0;$sex<count($arr_gender);$sex++){
 					$month_stat = array(1=>0,2=>0,3=>0,4=>0,5=>0,6=>0,7=>0,8=>0,9=>0,10=>0,11=>0,12=>0);
 					
+					$lb_stat_px = array(1=>array(),2=>array(),3=>array(),4=>array(),5=>array(),6=>array(),7=>array(),8=>array(),9=>array(),10=>array(),11=>array(),12=>array());
+
 					$q_natality = mysql_query("SELECT DISTINCT a.patient_id, a.delivery_date,b.patient_gender,b.patient_firstname FROM m_patient_mc  a, m_patient b WHERE a.delivery_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' AND a.outcome_id IN ('NSDF','NSDM','LSCSF','LSCSM') AND a.patient_id=b.patient_id AND b.patient_gender='$arr_gender[$sex]' ORDER by b.patient_dob") or die("Cannot query 234: ".mysql_error());
 
 					if(mysql_num_rows($q_natality)!=0):
@@ -1213,10 +1228,12 @@ function compute_indicators(){
 							//echo $delivery_date.'/'.$patient_id.'/'.$gender.'/'.$fname.'<br>';
 							if($this->get_px_brgy($patient_id,$brgy_array)):
 								$month_stat[$this->get_max_month($delivery_date)] += 1;							
+								array_push($lb_stat_px[$this->get_max_month($delivery_date)],array($patient_id,'Total Livebirths','epi',$delivery_date));
 							endif;
 						}
 					endif; 
 				
+					array_push($_SESSION["arr_px_labels"]["epi"],$lb_stat_px);
 					array_push($arr_gender_stat,$month_stat);
 
 				}
@@ -1226,14 +1243,17 @@ function compute_indicators(){
 				for($sex=0;$sex<count($arr_gender);$sex++){
 					$month_stat = array(1=>0,2=>0,3=>0,4=>0,5=>0,6=>0,7=>0,8=>0,9=>0,10=>0,11=>0,12=>0);
 
-					$q_complimentary_feed = mysql_query("SELECT DISTINCT a.patient_id, a.ccdev_service_date, round((TO_DAYS(a.ccdev_service_date) - TO_DAYS(b.patient_dob))/30 ,2) age, b.patient_dob FROM m_consult_ccdev_services a, m_patient b WHERE a.service_id='COMP' AND a.ccdev_service_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' AND a.patient_id=b.patient_id AND b.patient_gender='$arr_gender[$sex]' ORDER BY a.ccdev_service_date") or die("Cannot query 1181: ".mysql_error());
+					$comp_stat_px = array(1=>array(),2=>array(),3=>array(),4=>array(),5=>array(),6=>array(),7=>array(),8=>array(),9=>array(),10=>array(),11=>array(),12=>array());
+
+					$q_complimentary_feed = mysql_query("SELECT DISTINCT a.patient_id, a.ccdev_service_date, round(((a.age_on_service)/52)*12,2) as age_in_weeks, b.patient_dob FROM m_consult_ccdev_services a, m_patient b WHERE a.service_id='COMP' AND a.ccdev_service_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' AND a.patient_id=b.patient_id AND b.patient_gender='$arr_gender[$sex]' ORDER BY a.ccdev_service_date") or die("Cannot query 1181: ".mysql_error());
 
 					if(mysql_num_rows($q_complimentary_feed)!=0):
 						while(list($patient_id,$service_date,$edad,$dob)=mysql_fetch_array($q_complimentary_feed)){
 							//echo $patient_id.'/'.$service_date.'/'.$edad.'/'.$dob."<br>";
 							if($edad>=6 AND $edad<=8): //in months
 								if($this->get_px_brgy($patient_id,$brgy_array)):
-									$month_stat[$this->get_max_month($delivery_date)] += 1;
+									$month_stat[$this->get_max_month($service_date)] += 1;
+									array_push($comp_stat_px[$this->get_max_month($service_date)],array($patient_id,'Infant given complimentary food from 6-8 months','epi',$service_date));
 								endif;
 							endif;
 						}
@@ -1241,6 +1261,7 @@ function compute_indicators(){
 
 					endif;
 
+					array_push($_SESSION["arr_px_labels"]["epi"],$comp_stat_px);  
 					array_push($arr_gender_stat,$month_stat);
 
 				}
@@ -1249,17 +1270,19 @@ function compute_indicators(){
 			case 18: //infants with NBS done
 				for($sex=0;$sex<count($arr_gender);$sex++){
 					$month_stat = array(1=>0,2=>0,3=>0,4=>0,5=>0,6=>0,7=>0,8=>0,9=>0,10=>0,11=>0,12=>0);		
+					$nbs_stat_px = array(1=>array(),2=>array(),3=>array(),4=>array(),5=>array(),6=>array(),7=>array(),8=>array(),9=>array(),10=>array(),11=>array(),12=>array());
 
 					$q_nbs = mysql_query("SELECT DISTINCT a.patient_id, MIN(b.ccdev_service_date),b.service_id FROM m_patient a, m_consult_ccdev_services b WHERE a.patient_id=b.patient_id AND b.service_id='NBSDONE' AND a.patient_gender='$arr_gender[$sex]' AND round((TO_DAYS(b.ccdev_service_date)-TO_DAYS(a.patient_dob))/30,2) BETWEEN 0 AND 11 AND b.ccdev_service_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' GROUP by a.patient_id") or die("Cannot query 1206: ".mysql_error());
 
 					if(mysql_num_rows($q_nbs)!=0):
 						while(list($patient_id,$service_date)=mysql_fetch_array($q_nbs)){
 							if($this->get_px_brgy($patient_id,$brgy_array)):
-								$month_stat[$this->get_max_month($service_date)] += 1;
+								$nbs_stat[$this->get_max_month($service_date)] += 1;
+								array_push($nbs_stat_px[$this->get_max_month($service_date)],array($patient_id,'Infants for Newborn Screening (Done)','epi',$service_date));
 							endif;
 						}
 					endif;
-
+					array_push($_SESSION["arr_px_labels"]["epi"],$nbs_stat_px);
 					array_push($arr_gender_stat,$month_stat);
 				}
 
@@ -1268,6 +1291,7 @@ function compute_indicators(){
 			case 19:	//Infant 12-23 months old received Vitamin A
 				for($sex=0;$sex<count($arr_gender);$sex++){
 					$month_stat = array(1=>0,2=>0,3=>0,4=>0,5=>0,6=>0,7=>0,8=>0,9=>0,10=>0,11=>0,12=>0);
+					$vita_stat_px = array(1=>array(),2=>array(),3=>array(),4=>array(),5=>array(),6=>array(),7=>array(),8=>array(),9=>array(),10=>array(),11=>array(),12=>array());
 
 					$q_vita = mysql_query("SELECT DISTINCT a.patient_id, MIN(b.ccdev_service_date),round(((b.age_on_service)/52)*12,2) as age_in_weeks FROM m_patient a, m_consult_ccdev_services b WHERE a.patient_id=b.patient_id AND b.service_id='VITA' AND a.patient_gender='$arr_gender[$sex]' AND b.ccdev_service_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' GROUP by a.patient_id") or die("Cannot query 1225: ".mysql_error());
 
@@ -1276,11 +1300,13 @@ function compute_indicators(){
 							if($age >= 12 AND $age < 24):
 								if($this->get_px_brgy($patient_id,$brgy_array)):
 									$month_stat[$this->get_max_month($service_date)] += 1;
+									array_push($vita_stat_px[$this->get_max_month($service_date)],array($patient_id,'Infant 12-23 months old received Vitamin A','epi',$service_date));
 								endif;
 							endif;
 						}
 					endif;
 
+					array_push($_SESSION["arr_px_labels"]["epi"],$vita_stat_px);
 					array_push($arr_gender_stat,$month_stat);
 				}
 				
@@ -1290,6 +1316,8 @@ function compute_indicators(){
 				for($sex=0;$sex<count($arr_gender);$sex++){
 					$month_stat = array(1=>0,2=>0,3=>0,4=>0,5=>0,6=>0,7=>0,8=>0,9=>0,10=>0,11=>0,12=>0);
 
+					$vita_stat_px = array(1=>array(),2=>array(),3=>array(),4=>array(),5=>array(),6=>array(),7=>array(),8=>array(),9=>array(),10=>array(),11=>array(),12=>array());
+
 					$q_vita = mysql_query("SELECT DISTINCT a.patient_id, MIN(b.ccdev_service_date),round(((b.age_on_service)/52)*12,2) as age_in_weeks FROM m_patient a, m_consult_ccdev_services b WHERE a.patient_id=b.patient_id AND b.service_id='VITA' AND a.patient_gender='$arr_gender[$sex]' AND b.ccdev_service_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' GROUP by a.patient_id") or die("Cannot query 1225: ".mysql_error());
 
 					if(mysql_num_rows($q_vita)!=0): 
@@ -1297,11 +1325,13 @@ function compute_indicators(){
 							if($age >= 24 AND $age < 36):
 								if($this->get_px_brgy($patient_id,$brgy_array)):
 									$month_stat[$this->get_max_month($service_date)] += 1;
+									array_push($vita_stat_px[$this->get_max_month($service_date)],array($patient_id,'Infant 24-35 months old received Vitamin A','epi',$service_date));
 								endif;
 							endif;
 						}
 					endif;
 
+					array_push($_SESSION["arr_px_labels"]["epi"],$vita_stat_px);
 					array_push($arr_gender_stat,$month_stat);
 				}				
 				break;
@@ -1310,18 +1340,23 @@ function compute_indicators(){
 				for($sex=0;$sex<count($arr_gender);$sex++){ 
 					$month_stat = array(1=>0,2=>0,3=>0,4=>0,5=>0,6=>0,7=>0,8=>0,9=>0,10=>0,11=>0,12=>0);
 
+					$vita_stat_px = array(1=>array(),2=>array(),3=>array(),4=>array(),5=>array(),6=>array(),7=>array(),8=>array(),9=>array(),10=>array(),11=>array(),12=>array());
+
+
 					$q_vita = mysql_query("SELECT DISTINCT a.patient_id, MIN(b.ccdev_service_date),round(((b.age_on_service)/52)*12,2) as age_in_weeks FROM m_patient a, m_consult_ccdev_services b WHERE a.patient_id=b.patient_id AND b.service_id='VITA' AND a.patient_gender='$arr_gender[$sex]' AND b.ccdev_service_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' GROUP by a.patient_id") or die("Cannot query 1225: ".mysql_error());
 
 					if(mysql_num_rows($q_vita)!=0): 
-						while(list($patient_id,$service_date,$age)=mysql_fetch_array($q_vita)){
+						while(list($patient_id,$service_date,$age)=mysql_fetch_array($q_vita)){ 
 							if($age >= 36 AND $age < 48):
 								if($this->get_px_brgy($patient_id,$brgy_array)):
 									$month_stat[$this->get_max_month($service_date)] += 1;
+									array_push($vita_stat_px[$this->get_max_month($service_date)],array($patient_id,'Infant 36-47 months old received Vitamin A','epi',$service_date));
 								endif;
 							endif;
 						}
 					endif;
 
+					array_push($_SESSION["arr_px_labels"]["epi"],$vita_stat_px);
 					array_push($arr_gender_stat,$month_stat);
 				}				
 				break;
@@ -1330,6 +1365,8 @@ function compute_indicators(){
 				for($sex=0;$sex<count($arr_gender);$sex++){
 					$month_stat = array(1=>0,2=>0,3=>0,4=>0,5=>0,6=>0,7=>0,8=>0,9=>0,10=>0,11=>0,12=>0);
 
+					$vita_stat_px = array(1=>array(),2=>array(),3=>array(),4=>array(),5=>array(),6=>array(),7=>array(),8=>array(),9=>array(),10=>array(),11=>array(),12=>array());
+
 					$q_vita = mysql_query("SELECT DISTINCT a.patient_id, MIN(b.ccdev_service_date),round(((b.age_on_service)/52)*12,2) as age_in_weeks FROM m_patient a, m_consult_ccdev_services b WHERE a.patient_id=b.patient_id AND b.service_id='VITA' AND a.patient_gender='$arr_gender[$sex]' AND b.ccdev_service_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' GROUP by a.patient_id") or die("Cannot query 1225: ".mysql_error());
 
 					if(mysql_num_rows($q_vita)!=0): 
@@ -1337,11 +1374,13 @@ function compute_indicators(){
 							if($age >= 48 AND $age < 60): 
 								if($this->get_px_brgy($patient_id,$brgy_array)):
 									$month_stat[$this->get_max_month($service_date)] += 1;
+									array_push($vita_stat_px[$this->get_max_month($service_date)],array($patient_id,'Infant 48-59 months old received Vitamin A','epi',$service_date));
 								endif;
 							endif;
 						}
 					endif;
-
+					
+					array_push($_SESSION["arr_px_labels"]["epi"],$vita_stat_px);
 					array_push($arr_gender_stat,$month_stat);
 				}
 				break;
@@ -1350,6 +1389,9 @@ function compute_indicators(){
 				for($sex=0;$sex<count($arr_gender);$sex++){ 
 					$month_stat = array(1=>0,2=>0,3=>0,4=>0,5=>0,6=>0,7=>0,8=>0,9=>0,10=>0,11=>0,12=>0);
 
+					$iron_stat_px = array(1=>array(),2=>array(),3=>array(),4=>array(),5=>array(),6=>array(),7=>array(),8=>array(),9=>array(),10=>array(),11=>array(),12=>array());
+
+					
 					$q_iron = mysql_query("SELECT DISTINCT a.patient_id, MIN(b.ccdev_service_date),round(((b.age_on_service)/52)*12,2) as age_in_weeks FROM m_patient a, m_consult_ccdev_services b WHERE a.patient_id=b.patient_id AND b.service_id='IRON' AND a.patient_gender='$arr_gender[$sex]' AND b.ccdev_service_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' GROUP by a.patient_id") or die("Cannot query 1225: ".mysql_error());
 
 					if(mysql_num_rows($q_iron)!=0):
@@ -1357,11 +1399,13 @@ function compute_indicators(){
 							if($age >= 2 AND $age < 6): 
 								if($this->get_px_brgy($patient_id,$brgy_array)):
 									$month_stat[$this->get_max_month($service_date)] += 1;
+									array_push($iron_stat_px[$this->get_max_month($service_date)],array($patient_id,'Infant 2-5 months received Iron','epi',$service_date));
 								endif;
 							endif;
 						}
 					endif;
-
+					
+					array_push($_SESSION["arr_px_labels"]["epi"],$iron_stat_px);
 					array_push($arr_gender_stat,$month_stat);
 				}
 				
@@ -1371,6 +1415,8 @@ function compute_indicators(){
 				for($sex=0;$sex<count($arr_gender);$sex++){ 
 					$month_stat = array(1=>0,2=>0,3=>0,4=>0,5=>0,6=>0,7=>0,8=>0,9=>0,10=>0,11=>0,12=>0);
 
+					$iron_stat_px = array(1=>array(),2=>array(),3=>array(),4=>array(),5=>array(),6=>array(),7=>array(),8=>array(),9=>array(),10=>array(),11=>array(),12=>array());
+
 					$q_iron = mysql_query("SELECT DISTINCT a.patient_id, MIN(b.ccdev_service_date),round(((b.age_on_service)/52)*12,2) as age_in_weeks FROM m_patient a, m_consult_ccdev_services b WHERE a.patient_id=b.patient_id AND b.service_id='IRON' AND a.patient_gender='$arr_gender[$sex]' AND b.ccdev_service_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' GROUP by a.patient_id") or die("Cannot query 1225: ".mysql_error());
 
 					if(mysql_num_rows($q_iron)!=0):
@@ -1378,11 +1424,13 @@ function compute_indicators(){
 							if($age >= 6 AND $age < 7): 
 								if($this->get_px_brgy($patient_id,$brgy_array)):
 									$month_stat[$this->get_max_month($service_date)] += 1;
+									array_push($iron_stat_px[$this->get_max_month($service_date)],array($patient_id,'Infant 2-5 months received Iron','epi',$service_date));
 								endif;
 							endif;
 						}
 					endif;
-
+					
+					array_push($_SESSION["arr_px_labels"]["epi"],$iron_stat_px);
 					array_push($arr_gender_stat,$month_stat);
 				}
 				break;
@@ -1391,6 +1439,8 @@ function compute_indicators(){
 				for($sex=0;$sex<count($arr_gender);$sex++){ 
 					$month_stat = array(1=>0,2=>0,3=>0,4=>0,5=>0,6=>0,7=>0,8=>0,9=>0,10=>0,11=>0,12=>0);
 
+					$iron_stat_px = array(1=>array(),2=>array(),3=>array(),4=>array(),5=>array(),6=>array(),7=>array(),8=>array(),9=>array(),10=>array(),11=>array(),12=>array());
+
 					$q_iron = mysql_query("SELECT DISTINCT a.patient_id, MIN(b.ccdev_service_date),round(((b.age_on_service)/52)*12,2) as age_in_weeks FROM m_patient a, m_consult_ccdev_services b WHERE a.patient_id=b.patient_id AND b.service_id='IRON' AND a.patient_gender='$arr_gender[$sex]' AND b.ccdev_service_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' GROUP by a.patient_id") or die("Cannot query 1225: ".mysql_error());
 
 					if(mysql_num_rows($q_iron)!=0):
@@ -1398,11 +1448,13 @@ function compute_indicators(){
 							if($age >= 22 AND $age < 24): 
 								if($this->get_px_brgy($patient_id,$brgy_array)):
 									$month_stat[$this->get_max_month($service_date)] += 1;
+									array_push($iron_stat_px[$this->get_max_month($service_date)],array($patient_id,'Infant 22-23 months received Iron','epi',$service_date));
 								endif;
 							endif;
 						}
 					endif;
-
+					
+					array_push($_SESSION["arr_px_labels"]["epi"],$iron_stat_px);
 					array_push($arr_gender_stat,$month_stat);
 				}			
 				break;
@@ -1411,6 +1463,8 @@ function compute_indicators(){
 				for($sex=0;$sex<count($arr_gender);$sex++){ 
 					$month_stat = array(1=>0,2=>0,3=>0,4=>0,5=>0,6=>0,7=>0,8=>0,9=>0,10=>0,11=>0,12=>0);
 
+					$iron_stat_px = array(1=>array(),2=>array(),3=>array(),4=>array(),5=>array(),6=>array(),7=>array(),8=>array(),9=>array(),10=>array(),11=>array(),12=>array());
+
 					$q_iron = mysql_query("SELECT DISTINCT a.patient_id, MIN(b.ccdev_service_date),round(((b.age_on_service)/52)*12,2) as age_in_weeks FROM m_patient a, m_consult_ccdev_services b WHERE a.patient_id=b.patient_id AND b.service_id='IRON' AND a.patient_gender='$arr_gender[$sex]' AND b.ccdev_service_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' GROUP by a.patient_id") or die("Cannot query 1225: ".mysql_error());
 
 					if(mysql_num_rows($q_iron)!=0):
@@ -1418,11 +1472,13 @@ function compute_indicators(){
 							if($age >= 24 AND $age < 36): 
 								if($this->get_px_brgy($patient_id,$brgy_array)):
 									$month_stat[$this->get_max_month($service_date)] += 1;
+									array_push($iron_stat_px[$this->get_max_month($service_date)],array($patient_id,'Infant 22-23 months received Iron','epi',$service_date));
 								endif;
 							endif;
 						}
 					endif;
 
+					array_push($_SESSION["arr_px_labels"]["epi"],$iron_stat_px);
 					array_push($arr_gender_stat,$month_stat);
 				}
 				break;
@@ -1431,6 +1487,8 @@ function compute_indicators(){
 				for($sex=0;$sex<count($arr_gender);$sex++){ 
 					$month_stat = array(1=>0,2=>0,3=>0,4=>0,5=>0,6=>0,7=>0,8=>0,9=>0,10=>0,11=>0,12=>0);
 
+					$iron_stat_px = array(1=>array(),2=>array(),3=>array(),4=>array(),5=>array(),6=>array(),7=>array(),8=>array(),9=>array(),10=>array(),11=>array(),12=>array());
+
 					$q_iron = mysql_query("SELECT DISTINCT a.patient_id, MIN(b.ccdev_service_date),round(((b.age_on_service)/52)*12,2) as age_in_weeks FROM m_patient a, m_consult_ccdev_services b WHERE a.patient_id=b.patient_id AND b.service_id='IRON' AND a.patient_gender='$arr_gender[$sex]' AND b.ccdev_service_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' GROUP by a.patient_id") or die("Cannot query 1225: ".mysql_error());
 
 					if(mysql_num_rows($q_iron)!=0):
@@ -1438,11 +1496,13 @@ function compute_indicators(){
 							if($age >= 36 AND $age < 48): 
 								if($this->get_px_brgy($patient_id,$brgy_array)):
 									$month_stat[$this->get_max_month($service_date)] += 1;
+									array_push($iron_stat_px[$this->get_max_month($service_date)],array($patient_id,'Infant 36-47 months received Iron','epi',$service_date));
 								endif;
 							endif;
 						}
 					endif;
-
+					
+					array_push($_SESSION["arr_px_labels"]["epi"],$iron_stat_px);
 					array_push($arr_gender_stat,$month_stat);
 				}
 
@@ -1452,6 +1512,9 @@ function compute_indicators(){
 				for($sex=0;$sex<count($arr_gender);$sex++){ 
 					$month_stat = array(1=>0,2=>0,3=>0,4=>0,5=>0,6=>0,7=>0,8=>0,9=>0,10=>0,11=>0,12=>0);
 
+					$iron_stat_px = array(1=>array(),2=>array(),3=>array(),4=>array(),5=>array(),6=>array(),7=>array(),8=>array(),9=>array(),10=>array(),11=>array(),12=>array());
+
+
 					$q_iron = mysql_query("SELECT DISTINCT a.patient_id, MIN(b.ccdev_service_date),round(((b.age_on_service)/52)*12,2) as age_in_weeks FROM m_patient a, m_consult_ccdev_services b WHERE a.patient_id=b.patient_id AND b.service_id='IRON' AND a.patient_gender='$arr_gender[$sex]' AND b.ccdev_service_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' GROUP by a.patient_id") or die("Cannot query 1225: ".mysql_error());
 
 					if(mysql_num_rows($q_iron)!=0):
@@ -1459,11 +1522,13 @@ function compute_indicators(){
 							if($age >= 48 AND $age < 60): 
 								if($this->get_px_brgy($patient_id,$brgy_array)):
 									$month_stat[$this->get_max_month($service_date)] += 1;
+									array_push($iron_stat_px[$this->get_max_month($service_date)],array($patient_id,'Infant 48-59 months received Iron','epi',$service_date));
 								endif;
 							endif;
 						}
 					endif;
 
+					array_push($_SESSION["arr_px_labels"]["epi"],$iron_stat_px);
 					array_push($arr_gender_stat,$month_stat);
 				}				
 
@@ -1474,18 +1539,22 @@ function compute_indicators(){
 				for($sex=0;$sex<count($arr_gender);$sex++){ 
 					$month_stat = array(1=>0,2=>0,3=>0,4=>0,5=>0,6=>0,7=>0,8=>0,9=>0,10=>0,11=>0,12=>0);
 
+					$mnp_stat_px = array(1=>array(),2=>array(),3=>array(),4=>array(),5=>array(),6=>array(),7=>array(),8=>array(),9=>array(),10=>array(),11=>array(),12=>array());
+
 					$q_mnp = mysql_query("SELECT DISTINCT a.patient_id, MIN(b.ccdev_service_date),round(((b.age_on_service)/52)*12,2) as age_in_weeks FROM m_patient a, m_consult_ccdev_services b WHERE a.patient_id=b.patient_id AND b.service_id='MNP' AND a.patient_gender='$arr_gender[$sex]' AND b.ccdev_service_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' GROUP by a.patient_id") or die("Cannot query 1225: ".mysql_error());
 
-					if(mysql_num_rows($q_mnp)!=0):
+					if(mysql_num_rows($q_mnp)!=0): 
 						while(list($patient_id,$service_date,$age)=mysql_fetch_array($q_mnp)){
 							if($age >= 6 AND $age < 12): 
-								if($this->get_px_brgy($patient_id,$brgy_array)):
+								if($this->get_px_brgy($patient_id,$brgy_array)): 
 									$month_stat[$this->get_max_month($service_date)] += 1;
+									array_push($mnp_stat_px[$this->get_max_month($service_date)],array($patient_id,'Infant 6-11 months received MNP','epi',$service_date));
 								endif;
 							endif;
 						}
 					endif;
 
+					array_push($_SESSION["arr_px_labels"]["epi"],$mnp_stat_px);
 					array_push($arr_gender_stat,$month_stat);
 				}				
 				break;		
@@ -1494,6 +1563,8 @@ function compute_indicators(){
 				for($sex=0;$sex<count($arr_gender);$sex++){ 
 					$month_stat = array(1=>0,2=>0,3=>0,4=>0,5=>0,6=>0,7=>0,8=>0,9=>0,10=>0,11=>0,12=>0);
 
+					$mnp_stat_px = array(1=>array(),2=>array(),3=>array(),4=>array(),5=>array(),6=>array(),7=>array(),8=>array(),9=>array(),10=>array(),11=>array(),12=>array());
+
 					$q_mnp = mysql_query("SELECT DISTINCT a.patient_id, MIN(b.ccdev_service_date),round(((b.age_on_service)/52)*12,2) as age_in_weeks FROM m_patient a, m_consult_ccdev_services b WHERE a.patient_id=b.patient_id AND b.service_id='MNP' AND a.patient_gender='$arr_gender[$sex]' AND b.ccdev_service_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' GROUP by a.patient_id") or die("Cannot query 1225: ".mysql_error());
 
 					if(mysql_num_rows($q_mnp)!=0): 
@@ -1501,11 +1572,13 @@ function compute_indicators(){
 							if($age >= 12 AND $age < 24): 
 								if($this->get_px_brgy($patient_id,$brgy_array)):
 									$month_stat[$this->get_max_month($service_date)] += 1;
+									array_push($mnp_stat_px[$this->get_max_month($service_date)],array($patient_id,'Infant 12-23 months received MNP','epi',$service_date));
 								endif;
 							endif;
 						}
 					endif;
 
+					array_push($_SESSION["arr_px_labels"]["epi"],$mnp_stat_px);
 					array_push($arr_gender_stat,$month_stat);
 				}				
 				break;		
@@ -1515,6 +1588,8 @@ function compute_indicators(){
 				for($sex=0;$sex<count($arr_gender);$sex++){ 
 					$month_stat = array(1=>0,2=>0,3=>0,4=>0,5=>0,6=>0,7=>0,8=>0,9=>0,10=>0,11=>0,12=>0);
 
+					$deworm_stat_px = array(1=>array(),2=>array(),3=>array(),4=>array(),5=>array(),6=>array(),7=>array(),8=>array(),9=>array(),10=>array(),11=>array(),12=>array());
+
 					$q_deworm = mysql_query("SELECT DISTINCT a.patient_id, MIN(b.ccdev_service_date),round(((b.age_on_service)/52)*12,2) as age_in_weeks FROM m_patient a, m_consult_ccdev_services b WHERE a.patient_id=b.patient_id AND b.service_id='WORM' AND a.patient_gender='$arr_gender[$sex]' AND b.ccdev_service_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' GROUP by a.patient_id") or die("Cannot query 1225: ".mysql_error());
 
 					if(mysql_num_rows($q_deworm)!=0): 
@@ -1522,11 +1597,13 @@ function compute_indicators(){
 							if($age >= 12 AND $age < 60): 
 								if($this->get_px_brgy($patient_id,$brgy_array)):
 									$month_stat[$this->get_max_month($service_date)] += 1;
+									array_push($deworm_stat_px[$this->get_max_month($service_date)],array($patient_id,'Children 12-59 months old given de-worming tablet','epi',$service_date));
 								endif;
 							endif;
 						}
 					endif;
 
+					array_push($_SESSION["arr_px_labels"]["epi"],$deworm_stat_px);
 					array_push($arr_gender_stat,$month_stat);
 				}				
 				break;		
@@ -1534,7 +1611,8 @@ function compute_indicators(){
 			case 32:	//Anemic Children 6-11 months old seen
 				for($sex=0;$sex<count($arr_gender);$sex++){
 					$month_stat = array(1=>0,2=>0,3=>0,4=>0,5=>0,6=>0,7=>0,8=>0,9=>0,10=>0,11=>0,12=>0);			
-					
+					$anemic_stat_px = array(1=>array(),2=>array(),3=>array(),4=>array(),5=>array(),6=>array(),7=>array(),8=>array(),9=>array(),10=>array(),11=>array(),12=>array());
+
 					$q_anemia = mysql_query("SELECT DISTINCT b.consult_id,date_format(b.consult_date,'%Y-%m-%d'),a.patient_id,a.patient_dob,c.notes_id,round((TO_DAYS(date_format(b.consult_date,'%Y-%m-%d'))-TO_DAYS(a.patient_dob))/7,2) as age_wks FROM m_patient a, m_consult b,m_consult_notes c,m_consult_notes_dxclass d,m_lib_notes_dxclass e WHERE a.patient_id=b.patient_id AND b.consult_id=c.consult_id AND c.notes_id=d.notes_id AND d.class_id=e.class_id AND e.class_name LIKE '%anemia%' AND a.patient_gender='$arr_gender[$sex]' AND b.consult_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]'") or die("Cannot query: 753");
 					
 									
@@ -1546,11 +1624,13 @@ function compute_indicators(){
 							if($age_months>=6 && $age_months<12):
 								if($this->get_px_brgy($pxid,$brgy_array)):
 									$month_stat[$this->get_max_month($consult_date)] += 1;
+									array_push($anemic_stat_px[$this->get_max_month($consult_date)],array($pxid,'Anemic Children 6-11 months old seen','epi',$consult_date));
 								endif;
 							endif;
 						}
 					endif;
-				
+					
+					array_push($_SESSION["arr_px_labels"]["epi"],$anemic_stat_px);				
 					array_push($arr_gender_stat,$month_stat);
 
 				}
@@ -1559,6 +1639,8 @@ function compute_indicators(){
 			case 33:	//Anemic Children 6-11 months old received complete Iron
 				for($sex=0;$sex<count($arr_gender);$sex++){
 					$month_stat = array(1=>0,2=>0,3=>0,4=>0,5=>0,6=>0,7=>0,8=>0,9=>0,10=>0,11=>0,12=>0);
+
+					$anemic_stat_px = array(1=>array(),2=>array(),3=>array(),4=>array(),5=>array(),6=>array(),7=>array(),8=>array(),9=>array(),10=>array(),11=>array(),12=>array());
 
 					$q_anemia = mysql_query("SELECT DISTINCT b.consult_id,date_format(b.consult_date,'%Y-%m-%d'),a.patient_id,a.patient_dob,c.notes_id,f.anemia_completed_date,round((TO_DAYS(date_format(f.anemia_completed_date,'%Y-%m-%d'))-TO_DAYS(a.patient_dob))/7,2) as age_wks  FROM m_patient a, m_consult b,m_consult_notes c,m_consult_notes_dxclass d,m_lib_notes_dxclass e,m_consult_notes f WHERE a.patient_id=b.patient_id AND b.consult_id=c.consult_id AND c.notes_id=d.notes_id AND d.class_id=e.class_id AND e.class_name LIKE '%anemia%' AND a.patient_gender='$arr_gender[$sex]' AND f.anemia_completed_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' AND b.consult_id=f.consult_id AND f.anemia_completed_date!='0000-00-00'") or die("Cannot query: 1516");
 
@@ -1571,18 +1653,23 @@ function compute_indicators(){
 							if($age_months>=6 && $age_months<12):
 								if($this->get_px_brgy($pxid,$brgy_array)):
 									$month_stat[$this->get_max_month($anemia_iron_completed)] += 1;
+									array_push($anemic_stat_px[$this->get_max_month($consult_date)],array($pxid,'Anemic Children 6-11 months old received complete Iron','epi',$consult_date));
 								endif;
 							endif;
 						}
 					endif;
-				array_push($arr_gender_stat,$month_stat);
+
+					array_push($_SESSION["arr_px_labels"]["epi"],$anemic_stat_px);
+					array_push($arr_gender_stat,$month_stat);
 				}
 
 				break;			
 			
 			case 34:	//Anemic Children 12-59 months old seen
 				for($sex=0;$sex<count($arr_gender);$sex++){
-					$month_stat = array(1=>0,2=>0,3=>0,4=>0,5=>0,6=>0,7=>0,8=>0,9=>0,10=>0,11=>0,12=>0);			
+					$month_stat = array(1=>0,2=>0,3=>0,4=>0,5=>0,6=>0,7=>0,8=>0,9=>0,10=>0,11=>0,12=>0);		
+
+					$anemic_stat_px = array(1=>array(),2=>array(),3=>array(),4=>array(),5=>array(),6=>array(),7=>array(),8=>array(),9=>array(),10=>array(),11=>array(),12=>array());
 					
 					$q_anemia = mysql_query("SELECT DISTINCT b.consult_id,date_format(b.consult_date,'%Y-%m-%d'),a.patient_id,a.patient_dob,c.notes_id,round((TO_DAYS(date_format(b.consult_date,'%Y-%m-%d'))-TO_DAYS(a.patient_dob))/7,2) as age_wks FROM m_patient a, m_consult b,m_consult_notes c,m_consult_notes_dxclass d,m_lib_notes_dxclass e WHERE a.patient_id=b.patient_id AND b.consult_id=c.consult_id AND c.notes_id=d.notes_id AND d.class_id=e.class_id AND e.class_name LIKE '%anemia%' AND a.patient_gender='$arr_gender[$sex]' AND b.consult_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]'") or die("Cannot query: 753");
 					
@@ -1595,11 +1682,13 @@ function compute_indicators(){
 							if($age_months>=12 && $age_months<60):
 								if($this->get_px_brgy($pxid,$brgy_array)):
 									$month_stat[$this->get_max_month($consult_date)] += 1;
+									array_push($anemic_stat_px[$this->get_max_month($consult_date)],array($pxid,'Anemic Children 12-59 months old received complete Iron','epi',$consult_date));
 								endif;
 							endif;
 						}
 					endif;
 				
+					array_push($_SESSION["arr_px_labels"]["epi"],$anemic_stat_px);
 					array_push($arr_gender_stat,$month_stat);
 
 				}
@@ -1610,6 +1699,8 @@ function compute_indicators(){
 				for($sex=0;$sex<count($arr_gender);$sex++){
 					$month_stat = array(1=>0,2=>0,3=>0,4=>0,5=>0,6=>0,7=>0,8=>0,9=>0,10=>0,11=>0,12=>0);
 
+					$anemic_stat_px = array(1=>array(),2=>array(),3=>array(),4=>array(),5=>array(),6=>array(),7=>array(),8=>array(),9=>array(),10=>array(),11=>array(),12=>array());
+
 					$q_anemia = mysql_query("SELECT DISTINCT b.consult_id,date_format(b.consult_date,'%Y-%m-%d'),a.patient_id,a.patient_dob,c.notes_id,f.anemia_completed_date,round((TO_DAYS(date_format(f.anemia_completed_date,'%Y-%m-%d'))-TO_DAYS(a.patient_dob))/7,2) as age_wks  FROM m_patient a, m_consult b,m_consult_notes c,m_consult_notes_dxclass d,m_lib_notes_dxclass e,m_consult_notes f WHERE a.patient_id=b.patient_id AND b.consult_id=c.consult_id AND c.notes_id=d.notes_id AND d.class_id=e.class_id AND e.class_name LIKE '%anemia%' AND a.patient_gender='$arr_gender[$sex]' AND f.anemia_completed_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' AND b.consult_id=f.consult_id AND f.anemia_completed_date!='0000-00-00'") or die("Cannot query: 1516");
 
 					if(mysql_num_rows($q_anemia)!=0):
@@ -1621,11 +1712,14 @@ function compute_indicators(){
 							if($age_months>=12 && $age_months<60):
 								if($this->get_px_brgy($pxid,$brgy_array)):
 									$month_stat[$this->get_max_month($anemia_iron_completed)] += 1;
+									array_push($anemic_stat_px[$this->get_max_month($consult_date)],array($pxid,'Anemic Children 12-59 months old received complete Iron','epi',$consult_date));
 								endif;
 							endif;
 						}
 					endif;
-				array_push($arr_gender_stat,$month_stat);
+
+					array_push($_SESSION["arr_px_labels"]["epi"],$anemic_stat_px);
+					array_push($arr_gender_stat,$month_stat);
 				}
 
 				break;
