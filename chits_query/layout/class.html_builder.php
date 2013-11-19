@@ -94,7 +94,7 @@ class html_builder{
 		list($report_period) = mysql_fetch_array($q_report_period);
 		
 		$arr_px_labels = $_SESSION["arr_px_labels"];		
-echo count($arr_px_labels["epi"]);
+
 		foreach($cell_contents as $key=>$value){ 
 			echo "<tr style='background-color: #666666; color: #FFFF66; font-weight:bold; white-space: nowrap; font-size: 19px;'>";
 
@@ -104,7 +104,7 @@ echo count($arr_px_labels["epi"]);
 				echo "<td>";
 
 				if(!empty($arr_px_labels)): 
-					if($i!=0 && $value[$i]!=0): echo $key."<br>";
+					if($i!=0 && $value[$i]!=0):
 						if(isset($arr_px_labels["epi"])): 
 							$cat = 'epi'; 
 							$arr_names = $this->return_px_names(((($key*2)+$i)-1),$arr_px_labels,$cat);
