@@ -2149,17 +2149,19 @@ $pdf->AddPage();
 $_SESSION["arr_px_labels"] = array('epi'=>array());
 $ccdev_rec = $pdf->show_ccdev_summary();
 $arr_csv = array();
-foreach($ccdev_rec as $key=>$value){ 
-	if(($key==7) || ($key>=13 && $key<=18)): //this will ignore the rows for hepa at birth, rota1, rota2, penta 1,penta 2 and penta 3
 
-	else:
+
+
+foreach($ccdev_rec as $key=>$value){ 
+	//if(($key==7) || ($key>=13 && $key<=18)): //this will ignore the rows for hepa at birth, rota1, rota2, penta 1,penta 2 and penta 3
+	//else:
 		array_push($arr_csv,$value);
-	endif;
+	//endif;
 }
 
 if($_GET["type"]=='html'): 
 	$html_tab->create_table($_SESSION["w"],$_SESSION["header"],$ccdev_rec,$_SESSION["w2"],$_SESSION["subheader"]);
-elseif($_GET["type"]=='csv'):
+elseif($_GET["type"]=='csv'): 
 	$csv_creator->create_csv($_SESSION["ques"],$arr_csv,'csv');
 elseif($_GET["type"]=='efhsis'): 
 	$csv_creator->create_csv($_SESSION["ques"],$arr_csv,'efhsis');

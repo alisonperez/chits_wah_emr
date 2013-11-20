@@ -166,7 +166,76 @@ class csv_creator{
 
 			case '8': //child care
 
-				for($i=0;$i<18;$i++){ //first 18 indicators from BCG to Infant referred for NBS
+				for($i=0;$i<=12;$i++){ //first 12 indicators from BCG to Measles excluding the Hepa w/in 24 hours ($i=8). HepB and Hepa within 24 hrs will be added
+					
+					if($i!=8):
+						foreach($arr_stats[$i] as $key=>$value){ 
+							if($i==7):
+								$value = $value + $arr_stats[8][$key];
+							endif;
+
+							if($report_type=='M'):
+								if($key!=0):
+									array_push($arr_numero,$value);
+								endif;
+							elseif($report_type=='Q'):
+								if($key==2 || $key==3):
+									array_push($arr_numero,$value);
+								endif;
+							else:
+							endif;				
+						}					
+					endif;
+				}
+
+				for($i=23;$i<=28;$i++){ //indicator 23 (FIC) to index 28 (NBS)
+					foreach($arr_stats[$i] as $key=>$value){ 
+						if($report_type=='M'):
+							if($key!=0):
+								array_push($arr_numero,$value);
+							endif;
+						elseif($report_type=='Q'):
+							if($key==2 || $key==3):
+								array_push($arr_numero,$value);
+							endif;
+						else:
+						endif;				
+					}
+				}
+				
+
+				for($i=65;$i<=67;$i++){ //indicator 65 (infant 6-11 given vit A) to index 67 (infant 60-71 given vit A)
+					foreach($arr_stats[$i] as $key=>$value){ 
+						if($report_type=='M'):
+							if($key!=0):
+								array_push($arr_numero,$value);
+							endif;
+						elseif($report_type=='Q'):
+							if($key==2 || $key==3):
+								array_push($arr_numero,$value);
+							endif;
+						else:
+						endif;				
+					}
+				}
+				
+				for($i=35;$i<=44;$i++){ //indicator 35 (Sick child 6-11 seen) to index 44 (Anemic children 2-59 given iron)
+					foreach($arr_stats[$i] as $key=>$value){ 
+						if($report_type=='M'):
+							if($key!=0):
+								array_push($arr_numero,$value);
+							endif;
+						elseif($report_type=='Q'):
+							if($key==2 || $key==3):
+								array_push($arr_numero,$value);
+							endif;
+						else:
+						endif;				
+					}
+				}
+				
+
+				for($i=29;$i<=34;$i++){ //indicator 29 (no. diarrea cases seen) to index 34 (pneumonia given treatment)
 					foreach($arr_stats[$i] as $key=>$value){ 
 						if($report_type=='M'):
 							if($key!=0):
@@ -181,43 +250,94 @@ class csv_creator{
 					}
 				}
 
-				for($i=0;$i<6;$i++){ //provide allowance for the six INF_VITA indicators. place the value of 0 until October
-					array_push($arr_numero,0);
-				}
-
-				for($i=24;$i<34;$i++){ //count for for sick child, sick child with Vit A, infant with LBW
+				for($i=16;$i<=18;$i++){ //indicator 16 (penta 1) to index 18 (penta 3)
 					foreach($arr_stats[$i] as $key=>$value){ 
-					
-					if($report_type=='M'):
-						if($key!=0):
-							array_push($arr_numero,$value);
-						endif;
-					elseif($report_type=='Q'):
-						if($key==2 || $key==3):
-							array_push($arr_numero,$value);
-						endif;
-					else:
-					endif;
-					
+						if($report_type=='M'):
+							if($key!=0):
+								array_push($arr_numero,$value);
+							endif;
+						elseif($report_type=='Q'):
+							if($key==2 || $key==3):
+								array_push($arr_numero,$value);
+							endif;
+						else:
+						endif;				
 					}
 				}
 
+				//push measles again for the indicator MCV1
+				array_push($arr_numero,$arr_stats[12][1],$arr_stats[12][2]);
 
-				for($i=18;$i<24;$i++){ //count for for sick child, sick child with Vit A, infant with LBW
+				//push MMR for the indicator MCV2
+				array_push($arr_numero,$arr_stats[19][1],$arr_stats[19][2]);
+
+
+				for($i=13;$i<=15;$i++){ //indicator 13 (rota 1) to index 15 (rota 3)
 					foreach($arr_stats[$i] as $key=>$value){ 
-					if($report_type=='M'):
-						if($key!=0):
-							array_push($arr_numero,$value);
-						endif;
-					elseif($report_type=='Q'):
-						if($key==2 || $key==3):
-							array_push($arr_numero,$value);
-						endif;
-					else:
-					endif;
-
+						if($report_type=='M'):
+							if($key!=0):
+								array_push($arr_numero,$value);
+							endif;
+						elseif($report_type=='Q'):
+							if($key==2 || $key==3):
+								array_push($arr_numero,$value);
+							endif;
+						else:
+						endif;				
 					}
 				}
+
+				for($i=20;$i<=22;$i++){ //indicator 20 (pcv 1) to index 22 (pcv 3)
+					foreach($arr_stats[$i] as $key=>$value){ 
+						if($report_type=='M'):
+							if($key!=0):
+								array_push($arr_numero,$value);
+							endif;
+						elseif($report_type=='Q'):
+							if($key==2 || $key==3):
+								array_push($arr_numero,$value);
+							endif;
+						else:
+						endif;				
+					}
+				}
+
+				for($i=45;$i<=60;$i++){ //indicator 45 (Total livebirths) to index 46 (child 12-59 given deworming tablet) excluding $i=47 (NBS Screening done)
+
+					if($i!=47):	//excluding $i = 47
+						foreach($arr_stats[$i] as $key=>$value){ 
+							if($report_type=='M'):
+								if($key!=0):
+									array_push($arr_numero,$value);
+								endif;
+							elseif($report_type=='Q'):
+								if($key==2 || $key==3):
+									array_push($arr_numero,$value);
+								endif;
+							else:
+							endif;				
+						}
+					endif;
+				}
+				
+				//push MMR for the indicator infants 2-6 with LBW given Iron
+				array_push($arr_numero,$arr_stats[42][1],$arr_stats[42][2]);
+
+				for($i=61;$i<=64;$i++){ //indicator 61 (anemic children 6-11 seen) to index 64 (anemic children 12-59 months old received full dose of Iron)
+					foreach($arr_stats[$i] as $key=>$value){ 
+						if($report_type=='M'):
+							if($key!=0):
+								array_push($arr_numero,$value);
+							endif;
+						elseif($report_type=='Q'):
+							if($key==2 || $key==3):
+								array_push($arr_numero,$value);
+							endif;
+						else:
+						endif;				
+					}
+				}
+				
 				$str_stat = implode(",",$arr_numero);
 				break;
 
