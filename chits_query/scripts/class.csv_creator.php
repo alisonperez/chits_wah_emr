@@ -40,6 +40,7 @@ class csv_creator{
 			endif;
 			
 			list($yr,$month,$date) = explode('-',$date_reported);
+			$month = sprintf("%02s",$month);
 			$reg_code = sprintf("%02s",$reg_code);
 			$prov_code = sprintf("%04s",$prov_code);
 			$citymun_code = sprintf("%06s",$citymun_code);
