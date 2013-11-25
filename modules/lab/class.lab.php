@@ -318,7 +318,7 @@ class lab extends module {
 			    
 			    print "<center><input type='submit' value = 'Edit Lab Exam' class='textbox' name='submitlab' style='border: 1px solid #000000'></center>&nbsp;&nbsp;";
     			    
-			    print "<center><input type='submit' value = 'Print Lab Result' class='textbox' name='submitlab' style='border: 1px solid #000000'></center>&nbsp;&nbsp;";
+			    print "<center><input type='submit' value = 'Print Lab Result' class='textbox' name='submitlab' style='border: 1px solid #000000' onclick=\"javascript:window.open('../chits_query/index.php')\"></center>&nbsp;&nbsp;";
 			    echo '</form>';
 
                         } else {

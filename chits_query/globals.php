@@ -7,6 +7,7 @@
   $_SESSION["query"] = $dbname;
   $dbuser = "root";
   $dbpwd = "root";
+
   $_SESSION["province"] = "Tarlac";
   $_SESSION["lgu"] = "Victoria";
   $_SESSION["barangay_loc"] = "Villa Aglipay";
