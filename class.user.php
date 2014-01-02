@@ -357,9 +357,19 @@ class User {
         print "<span class='boxtitle'>".LBL_CELLULAR."</span><br> ";
         print "<input type='text' maxlength='20' class='textbox' name='user_cellular' value='".($user["user_cellular"]?$user["user_cellular"]:$post_vars["user_cellular"])."' style='border: 1px solid #000000'><br>";
         print "</td></tr>";
-	print "<tr valign='top'><td>";
+
+		print"</tr><td>Upload Picture&nbsp;&nbsp;";
+		print "<input type='file' name='user_pic' size='6' />";
+		print "</td></tr>";
+
+		print"</tr><td>Upload E-Signature (optional)&nbsp;&nbsp;";
+		print "<input type='file' name='user_esign' size='6' />";
+		print "</td></tr>";
+
+		print "<tr valign='top'><td>";
         print "<input type='checkbox' name='chk_sms_report' ". (($user["user_receive_sms"]=='Y')?'CHECKED':'')."><span class='boxtitle'>Yes, I want to receive SMS on basic statistics (FOR LCE's and MHO's ONLY)!</span></input>";
         print "</td></tr>";
+			
         print "<tr><td><br>";
         if ($get_vars["user_id"]) {
             print "<input type='hidden' name='user_id' value='".$get_vars["user_id"]."'>";
@@ -375,6 +385,8 @@ class User {
             }
         }
         print "</td></tr>";
+
+
         print "</form>";
         print "</table><br>";
     }
