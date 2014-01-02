@@ -70,10 +70,11 @@ if($_SESSION["userid"]!=""):
 
       echo "<table style=\"font-family: arial\">";
 
-      echo "<tr valign='top' align='center' style=\"background-color: #666666;color: #FFFF66;text-align: center;font-weight: bold;font-size:16pt;\"><td colspan='3'>QUERY BROWSER -- Report Generator for Health Programs and Indicators</td></tr>";
-
+      echo "<tr valign='top' align='center' style=\"background-color: #666666;color: #FFFF66;text-align: center;font-weight: bold;font-size:16pt;\"><td colspan='3'>QUERY BROWSER v2 -- Report Generator for Health Programs and Indicators</td></tr>";
+      
       echo "<tr valign='top' align='center' style=\"background-color: #666666;color: #FFFF66;text-align: left;font-weight: bold;font-size:13px;\"><td colspan='3'>DIRECTIONS:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1. Select Classification&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2. Select Queries&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3. Set the Filters&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;4. Click SUBMIT and download the REPORT</td></tr>";
 	
+	  echo "<tr valign='top' align='center' style=\"background-color: #666666;color: #FFFF66;text-align: left;font-weight: bold;font-size:13px;\"><td colspan='3'>This version includes FHSIS 2012 new indicators for maternal care, child care and family planning programs. You may access the old QB version <a href='../chits_query_2008/index.php' target='new'>here</a>.</td></tr>";
 
       echo "<tr valign=\"top\"><td rowspan=\"2\">";
       //container of questions
