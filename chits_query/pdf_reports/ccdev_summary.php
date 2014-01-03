@@ -614,7 +614,7 @@ function compute_indicators(){
 				$r_sick1 = array();
 				$r_sick2 = array();
 				$r_sick3 = array();
-				$arr_sakit = array('measles','severe pneumonia','persistent diarrhea','malnutrition','xerophthalmia','night blindness','bitot','corneal xerosis','corneal ulcerations','keratomalacia');
+				$arr_sakit = array('measles','severe pneumonia','diarrhea','malnutrition','xerophthalmia','night blindness','bitot','corneal xerosis','corneal ulcerations','keratomalacia');
 
 				for($x=0;$x<count($arr_sakit);$x++){
 					$str_sakit = "SELECT a.consult_id FROM m_consult a, m_consult_notes_dxclass b,m_lib_notes_dxclass c WHERE a.consult_id=b.consult_id AND b.class_id=c.class_id";

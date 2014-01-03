@@ -112,7 +112,7 @@ class User {
             case "Add User":
                 $active = ($post_vars["isactive"]?"Y":"N");
                 $admin = ($post_vars["isadmin"]?"Y":"N");
-		//$this->move_image();
+				$this->move_image();
                 $sql = "insert into game_user (user_firstname, user_lastname, user_middle, user_lang, ".
                        "user_email, user_cellular, user_login, user_password, user_pin, user_dob, user_gender, ".
                        "user_active, user_admin, user_role, user_receive_sms) ".
@@ -163,7 +163,7 @@ class User {
                            "user_password = old_password('".$post_vars["user_password"]."'), ".
                            "user_active = '$active', ".
                            "user_admin = '$admin', ".
-			   "user_receive_sms = '$receive_sms' ".
+						   "user_receive_sms = '$receive_sms' ".
                            "where user_id = '".$post_vars["user_id"]."'";
                 }
 		
@@ -176,9 +176,9 @@ class User {
     }
 
     function validate_user() {
-	$allowed_image_format = array('image/png','image/jpg','image/gif','image/jpeg');
+		$allowed_image_format = array('image/png','image/jpg','image/gif','image/jpeg');
 
-
+		print_r($_FILES);
         if (func_num_args()) {
             $arg_list = func_get_args();
             $post_vars = $arg_list[0];
@@ -887,7 +887,6 @@ class User {
    }
 
    function move_image(){
-
    }
 }
 ?>
