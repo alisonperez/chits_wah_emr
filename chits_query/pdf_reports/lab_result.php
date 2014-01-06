@@ -174,7 +174,7 @@ $pdf->SetFont('Arial','',10);
 $pdf->AddPage();
 
 $pdf->show_lab_result($_SESSION["lab_print"]);
-
+$pdf->Image('/var/www/chits/images/fp_alert.jpeg','10','200','20','20');
 $pdf->Output();
 
 ?>

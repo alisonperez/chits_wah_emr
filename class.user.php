@@ -122,8 +122,13 @@ class User {
                        "'".strtolower($post_vars["user_login"])."', old_password('".$post_vars["user_password"]."'), '".$post_vars["user_pin"]."', '$dob', '".$post_vars["user_gender"]."', ".
                        "'$active', '$admin', '".$post_vars["role_id"]."','".$receive_sms."')";
 
-				if ($result = mysql_query($sql)) {					
+				
+
+				if ($result = mysql_query($sql)) {									
+
 					$user_id = mysql_insert_id();
+
+					$update_user = mysql_query("UPDATE game_user SET name_designation_esign='$_POST[txt_name_designation]' WHERE user_id='$user_id'") or die("Cannot query 128: ".mysql_error());
 
 					$pic = $this->move_image($_FILES["user_pic"],$post_vars["user_login"],'pic');
 					$esign = $this->move_image($_FILES["user_esign"],$post_vars["user_login"],'esign');
@@ -175,7 +180,10 @@ class User {
                            "where user_id = '".$post_vars["user_id"]."'";
                 }
 		
-                if ($result = mysql_query($sql)) { print_r($_FILES);
+                if ($result = mysql_query($sql)) {
+
+					$update_user = mysql_query("UPDATE game_user SET name_designation_esign='$_POST[txt_name_designation]' WHERE user_id='$post_vars[user_id]'") or die("Cannot query 128: ".mysql_error());
+
 					if(!empty($_FILES["user_pic"]["tmp_name"])):
 						$pic = $this->move_image($_FILES["user_pic"],$post_vars["user_login"],'pic'); echo $pic;
 						$q_update = mysql_query("UPDATE game_user SET picture_file='$pic' WHERE user_id='$post_vars[user_id]'") or die("Cannot query 180: ".mysql_error());
@@ -282,7 +290,7 @@ class User {
             $post_vars = $arg_list[1];
             $get_vars = $arg_list[2];
             if ($get_vars["user_id"]) {
-                $sql = "select user_id, user_lastname, user_firstname, user_lang, user_dob, user_gender, user_email, user_pin, user_login, user_admin, user_active, user_cellular, user_role, user_receive_sms,picture_file,esign ".
+                $sql = "select user_id, user_lastname, user_firstname, user_lang, user_dob, user_gender, user_email, user_pin, user_login, user_admin, user_active, user_cellular, user_role, user_receive_sms,picture_file,esign,name_designation_esign ".
                        "from game_user where user_id = '".$get_vars["user_id"]."'";
                 if ($result = mysql_query($sql)) {
                     if (mysql_num_rows($result)) {
@@ -388,9 +396,13 @@ class User {
 		if(!empty($user["esign"])):
 			echo "<img src='$user[esign]' width='50' height='50' />";
 		endif;
-
 		print "<input type='file' name='user_esign' size='6' />";
 		print "</td></tr>";
+
+		print"<tr><td>Name and Designation (for e-signing)";
+		print "<textarea name='txt_name_designation' cols='30'>$user[name_designation_esign]</textarea>";
+		print "</td></tr>";
+
 
 		print "<tr valign='top'><td>";
         print "<input type='checkbox' name='chk_sms_report' ". (($user["user_receive_sms"]=='Y')?'CHECKED':'')."><span class='boxtitle'>Yes, I want to receive SMS on basic statistics (FOR LCE's and MHO's ONLY)!</span></input>";
