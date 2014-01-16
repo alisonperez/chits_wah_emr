@@ -177,7 +177,7 @@ function show_philhealth_list(){
 		$q_hh = mysql_query("SELECT a.patient_id,b.patient_lastname,b.patient_firstname,round((to_days(now())-to_days(b.patient_dob))/365 , 1) computed_age FROM m_family_members a, m_patient b WHERE a.patient_id!='$arr_px[$i]' AND a.patient_id=b.patient_id AND a.family_id='$family_id'") or die("Cannot query 159 ".mysql_error());
 
 		while(list($pxid,$px_lname,$px_fname,$age) = mysql_fetch_array($q_hh)){
-		        $marked = ($age>=60 || $age <= 21)?'*':'';		        
+		        $marked = ($age>=60 || $age < 21)?'*':'';		        
 			$relatives .= $px_fname.' '.$px_lname.' ('.$age.')'.$marked.', ';
 		}
 

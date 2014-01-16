@@ -318,7 +318,30 @@ class lab extends module {
 			    
 			    print "<center><input type='submit' value = 'Edit Lab Exam' class='textbox' name='submitlab' style='border: 1px solid #000000'></center>&nbsp;&nbsp;";
     			    
+				$q_medtech = mysql_query("SELECT user_id, user_lastname, user_firstname FROM game_user WHERE user_role='MEDTECH' ORDER BY user_lastname ASC, user_firstname ASC") or die("Cannot query 324: ".mysql_error());
+				echo "<br>Processed by&nbsp;&nbsp;&nbsp;"; 
+				echo "<select name='sel_medtech' size='1'>";
+				echo "<option value=''>-- Select Personnel --</option>";
+
+				while(list($user_id,$lname,$fname) = mysql_fetch_array($q_medtech)){
+					echo "<option value='$user_id'>$lname, $fname</option>";
+				}
+				echo "</select>";
+
+				echo "<br>";
+
+				$q_doctor = mysql_query("SELECT user_id, user_lastname, user_firstname FROM game_user WHERE user_role='MD' ORDER BY user_lastname ASC, user_firstname ASC") or die("Cannot query 324: ".mysql_error());
+				echo "Noted by&nbsp;&nbsp;&nbsp;";
+				echo "<select name='sel_md' size='1'>";
+				echo "<option value=''>-- Select Personnel --</option>";
+
+				while(list($user_id,$lname,$fname) = mysql_fetch_array($q_doctor)){
+					echo "<option value='$user_id'>$lname, $fname</option>";
+				}
+				echo "</select>";
+
 			    print "<center><input type='submit' value = 'Print Lab Result' class='textbox' name='submitlab' style='border: 1px solid #000000' onclick=\"javascript:window.open('../chits_query/index.php')\"></center>&nbsp;&nbsp;";
+
 			    echo '</form>';
 
                         } else {
@@ -364,7 +387,7 @@ class lab extends module {
 	    	$q_lab = mysql_query("UPDATE m_consult_lab SET request_done='N' WHERE request_id='$_GET[request_id]'") or die("Cannot query: 362 ".mysql_error());
 	    	break;
 	case "Print Lab Result":
-			header("Location: ../chits_query/pdf_reports/lab_result.php");	
+			header("Location: ../chits_query/pdf_reports/lab_result.php?process=$_POST[sel_medtech]&noted=$_POST[sel_md]&lab_id=$_GET[module]");	
 			break;
 	default:
 		
