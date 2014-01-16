@@ -143,7 +143,7 @@ function Header()
 
 
 	    $_SESSION["w"] = $w = array(48,48,48,48,48,48,48); //340
-	    $_SESSION["header"] = $header = array('NAME OF MEMBER','STREET,PUROK/SITIO','BARANGAY','DATE OF BIRTH','PHILHEALTH ID','DATE OF EXPIRATION','HOUSEHOLD MEMBERS'."\n".'(* - Potential Dependents)');    	    
+	    $_SESSION["header"] = $header = array('NAME OF MEMBER','STREET,PUROK/SITIO','BARANGAY','DATE OF BIRTH','PHILHEALTH ID / TYPE','DATE OF EXPIRATION','HOUSEHOLD MEMBERS'."\n".'(* - Potential Dependents)');    	    
         endif;
 
         $this->SetWidths($w);
@@ -181,10 +181,15 @@ function show_philhealth_list(){
 			$relatives .= $px_fname.' '.$px_lname.' ('.$age.')'.$marked.', ';
 		}
 
-		$q_philhealth = mysql_query("SELECT philhealth_id,date_format(expiry_date,'%m-%d-%Y') as expiration_date FROM m_patient_philhealth WHERE patient_id='$arr_px[$i]' ORDER by expiry_date ASC") or die("Cannot query 165". mysql_error());
-		list($philhealth_id,$expiration) = mysql_fetch_array($q_philhealth);
+		$q_philhealth = mysql_query("SELECT philhealth_id,member_id, date_format(expiry_date,'%m-%d-%Y') as expiration_date FROM m_patient_philhealth WHERE patient_id='$arr_px[$i]' ORDER by expiry_date ASC") or die("Cannot query 165". mysql_error());
 		
-		$arr_philhealth = array($px_lastname.', '.$px_firstname.'  '.$px_middle,$address,$brgy_name,$px_dob,$philhealth_id,$expiration,$relatives);
+		list($philhealth_id,$member_id,$expiration) = mysql_fetch_array($q_philhealth);
+
+		$q_member = mysql_query("SELECT member_label FROM m_lib_philhealth_member_type WHERE member_id='$member_id'") or die("Cannot query: 188".mysql_error());
+		list($member_label) = mysql_fetch_array($q_member);
+
+		
+		$arr_philhealth = array($px_lastname.', '.$px_firstname.'  '.$px_middle,$address,$brgy_name,$px_dob,$philhealth_id.' / '.$member_label,$expiration,$relatives);
 	
 		$this->Row($arr_philhealth);
 
