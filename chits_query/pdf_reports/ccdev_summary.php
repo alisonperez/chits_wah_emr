@@ -1274,17 +1274,17 @@ function compute_indicators(){
 
 					$q_nbs = mysql_query("SELECT DISTINCT a.patient_id, MIN(b.ccdev_service_date),b.service_id FROM m_patient a, m_consult_ccdev_services b WHERE a.patient_id=b.patient_id AND b.service_id='NBSDONE' AND a.patient_gender='$arr_gender[$sex]' AND round((TO_DAYS(b.ccdev_service_date)-TO_DAYS(a.patient_dob))/30,2) BETWEEN 0 AND 11.999 AND b.ccdev_service_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' GROUP by a.patient_id") or die("Cannot query 1206: ".mysql_error());
 
-					if(mysql_num_rows($q_nbs)!=0):
-						while(list($patient_id,$service_date)=mysql_fetch_array($q_nbs)){
-							if($this->get_px_brgy($patient_id,$brgy_array)):
-								$nbs_stat[$this->get_max_month($service_date)] += 1;
+					if(mysql_num_rows($q_nbs)!=0): 
+						while(list($patient_id,$service_date)=mysql_fetch_array($q_nbs)){ 
+							if($this->get_px_brgy($patient_id,$brgy_array)): 
+								$month_stat[$this->get_max_month($service_date)] += 1;
 								array_push($nbs_stat_px[$this->get_max_month($service_date)],array($patient_id,'Infants for Newborn Screening (Done)','epi',$service_date));
 							endif;
 						}
 					endif;
-					array_push($_SESSION["arr_px_labels"]["epi"],$nbs_stat_px);
-					array_push($arr_gender_stat,$month_stat);
-				}
+					array_push($_SESSION["arr_px_labels"]["epi"],$nbs_stat_px); 
+					array_push($arr_gender_stat,$month_stat); 
+				} 
 
 				break;
 			
