@@ -617,7 +617,7 @@ function compute_indicators(){
 				$arr_sakit = array('measles','severe pneumonia','diarrhea','malnutrition','xerophthalmia','night blindness','bitot','corneal xerosis','corneal ulcerations','keratomalacia');
 
 				for($x=0;$x<count($arr_sakit);$x++){
-					$str_sakit = "SELECT a.consult_id FROM m_consult a, m_consult_notes_dxclass b,m_lib_notes_dxclass c WHERE a.consult_id=b.consult_id AND b.class_id=c.class_id";
+					$str_sakit = "SELECT a.consult_id,a.patient_id FROM m_consult a, m_consult_notes_dxclass b,m_lib_notes_dxclass c WHERE a.consult_id=b.consult_id AND b.class_id=c.class_id";
 
 					$r_sakit = explode(" ",$arr_sakit[$x]);
 
@@ -633,10 +633,10 @@ function compute_indicators(){
 						}
 					endif;
 	
-				}
+				} 
 				$r_consult = array_unique($r_consult);
 				$str_consult_id = implode(',',$r_consult);
-				
+
 				//print_r($str_consult_id);
 				
 				foreach($sub_arr_crit as $arr_key=>$arr_label){
@@ -653,7 +653,7 @@ function compute_indicators(){
 					if($sick_key=='6*11'):
 						$q_sick = mysql_query("SELECT a.patient_id, date_format(b.consult_date,'%Y-%m-%d'),b.consult_id,round((TO_DAYS(date_format(b.consult_date,'%Y-%m-%d'))-TO_DAYS(a.patient_dob))/30,2) FROM m_patient a,m_consult b WHERE a.patient_id=b.patient_id AND b.consult_id='$r_consult[$m]' AND b.consult_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' AND a.patient_gender='$sex_label' AND round((TO_DAYS(date_format(b.consult_date,'%Y-%m-%d'))-TO_DAYS(a.patient_dob))/30,2) BETWEEN 6 AND 11.9999") or die("Cannot query: 440");
 
-					if(mysql_num_rows($q_sick)!=0):
+					if(mysql_num_rows($q_sick)!=0): 
 						array_push($r_sick1,$r_consult[$m]);
 						while(list($pxid,$consult_date,$consult_id,$range)=mysql_fetch_array($q_sick)){							
 							if($this->get_px_brgy($pxid,$brgy_array)):
@@ -728,7 +728,7 @@ function compute_indicators(){
 							$sick_stat_px = array(1=>array(),2=>array(),3=>array(),4=>array(),5=>array(),6=>array(),7=>array(),8=>array(),9=>array(),10=>array(),11=>array(),12=>array());				
 							
 							if($vita_key=='6*11'):
-								foreach($r_consult[0] as $consult_key=>$consult_id){
+								foreach($r_consult[0] as $consult_key=>$consult_id){ 
 										$q_vita = mysql_query("SELECT a.vita_date,b.patient_id FROM m_consult_notes a,m_patient b WHERE a.patient_id=b.patient_id AND a.consult_id='$consult_id' AND b.patient_gender='$sex_label' AND a.vita_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]'") or die("Cannot query: 732");
 
 									if(mysql_num_rows($q_vita)!=0): 
