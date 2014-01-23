@@ -1581,18 +1581,18 @@ class notes extends module {
 			
 		endif;
 
-		$patient_id = healthcenter::get_patient_id($get_vars["consult_id"]);
-		$q_px = mysql_query("SELECT a.patient_dob,b.consult_date FROM m_patient a, m_consult b WHERE a.patient_id='$patient_id' AND round((TO_DAYS(date_format(consult_date,'%Y-%m-%d')) - TO_DAYS(a.patient_dob))/7,2) < 2190") or die("Cannot query: 1334"); 
-		
-		//2190 was derived by multiplying 365 day x 6 year since sick is between 0-5
-		
+		$patient_id = healthcenter::get_patient_id($get_vars["consult_id"]); 
+		$q_px = mysql_query("SELECT a.patient_dob,b.consult_date FROM m_patient a, m_consult b WHERE a.patient_id='$patient_id' AND a.patient_id=b.patient_id AND round((TO_DAYS(date_format(consult_date,'%Y-%m-%d')) - TO_DAYS(a.patient_dob))/7,2) < 2190") or die("Cannot query: 1334"); 
 
-		if(mysql_num_rows($q_px)==0):
+		//2190 was derived by multiplying 365 day x 6 year since sick is between 0-5
+
+
+		if(mysql_num_rows($q_px)!=0):
 
 			$arr_diag_vit = array('measles','severe pneumonia','diarrhea','malnutrition','xerophthalmia','night blindness','bitot','corneal xerosis','corneal ulcerations','keratomalacia');
 			$arr_diag_marker = array(0,0,0,0,0,0,0,0,0,0);
 
-			for($a=0;$a<count($arr_diag_vit);$a++){
+			for($a=0;$a<count($arr_diag_vit);$a++){ 
 				$q_sakit = "SELECT a.notes_id FROm m_consult_notes_dxclass a,m_lib_notes_dxclass b WHERE a.notes_id='$get_vars[notes_id]' AND a.class_id=b.class_id";
 
 				$arr_sakit = explode(" ",$arr_diag_vit[$a]);
