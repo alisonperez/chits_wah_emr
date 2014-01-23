@@ -1125,15 +1125,17 @@ function compute_indicators(){
 
 					$month_stat = array(1=>0,2=>0,3=>0,4=>0,5=>0,6=>0,7=>0,8=>0,9=>0,10=>0,11=>0,12=>0);
 
-					$q_lbw = mysql_query("SELECT a.patient_id,b.ccdev_id,b.date_registered,b.lbw_date_started,b.lbw_date_completed FROM m_patient a,m_patient_ccdev b WHERE a.patient_id=b.patient_id AND round((TO_DAYS(b.date_registered) - TO_DAYS(a.patient_dob))/30,2) BETWEEN 2 AND 6.999 AND b.date_registered BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' AND round((TO_DAYS(b.lbw_date_completed) - TO_DAYS(a.patient_dob))/30,2) BETWEEN 0 AND 6.999 AND a.patient_gender='$arr_gender[$sex]'") or die("Cannot query: 715");
+					//$q_lbw = mysql_query("SELECT a.patient_id,b.ccdev_id,b.date_registered,b.lbw_date_started,b.lbw_date_completed FROM m_patient a,m_patient_ccdev b WHERE a.patient_id=b.patient_id AND round((TO_DAYS(b.date_registered) - TO_DAYS(a.patient_dob))/30,2) BETWEEN 2 AND 6.999 AND b.date_registered BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' AND round((TO_DAYS(b.lbw_date_completed) - TO_DAYS(a.patient_dob))/30,2) BETWEEN 0 AND 6.999 AND a.patient_gender='$arr_gender[$sex]'") or die("Cannot query: 715");
 
-					if(mysql_num_rows($q_lbw)!=0):
+					$q_lbw = mysql_query("SELECT a.patient_id,b.ccdev_id,b.date_registered,b.lbw_date_started,b.lbw_date_completed FROM m_patient a,m_patient_ccdev b WHERE a.patient_id=b.patient_id AND round((TO_DAYS(b.date_registered) - TO_DAYS(a.patient_dob))/30,2) BETWEEN 2 AND 6.999 AND b.lbw_date_started BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' AND a.patient_gender='$arr_gender[$sex]'") or die("Cannot query: 715");
 
-						while(list($pxid,$ccdevid,$ccdev_date,$start_date,$completed_date)=mysql_fetch_array($q_lbw)){
+					if(mysql_num_rows($q_lbw)!=0): 
+
+						while(list($pxid,$ccdevid,$ccdev_date,$start_date,$completed_date)=mysql_fetch_array($q_lbw)){ 
 							if($this->get_lbw($ccdevid)=='lbw'):
-								if($this->get_px_brgy($pxid,$brgy_array)):
-									$month_stat[$this->get_max_month($completed_date)] += 1;
-									array_push($month_stat_px[$this->get_max_month($completed_date)],array($pxid,'Infants 2-6 mos with LBW Given Iron','epi',$completed_date));
+								if($this->get_px_brgy($pxid,$brgy_array)): 
+									$month_stat[$this->get_max_month($start_date)] += 1;
+									array_push($month_stat_px[$this->get_max_month($start_date)],array($pxid,'Infants 2-6 mos with LBW Given Iron','epi',$start_date));
 								endif;
 							endif;
 						}
