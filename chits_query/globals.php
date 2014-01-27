@@ -1,7 +1,7 @@
 <?
   session_start();
   
-  $dbname = 'gerona_new_01222014';
+  $dbname = 'chits_live';
   //$dbname = 'camiling_core_data';
   #$dbname2 = 'chitsquery';
   $_SESSION["query"] = $dbname;

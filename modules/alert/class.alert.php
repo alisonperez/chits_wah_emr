@@ -2367,6 +2367,7 @@ class alert extends module{
 		$q_stats_today = mysql_query("SELECT news_text FROM m_news WHERE DATE(news_timestamp) < '$date_today' AND news_title LIKE '%Stat Updates%' ORDER BY news_timestamp DESC") or die("Cannot query: ".mysql_error());
 
 		$q_insert_today = mysql_query("SELECT sms_code FROM m_lib_sms_alert WHERE alert_date='$date_today' AND alert_id='basic'") or die("Cannot query 2217: ".mysql_error());
+			
 
 		if(mysql_num_rows($q_user)!=0 && mysql_num_rows($q_stats_today)!=0):
 
@@ -2377,8 +2378,8 @@ class alert extends module{
 			$stat_txt = str_replace('/','-',$stat_txt);
 			$stat_txt = str_replace('(','- ',$stat_txt);
 			$stat_txt = str_replace(')','',$stat_txt);
-
-			while($user = mysql_fetch_array($q_user)){
+			
+			while($user = mysql_fetch_array($q_user)){ 
 				
 				if((mysql_num_rows($q_insert_today)==0)):
 
