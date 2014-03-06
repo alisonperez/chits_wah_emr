@@ -6,6 +6,3 @@ DEADJOE
 *.bak
 modules/_menu.php
 *.csv
-site/mobilemidwife_sync/json_docs/*
-images/signature/*
-images/pics/*
