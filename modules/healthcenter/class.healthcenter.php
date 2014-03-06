@@ -508,7 +508,7 @@ class healthcenter extends module{
             if ($post_vars["submitconsult"] || $get_vars["enter_consult"] || $post_vars["confirm_add_consult"]) {
                 //$post_vars["consult_id"] = $get_vars["enter_consult"];
                 // confirms consult for found patients		                
-		$this->process_consult($menu_id, $post_vars, $get_vars);
+				$this->process_consult($menu_id, $post_vars, $get_vars);
             }
             if ($post_vars["submitsearch"]) {
                 // lists down search results for patient
@@ -1412,6 +1412,7 @@ class healthcenter extends module{
                 }
             } else {
                 if ($post_vars["confirm_add_consult"]=="No") {
+					echo 'nosilazerep';
                     header("location: ".$_SERVER["PHP_SELF"]."?page=CONSULTS&menu_id=".$get_vars["menu_id"]."&consult_id=$insert_id&ptmenu=DETAILS");
                 }
             }
@@ -1549,11 +1550,16 @@ function hypertension_code() {
             } elseif ($post_vars["consult_patient_id"]) {
                 $patient_id = $post_vars["consult_patient_id"];
             }
-            print "<font color='red' size='5'><b>You are attempting to load a patient that is already in today's consult. Are you sure you want to load this patient's records again?</b></font><br />";
+            /* print "<font color='red' size='5'><b>You are attempting to load a patient that is already in today's consult. Are you sure you want to load this patient's records again?</b></font><br />";
             print "<input type='hidden' name='patient_id' value='$patient_id'/> ";
             print "<input type='hidden' name='sked_id' value='".$get_vars["sked_id"]."'/> ";
             print "<input type='submit' name='confirm_add_consult' value='Yes' class='textbox' style='font-weight: bold; font-size:14pt; background-color: #FFFF33; border: 2px solid black' /> ";
-            print "<input type='submit' name='confirm_add_consult' value='No' class='textbox' style='font-weight: bold; font-size:14pt; background-color: #FFCC33; border: 2px solid black' /> ";
+            print "<input type='submit' name='confirm_add_consult' value='No' class='textbox' style='font-weight: bold; font-size:14pt; background-color: #FFCC33; border: 2px solid black' /> "; */
+
+			print "<font color='red' size='5'><b>The patient you are trying to search is already on active consultation. Please check the CONSULTS TODAY box and click the patient's name to load the individual treatment record.</b></font><br />";
+            print "<input type='hidden' name='patient_id' value='$patient_id'/> ";
+            print "<input type='hidden' name='sked_id' value='".$get_vars["sked_id"]."'/> ";
+  
             print "</td></tr>";
             print "</form>";
             print "</table>";
@@ -1568,10 +1574,13 @@ function hypertension_code() {
         }
 
         $date = date("Y-m-d");
-        $sql = "select patient_id from m_consult ".
+        /*$sql = "select patient_id from m_consult ".
              "where consult_end = '0000-00-00 00:00:00' and ".
-             "patient_id = '$patient_id' and to_days(consult_date) = to_days('$date')";
-        if ($result = mysql_query($sql)) {
+             "patient_id = '$patient_id' and to_days(consult_date) = to_days('$date')"; */
+		
+		$sql = "SELECT patient_id FROM m_consult WHERE consult_end = '0000-00-00 00:00:00' AND patient_id='$patient_id'";
+
+        if ($result = mysql_query($sql)) { 
             if (mysql_num_rows($result)) {
                 list($pt_in_consult) = mysql_fetch_array($result);
                 return $pt_in_consult;
