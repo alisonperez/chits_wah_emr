@@ -901,7 +901,7 @@ class healthcenter extends module{
 	
 	function compute_bmi($height,$weight){
 
-		echo "Body Mass Index: ";
+		echo "<a href='#' onclick=\"javascript:alert('BMI Formula: kg/(meters * meters). If BMI is < 18.5, UNDERWEIGHT. If BMI is >=18.5 and <25, NORMAL. If BMI is >=25 and <30, OVERWEIGHT. If BMI >=30, OBESE'); return false; \" alt='Click to view BMI range'>Body Mass Index:</a>";
 		$ht_cm = $height / 100;			
 		
 		if($ht_cm!=0):		
