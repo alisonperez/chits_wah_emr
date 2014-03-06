@@ -811,7 +811,8 @@ class mc extends module {
 						
                         $sql = "insert into m_consult_mc_services (mc_id, consult_id, user_id, patient_id, mc_timestamp, service_id, visit_type) ".
                                "values ('".$post_vars["mc_id"]."', '".$get_vars["consult_id"]."', '".$_SESSION["userid"]."', '$patient_id', sysdate(), '$value', '".$post_vars["visit_type"]."')";
-                        $result = mysql_query($sql);
+                        $result = mysql_query($sql) or die("Cannot query 814: ".mysql_error());
+						
                     }
                 }
                 if ($post_vars["vaccines"]) {
@@ -3053,7 +3054,7 @@ class mc extends module {
         print "<b>".FTITLE_SERVICE_RECORD."</b><br/>";
         $patient_id = healthcenter::get_patient_id($get_vars["consult_id"]);
         $sql = "select mc_id, service_id, date_format(mc_timestamp,'%a %d %b %Y') service_date, mc_timestamp,actual_service_date, date_format(actual_service_date,'%a %d %b %Y') actual_sdate, service_qty, syphilis_result,intake_penicillin "."from m_consult_mc_services "."where patient_id = '$patient_id' order by service_id, actual_service_date desc";
-        if ($result = mysql_query($sql)) {
+        if ($result = mysql_query($sql) or die("Cannot query 3057: ".mysql_error())) {
             if (mysql_num_rows($result)) {
                 while (list($cid, $service, $sdate, $ts, $actual_service_date, $actual_sdate, $qty, $syphilis) = mysql_fetch_array($result)) {
 

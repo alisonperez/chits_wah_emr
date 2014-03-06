@@ -1286,7 +1286,7 @@ class healthcenter extends module{
         if ($result) {
 	    print "<a name='consults'></a>";
 
-            print "<span class='patient'>".FTITLE_CONSULTS_TODAY."</span><br>";
+        print "<span class='patient'>".FTITLE_CONSULTS_TODAY."</span><br>";
 
 	    healthcenter::show_tab_headers($arr_facility);
 
@@ -1303,7 +1303,13 @@ class healthcenter extends module{
 
                     $q_lab = mysql_query("SELECT request_id,request_done FROM m_consult_lab WHERE patient_id='$pid' AND consult_id='$cid'") or die("Cannot query 1224".mysql_error());
 
-                    if(mysql_num_rows($q_lab)!=0):
+					$q_treatment = mysql_query("SELECT notes_plan FROM m_consult_notes WHERE patient_id='$pid' AND consult_id='$cid'") or die("Cannot query 1306: ".mysql_error());
+
+					list($notes_plan) = mysql_fetch_array($q_treatment);
+					
+					$notes_plan = trim($notes_plan);
+
+					if(mysql_num_rows($q_lab)!=0):
                         $arr_done = array();
                         $arr_id = array();
                         while(list($req_id,$done_status) = mysql_fetch_array($q_lab)){
@@ -1318,12 +1324,15 @@ class healthcenter extends module{
                         $request_id = $done = "";
                     endif;
 
-
                     $visits = healthcenter::get_total_visits($pid);
-                    $consult_array[$i] = "<a href='".$_SERVER["PHP_SELF"]."?page=CONSULTS&menu_id=$consult_menu_id&consult_id=$cid&ptmenu=DETAILS' title='".INSTR_CLICK_TO_VIEW_RECORD."' ".($see_doctor=="Y"?"style='background-color: #FFFF33'":"").">".
-                    "<b>$plast, $pfirst</b></a> [$visits] ".($see_doctor=="Y"?"<img src='../images/star.gif' border='0'/>":"").(($request_id!="")?(($done=="Y")?"<a href='$_SERVER[PHP_SELF]?$url' title='lab completed'><img src='../images/lab.png' width='15px' height='15px' border='0' alt='lab completed' /></a>":"<a href='$_SERVER[PHP_SELF]?$url' title='lab pending'><img src='../images/lab_untested.png' width='15px' height='15px' border='0' alt='lab pending' /></a>"):"");
-		
-		    $consult_array[$i] = $consult_array[$i].$this->check_icons($pid,$cid,$consult_menu_id);
+                    $consult_array[$i] = "<a href='".$_SERVER["PHP_SELF"]."?page=CONSULTS&menu_id=$consult_menu_id&consult_id=$cid&ptmenu=DETAILS' title='".INSTR_CLICK_TO_VIEW_RECORD."' ".
+					
+					//($see_doctor=="Y"?"style='background-color: #FFFF33'":"").
+					(($notes_plan!="")?"style='background-color: #33FFFF'":($see_doctor=="Y"?"style='background-color: #FFFF33'":"")).
+					
+					">"."<b>$plast, $pfirst</b></a> [$visits] ".($see_doctor=="Y"?"<img src='../images/star.gif' border='0'/>":"").(($request_id!="")?(($done=="Y")?"<a href='$_SERVER[PHP_SELF]?$url' title='lab completed'><img src='../images/lab.png' width='15px' height='15px' border='0' alt='lab completed' /></a>":"<a href='$_SERVER[PHP_SELF]?$url' title='lab pending'><img src='../images/lab_untested.png' width='15px' height='15px' border='0' alt='lab pending' /></a>"):"");
+					
+				    $consult_array[$i] = $consult_array[$i].$this->check_icons($pid,$cid,$consult_menu_id);
 			
                     $i++;
                 }
