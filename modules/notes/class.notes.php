@@ -356,7 +356,7 @@ class notes extends module {
 		case "Create Follow-up Notes":
 			$sql = "insert into m_consult_notes (consult_id, patient_id, user_id, notes_timestamp) "."values ('".$get_vars["consult_id"]."', '$patient_id', '".$_SESSION["userid"]."', sysdate())";
 		
-			break;
+			break; xxx
         case "Save Complaint":
             if ($post_vars["complaintcat"]) {
                 foreach ($post_vars["complaintcat"] as $key=>$value) {
