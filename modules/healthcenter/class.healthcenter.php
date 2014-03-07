@@ -1293,7 +1293,7 @@ class healthcenter extends module{
 
             print "<table width=600 bgcolor='#FFFFFF' cellpadding='3' cellspacing='0' style='border: 2px solid black'>";
             print "<tr><td>";
-            print "<span class='tinylight'>HIGHLIGHTED NAMES OR THOSE MARKED WITH <img src='../images/star.gif' border='0'/> WILL SEE PHYSICIAN.</span><br/>";
+            print "<span class='tinylight'>NAMES IN <font style='color:#FFFF33;background-color:black;'><b>YELLOW</b></font> OR THOSE MARKED WITH <img src='../images/star.gif' border='0'/> WILL SEE PHYSICIAN. NAMES IN <font style='color:#33FFFF;background-color:black;'><b>CYAN</b></font> ARE THOSE PRESCRIBED WITH MEDICINES AFTER THE CONSULTATION.</span><br/>";
             if (mysql_num_rows($result)) {
                 // initialize array index
                 $i=0;
