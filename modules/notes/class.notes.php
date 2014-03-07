@@ -352,6 +352,11 @@ class notes extends module {
 				header("location: ".$_SERVER["PHP_SELF"]."?page=".$get_vars["page"]."&menu_id=".$get_vars["menu_id"]."&consult_id=".$get_vars["consult_id"]."&ptmenu=NOTES&module=notes&notes=$note_link&notes_id=$insert_id#menu");
             }
             break;
+		
+		case "Create Follow-up Notes":
+			$sql = "insert into m_consult_notes (consult_id, patient_id, user_id, notes_timestamp) "."values ('".$get_vars["consult_id"]."', '$patient_id', '".$_SESSION["userid"]."', sysdate())";
+		
+			break;
         case "Save Complaint":
             if ($post_vars["complaintcat"]) {
                 foreach ($post_vars["complaintcat"] as $key=>$value) {
@@ -457,9 +462,37 @@ class notes extends module {
 		else:
 			echo "<font color='red' size='2'>Please click the consult date on the right to <br> view details of notes.</font>";
 		endif;
-
-
+		
+		notes::form_follow_up();
     }
+
+	function form_follow_up(){
+
+		$pxid = healthcenter::get_patient_id($_GET["consult_id"]);
+
+		$q_diagnosis = mysql_query("SELECT b.notes_id,a.consult_id, date_format(a.consult_date,'%Y-%m-%d'), d.class_name FROM m_consult a,m_consult_notes b, m_consult_notes_dxclass c, m_lib_notes_dxclass d WHERE a.patient_id='$pxid' AND a.consult_id=c.consult_id AND b.notes_id=c.notes_id AND c.class_id=d.class_id ORDER by a.consult_date ") or die("Cannot query 463: ".mysql_error());
+
+		if(mysql_num_rows($q_diagnosis)!=0):
+			echo 'OR Select a previous diagnosis for FOLLOW-UP consult';
+
+			echo "<table>";
+		
+			echo "<form action='#notes_form' method='POST' name='form_followup'>";
+			while(list($notes_id,$consult_id,$consult_date,$diagnosis)=mysql_fetch_array($q_diagnosis)){
+				//echo "<a href='$_SERVER[PHP_SELF]?page=$_GET[page]&menu_id=$_GET[menu_id]&consult_id=$consult_id&ptmenu=$_GET[ptmenu]&module=$_GET[module]&notes=$_GET[notes]&notes_id=$notes_id'>$diagnosis [$consult_date]</a>";
+				echo "<tr><td>";
+				echo "<input type='radio' name='past_dx' value='$notes_id-$consult_id'>$diagnosis [$consult_date]</input>";
+				echo "</td></tr>";
+			}
+			echo "<tr><td>";
+			echo "<input type='submit' name='submitnotes' value='Create Follow-up Notes' class='textbox' style='border: 1px solid black'/>";
+			echo "</td></tr>";
+			echo "</form>";
+			echo "</table>";
+		else: 
+
+		endif;
+	}
 
     function form_consult_complaint() {
     //
