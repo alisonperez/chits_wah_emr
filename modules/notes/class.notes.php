@@ -217,8 +217,10 @@ class notes extends module {
         $n->notes_menu($menu_id, $post_vars, $get_vars, $validuser, $isadmin);
         
         mysql_query("ALTER TABLE `m_consult_notes` DROP PRIMARY KEY , ADD PRIMARY KEY (`notes_id`)");
+
+		$_SESSION["followup"] = $this->check_followup();        
         
-        if ($post_vars["submitnotes"]) {
+		if ($post_vars["submitnotes"]) {
             $n->process_consult_notes($menu_id, $post_vars, $get_vars, $validuser, $isadmin);
         }
         switch($get_vars["notes"]) {
@@ -354,9 +356,16 @@ class notes extends module {
             break;
 		
 		case "Create Follow-up Notes":
-			$sql = "insert into m_consult_notes (consult_id, patient_id, user_id, notes_timestamp) "."values ('".$get_vars["consult_id"]."', '$patient_id', '".$_SESSION["userid"]."', sysdate())";
-		
+			$q_notes = mysql_query("insert into m_consult_notes (consult_id, patient_id, user_id, notes_timestamp) "."values ('".$get_vars["consult_id"]."', '$patient_id', '".$_SESSION["userid"]."', sysdate())") or die("Cannot query 357: ".mysql_error());
+			
+			if($q_notes):
+					$insert_id = mysql_insert_id();
+					
+					$q_notes_follow_up = mysql_query("INSERT INTO m_consult_notes_followup SET notes_id='$insert_id',consult_id='$_GET[consult_id]',followup_notes_id='$_POST[notes_id]',followup_consult_id='$_POST[consult_id]',followup_class_id='$_POST[diagnosis_class_id]',patient_id='$patient_id',user_id='$_SESSION[userid]'") or die("Cannot query 362: ".mysql_error());
+			endif;
+
 			break;
+
         case "Save Complaint":
             if ($post_vars["complaintcat"]) {
                 foreach ($post_vars["complaintcat"] as $key=>$value) {
@@ -366,8 +375,10 @@ class notes extends module {
                 }                                                
             }
                 $update_complaint_note = mysql_query("UPDATE m_consult_notes SET notes_complaint='$post_vars[complaint_notes]' WHERE consult_id='$get_vars[consult_id]'") or die("Cannot query: 302 ".mysql_error());                                        
-                //header("location: ".$_SERVER["PHP_SELF"]."?page=".$get_vars["page"]."&menu_id=".$get_vars["menu_id"]."&consult_id=".$get_vars["consult_id"]."&ptmenu=NOTES&module=notes&notes=CC&notes_id=".$get_vars["notes_id"]."#menu");
-		header("location: ".$_SERVER["PHP_SELF"]."?page=".$get_vars["page"]."&menu_id=".$get_vars["menu_id"]."&consult_id=".$get_vars["consult_id"]."&ptmenu=NOTES&module=notes&notes=$note_link&notes_id=".$get_vars["notes_id"]."#menu");                                
+
+				//header("location: ".$_SERVER["PHP_SELF"]."?page=".$get_vars["page"]."&menu_id=".$get_vars["menu_id"]."&consult_id=".$get_vars["consult_id"]."&ptmenu=NOTES&module=notes&notes=CC&notes_id=".$get_vars["notes_id"]."#menu");
+	
+				header("location: ".$_SERVER["PHP_SELF"]."?page=".$get_vars["page"]."&menu_id=".$get_vars["menu_id"]."&consult_id=".$get_vars["consult_id"]."&ptmenu=NOTES&module=notes&notes=$note_link&notes_id=".$get_vars["notes_id"]."#menu");                                
             break;
             
         case "Save History":
@@ -397,8 +408,9 @@ class notes extends module {
             if ($post_vars["dxclass"]) {
                 foreach($post_vars["dxclass"] as $key=>$value) {
 
-                    $sql = "insert into m_consult_notes_dxclass (notes_id, consult_id, patient_id, class_id, diagnosis_date, user_id, diagnosis_timestamp) ".
-                           "values ('".$get_vars["notes_id"]."', '".$get_vars["consult_id"]."', '$patient_id', '$value', '$consult_date', '".$_SESSION["userid"]."', sysdate())";
+                    $sql = "insert into m_consult_notes_dxclass (notes_id, consult_id, patient_id, class_id, diagnosis_date, user_id, diagnosis_timestamp) "."values ('".$get_vars["notes_id"]."', '".$get_vars["consult_id"]."', '$patient_id', '$value', '$consult_date', '".$_SESSION["userid"]."', sysdate())";
+					
+
                     $result = mysql_query($sql) or die(mysql_error());
                 }
                 //header("location: ".$_SERVER["PHP_SELF"]."?page=".$get_vars["page"]."&menu_id=".$get_vars["menu_id"]."&consult_id=".$get_vars["consult_id"]."&ptmenu=NOTES&module=notes&notes=DX&notes_id=".$get_vars["notes_id"]."#menu");
@@ -458,19 +470,21 @@ class notes extends module {
 		
         print "</form>";
         print "</table><br/>";
+
+		notes::form_follow_up();
 		
 		else:
 			echo "<font color='red' size='2'>Please click the consult date on the right to <br> view details of notes.</font>";
 		endif;
 		
-		notes::form_follow_up();
+
     }
 
 	function form_follow_up(){
 
 		$pxid = healthcenter::get_patient_id($_GET["consult_id"]);
 
-		$q_diagnosis = mysql_query("SELECT b.notes_id,a.consult_id, date_format(a.consult_date,'%Y-%m-%d'), d.class_name FROM m_consult a,m_consult_notes b, m_consult_notes_dxclass c, m_lib_notes_dxclass d WHERE a.patient_id='$pxid' AND a.consult_id=c.consult_id AND b.notes_id=c.notes_id AND c.class_id=d.class_id ORDER by a.consult_date ") or die("Cannot query 463: ".mysql_error());
+		$q_diagnosis = mysql_query("SELECT b.notes_id,a.consult_id, date_format(a.consult_date,'%Y-%m-%d'), d.class_name,d.class_id FROM m_consult a,m_consult_notes b, m_consult_notes_dxclass c, m_lib_notes_dxclass d WHERE a.patient_id='$pxid' AND a.consult_id=c.consult_id AND b.notes_id=c.notes_id AND c.class_id=d.class_id ORDER by a.consult_date ") or die("Cannot query 463: ".mysql_error());
 
 		if(mysql_num_rows($q_diagnosis)!=0):
 			echo '<br><br>OR Select a previous diagnosis for FOLLOW-UP consult';
@@ -478,15 +492,21 @@ class notes extends module {
 			echo "<table>";
 		
 			echo "<form action='#notes_form' method='POST' name='form_followup'>";
-			while(list($notes_id,$consult_id,$consult_date,$diagnosis)=mysql_fetch_array($q_diagnosis)){
+			while(list($notes_id,$consult_id,$consult_date,$diagnosis,$class_id)=mysql_fetch_array($q_diagnosis)){
 				//echo "<a href='$_SERVER[PHP_SELF]?page=$_GET[page]&menu_id=$_GET[menu_id]&consult_id=$consult_id&ptmenu=$_GET[ptmenu]&module=$_GET[module]&notes=$_GET[notes]&notes_id=$notes_id'>$diagnosis [$consult_date]</a>";
 				echo "<tr><td>";
-				echo "<input type='radio' name='past_dx' value='$notes_id-$consult_id'>$diagnosis [$consult_date]</input>";
+				echo "<input type='radio' name='past_dx'>$diagnosis [$consult_date]</input>";
 				echo "</td></tr>";
+
+				echo "<input type='hidden' value='$pxid' name='pxid' />";
+				echo "<input type='hidden' value='$notes_id' name='notes_id' />";
+				echo "<input type='hidden' value='$consult_id' name='consult_id' />";
+				echo "<input type='hidden' value='$class_id' name='diagnosis_class_id' />";
 			}
 			echo "<tr><td>";
 			echo "<input type='submit' name='submitnotes' value='Create Follow-up Notes' class='textbox' style='border: 1px solid black'/>";
 			echo "</td></tr>";
+
 			echo "</form>";
 			echo "</table>";
 		else: 
@@ -600,7 +620,7 @@ class notes extends module {
             $post_vars = $arg_list[1];
             $get_vars = $arg_list[2];
             $validuser = $arg_list[3];
-            $isadmin = $arg_list[4];
+             $isadmin = $arg_list[4];
             //print_r($arg_list);
         }
         $sql = "select notes_physicalexam from m_consult_notes where notes_id = '".$get_vars["notes_id"]."'";
@@ -700,11 +720,12 @@ class notes extends module {
             $isadmin = $arg_list[4];
             //print_r($arg_list);
         }
-        
+
 		$get_diag = mysql_query("SELECT a.class_id FROM m_consult_notes_dxclass a, m_consult_notes b WHERE a.notes_id='$get_vars[notes_id]' AND a.notes_id=b.notes_id") or die("Cannot query: 572");
 		
-		
-		if(mysql_num_rows($get_diag)==0):
+
+
+		if((mysql_num_rows($get_diag)==0) && $_SESSION["followup"]==0):
 			echo "<font color='red'>Please record the diagnosis first before doing treament plan.</font>";
 		
 		else:
@@ -887,8 +908,8 @@ class notes extends module {
             $get_vars = $arg_list[2];
             $validuser = $arg_list[3];
             $isadmin = $arg_list[4];
-        }
-        // do some processing here
+        }        
+		// do some processing here
         if ($get_vars["delete_complaint_id"]) {
             if (module::confirm_delete($menu_id, $post_vars, $get_vars)) {
                 $sql = "delete from m_consult_notes_complaint ".
@@ -1028,6 +1049,8 @@ class notes extends module {
         case "Delete Notes":
             if (module::confirm_delete($menu_id, $post_vars, $get_vars)) {
                 $sql = "delete from m_consult_notes where notes_id = '".$post_vars["notes_id"]."'";
+				$del_follow_up = mysql_query("DELETE FROM m_consult_notes_followup WHERE notes_id='$_POST[notes_id]'") or die("Cannot query 1046: ".mysql_error());
+
                 if ($result = mysql_query($sql)) {
                     header("location: ".$_SERVER["PHP_SELF"]."?page=".$get_vars["page"]."&menu_id=".$get_vars["menu_id"]."&consult_id=".$get_vars["consult_id"]."&ptmenu=NOTES&module=notes&notes=".$get_vars["notes"]);
                 }
@@ -1183,7 +1206,7 @@ class notes extends module {
 
 	}
 
-    function show_diagnosis() {
+    function show_diagnosis() { 
         if (func_num_args()>0) {
             $arg_list = func_get_args();
             $menu_id = $arg_list[0];
@@ -1209,6 +1232,20 @@ class notes extends module {
         }
     }
 
+
+	function check_followup(){
+		$check_followup = mysql_query("SELECT d.followup_id, d.followup_notes_id, d.followup_consult_id, c.class_name,date_format(a.consult_date,'%Y-%m-%d') FROM m_consult a, m_consult_notes b, m_lib_notes_dxclass c, m_consult_notes_followup d WHERE a.consult_id=b.consult_id AND b.notes_id=d.followup_notes_id AND d.notes_id='$_GET[notes_id]' AND d.followup_class_id=c.class_id") or die("Cannot query 1233: ".mysql_error());
+
+		if(mysql_num_rows($check_followup)!=0):
+			list($followup_id, $orig_notes_id, $orig_consult_id, $diagnosis_name,$orig_consult_date) = mysql_fetch_array($check_followup);
+			
+			echo "<font color='#009900'><b>NOTE</b>:</font><font color='black'> This is a follow-up consultation to the diagnosis, <b>".$diagnosis_name."</b>, made last <b>".$orig_consult_date."</b></font><br><br>";
+			
+			return 1;
+		else:
+			return 0;
+		endif;
+	}
     function get_plan() {
     //
     // get diagnosis list for given date and patient
