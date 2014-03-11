@@ -218,7 +218,7 @@ class notes extends module {
         
         mysql_query("ALTER TABLE `m_consult_notes` DROP PRIMARY KEY , ADD PRIMARY KEY (`notes_id`)");
 
-		$_SESSION["followup"] = $this->check_followup();        
+		$_SESSION["followup"] = $n->check_followup();        
         
 		if ($post_vars["submitnotes"]) {
             $n->process_consult_notes($menu_id, $post_vars, $get_vars, $validuser, $isadmin);
@@ -278,7 +278,7 @@ class notes extends module {
     function display_notes_archive() {
 
 		if($_POST["submit_consult"]=='Print Consult'):
-			if(count($_POST["consult_rec"])!=0): 
+			if(count($_POST["consult_rec"])!=0):
 				$arr_consult_rec = serialize($_POST["consult_rec"]);
 				header("Location: ../chits_query/pdf_reports/gen_consult.php?pxid=$_POST[patient_id]&consult_rec=$arr_consult_rec");				
 			else:
@@ -484,13 +484,12 @@ class notes extends module {
 
 		$pxid = healthcenter::get_patient_id($_GET["consult_id"]);
 
-		$q_diagnosis = mysql_query("SELECT b.notes_id,a.consult_id, date_format(a.consult_date,'%Y-%m-%d'), d.class_name,d.class_id FROM m_consult a,m_consult_notes b, m_consult_notes_dxclass c, m_lib_notes_dxclass d WHERE a.patient_id='$pxid' AND a.consult_id=c.consult_id AND b.notes_id=c.notes_id AND c.class_id=d.class_id ORDER by a.consult_date ") or die("Cannot query 463: ".mysql_error());
+		$q_diagnosis = mysql_query("SELECT b.notes_id,a.consult_id, date_format(a.consult_date,'%Y-%m-%d'), d.class_name,d.class_id FROM m_consult a,m_consult_notes b, m_consult_notes_dxclass c, m_lib_notes_dxclass d WHERE a.patient_id='$pxid' AND a.consult_id=c.consult_id AND b.notes_id=c.notes_id AND c.class_id=d.class_id ORDER by a.consult_date DESC") or die("Cannot query 463: ".mysql_error());
 
 		if(mysql_num_rows($q_diagnosis)!=0):
-			echo '<br><br>OR Select a previous diagnosis for FOLLOW-UP consult';
+			echo "<table>";			
+			echo "<tr><td><b>OR Select a previous diagnosis for FOLLOW-UP consult</b></td></tr>";
 
-			echo "<table>";
-		
 			echo "<form action='#notes_form' method='POST' name='form_followup'>";
 			while(list($notes_id,$consult_id,$consult_date,$diagnosis,$class_id)=mysql_fetch_array($q_diagnosis)){
 				//echo "<a href='$_SERVER[PHP_SELF]?page=$_GET[page]&menu_id=$_GET[menu_id]&consult_id=$consult_id&ptmenu=$_GET[ptmenu]&module=$_GET[module]&notes=$_GET[notes]&notes_id=$notes_id'>$diagnosis [$consult_date]</a>";
@@ -1234,12 +1233,36 @@ class notes extends module {
 
 
 	function check_followup(){
+		$pxid = healthcenter::get_patient_id($_GET["consult_id"]);
+
 		$check_followup = mysql_query("SELECT d.followup_id, d.followup_notes_id, d.followup_consult_id, c.class_name,date_format(a.consult_date,'%Y-%m-%d') FROM m_consult a, m_consult_notes b, m_lib_notes_dxclass c, m_consult_notes_followup d WHERE a.consult_id=b.consult_id AND b.notes_id=d.followup_notes_id AND d.notes_id='$_GET[notes_id]' AND d.followup_class_id=c.class_id") or die("Cannot query 1233: ".mysql_error());
+		
+		
 
 		if(mysql_num_rows($check_followup)!=0):
 			list($followup_id, $orig_notes_id, $orig_consult_id, $diagnosis_name,$orig_consult_date) = mysql_fetch_array($check_followup);
 			
-			echo "<font color='#009900'><b>NOTE</b>:</font><font color='black'> This is a follow-up consultation to the diagnosis, <b>".$diagnosis_name."</b>, made last <b>".$orig_consult_date."</b></font><br><br>";
+
+			$q_consult_followup = mysql_query("SELECT DISTINCT c.consult_id FROM m_consult a, m_consult_notes b, m_consult_notes_followup c WHERE a.consult_id=b.consult_id AND b.consult_id=c.followup_consult_id AND b.notes_id=c.followup_notes_id AND c.followup_notes_id='$orig_notes_id'") or die("Cannot query 1244: ".mysql_error());
+			
+			$r_consult = array();
+			
+			array_push($r_consult,$orig_consult_id);
+
+			if(mysql_num_rows($q_consult_followup)!=0):
+				while(list($followup_consult_id)=mysql_fetch_array($q_consult_followup)){
+
+					array_push($r_consult,$followup_consult_id);
+				}
+			endif;
+			$arr_consult_rec = serialize($r_consult);			 
+
+			echo "<font color='#009900'><b>NOTE</b>:</font><font color='black'>This is a follow-up consultation to the diagnosis, <b>".$diagnosis_name."</b>, made last <b>".$orig_consult_date."</b></font>. To view the consultations for this diagnosis, please click ";
+			echo "<a href='../chits_query/pdf_reports/gen_consult.php?pxid=$pxid&consult_rec=$arr_consult_rec'>HERE</a>";
+			
+
+
+			echo "<br><br>";
 			
 			return 1;
 		else:
