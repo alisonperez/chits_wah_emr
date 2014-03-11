@@ -356,7 +356,7 @@ class notes extends module {
 		case "Create Follow-up Notes":
 			$sql = "insert into m_consult_notes (consult_id, patient_id, user_id, notes_timestamp) "."values ('".$get_vars["consult_id"]."', '$patient_id', '".$_SESSION["userid"]."', sysdate())";
 		
-			break; xxx
+			break;
         case "Save Complaint":
             if ($post_vars["complaintcat"]) {
                 foreach ($post_vars["complaintcat"] as $key=>$value) {
@@ -473,7 +473,7 @@ class notes extends module {
 		$q_diagnosis = mysql_query("SELECT b.notes_id,a.consult_id, date_format(a.consult_date,'%Y-%m-%d'), d.class_name FROM m_consult a,m_consult_notes b, m_consult_notes_dxclass c, m_lib_notes_dxclass d WHERE a.patient_id='$pxid' AND a.consult_id=c.consult_id AND b.notes_id=c.notes_id AND c.class_id=d.class_id ORDER by a.consult_date ") or die("Cannot query 463: ".mysql_error());
 
 		if(mysql_num_rows($q_diagnosis)!=0):
-			echo 'OR Select a previous diagnosis for FOLLOW-UP consult';
+			echo '<br><br>OR Select a previous diagnosis for FOLLOW-UP consult';
 
 			echo "<table>";
 		
