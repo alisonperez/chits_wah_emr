@@ -968,6 +968,7 @@ class mc extends module {
                         $trimester = mc::get_trimester($post_vars["mc_id"], $visit_date);
                         list($aog_weeks, $days) = mc::get_aog($post_vars["mc_id"], $visit_date);
                         $aog_total = $aog_weeks + ($days/7);
+                        $aog_in_days = ($aog_weeks*7) + ($days/7);
                         $data_type = "EXT";
 			$private = (isset($post_vars["check_private"]))?'Y':'';
 
@@ -2475,7 +2476,9 @@ class mc extends module {
                     // if has delivered, compute AOG according to that
                     // if not compute by consult_date
                     list($aog_wks, $aog_days) = mc::get_aog($mc["mc_id"], (mc::get_delivery_date($mc["mc_id"])=="0000-00-00"?healthcenter::get_consult_date($get_vars["consult_id"]):mc::get_delivery_date($mc["mc_id"])));
-                    print "AOG: ".$aog_wks." WKS ".$aog_days." DAYS<br/>";
+                    $aog_in_days = ($aog_wks*7) + $aog_days;
+                    //print "AOG: ".$aog_wks." WKS ".$aog_days." DAYS<br/>";
+                    print "AOG: ".$aog_in_days." DAYS<br/>";
                     print "</span>";
                     print "</td><td>";  
                     // column 2 
@@ -2704,7 +2707,9 @@ class mc extends module {
                     print "FUNDIC HT (CM): ".$mc["fundic_height"]."<br/>";
                     print "FETAL PRES: ".$mc["presentation"]."<br/>";
                     list($aog_wks, $aog_days) = mc::get_aog($mc["mc_id"], $mc["prenatal_date"]);
-                    print "AOG: ".$aog_wks." WKS ".$aog_days." DAYS<br/>";
+                    $aog_in_days = ($aog_wks*7) + $aog_days;
+                    //print "AOG: ".$aog_wks." WKS ".$aog_days." DAYS<br/>";
+                    print "AOG: ".$aog_in_days." DAYS<br/>";
                     print "FHR (BPM): ".$mc["fhr"]."<br/>";
                     print "LOCATION: ".$mc["fhr_location"]."<br/>";
                     print "</span>";
