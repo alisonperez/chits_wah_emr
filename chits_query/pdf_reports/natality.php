@@ -183,13 +183,15 @@ function show_natality(){
 	$arr_csv = array();
 	$arr_consolidate = array();
 	
-	$criteria = array('Livebirths (LB)','LB w/ weights 2500 grams & greater','LB w/ weights less than 2500 grams','LB - Not known weight','LB delivered by doctors','LB delivered by nurses','LB delivered by midwives','LB delivered by hilot / TBA','LB delivered by others','Deliveries','Normal Pregnancy','Risk Pregnancy','Unknown Pregnancy','Normal Deliveries','Normal Deliveries at Home','Normal Deliveries at Hospital','Normal Deliveries - Other Place','Other Types of Deliveries','Other Type of Deliveries at Home','Other Type of Deliveries at Hospital','Other Type of Deliveries - Other Places');
-	
+	//$criteria = array('Livebirths (LB)','LB w/ weights 2500 grams & greater','LB w/ weights less than 2500 grams','LB - Not known weight','LB delivered by doctors','LB delivered by nurses','LB delivered by midwives','LB delivered by hilot / TBA','LB delivered by others','Deliveries','Normal Pregnancy','Risk Pregnancy','Unknown Pregnancy','Normal Deliveries','Normal Deliveries at Home','Normal Deliveries at Hospital','Normal Deliveries - Other Place','Other Types of Deliveries','Other Type of Deliveries at Home','Other Type of Deliveries at Hospital','Other Type of Deliveries - Other Places');
+
+	$criteria = array('Livebirths (LB)','LB w/ weights 2500 grams & greater','LB w/ weights less than 2500 grams','LB - Not known weight','LB delivered by doctors','LB delivered by nurses','LB delivered by midwives','LB delivered by hilot/TBA','LB delivered by others','LB delivered by unknown','Total number of Deliveries by Place','Number of deliveries at Health Facilities','Number of deliveries at RHU','Number of deliveries at Hospitals','Number of deliveries at BHS','Number of deliveries at Lying-in','Number of Non-institutional Deliveries (NID)','Number of deliveries at Home','Number of deliveries Others','Total number of deliveries by Type','Number of Normal Deliveries (NSD)','Number of Operative Deliveries','Total Number of Pregnancies','Livebirths','Fetal Death','Abortion','Total Number of Pregnancies','Livebirths','Fetal Death','Abortion','Normal Deliveries','Normal Deliveries at Home','Normal Deliveries at Health Facility','Normal Deliveries - Other Places','Operative Deliveries','Operative Deliveries at Health Facility','Operative Deliveries at Other Places','Number of Pregnancies','Livebirths','Fetal Death','Abortion','Number of Deliveries','Number of Normal Deliveries (NSD)','Number of Operative Deliveries','LB w/ weights 2500 grams & greater','LB w/ weights less than 2500 grams','LB - Not known weight','LB delivered by doctors','LB delivered by nurses','LB delivered by midwives','LB delivered by hilot/TBA','LB delivered by others');
+print_r($criteria);
 	if($_SESSION[ques]>=120 && $_SESSION[ques]<=123): //natality livebirth questions
-		$start = 0;
-		$end = 8;
+		$start = 26;
+		$end = 37;
 	elseif($_SESSION[ques]>=124 && $_SESSION[ques]<=127): //natality deliveries questions
-		$start = 9;
+		$start = 37;
 		$end = count($criteria);
 	else:
 
@@ -485,7 +487,7 @@ function compute_indicator($crit){
 
 			break;
 
-		case 16: //normal deliveries at hospital
+		case 16: //normal deliveries at all health facilities
 			$arr_natality = array('0');
 
 			if(in_array('all',$_SESSION[brgy])):
