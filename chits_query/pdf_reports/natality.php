@@ -209,8 +209,14 @@ function show_natality(){
 		$arr_natality_stat = $this->compute_indicator($i); 
 
 		if($_SESSION[ques]>=120 && $_SESSION[ques]<=123): //natality livebirth questions
-			$w = array(90,25,25,25,25,60,60);
+			$w = array(90,25,25,25,25,60,60); 
+			
+			echo $criteria[$i].'/'.$i."<br>";
+			
+			$this->get_target_percentage($i,$arr_natality_stat["total"]);
+
 			array_push($arr_consolidate,array($criteria[$i],$arr_natality_stat["M"],$arr_natality_stat["F"],$arr_natality_stat["total"],'','',''));
+			
 			$this->Row(array($criteria[$i],$arr_natality_stat["M"],$arr_natality_stat["F"],$arr_natality_stat["total"],'','',''));
 		elseif($_SESSION[ques]>=124 && $_SESSION[ques]<=127):
 			$w = array(90,75,25,60,60);
@@ -257,8 +263,8 @@ function compute_indicator($crit){
 			//array_push($_SESSION["arr_px_labels"]["natality"],$arr_natality_lb);
 			$arr_natality["total"] = $arr_natality["M"] + $arr_natality["F"];			
 
-			$arr_natality[0] = $arr_natality["total"];
-			
+			$arr_natality[0] = $_SESSION["livebirths"] = $arr_natality["total"];
+				
 			break;
 
 		//case 2: //lb with weight 2500 grams or greater
@@ -417,13 +423,13 @@ function compute_indicator($crit){
 
 			$arr_natality["total"] = $arr_natality["M"] + $arr_natality["F"];
 
-			$arr_natality[0] = $arr_natality["total"];
+			$arr_natality[0] = $_SESSION["nsd"] = $arr_natality["total"];
 
 			break;
 
 
 		//case 15: //normal deliveries at home
-		case (in_array($crit,array(17,31))): 
+		case (in_array($crit,array(17,31))): //nsd at home
 			$arr_natality = array('0');
 			$arr_natality = array("M"=>0,"F"=>0,"total"=>0);
 
@@ -445,7 +451,7 @@ function compute_indicator($crit){
 			break;
 
 		//case 16: //normal deliveries at all health facilities
-		case (in_array($crit,array(32))):
+		case (in_array($crit,array(32))):	//nsd at health facility
 			$arr_natality = array('0');
 			$arr_natality = array("M"=>0,"F"=>0,"total"=>0);
 
@@ -508,11 +514,11 @@ function compute_indicator($crit){
 			
 			$arr_natality["total"] = $arr_natality["M"] + $arr_natality["F"];
 
-			$arr_natality[0] = $arr_natality["total"];
+			$arr_natality[0] = $_SESSION["operative"] = $arr_natality["total"];
 
 			break;
 		
-		case (in_array($crit,array(26,37))): //number of pregnancies
+		case (in_array($crit,array(22,26,37))): //number of pregnancies
 
 			$arr_natality = array("M"=>0,"F"=>0,"total"=>0);
 			if(in_array('all',$_SESSION[brgy])):
@@ -527,7 +533,7 @@ function compute_indicator($crit){
 
 			$arr_natality["total"] = $arr_natality["M"] + $arr_natality["F"];
 
-			$arr_natality[0] = $arr_natality["total"];
+			$arr_natality[0] = $_SESSION["pregnancies"] = $arr_natality["total"];
 			
 			break;
 
@@ -721,6 +727,25 @@ function get_px_gender($outcome_id){
 	endif;
 }
 
+function get_target_percentage($indicator,$total){
+	$arr_preg_deno = array(0,23,27,38,28,39,29,40,20,42,30);
+	$arr_nsd_deno = array(17,31,32,18,33,21,34,43);
+	$arr_operative_deno = array(35,36);
+	$arr_livebirth_deno = array(44,45,46,47,48,49,50,51);
+
+	if(in_array($indicator,$arr_preg_deno)):
+		$denominator = $_SESSION["pregnancies"];
+	elseif(in_array($indicator,$arr_nsd_deno)):
+		$denominator = $_SESSION[]; xxx
+	elseif(in_array($indicator,$arr_operative_deno)):
+
+	elseif(in_array($indicator,$arr_livebirth_deno)):
+
+	else:
+
+	endif;
+}
+
 function Footer(){
     $this->SetY(-15);
     //Arial italic 8
@@ -741,6 +766,7 @@ $pdf->AddPage();
 //$_SESSION["arr_px_labels"] = array('natality'=>array());
 
 $natality_content = $pdf->show_natality();
+//echo $_SESSION["livebirths"].'/'.$_SESSION["pregnancies"].'/'.$_SESSION["nsd"].'/'.$_SESSION["operative"];
 
 if($_GET["type"]=='html'):
 	if($_SESSION[ques]>=120 && $_SESSION[ques]<=123): //natality livebirth questions	
