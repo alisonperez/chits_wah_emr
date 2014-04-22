@@ -188,11 +188,15 @@ function show_natality(){
 	$criteria = array('Livebirths (LB)','LB w/ weights 2500 grams & greater','LB w/ weights less than 2500 grams','LB - Not known weight','LB delivered by doctors','LB delivered by nurses','LB delivered by midwives','LB delivered by hilot/TBA','LB delivered by others','LB delivered by unknown','Total number of Deliveries by Place','Number of deliveries at Health Facilities','Number of deliveries at RHU','Number of deliveries at Hospitals','Number of deliveries at BHS','Number of deliveries at Lying-in','Number of Non-institutional Deliveries (NID)','Number of deliveries at Home','Number of deliveries Others','Total number of deliveries by Type','Number of Normal Deliveries (NSD)','Number of Operative Deliveries','Total Number of Pregnancies','Livebirths','Fetal Death','Abortion','Total Number of Pregnancies','Livebirths','Fetal Death','Abortion','Normal Deliveries','Normal Deliveries at Home','Normal Deliveries at Health Facility','Normal Deliveries - Other Places','Operative Deliveries','Operative Deliveries at Health Facility','Operative Deliveries at Other Places','Number of Pregnancies','Livebirths','Fetal Death','Abortion','Number of Deliveries','Number of Normal Deliveries (NSD)','Number of Operative Deliveries','LB w/ weights 2500 grams & greater','LB w/ weights less than 2500 grams','LB - Not known weight','LB delivered by doctors','LB delivered by nurses','LB delivered by midwives','LB delivered by hilot/TBA','LB delivered by others');
 
 	if($_SESSION[ques]>=120 && $_SESSION[ques]<=123): //natality livebirth questions
-		$start = 26;
-		$end = 37;
-	elseif($_SESSION[ques]>=124 && $_SESSION[ques]<=127): //natality deliveries questions
+		/*$start = 26;
+		$end = 37;*/
 		$start = 37;
 		$end = count($criteria);
+	elseif($_SESSION[ques]>=124 && $_SESSION[ques]<=127): //natality deliveries questions
+		/*$start = 37;
+		$end = count($criteria);*/
+		$start = 26;
+		$end = 37;
 	else:
 
 	endif;
@@ -234,7 +238,8 @@ function compute_indicator($crit){
 		switch($crit){
 
 		//case 1:	//total number of live births
-		case (in_array($crit,array(0,23,27,38))):	//total number of live births
+		case (in_array($crit,array(0,23,27,38))):	//total number of live births, outcome is normal & operative
+
 			$arr_natality = array("M"=>0,"F"=>0,"total"=>0);
 			$arr_natality_lb = array(1=>array(),2=>array(),3=>array(),4=>array(),5=>array(),6=>array(),7=>array(),8=>array(),9=>array(),10=>array(),11=>array(),12=>array());
 
@@ -247,15 +252,12 @@ function compute_indicator($crit){
 			
 			while(list($mc_id,$pxid,$delivery_date,$outcome_id) = mysql_fetch_array($q_natality)){
 				$arr_natality[$this->get_px_gender($outcome_id)] += 1;
-				/*if($this->get_px_gender($outcome_id)=='M'):
-					array_push($arr_natality_lb[$this->get_max_month($delivery_date)],array($pxid,$mc_id,'natality',$delivery_date));
-				else:
-					array_push();
-				endif;*/
 			}
 
 			//array_push($_SESSION["arr_px_labels"]["natality"],$arr_natality_lb);
 			$arr_natality["total"] = $arr_natality["M"] + $arr_natality["F"];			
+
+			$arr_natality[0] = $arr_natality["total"];
 			
 			break;
 
@@ -594,8 +596,30 @@ function compute_indicator($crit){
 
 			$arr_natality[0] = $arr_natality["total"];
 
+			break;
+
+		case (in_array($crit,array(41))): //number of deliveries. includes NSD, Operative, Still birth
+
+			$arr_natality = array('0');
+			$arr_natality = array("M"=>0,"F"=>0,"total"=>0);
+
+			if(in_array('all',$_SESSION[brgy])):
+				$q_lb = mysql_query("SELECT mc_id,patient_id,delivery_date,outcome_id FROM m_patient_mc WHERE delivery_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]'") or die("Cannot query 498: ".mysql_error());
+			else:
+				$q_lb = mysql_query("SELECT a.mc_id, a.patient_id,a.delivery_date,a.outcome_id FROM m_patient_mc a,m_family_members b, m_family_address c WHERE a.delivery_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' AND a.patient_id=b.patient_id AND b.family_id=c.family_id AND c.barangay_id IN ($brgy_array)") or die("Cannot query 500: ".mysql_error());
+			endif;
+
+
+			while(list($mc_id,$pxid,$delivery_date,$outcome_id)=mysql_fetch_array($q_lb)){
+				$arr_natality[$this->get_px_gender($outcome_id)] += 1;
+			}			
+			
+			$arr_natality["total"] = $arr_natality["M"] + $arr_natality["F"];
+
+			$arr_natality[0] = $arr_natality["total"];
 
 			break;
+
 		default:
 
 			break;
