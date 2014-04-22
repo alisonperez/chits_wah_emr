@@ -265,9 +265,9 @@ function compute_indicator($crit){
 		case (in_array($crit,array(1,44))):
 			$arr_natality = array("M"=>0,"F"=>0,"total"=>0);
 			if(in_array('all',$_SESSION[brgy])):
-				$q_lb = mysql_query("SELECT mc_id,patient_id,delivery_date,outcome_id FROM m_patient_mc WHERE delivery_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' AND birthweight >= '2.5'") or die("Cannot query 251: ".mysql_error());
+				$q_lb = mysql_query("SELECT mc_id,patient_id,delivery_date,outcome_id FROM m_patient_mc WHERE delivery_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' AND birthweight >= '2.5' AND outcome_id IN ('NSDF','NSDM','LSCSF','LSCSM')") or die("Cannot query 251: ".mysql_error());
 			else:
-				$q_lb = mysql_query("SELECT a.mc_id, a.patient_id,a.delivery_date,a.outcome_id FROM m_patient_mc a,m_family_members b, m_family_address c WHERE a.delivery_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' AND a.birthweight >= '2.5' AND a.patient_id=b.patient_id AND b.family_id=c.family_id AND c.barangay_id IN ($brgy_array)") or die("Cannot query 253: ".mysql_error());
+				$q_lb = mysql_query("SELECT a.mc_id, a.patient_id,a.delivery_date,a.outcome_id FROM m_patient_mc a,m_family_members b, m_family_address c WHERE a.delivery_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' AND a.birthweight >= '2.5' AND AND a.outcome_id IN ('NSDF','NSDM','LSCSF','LSCSM') AND a.patient_id=b.patient_id AND b.family_id=c.family_id AND c.barangay_id IN ($brgy_array)") or die("Cannot query 253: ".mysql_error());
 			endif;
 			
 			while(list($mc_id,$pxid,$delivery_date,$outcome_id) = mysql_fetch_array($q_lb)){
@@ -281,9 +281,9 @@ function compute_indicator($crit){
 		case (in_array($crit,array(2,45))): 
 			$arr_natality = array("M"=>0,"F"=>0,"total"=>0);
 			if(in_array('all',$_SESSION[brgy])):
-				$q_lb = mysql_query("SELECT mc_id,patient_id,delivery_date,outcome_id FROM m_patient_mc WHERE delivery_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' AND birthweight < '2.5' AND birthweight > '0'") or die("Cannot query 265: ".mysql_error());
+				$q_lb = mysql_query("SELECT mc_id,patient_id,delivery_date,outcome_id FROM m_patient_mc WHERE delivery_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' AND birthweight < '2.5' AND birthweight > '0' AND outcome_id IN ('NSDF','NSDM','LSCSF','LSCSM')") or die("Cannot query 284: ".mysql_error());
 			else:
-				$q_lb = mysql_query("SELECT a.mc_id, a.patient_id,a.delivery_date,a.outcome_id FROM m_patient_mc a,m_family_members b, m_family_address c WHERE a.delivery_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' AND a.birthweight < '2.5' AND birthweight > '0' AND a.patient_id=b.patient_id AND b.family_id=c.family_id AND c.barangay_id IN ($brgy_array)") or die("Cannot query 367: ".mysql_error());
+				$q_lb = mysql_query("SELECT a.mc_id, a.patient_id,a.delivery_date,a.outcome_id FROM m_patient_mc a,m_family_members b, m_family_address c WHERE a.delivery_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' AND a.birthweight < '2.5' AND birthweight > '0' AND AND a.outcome_id IN ('NSDF','NSDM','LSCSF','LSCSM') AND a.patient_id=b.patient_id AND b.family_id=c.family_id AND c.barangay_id IN ($brgy_array)") or die("Cannot query 367: ".mysql_error());
 			endif;
 			
 			while(list($mc_id,$pxid,$delivery_date,$outcome_id) = mysql_fetch_array($q_lb)){
@@ -298,9 +298,9 @@ function compute_indicator($crit){
 		case (in_array($crit,array(3,46))):
 			$arr_natality = array("M"=>0,"F"=>0,"total"=>0);
 			if(in_array('all',$_SESSION[brgy])):
-				$q_lb = mysql_query("SELECT mc_id,patient_id,delivery_date,outcome_id FROM m_patient_mc WHERE delivery_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' AND birthweight='0'") or die("Cannot query 281: ".mysql_error());
+				$q_lb = mysql_query("SELECT mc_id,patient_id,delivery_date,outcome_id FROM m_patient_mc WHERE delivery_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' AND birthweight='' AND outcome_id IN ('NSDF','NSDM','LSCSF','LSCSM')") or die("Cannot query 281: ".mysql_error());
 			else:
-				$q_lb = mysql_query("SELECT a.mc_id, a.patient_id,a.delivery_date,a.outcome_id FROM m_patient_mc a,m_family_members b, m_family_address c WHERE a.delivery_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' AND a.birthweight='0' AND a.patient_id=b.patient_id AND b.family_id=c.family_id AND c.barangay_id IN ($brgy_array)") or die("Cannot query 283: ".mysql_error());
+				$q_lb = mysql_query("SELECT a.mc_id, a.patient_id,a.delivery_date,a.outcome_id FROM m_patient_mc a,m_family_members b, m_family_address c WHERE a.delivery_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' AND a.birthweight='' AND a.outcome_id IN ('NSDF','NSDM','LSCSF','LSCSM') AND a.patient_id=b.patient_id AND b.family_id=c.family_id AND c.barangay_id IN ($brgy_array)") or die("Cannot query 283: ".mysql_error());
 			endif;
 			
 			while(list($mc_id,$pxid,$delivery_date,$outcome_id) = mysql_fetch_array($q_lb)){
@@ -311,12 +311,14 @@ function compute_indicator($crit){
 			break;
 			
 		//case 5: // lb delivered by doctors MD, RN, MW, UTH, TRH, OTH
-		case (in_array($crit,array(4,47))):
+		case (in_array($crit,array(4,47))): //livebirths delivered by doctors
+
+
 			$arr_natality = array("M"=>0,"F"=>0,"total"=>0);
 			if(in_array('all',$_SESSION[brgy])):
-				$q_lb = mysql_query("SELECT mc_id,patient_id,delivery_date,outcome_id FROM m_patient_mc WHERE delivery_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' AND birthmode='MD'") or die("Cannot query 296: ".mysql_error());
+				$q_lb = mysql_query("SELECT mc_id,patient_id,delivery_date,outcome_id FROM m_patient_mc WHERE delivery_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' AND birthmode='MD' AND outcome_id IN ('NSDF','NSDM','LSCSF','LSCSM')") or die("Cannot query 296: ".mysql_error());
 			else:
-				$q_lb = mysql_query("SELECT a.mc_id, a.patient_id,a.delivery_date,a.outcome_id FROM m_patient_mc a,m_family_members b, m_family_address c WHERE a.delivery_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' AND a.birthmode='MD' AND a.patient_id=b.patient_id AND b.family_id=c.family_id AND c.barangay_id IN ($brgy_array)") or die("Cannot query 298: ".mysql_error());
+				$q_lb = mysql_query("SELECT a.mc_id, a.patient_id,a.delivery_date,a.outcome_id FROM m_patient_mc a,m_family_members b, m_family_address c WHERE a.delivery_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' AND a.birthmode='MD' AND outcome_id IN ('NSDF','NSDM','LSCSF','LSCSM') AND a.patient_id=b.patient_id AND b.family_id=c.family_id AND c.barangay_id IN ($brgy_array)") or die("Cannot query 298: ".mysql_error());
 			endif;
 			
 			while(list($mc_id,$pxid,$delivery_date,$outcome_id) = mysql_fetch_array($q_lb)){
@@ -326,13 +328,15 @@ function compute_indicator($crit){
 			$arr_natality["total"] = $arr_natality["M"] + $arr_natality["F"];
 
 			break;
+
 		//case 6:    //lb delivered by nurses
-		case (in_array($crit,array(5,48))):
+		case (in_array($crit,array(5,48))):	//livebirths delivered by nurses
+
 			$arr_natality = array("M"=>0,"F"=>0,"total"=>0);
 			if(in_array('all',$_SESSION[brgy])):
-				$q_lb = mysql_query("SELECT mc_id,patient_id,delivery_date,outcome_id FROM m_patient_mc WHERE delivery_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' AND birthmode='RN'") or die("Cannot query 311: ".mysql_error());
+				$q_lb = mysql_query("SELECT mc_id,patient_id,delivery_date,outcome_id FROM m_patient_mc WHERE delivery_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' AND birthmode='RN' AND outcome_id IN ('NSDF','NSDM','LSCSF','LSCSM')") or die("Cannot query 311: ".mysql_error());
 			else:
-				$q_lb = mysql_query("SELECT a.mc_id, a.patient_id,a.delivery_date,a.outcome_id FROM m_patient_mc a,m_family_members b, m_family_address c WHERE a.delivery_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' AND a.birthmode='RN' AND a.patient_id=b.patient_id AND b.family_id=c.family_id AND c.barangay_id IN ($brgy_array)") or die("Cannot query 313: ".mysql_error());
+				$q_lb = mysql_query("SELECT a.mc_id, a.patient_id,a.delivery_date,a.outcome_id FROM m_patient_mc a,m_family_members b, m_family_address c WHERE a.delivery_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' AND a.birthmode='RN' AND a.outcome_id IN ('NSDF','NSDM','LSCSF','LSCSM') AND a.patient_id=b.patient_id AND b.family_id=c.family_id AND c.barangay_id IN ($brgy_array)") or die("Cannot query 313: ".mysql_error());
 			endif;
 			
 			while(list($mc_id,$pxid,$delivery_date,$outcome_id) = mysql_fetch_array($q_lb)){
@@ -344,12 +348,13 @@ function compute_indicator($crit){
 			break; 
 
 		//case 7://lb delivered by midwives
-		case (in_array($crit,array(6,49))):
+
+		case (in_array($crit,array(6,49))): //livebirths delivered by midwives
 			$arr_natality = array("M"=>0,"F"=>0,"total"=>0);
 			if(in_array('all',$_SESSION[brgy])):
-				$q_lb = mysql_query("SELECT mc_id,patient_id,delivery_date,outcome_id FROM m_patient_mc WHERE delivery_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' AND birthmode='MW'") or die("Cannot query 327: ".mysql_error());
+				$q_lb = mysql_query("SELECT mc_id,patient_id,delivery_date,outcome_id FROM m_patient_mc WHERE delivery_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' AND birthmode='MW' AND outcome_id IN ('NSDF','NSDM','LSCSF','LSCSM')") or die("Cannot query 327: ".mysql_error());
 			else:
-				$q_lb = mysql_query("SELECT a.mc_id, a.patient_id,a.delivery_date,a.outcome_id FROM m_patient_mc a,m_family_members b, m_family_address c WHERE a.delivery_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' AND a.birthmode='MW' AND a.patient_id=b.patient_id AND b.family_id=c.family_id AND c.barangay_id IN ($brgy_array)") or die("Cannot query 329: ".mysql_error());
+				$q_lb = mysql_query("SELECT a.mc_id, a.patient_id,a.delivery_date,a.outcome_id FROM m_patient_mc a,m_family_members b, m_family_address c WHERE a.delivery_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' AND a.birthmode='MW' AND a.outcome_id IN ('NSDF','NSDM','LSCSF','LSCSM') AND a.patient_id=b.patient_id AND b.family_id=c.family_id AND c.barangay_id IN ($brgy_array)") or die("Cannot query 329: ".mysql_error());
 			endif;
 			
 			while(list($mc_id,$pxid,$delivery_date,$outcome_id) = mysql_fetch_array($q_lb)){
@@ -361,12 +366,12 @@ function compute_indicator($crit){
 			break;
 
 		//case 8: // lb delivered by hilot / tba
-		case (in_array($crit,array(7,50))):
+		case (in_array($crit,array(7,50))):	//livebirths delivered by hilot / TBA
 			$arr_natality = array("M"=>0,"F"=>0,"total"=>0);
 			if(in_array('all',$_SESSION[brgy])):
-				$q_lb = mysql_query("SELECT mc_id,patient_id,delivery_date,outcome_id FROM m_patient_mc WHERE delivery_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' AND birthmode IN ('UTH','TRH')") or die("Cannot query 344: ".mysql_error());
+				$q_lb = mysql_query("SELECT mc_id,patient_id,delivery_date,outcome_id FROM m_patient_mc WHERE delivery_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' AND birthmode IN ('UTH','TRH') AND outcome_id IN ('NSDF','NSDM','LSCSF','LSCSM')") or die("Cannot query 344: ".mysql_error());
 			else:
-				$q_lb = mysql_query("SELECT a.mc_id, a.patient_id,a.delivery_date,a.outcome_id FROM m_patient_mc a,m_family_members b, m_family_address c WHERE a.delivery_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' AND birthmode IN ('UTH','TRH') AND a.patient_id=b.patient_id AND b.family_id=c.family_id AND c.barangay_id IN ($brgy_array)") or die("Cannot query 346: ".mysql_error());
+				$q_lb = mysql_query("SELECT a.mc_id, a.patient_id,a.delivery_date,a.outcome_id FROM m_patient_mc a,m_family_members b, m_family_address c WHERE a.delivery_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' AND birthmode IN ('UTH','TRH') AND a.outcome_id IN ('NSDF','NSDM','LSCSF','LSCSM') AND a.patient_id=b.patient_id AND b.family_id=c.family_id AND c.barangay_id IN ($brgy_array)") or die("Cannot query 346: ".mysql_error());
 			endif;
 			
 			while(list($mc_id,$pxid,$delivery_date,$outcome_id) = mysql_fetch_array($q_lb)){
@@ -381,9 +386,9 @@ function compute_indicator($crit){
 		case (in_array($crit,array(8,51))):	
 			$arr_natality = array("M"=>0,"F"=>0,"total"=>0);
 			if(in_array('all',$_SESSION[brgy])):
-				$q_lb = mysql_query("SELECT mc_id,patient_id,delivery_date,outcome_id FROM m_patient_mc WHERE delivery_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' AND birthmode='OTH'") or die("Cannot query 361: ".mysql_error());
+				$q_lb = mysql_query("SELECT mc_id,patient_id,delivery_date,outcome_id FROM m_patient_mc WHERE delivery_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' AND birthmode='OTH' AND outcome_id IN ('NSDF','NSDM','LSCSF','LSCSM')") or die("Cannot query 361: ".mysql_error());
 			else:
-				$q_lb = mysql_query("SELECT a.mc_id, a.patient_id,a.delivery_date,a.outcome_id FROM m_patient_mc a,m_family_members b, m_family_address c WHERE a.delivery_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' AND birthmode='OTH' AND a.patient_id=b.patient_id AND b.family_id=c.family_id AND c.barangay_id IN ($brgy_array)") or die("Cannot query 363: ".mysql_error());
+				$q_lb = mysql_query("SELECT a.mc_id, a.patient_id,a.delivery_date,a.outcome_id FROM m_patient_mc a,m_family_members b, m_family_address c WHERE a.delivery_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' AND birthmode='OTH' AND a.outcome_id IN ('NSDF','NSDM','LSCSF','LSCSM') AND a.patient_id=b.patient_id AND b.family_id=c.family_id AND c.barangay_id IN ($brgy_array)") or die("Cannot query 363: ".mysql_error());
 			endif;
 			
 			while(list($mc_id,$pxid,$delivery_date,$outcome_id) = mysql_fetch_array($q_lb)){
