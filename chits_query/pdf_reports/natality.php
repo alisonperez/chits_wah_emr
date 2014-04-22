@@ -553,7 +553,49 @@ function compute_indicator($crit){
 			
 			break;
 
+		case (in_array($crit,array(35))):	//number of operative deliveries at health facility (HC,BHS,HOSP,LYING-IN)
 
+			$arr_natality = array('0');
+			$arr_natality = array("M"=>0,"F"=>0,"total"=>0);
+
+			if(in_array('all',$_SESSION[brgy])):
+				$q_lb = mysql_query("SELECT mc_id,patient_id,delivery_date,outcome_id FROM m_patient_mc WHERE delivery_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' AND outcome_id IN ('LSCSF','LSCSM') AND delivery_location IN ('HC','BHS','HOSP','LYIN')") or die("Cannot query 498: ".mysql_error());
+			else:
+				$q_lb = mysql_query("SELECT a.mc_id, a.patient_id,a.delivery_date,a.outcome_id FROM m_patient_mc a,m_family_members b, m_family_address c WHERE a.delivery_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' AND a.outcome_id IN ('LSCSF','LSCSM') AND a.delivery_location IN ('HC','BHS','HOSP','LYIN') AND a.patient_id=b.patient_id AND b.family_id=c.family_id AND c.barangay_id IN ($brgy_array)") or die("Cannot query 500: ".mysql_error());
+			endif;
+
+
+			while(list($mc_id,$pxid,$delivery_date,$outcome_id)=mysql_fetch_array($q_lb)){
+				$arr_natality[$this->get_px_gender($outcome_id)] += 1;
+			}			
+			
+			$arr_natality["total"] = $arr_natality["M"] + $arr_natality["F"];
+
+			$arr_natality[0] = $arr_natality["total"];
+
+			break;
+		
+		case (in_array($crit,array(36))):	//number of operative deliveries at OTHERS
+			$arr_natality = array('0');
+			$arr_natality = array("M"=>0,"F"=>0,"total"=>0);
+
+			if(in_array('all',$_SESSION[brgy])):
+				$q_lb = mysql_query("SELECT mc_id,patient_id,delivery_date,outcome_id FROM m_patient_mc WHERE delivery_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' AND outcome_id IN ('LSCSF','LSCSM') AND delivery_location IN ('OTHERS')") or die("Cannot query 498: ".mysql_error());
+			else:
+				$q_lb = mysql_query("SELECT a.mc_id, a.patient_id,a.delivery_date,a.outcome_id FROM m_patient_mc a,m_family_members b, m_family_address c WHERE a.delivery_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' AND a.outcome_id IN ('LSCSF','LSCSM') AND a.delivery_location IN ('OTHERS') AND a.patient_id=b.patient_id AND b.family_id=c.family_id AND c.barangay_id IN ($brgy_array)") or die("Cannot query 500: ".mysql_error());
+			endif;
+
+
+			while(list($mc_id,$pxid,$delivery_date,$outcome_id)=mysql_fetch_array($q_lb)){
+				$arr_natality[$this->get_px_gender($outcome_id)] += 1;
+			}			
+			
+			$arr_natality["total"] = $arr_natality["M"] + $arr_natality["F"];
+
+			$arr_natality[0] = $arr_natality["total"];
+
+
+			break;
 		default:
 
 			break;
