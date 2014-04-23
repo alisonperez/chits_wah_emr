@@ -974,11 +974,14 @@ function get_brgy_pop(){
 }
 
 function get_target($criteria){
-	if($criteria>=1 && $criteria<=5):
+	/*if($criteria>=1 && $criteria<=5):	//prenatal percentage
 		$perc = '.035';
-	else:
+	else:	//postpartum percentage
 		$perc = '.03';
 	endif;
+	*/
+
+	$perc = .027; //postpartum and prenatal eligible populations at 2.7%
 	return $perc;
 }
 
