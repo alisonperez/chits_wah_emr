@@ -162,19 +162,22 @@ function Header()
 	$this->SetFont('Arial','',13);
 	$this->Cell(0,5,$brgy_label,0,1,'C');
 	
-	$_SESSION["w"] = $w = array(90,75,25,60,60); //340
-	$_SESSION["header"] = $header = array('INDICATORS','Number','%','Interpretation','Recommendation / Actions Taken');
 
 	if($_SESSION[ques]>=120 && $_SESSION[ques]<=123): //natality livebirth questions
 		$_SESSION["w2"] = $w2 = array(90,25,25,25,25,60,60); //340	
-		$_SESSION["header2"] = $header2 = array(' ','Male','Female','Total',' ',' ',' ');
+		$_SESSION["header2"] = $header2 = array(' ','Male','Female','Total','%','Interpretation','Recommendation / Actions Taken');
 		$this->SetWidths($w2);
 		$this->Row($header2);
+	elseif($_SESSION[ques]>=123 && $_SESSION[ques]<=127):
+		$_SESSION["w"] = $w = array(90,75,25,60,60); //340
+		$_SESSION["header"] = $header = array('INDICATORS','Number','%','Interpretation','Recommendation / Actions Taken');
+		$this->Ln();
+		$this->SetWidths($w);
+		$this->Row($header);
+	else: 
+
 	endif;
 
-	$this->Ln();
-	$this->SetWidths($w);
-	$this->Row($header);
 	
 }
 
@@ -208,25 +211,26 @@ function show_natality(){
 		
 		$arr_natality_stat = $this->compute_indicator($i); 
 
+		$perc = $this->get_target_percentage($i,$arr_natality_stat["total"]);		
+
 		if($_SESSION[ques]>=120 && $_SESSION[ques]<=123): //natality livebirth questions
 			$w = array(90,25,25,25,25,60,60); 
 			
-			echo $criteria[$i].'/'.$i."<br>";
+			array_push($arr_consolidate,array($criteria[$i],$arr_natality_stat["M"],$arr_natality_stat["F"],$arr_natality_stat["total"],$perc,'',''));
 			
-			$this->get_target_percentage($i,$arr_natality_stat["total"]);
-
-			array_push($arr_consolidate,array($criteria[$i],$arr_natality_stat["M"],$arr_natality_stat["F"],$arr_natality_stat["total"],'','',''));
-			
-			$this->Row(array($criteria[$i],$arr_natality_stat["M"],$arr_natality_stat["F"],$arr_natality_stat["total"],'','',''));
+			$this->Row(array($criteria[$i],$arr_natality_stat["M"],$arr_natality_stat["F"],$arr_natality_stat["total"],$perc,'',''));
+			$this->Row($arr_consolidate);
 		elseif($_SESSION[ques]>=124 && $_SESSION[ques]<=127):
-			$w = array(90,75,25,60,60);
-			array_push($arr_consolidate,array($criteria[$i],$arr_natality_stat[0],'','',''));
-			$this->Row(array($criteria[$i],$arr_natality_stat[0],'','',''));
+			$w = array(90,75,25,60,60); 
+			array_push($arr_consolidate,array($criteria[$i],$arr_natality_stat[0],$perc,'',''));
+			
+			$this->Row(array($criteria[$i],$arr_natality_stat[0],$perc,'',''));
+
 		else:
 
 		endif;
 	}
-	
+
 	return $arr_consolidate;
 }
 
@@ -728,21 +732,30 @@ function get_px_gender($outcome_id){
 }
 
 function get_target_percentage($indicator,$total){
-	$arr_preg_deno = array(0,23,27,38,28,39,29,40,20,42,30);
-	$arr_nsd_deno = array(17,31,32,18,33,21,34,43);
+	$arr_preg_deno = array(0,23,27,28,29,20,30,34);
+	$arr_nsd_deno = array(17,31,32,18,33,21);
 	$arr_operative_deno = array(35,36);
 	$arr_livebirth_deno = array(44,45,46,47,48,49,50,51);
+	$denominator = '';
+
 
 	if(in_array($indicator,$arr_preg_deno)):
 		$denominator = $_SESSION["pregnancies"];
-	elseif(in_array($indicator,$arr_nsd_deno)):
-		$denominator = $_SESSION[]; xxx
+	elseif(in_array($indicator,$arr_nsd_deno)): 
+		$denominator = $_SESSION["nsd"]; 
 	elseif(in_array($indicator,$arr_operative_deno)):
-
+		$denominator = $_SESSION["operative"];
 	elseif(in_array($indicator,$arr_livebirth_deno)):
+		$denominator = $_SESSION["livebirths"];
+	else: 
+		$denominator = '-';
+	endif;
 
-	else:
 
+	if($denominator!='-'): 
+		return round((($total / $denominator)*100),2);
+	else: 
+		return $denominator;
 	endif;
 }
 
@@ -763,10 +776,8 @@ $pdf->AliasNbPages();
 $pdf->SetFont('Arial','',13);
 $pdf->AddPage();
 
-//$_SESSION["arr_px_labels"] = array('natality'=>array());
 
 $natality_content = $pdf->show_natality();
-//echo $_SESSION["livebirths"].'/'.$_SESSION["pregnancies"].'/'.$_SESSION["nsd"].'/'.$_SESSION["operative"];
 
 if($_GET["type"]=='html'):
 	if($_SESSION[ques]>=120 && $_SESSION[ques]<=123): //natality livebirth questions	
