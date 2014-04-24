@@ -275,7 +275,7 @@ function show_mc_summary(){
 
 				    array_push($arr_consolidate,$arr_disp);
 
-                    for($x=0;$x<count($arr_disp);$x++){
+                    for($x=0;$x<count($arr_disp);$x++){ 
                         if($x==0):
                             $this->Cell($w[$x],6,($i+1).'. '.$arr_disp[$x],'1',0,'1');
                         else:
@@ -1146,6 +1146,7 @@ endif; */
 
 $_SESSION["arr_px_labels"] = array('mc'=>array());
 $mc_content = $pdf->show_mc_summary();
+
 
 if($_GET["type"]=='html'):
 	$html_tab->create_table($_SESSION["w"],$_SESSION["header"],$mc_content);

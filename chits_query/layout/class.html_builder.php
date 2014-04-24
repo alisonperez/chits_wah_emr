@@ -100,10 +100,10 @@ class html_builder{
 
 			for($i=0;$i<count($value);$i++){ 
 				$arr_names = array();
-				
+
 				echo "<td>";
 
-				if(!empty($arr_px_labels)): 
+ 				if(!empty($arr_px_labels) && $report_period=='M'): 
 					if($i!=0 && $value[$i]!=0):
 						if(isset($arr_px_labels["epi"])): 
 							$cat = 'epi'; 
@@ -161,7 +161,7 @@ class html_builder{
 							echo "<a href='../../site/disp_name.php?id=$ser_arr_names&cat=$label&prog=$cat' target='new'>".$value[$i]."</a>";
 						endif;
 						
-					else:
+					else: 
 						echo $value[$i]; 
 					endif;
 				else:
