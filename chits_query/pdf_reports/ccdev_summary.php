@@ -249,11 +249,18 @@ function show_ccdev_summary(){
         endif;
 	
 	
-	for($i=0;$i<count($arr_indicators);$i++){
+	for($i=0;$i<count($arr_indicators);$i++){ 		
+		
 		$sub_arr = array();
 		$brgy_pop = $this->get_brgy_pop(); //get population of brgy/s
 		$target_perc = $this->get_target($i); //get the percentage of targets
-		$target = round(($brgy_pop * $target_perc)); //get the population target
+
+
+		if($target_perc!=0):
+			$target = round(($brgy_pop * $target_perc)); //get the population target
+		else:
+			$target = '-';
+		endif;
 		
 		$disp_arr = array();
 		
@@ -1980,11 +1987,12 @@ function get_quarterly_total($r_month,$target){
 }
 
 function get_target($criteria){
-	if($criteria>=0 && $criteria<=2):
-		$perc = '0.027';
+	if(in_array($criteria,array(1,5))):	//FIC and EBF
+		$perc = 0.027;
 	else:
-
+		$perc = 0;	
 	endif;
+
 	return $perc;
 }
 function get_cpab($pxid){
