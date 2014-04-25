@@ -211,7 +211,7 @@ class ptgroup extends module {
                         } 
                                                                                                                      
                     } else {
-                        if($id=='FP' && ($age>=50 || $age<=14 )): //do not display FP checkbox if patient is >=50 or <=14
+                        if($id=='FP' && ($age>=55 || $age<=9 )): //do not display FP checkbox if patient is >=50 or <=14
                         else: 
                             print "<input type='checkbox' name='ptgroup[]' value='$id'> $name<br/>";
                         endif;

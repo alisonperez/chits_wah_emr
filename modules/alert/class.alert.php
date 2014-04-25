@@ -1243,9 +1243,9 @@ class alert extends module{
 
 
 					case '30':		//female sterilization dropout
-						$q_fp = $this->check_active_user($patient_id,'FSTR/BTL');
+						$q_fp = $this->check_active_user($patient_id,'FSTRBTL');
 
-						if(mysql_num_rows($q_fp)!=0):
+						if(mysql_num_rows($q_fp)!=0): echo 
 							list($fp_px_id,$date_registered) = mysql_fetch_array($q_fp);
 							
 							$px_age = $this->get_patient_age($patient_id);
@@ -1253,10 +1253,23 @@ class alert extends module{
 							if($px_age >= 50):	//candidate for dropout in BTL is px_age>=50
 								array_push($arr_case_id,$fp_px_id);
 							endif;
-						endif;
+						endif;						
+						break;
+
+					case '31':	//male sterilization/vasectomy dropout
+						$q_fp = $this->check_active_user($patient_id,'MSV');
+
+						if(mysql_num_rows($q_fp)!=0):
+							list($fp_px_id,$date_registered) = mysql_fetch_array($q_fp);
+							
+							$px_age = $this->get_patient_age($patient_id);
+							
+							if($px_age >= 50):	//candidate for dropout in BTL/MSV is px_age>=50
+								array_push($arr_case_id,$fp_px_id);
+							endif;
+						endif;						
 						
 
-						break;
 					default:
 
 						break;
