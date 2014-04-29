@@ -1269,7 +1269,11 @@ class alert extends module{
 							endif;
 						endif;						
 						
-
+					case 32:	//NFP LAM dropout alert
+						$q_fp = $this->check_active_user($patient_id,'NFPLAM');
+						
+						
+						
 					default:
 
 						break;

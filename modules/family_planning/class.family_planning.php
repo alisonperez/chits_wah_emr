@@ -680,8 +680,10 @@ class family_planning extends module{
 				$this->show_method_list('form_methods','sel_methods');
 				$this->show_previous_method("None");
 
-				echo "<tr><td class='boxtitle'>TREATMENT PARTNER</td><td><input type='text' name='txt_tx_partner' size='20'></input></td></tr>";				
+				echo "<tr><td class='boxtitle'>IF LAM,SPECIFY DATE OF DELIVERY</td><td><input type='text' name='txt_dob' size='8'></input>&nbsp;<a href=\"javascript:show_calendar4('document.form_methods.txt_dob_reg', document.form_methods.txt_dob.value);\"><img src='../images/cal.gif' width='16' height='16' border='0' alt='Click here to pick up date'></a></td></tr>";	
 
+				echo "<tr><td class='boxtitle'>TREATMENT PARTNER</td><td><input type='text' name='txt_tx_partner' size='20'></input></td></tr>";
+			
 				echo "<tr><td class='boxtitle'>REASON FOR PERMANENT METHOD</td>";
 				echo "<td class='boxtitle'><textarea name='txt_reason' cols='30' row='10'>";
 				echo "</textarea></td></tr>";
@@ -709,15 +711,19 @@ class family_planning extends module{
 						echo "</td></tr>"; */
                                                             
 						$this->show_method_list('form_methods','sel_methods');
+
+						echo "<tr><td class='boxtitle'>IF LAM,SPECIFY DATE OF DELIVERY</td><td><input type='text' name='txt_dob' size='8'></input>&nbsp;<a href=\"javascript:show_calendar4('document.form_methods.txt_dob', document.form_methods.txt_dob.value);\"><img src='../images/cal.gif' width='16' height='16' border='0' alt='Click here to pick up date'></a></td></tr>";	
+
 						echo "<tr><td class='boxtitle'>TREATMENT PARTNER</td><td><input type='text' name='txt_tx_partner' size='20'></input></td></tr>";				
-                                                $this->show_fp_clients();
+                        $this->show_fp_clients();
                                                 
-                                                echo "<tr><td class='boxtitle'>REASON FOR PERMANENT METHOD</td>";
-                                                echo "<td><textarea name='txt_reason' cols='30' row='10'>";
-                                                echo "</textarea></td></tr>";
-                                                
-                                                
-			    			echo "<tr><td class='boxtitle'>PREVIOUS METHOD:</td><td>";
+                        echo "<tr><td class='boxtitle'>REASON FOR PERMANENT METHOD</td>";
+
+						echo "<td><textarea name='txt_reason' cols='30' row='10'>";
+                        
+						echo "</textarea></td></tr>";
+                      
+			    		echo "<tr><td class='boxtitle'>PREVIOUS METHOD:</td><td>";
 						echo (isset($arr_current[0]["method_name"]))?$arr_current[0]["method_name"]:'None';
 						echo "</td></tr>";
 
@@ -749,6 +755,8 @@ class family_planning extends module{
 						echo "<a href=\"javascript:show_calendar4('document.form_methods.txt_date_reg', document.form_methods.txt_date_reg.value);\"><img src='../images/cal.gif' width='16' height='16' border='0' alt='Click here to pick up date'></a>";
 						echo "</td></tr>";
 
+						echo "<tr><td class='boxtitle'>IF LAM,SPECIFY DATE OF DELIVERY</td><td><input type='text' name='txt_dob' size='8'></input>&nbsp;<a href=\"javascript:show_calendar4('document.form_methods.txt_dob', document.form_methods.txt_dob.value);\"><img src='../images/cal.gif' width='16' height='16' border='0' alt='Click here to pick up date'></a></td></tr>";	
+
 						echo "<tr><td class='boxtitle'>TREATMENT PARTNER:</td><td>";
 						$txpartner = $arr_current[0][treatment_partner];
 						echo "<input type='text' size='20' value='$txpartner' name='txt_treatment_partner'></input>";
@@ -756,8 +764,10 @@ class family_planning extends module{
 						                                            
 						
 						echo "<tr><td class='boxtitle'>REASON FOR PERMANENT METHOD</td>";
-                                                echo "<td><textarea name='txt_reason' cols='30' row='10'>".$arr_current[0][permanent_reason];
-                				echo "</textarea></td></tr>";
+                        
+						echo "<td><textarea name='txt_reason' cols='30' row='10'>".$arr_current[0][permanent_reason];
+                		
+						echo "</textarea></td></tr>";
 				
 						echo "<tr><td class='boxtitle'>PREVIOUS METHOD:</td><td>";
 						echo (isset($arr_current[1]["method_name"]))?$arr_current[1]["method_name"]:'None';
@@ -1226,7 +1236,7 @@ class family_planning extends module{
                 endif;
 
 		if(mysql_num_rows($q_methods)!=0):
-			echo "<select name='$form_name'>";
+			echo "<select name='$form_name' onchange=\"alert('If LAM method is selected, record the client date of delivery. Otherwise, leave it blank.')\">";
 			while($r_methods = mysql_fetch_array($q_methods)){
 				echo "<option value='$r_methods[method_id]'>$r_methods[method_name]</option>";
 			}
@@ -1383,22 +1393,22 @@ class family_planning extends module{
                                                 list($duration_bleeding,$past_mens) = mysql_fetch_array($q_fp_obs);
                                                 
 						if(mysql_num_rows($q_mc)!=0):
-						    list($fpal,$delivery_date,$outcome_id, $patient_lmp) = mysql_fetch_array($q_mc);						    						    
-						    
-						
+						    list($fpal,$delivery_date,$outcome_id, $patient_lmp) = mysql_fetch_array($q_mc);
+
 						    if($delivery_date=='0000-00-00'):
 						        $delivery_date = '';
 						        echo "<br><font size='2' color='red' class='boxtitle'><b>This patient has an existing record in CHITS. Patient is presently pregnant based on records.</b></font>";
-                                                    else:
-                                                        echo "<br><font size='2' color='red' class='boxtitle'><b>This patient has an existing record in CHITS. Patient's pregnancy and delivery was previously been recorded.</b></font>"; 
-                                                    endif;
+                            else:
+                                echo "<br><font size='2' color='red' class='boxtitle'><b>This patient has an existing record in CHITS. Patient's pregnancy and delivery was previously been recorded.</b></font>"; 
+						    endif;
 						
-                                                    $q_outcome = mysql_query("SELECT outcome_name FROM m_lib_mc_outcome WHERE outcome_id='$outcome_id'") or die("Cannot query 1315".mysql_error());
-                                                    if(mysql_num_rows($q_outcome)!=0):
-						        list($outcome_name) = mysql_fetch_array($q_outcome);
-                                                    else:
-						        $outcome_name = '';
-                                                    endif;
+                          $q_outcome = mysql_query("SELECT outcome_name FROM m_lib_mc_outcome WHERE outcome_id='$outcome_id'") or die("Cannot query 1315".mysql_error());
+
+						  if(mysql_num_rows($q_outcome)!=0):
+					        list($outcome_name) = mysql_fetch_array($q_outcome);
+                          else:
+					        $outcome_name = '';
+                          endif;
                                                 
 						endif;
 						
