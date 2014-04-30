@@ -744,12 +744,12 @@ class family_planning extends module{
 						list($y,$m,$d) = explode('-',$arr_current[0]["date_registered"]);
 						$datereg = $m.'/'.$d.'/'.$y;
 
-						if(!empty($arr_current[0]["date_delivery"])):												list($dob_y,$dob_m,$dob_d) =	explode('-',$arr_current[0]["date_delivery"]);
+						if((!empty($arr_current[0]["date_delivery"])) && $arr_current[0]["date_delivery"]!='0000-00-00'):									list($dob_y,$dob_m,$dob_d) =	explode('-',$arr_current[0]["date_delivery"]);
 							$datedob = $dob_m.'/'.$dob_d.'/'.$dob_y;
-
 						else:
 							$datedob = '';						
-						endif;												
+						endif;									
+
 						$this->show_fp_clients($arr_current[0]["client_code"]);						
 												
 						echo "<tr><td class='boxtitle'>DATE OF REGISTRATION:</td><td>";
@@ -757,7 +757,7 @@ class family_planning extends module{
 						echo "<a href=\"javascript:show_calendar4('document.form_methods.txt_date_reg', document.form_methods.txt_date_reg.value);\"><img src='../images/cal.gif' width='16' height='16' border='0' alt='Click here to pick up date'></a>";
 						echo "</td></tr>";
 
-						echo "<tr><td class='boxtitle'>IF LAM,SPECIFY DATE OF DELIVERY</td><td><input type='text' name='txt_dob' size='8' value='$datedob'></input>&nbsp;<a href=\"javascript:show_calendar4('document.form_methods.txt_dob', document.form_methods.txt_dob.value);\"><img src='../images/cal.gif' width='16' height='16' border='0' alt='Click here to pick up date'></a></td></tr>";	
+						echo "<tr><td class='boxtitle'>IF LAM,SPECIFY DATxE OF DELIVERY</td><td><input type='text' name='txt_dob' size='8' value='$datedob'></input>&nbsp;<a href=\"javascript:show_calendar4('document.form_methods.txt_dob', document.form_methods.txt_dob.value);\"><img src='../images/cal.gif' width='16' height='16' border='0' alt='Click here to pick up date'></a></td></tr>";	
 
 						echo "<tr><td class='boxtitle'>TREATMENT PARTNER:</td><td>";
 						$txpartner = $arr_current[0][treatment_partner];
@@ -1755,8 +1755,9 @@ class family_planning extends module{
 							endif;
 
 						else: //   a simple edit of date of registration, type of client and treatment partner
-								list($m,$d,$y) = explode('/',$_POST["txt_date_reg"]);
-								$date_reg = $y.'-'.$m.'-'.$d;
+
+						list($m,$d,$y) = explode('/',$_POST["txt_date_reg"]);
+						$date_reg = $y.'-'.$m.'-'.$d;
 
 						if(!empty($_POST["txt_dob"])):	   
 							list($dob_m,$dob_d,$dob_y) = explode('/',$_POST["txt_dob"]);

@@ -10,8 +10,6 @@ if(!empty($_SESSION[userid])):
 $arr = array();
 $arr = unserialize(stripslashes($_GET["id"]));
 
-
-
 echo "<html>";
 echo "<head><title>List of Family / Household Members</title>";
 echo "<style type='text/css'>";
