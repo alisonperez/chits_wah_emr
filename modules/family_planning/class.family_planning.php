@@ -447,10 +447,6 @@ class family_planning extends module{
 		
 	}
 
-
-
-
-
 	function drop_tables(){
 		module::execsql("DROP table m_patient_fp");
 		module::execsql("DROP table m_patient_fp_dropout");
@@ -642,14 +638,14 @@ class family_planning extends module{
 
 		$pxid = healthcenter::get_patient_id($_GET["consult_id"]);
 
-		$q_fp_methods = mysql_query("SELECT a.fp_id,b.fp_px_id,b.method_id,c.method_name,b.drop_out,b.date_registered,b.treatment_partner,b.dropout_reason,FLOOR((unix_timestamp(b.date_dropout)-unix_timestamp(b.date_registered))/(3600*24)) as duration,b.date_dropout,b.dropout_reason,b.client_code,b.permanent_reason FROM m_patient_fp a, m_patient_fp_method b, m_lib_fp_methods c WHERE a.patient_id='$pxid' AND a.fp_id=b.fp_id AND b.method_id=c.method_id ORDER by b.drop_out DESC,b.date_registered DESC") or die("Cannot query: 534");
+		$q_fp_methods = mysql_query("SELECT a.fp_id,b.fp_px_id,b.method_id,c.method_name,b.drop_out,b.date_registered,b.treatment_partner,b.dropout_reason,FLOOR((unix_timestamp(b.date_dropout)-unix_timestamp(b.date_registered))/(3600*24)) as duration,b.date_dropout,b.dropout_reason,b.client_code,b.permanent_reason,b.date_delivery FROM m_patient_fp a, m_patient_fp_method b, m_lib_fp_methods c WHERE a.patient_id='$pxid' AND a.fp_id=b.fp_id AND b.method_id=c.method_id ORDER by b.drop_out DESC,b.date_registered DESC") or die("Cannot query: 534".mysql_error());
 		
 		if(isset($_SESSION["dropout_info"]) && $_GET["action"]=="drop"):   //indicates that the end-user pressed YES for dropping out patient
 			//print_r($_SESSION["dropout_info"]);
 			
 			list($mreg,$dreg,$yreg) = explode('/',$_SESSION["dropout_info"]["txt_date_reg"]);
 			list($mdrop,$ddrop,$ydrop) = explode('/',$_SESSION["dropout_info"]["txt_date_dropout"]);
-
+ 
 			$reg = $yreg.'-'.$mreg.'-'.$dreg;
 			$drop = $ydrop.'-'.$mdrop.'-'.$ddrop;
 			$drop_reason = $_SESSION["dropout_info"]["sel_dropout"];
@@ -740,14 +736,20 @@ class family_planning extends module{
 						break;
 
 					case "N":		//current users of FP method
-					        
+
 						echo "<input type='hidden' name='fp_px_id' value='$fp_px_id'></input>";
 						echo "<input type='hidden' name='method_id' value='$method_id'></input>";
 
 						echo "<tr><td class='boxtitle'>CURRENT METHOD:</td><td>".$arr_current[0]["method_name"]."</td></tr>";
 						list($y,$m,$d) = explode('-',$arr_current[0]["date_registered"]);
 						$datereg = $m.'/'.$d.'/'.$y;
-																		
+
+						if(!empty($arr_current[0]["date_delivery"])):												list($dob_y,$dob_m,$dob_d) =	explode('-',$arr_current[0]["date_delivery"]);
+							$datedob = $dob_m.'/'.$dob_d.'/'.$dob_y;
+
+						else:
+							$datedob = '';						
+						endif;												
 						$this->show_fp_clients($arr_current[0]["client_code"]);						
 												
 						echo "<tr><td class='boxtitle'>DATE OF REGISTRATION:</td><td>";
@@ -755,7 +757,7 @@ class family_planning extends module{
 						echo "<a href=\"javascript:show_calendar4('document.form_methods.txt_date_reg', document.form_methods.txt_date_reg.value);\"><img src='../images/cal.gif' width='16' height='16' border='0' alt='Click here to pick up date'></a>";
 						echo "</td></tr>";
 
-						echo "<tr><td class='boxtitle'>IF LAM,SPECIFY DATE OF DELIVERY</td><td><input type='text' name='txt_dob' size='8'></input>&nbsp;<a href=\"javascript:show_calendar4('document.form_methods.txt_dob', document.form_methods.txt_dob.value);\"><img src='../images/cal.gif' width='16' height='16' border='0' alt='Click here to pick up date'></a></td></tr>";	
+						echo "<tr><td class='boxtitle'>IF LAM,SPECIFY DATE OF DELIVERY</td><td><input type='text' name='txt_dob' size='8' value='$datedob'></input>&nbsp;<a href=\"javascript:show_calendar4('document.form_methods.txt_dob', document.form_methods.txt_dob.value);\"><img src='../images/cal.gif' width='16' height='16' border='0' alt='Click here to pick up date'></a></td></tr>";	
 
 						echo "<tr><td class='boxtitle'>TREATMENT PARTNER:</td><td>";
 						$txpartner = $arr_current[0][treatment_partner];
@@ -1489,9 +1491,19 @@ class family_planning extends module{
 
 		$reg_date = $year.'-'.$month.'-'.$date;
 
+		
+
 		if(empty($_POST[txt_date_reg])):
 			echo "<script language='javascript'''>";
 			echo "alert('Please supply date of registration')";
+			echo "</script>";
+		elseif($_POST[sel_methods]=='NFPLAM' && empty($_POST[txt_dob])):
+			echo "<script language='javascript'''>";
+			echo "alert('For LAM method, please supply the date of delivery.')";
+			echo "</script>";			
+		elseif($_POST[sel_methods]!='NFPLAM' && !empty($_POST[txt_dob])):
+			echo "<script language='javascript'''>";
+			echo "alert('For non-LAM method, there is no need to supply the date of delivery.')";
 			echo "</script>";
 
 		elseif($permanent=='N' && !empty($_POST[txt_reason])):
@@ -1499,17 +1511,25 @@ class family_planning extends module{
 			echo "alert('The method you have choosen is not permanent. Please delete reason for using permanent method')";
 			echo "</script>";
 		else:
-					$pxid = healthcenter::get_patient_id($_GET["consult_id"]);
-					$get_fp = mysql_query("SELECT fp_id FROM m_patient_fp WHERE patient_id='$pxid'") or die("Cannot query: 1189");
-					list($fpid) = mysql_fetch_array($get_fp);
-					
-					$insert_fp_method_service = mysql_query("INSERT INTO m_patient_fp_method SET fp_id='$fpid',patient_id='$pxid',consult_id='$_GET[consult_id]',date_registered='$reg_date',date_encoded=DATE_FORMAT(NOW(),'%y-%m-%d'),method_id='$_POST[sel_methods]',treatment_partner='$_POST[txt_tx_partner]',user_id='$_SESSION[userid]',permanent_method='$permanent',client_code='$_POST[sel_clients]',permanent_reason='$_POST[txt_reason]'") or die("Cannot query ".mysql_error());
+			list($dob_month,$dob_day,$dob_year) = explode('/',$_POST["txt_dob"]);
+			
+			$dob = $dob_year.'-'.$dob_month.'-'.$dob_day;
 
-						if($insert_fp_method_service):
-							echo "<font color='red'>Patient was successfully been enrolled in $_POST[sel_methods]</font>";
-						else:
-							echo "<font color='red'>Patient was not enrolled in $_POST[sel_methods]</font>";
-						endif;
+			$pxid = healthcenter::get_patient_id($_GET["consult_id"]);
+			$get_fp = mysql_query("SELECT fp_id FROM m_patient_fp WHERE patient_id='$pxid'") or die("Cannot query: 1189");
+			list($fpid) = mysql_fetch_array($get_fp);
+			
+			if($_POST["sel_methods"]=='NFPLAM'):
+				$insert_fp_method_service = mysql_query("INSERT INTO m_patient_fp_method SET fp_id='$fpid',patient_id='$pxid',consult_id='$_GET[consult_id]',date_registered='$reg_date',date_encoded=DATE_FORMAT(NOW(),'%y-%m-%d'),method_id='$_POST[sel_methods]',treatment_partner='$_POST[txt_tx_partner]',user_id='$_SESSION[userid]',permanent_method='$permanent',client_code='$_POST[sel_clients]',permanent_reason='$_POST[txt_reason]',date_delivery='$dob'") or die("Cannot query ".mysql_error());
+			else:
+				$insert_fp_method_service = mysql_query("INSERT INTO m_patient_fp_method SET fp_id='$fpid',patient_id='$pxid',consult_id='$_GET[consult_id]',date_registered='$reg_date',date_encoded=DATE_FORMAT(NOW(),'%y-%m-%d'),method_id='$_POST[sel_methods]',treatment_partner='$_POST[txt_tx_partner]',user_id='$_SESSION[userid]',permanent_method='$permanent',client_code='$_POST[sel_clients]',permanent_reason='$_POST[txt_reason]'") or die("Cannot query ".mysql_error());
+			endif;
+
+			if($insert_fp_method_service):
+				echo "<font color='red'>Patient was successfully been enrolled in $_POST[sel_methods]</font>";
+			else:
+				echo "<font color='red'>Patient was not enrolled in $_POST[sel_methods]</font>";
+			endif;
 		endif;
 	}
 
@@ -1668,16 +1688,27 @@ class family_planning extends module{
 	}
 
 	function update_method_visit(){
-	                
+        
 			if(empty($_POST["txt_date_reg"])):
-                                echo "<script language='javascript'>";
-                                echo "alert('Date of registration cannot be empty.')";
-                                echo "</script>";
+				echo "<script language='javascript'>";
+                echo "alert('Date of registration cannot be empty.')";
+                echo "</script>";
 
 			elseif($_POST["sel_dropout"]!=0 && empty($_POST["txt_date_dropout"])):  // make a check that when dropping a patient, there should be a date of drop out
-                                echo "<script language='javascript'>";
-                                echo "alert('Cannot drop patient from this method. Indicate a date of drop out.')";
-                                echo "</script>";
+            
+				echo "<script language='javascript'>";          
+				echo "alert('Cannot drop patient from this method. Indicate a date of drop out.')";        
+				echo "</script>";
+
+			elseif($_POST[method_id]=='NFPLAM' && empty($_POST[txt_dob])):
+				echo "<script language='javascript'''>";
+				echo "alert('For LAM method, please supply the date of delivery.')";
+				echo "</script>";			
+			elseif($_POST[method_id]!='NFPLAM' && !empty($_POST[txt_dob])):
+				echo "<script language='javascript'''>";
+				echo "alert('For non-LAM method, there is no need to supply the date of delivery.')";
+				echo "</script>";
+
 			else:
 
 				$q_date = mysql_query("SELECT date_service FROM m_patient_fp_method_service WHERE fp_px_id='$_POST[fp_px_id]'") or die("Cannot query: 1469");
@@ -1726,8 +1757,15 @@ class family_planning extends module{
 						else: //   a simple edit of date of registration, type of client and treatment partner
 								list($m,$d,$y) = explode('/',$_POST["txt_date_reg"]);
 								$date_reg = $y.'-'.$m.'-'.$d;
-                                                                
-								$update_fp_method = mysql_query("UPDATE m_patient_fp_method SET date_registered='$date_reg', treatment_partner='$_POST[txt_treatment_partner]',client_code='$_POST[sel_clients]',permanent_reason='$_POST[txt_reason]' WHERE fp_px_id='$_POST[fp_px_id]'") or die("Cannot query: 1546");
+
+						if(!empty($_POST["txt_dob"])):	   
+							list($dob_m,$dob_d,$dob_y) = explode('/',$_POST["txt_dob"]);
+							$datedob = $dob_y.'-'.$dob_m.'-'.$dob_d;
+						else:
+							$datedob = '';
+						endif;
+
+						$update_fp_method = mysql_query("UPDATE m_patient_fp_method SET date_registered='$date_reg', treatment_partner='$_POST[txt_treatment_partner]',client_code='$_POST[sel_clients]',permanent_reason='$_POST[txt_reason]',date_delivery='$datedob' WHERE fp_px_id='$_POST[fp_px_id]'") or die("Cannot query: 1546");
 
 								if($update_fp_method):
 									echo "<script language='javascript'>";
