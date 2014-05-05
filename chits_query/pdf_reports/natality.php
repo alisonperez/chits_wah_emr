@@ -136,6 +136,8 @@ function Header()
 		$this->Cell(0,5,'NATALITY - LIVEBIRTHS ('.$date_label.')'.' - '.$municipality_label,0,1,'C');
 	elseif($_SESSION[ques]>=124 && $_SESSION[ques]<=127): //natality deliveries questions
 		$this->Cell(0,5,'NATALITY - DELIVERIES ('.$date_label.')'.' - '.$municipality_label,0,1,'C');
+	elseif($_SESSION[ques]==128):	//summary table for natality
+		$this->Cell(0,5,'NATALITY SUMMARY TABLE ('.$date_label.')'.' - '.$municipality_label,0,1,'C');
 	else:
 
 	endif;
@@ -174,6 +176,12 @@ function Header()
 		$this->Ln();
 		$this->SetWidths($w);
 		$this->Row($header);
+	elseif($_SESSION[ques]==128):
+		$_SESSION["w"] = $w =		array(66,16,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,17); //340
+		$_SESSION["header"] = $header = array('INDICATORS','Target','JAN','FEB','MAR','1st Q','APR','MAY','JUNE','2nd Q','JULY','AUG','SEPT','3rd Q','OCT','NOV','DEC','4th Q','TOTAL');	
+		
+		$this->SetWidths($w);
+		$this->Row($header);
 	else: 
 
 	endif;
@@ -200,6 +208,9 @@ function show_natality(){
 		$end = count($criteria);*/
 		$start = 26;
 		$end = 37;
+	elseif($_SESSION[ques]==128):
+		$start = 0;
+		$end = 26;
 	else:
 
 	endif;
@@ -225,6 +236,10 @@ function show_natality(){
 			array_push($arr_consolidate,array($criteria[$i],$arr_natality_stat[0],$perc,'',''));
 			
 			$this->Row(array($criteria[$i],$arr_natality_stat[0],$perc,'',''));
+		elseif($_SESSION[ques]==128):
+			$w =		array(66,16,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,17); //340
+			array_push($arr_consolidate,array($criteria[$i],$arr_natality_stat[0],$perc,'',''));
+			$this->Row(array($criteria[$i],$arr_natality_stat[0],$perc,'',''));
 
 		else:
 
@@ -237,7 +252,7 @@ function show_natality(){
 
 
 function compute_indicator($crit){
-	
+
 	list($syr,$smonth,$sdate) = explode('-',$_SESSION[sdate2]);
 	list($eyr,$emonth,$edate) = explode('-',$_SESSION[edate2]);
 	$brgy_array = $this->get_brgy_array();
