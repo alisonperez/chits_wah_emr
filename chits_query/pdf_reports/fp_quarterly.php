@@ -143,7 +143,7 @@ function Header()
     $this->SetFont('Arial','B','12');
     $_SESSION["w"] = $w = array(75,28,28,26,28,28,28,47,52);
     $this->SetWidths($w);
-    $_SESSION["header"] = $label = array('Indicators','Current User (Begin Qtr)','New Acceptors','Others','Dropout','Current User (End Qtr)','CPR'."\n".'(CU/TP) x 14.5% x 85%','Interpretation','Recommendation/Action Taken');
+    $_SESSION["header"] = $label = array('Indicators','Current User (Begin Qtr)','New Acceptors','Others','Dropout','Current User (End Qtr)','CPR'."\n".'(CU/(TP X 0.12325)) X 100%','Interpretation','Recommendation/Action Taken');
     $this->Row($label);
 }
 
