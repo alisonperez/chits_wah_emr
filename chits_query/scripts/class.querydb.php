@@ -304,9 +304,11 @@ class querydb{
 			$ret_file = $this->process_philhealth_list($quesno);
 		elseif($quesno==111):
 			$ret_file = $this->process_philhealth_consult($quesno);
-                elseif($quesno>=120 && $quesno<=123): 
-                        $ret_file = $this->process_natality($quesno);
+        elseif($quesno>=120 && $quesno<=123): 
+             $ret_file = $this->process_natality($quesno);
 		elseif($quesno>=124 && $quesno<=127):
+			$ret_file = $this->process_natality($quesno);
+		elseif($quesno==128):
 			$ret_file = $this->process_natality($quesno);
 		elseif($quesno>=150 && $quesno<=155):
 			$ret_file = $this->process_alert($quesno);

@@ -1243,9 +1243,9 @@ class alert extends module{
 
 
 					case '30':		//female sterilization dropout
-						$q_fp = $this->check_active_user($patient_id,'FSTR/BTL');
+						$q_fp = $this->check_active_user($patient_id,'FSTRBTL');
 
-						if(mysql_num_rows($q_fp)!=0):
+						if(mysql_num_rows($q_fp)!=0): echo 
 							list($fp_px_id,$date_registered) = mysql_fetch_array($q_fp);
 							
 							$px_age = $this->get_patient_age($patient_id);
@@ -1253,10 +1253,41 @@ class alert extends module{
 							if($px_age >= 50):	//candidate for dropout in BTL is px_age>=50
 								array_push($arr_case_id,$fp_px_id);
 							endif;
+						endif;						
+						break;
+
+					case '31':	//male sterilization/vasectomy dropout
+						$q_fp = $this->check_active_user($patient_id,'MSV');
+
+						if(mysql_num_rows($q_fp)!=0):
+							list($fp_px_id,$date_registered) = mysql_fetch_array($q_fp);
+							
+							$px_age = $this->get_patient_age($patient_id);
+							
+							if($px_age >= 50):	//candidate for dropout in BTL/MSV is px_age>=50
+								array_push($arr_case_id,$fp_px_id);
+							endif;
+						endif;						
+						
+					case 32:	//NFP LAM dropout alert
+						$q_fp = $this->check_active_user($patient_id,'NFPLAM');
+						
+						if(mysql_num_rows($q_fp)!=0):
+							list($fp_px_id,$date_registered) = mysql_fetch_array($q_fp);						
+
+							$get_child_age = mysql_query("SELECT (((TO_DAYS(NOW()) - TO_DAYS(date_delivery))/365)*12) as 'px_age' FROM m_patient_fp_method WHERE fp_px_id='$fp_px_id'") or die("Cannot query: 1282".mysql_qerror());
+							
+							if(mysql_num_rows($get_child_age)!=0): 
+								list($child_age) = mysql_fetch_array($get_child_age);
+
+								if($child_age>=6):
+									array_push($arr_case_id,$fp_px_id);								
+								endif;
+								
+							endif;
+			
 						endif;
 						
-
-						break;
 					default:
 
 						break;
