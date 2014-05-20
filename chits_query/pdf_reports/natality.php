@@ -223,6 +223,7 @@ function show_natality(){
 		$arr_natality_stat = $this->compute_indicator($i); 
 
 		$perc = $this->get_target_percentage($i,$arr_natality_stat["total"]);		
+		
 
 		if($_SESSION[ques]>=120 && $_SESSION[ques]<=123): //natality livebirth questions
 			$w = array(90,25,25,25,25,60,60); 
@@ -238,6 +239,8 @@ function show_natality(){
 			$this->Row(array($criteria[$i],$arr_natality_stat[0],$perc,'',''));
 		elseif($_SESSION[ques]==128):
 			$w =		array(66,16,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,15,17); //340
+
+
 			array_push($arr_consolidate,array($criteria[$i],$arr_natality_stat[0],$perc,'',''));
 			$this->Row(array($criteria[$i],$arr_natality_stat[0],$perc,'',''));
 
@@ -258,15 +261,18 @@ function compute_indicator($crit){
 	$brgy_array = $this->get_brgy_array();
 	$brgy_array = implode(',',$brgy_array);
 
+	$month_stat = array();
 
+    for($i=1;$i<13;$i++){
+        $month_stat[$i] = 0;
+    }
 
-		switch($crit){
+	switch($crit){
 
 		//case 1:	//total number of live births
 		case (in_array($crit,array(0,23,27,38))):	//total number of live births, outcome is normal & operative
 
 			$arr_natality = array("M"=>0,"F"=>0,"total"=>0);
-			$arr_natality_lb = array(1=>array(),2=>array(),3=>array(),4=>array(),5=>array(),6=>array(),7=>array(),8=>array(),9=>array(),10=>array(),11=>array(),12=>array());
 
 			if(in_array('all',$_SESSION[brgy])):
 				$q_natality = mysql_query("SELECT mc_id, patient_id,delivery_date,outcome_id FROM m_patient_mc WHERE delivery_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' AND outcome_id IN ('NSDF','NSDM','LSCSF','LSCSM')") or die("Cannot query 234: ".mysql_error());
@@ -277,13 +283,15 @@ function compute_indicator($crit){
 			
 			while(list($mc_id,$pxid,$delivery_date,$outcome_id) = mysql_fetch_array($q_natality)){
 				$arr_natality[$this->get_px_gender($outcome_id)] += 1;
+
+                $month_stat[$this->get_max_month($delivery_date)] += 1;
 			}
 
 			//array_push($_SESSION["arr_px_labels"]["natality"],$arr_natality_lb);
 			$arr_natality["total"] = $arr_natality["M"] + $arr_natality["F"];			
 
 			$arr_natality[0] = $_SESSION["livebirths"] = $arr_natality["total"];
-				
+	
 			break;
 
 		//case 2: //lb with weight 2500 grams or greater
@@ -656,8 +664,11 @@ function compute_indicator($crit){
 
 		} // end <switch>
 //	} //end <for> months
-	
-	return $arr_natality;
+		if($_SESSION[ques]==128):
+			return $month_stat;
+		else:
+			return $arr_natality;
+		endif;
 }
 
 function get_brgy_array(){
