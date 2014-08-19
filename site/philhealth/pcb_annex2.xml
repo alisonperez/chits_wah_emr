@@ -1,0 +1,263 @@
+<?xml version='1.0' encoding='UTF-8'?>
+
+<!-- Form: PCB Form A2 -->
+<dataValueSet xmlns="http://dhis2.org/schema/dxf/2.0" dataSet="bazOE3Zgw8O" period="PERIOD" orgUnit="ORGUNIT">
+	<!-- DE: History Of Diagnosis Of Hypertension (integer) -->
+	<!-- Category: (Male, Uncategorized, Member)  -->
+	<dataValue dataElement="nkOlqRCq8J9" categoryOptionCombo="Gb0BGTbfg19" value=""/>
+
+	<!-- DE: History Of Diagnosis Of Hypertension (integer) -->
+	<!-- Category: (Male, Uncategorized, Dependent)  -->
+	<dataValue dataElement="nkOlqRCq8J9" categoryOptionCombo="kmAfodCt6AZ" value=""/>
+
+	<!-- DE: History Of Diagnosis Of Hypertension (integer) -->
+	<!-- Category: (Female, Pregnant, Dependent)  -->
+	<dataValue dataElement="nkOlqRCq8J9" categoryOptionCombo="MUQxq9J7UYH" value=""/>
+
+	<!-- DE: History Of Diagnosis Of Hypertension (integer) -->
+	<!-- Category: (Female, Non-Pregnant, Member)  -->
+	<dataValue dataElement="nkOlqRCq8J9" categoryOptionCombo="RJCP3pTXPpd" value=""/>
+
+	<!-- DE: History Of Diagnosis Of Hypertension (integer) -->
+	<!-- Category: (Female, Non-Pregnant, Dependent)  -->
+	<dataValue dataElement="nkOlqRCq8J9" categoryOptionCombo="tF0Ng9gqkUW" value=""/>
+
+	<!-- DE: History Of Diagnosis Of Hypertension (integer)	-->
+	<!-- Category: (Female, Pregnant, Member)  -->
+	<dataValue dataElement="nkOlqRCq8J9" categoryOptionCombo="gfWVfTtytf3" value=""/>
+
+	
+	<!-- DE: Age - Sex Distribution (integer) -->
+	<!-- Category: (60 Years And Above, Male)  -->
+	<dataValue dataElement="NCq15lhqnuo" categoryOptionCombo="v27BmfkE9yM" value=""/>
+
+	<!-- DE: Age - Sex Distribution (integer) -->
+	<!-- Category: (25 - 59 Years, Male)  -->
+	<dataValue dataElement="NCq15lhqnuo" categoryOptionCombo="jQqJmpVotsc" value=""/>
+
+	<!-- DE: Age - Sex Distribution (integer) -->
+	<!-- Category: (60 Years And Above, Female)  -->
+	<dataValue dataElement="NCq15lhqnuo" categoryOptionCombo="vP5gsrG4pZM" value=""/>
+
+	<!-- DE: Age - Sex Distribution (integer) -->
+	<!-- Category: (25 - 59 Years, Female)  -->
+	<dataValue dataElement="NCq15lhqnuo" categoryOptionCombo="MNsjmluOX4O" value=""/>
+
+	<!-- DE: Age - Sex Distribution (integer) -->
+	<!-- Category:  (2 - 5 Years, Female) -->
+	<dataValue dataElement="NCq15lhqnuo" categoryOptionCombo="KBpuiPCfwl2" value=""/>
+
+	<!-- DE: Age - Sex Distribution (integer) -->
+	<!-- Category:  (16 - 24 Years, Female) -->
+	<dataValue dataElement="NCq15lhqnuo" categoryOptionCombo="m4DCDIzvEEs" value=""/>
+
+	<!-- DE: Age - Sex Distribution (integer) -->
+	<!-- Category: (6 - 15 Years, Male)  -->
+	<dataValue dataElement="NCq15lhqnuo" categoryOptionCombo="WgqPg1sOB2P" value=""/>
+
+	<!-- DE: Age - Sex Distribution (integer) -->
+	<!-- Category: (0 - 1 Years, Female) -->
+	<dataValue dataElement="NCq15lhqnuo" categoryOptionCombo="YDEW3nm5WC7" value=""/>
+
+	<!-- DE: Age - Sex Distribution (integer) -->
+	<!-- Category: (6 - 15 Years, Female)  -->
+	<dataValue dataElement="NCq15lhqnuo" categoryOptionCombo="Stpt6peYojW" value=""/>
+
+	<!-- DE: Age - Sex Distribution (integer) -->
+	<!-- Category: (0 - 1 Years, Male) -->
+	<dataValue dataElement="NCq15lhqnuo" categoryOptionCombo="qYSsxO6u0zf" value=""/>
+
+	<!-- DE: Age - Sex Distribution (integer) -->
+	<!-- Category: (2 - 5 Years, Male)  -->
+	<dataValue dataElement="NCq15lhqnuo" categoryOptionCombo="cOxEffR1G4w" value=""/>
+
+	<!-- DE: Age - Sex Distribution (integer) -->
+	<!-- Category: (16 - 24 Years, Male)  -->
+	<dataValue dataElement="NCq15lhqnuo" categoryOptionCombo="zQTU2sW2Lo5" value=""/>
+
+	
+	<!-- DE: Breast Cancer Screening (integer) -->
+	<!-- Category: (Dependent)  -->
+	<dataValue dataElement="VkZjE6L652o" categoryOptionCombo="nVh4nHYTIPn" value=""/>
+
+	<!-- DE: Breast Cancer Screening (integer) -->
+	<!-- Category: (Member)  -->
+	<dataValue dataElement="VkZjE6L652o" categoryOptionCombo="jU2qMGkPJ6p" value=""/>
+
+	
+	<!-- DE: Intake Of Hypertensive Medicine (integer) -->
+	<!-- Category: (Male, Uncategorized, Member)  -->
+	<dataValue dataElement="LMpAtaSUrMx" categoryOptionCombo="Gb0BGTbfg19" value=""/>
+	
+	<!-- DE: Intake Of Hypertensive Medicine (integer) -->
+	<!-- Category: (Male, Uncategorized, Dependent)  -->
+	<dataValue dataElement="LMpAtaSUrMx" categoryOptionCombo="kmAfodCt6AZ" value=""/>
+	
+	<!-- DE: Intake Of Hypertensive Medicine (integer) -->
+	<!-- Category: (Female, Pregnant, Dependent)  -->
+	<dataValue dataElement="LMpAtaSUrMx" categoryOptionCombo="MUQxq9J7UYH" value=""/>
+	
+	<!-- DE: Intake Of Hypertensive Medicine (integer) -->
+	<!-- Category: (Female, Non-Pregnant, Member)  -->
+	<dataValue dataElement="LMpAtaSUrMx" categoryOptionCombo="RJCP3pTXPpd" value=""/>
+
+	<!-- DE: Intake Of Hypertensive Medicine (integer) -->
+	<!-- Category: (Female, Non-Pregnant, Dependent)  -->
+	<dataValue dataElement="LMpAtaSUrMx" categoryOptionCombo="tF0Ng9gqkUW" value=""/>
+	
+	<!-- DE: Intake Of Hypertensive Medicine (integer) -->
+	<!-- Category: (Female, Pregnant, Member)  -->
+	<dataValue dataElement="LMpAtaSUrMx" categoryOptionCombo="gfWVfTtytf3" value=""/>
+
+	
+	<!-- DE: Adult With BP > 180/120 MmHg (integer) -->
+	<!-- Category: (Male, Uncategorized, Member)  -->
+	<dataValue dataElement="omNTBZemMAf" categoryOptionCombo="Gb0BGTbfg19" value=""/>
+
+	<!-- DE: Adult With BP > 180/120 MmHg (integer) -->
+	<!-- Category: (Male, Uncategorized, Dependent)  -->
+	<dataValue dataElement="omNTBZemMAf" categoryOptionCombo="kmAfodCt6AZ" value=""/>
+
+	<!-- DE: Adult With BP > 180/120 MmHg (integer) -->
+	<!-- Category: (Female, Pregnant, Dependent)  -->
+	<dataValue dataElement="omNTBZemMAf" categoryOptionCombo="MUQxq9J7UYH" value=""/>
+
+	<!-- DE: Adult With BP > 180/120 MmHg (integer) -->
+	<!-- Category: (Female, Non-Pregnant, Member)  -->
+	<dataValue dataElement="omNTBZemMAf" categoryOptionCombo="RJCP3pTXPpd" value=""/>
+
+	<!-- DE: Adult With BP > 180/120 MmHg (integer) -->
+	<!-- Category: (Female, Non-Pregnant, Dependent)  -->
+	<dataValue dataElement="omNTBZemMAf" categoryOptionCombo="tF0Ng9gqkUW" value=""/>
+
+	<!-- DE: Adult With BP > 180/120 MmHg (integer) -->
+	<!-- Category: (Female, Pregnant, Member)  -->
+	<dataValue dataElement="omNTBZemMAf" categoryOptionCombo="gfWVfTtytf3" value=""/>
+
+	
+	<!-- DE: History Of Diagnosis Of Diabetes (integer) -->
+	<!-- Category: (Male, Member)  -->
+	<dataValue dataElement="V0mNENVblkQ" categoryOptionCombo="JBMEkIpAf0I" value=""/>
+
+	<!-- DE: History Of Diagnosis Of Diabetes (integer) -->
+	<!-- Category: (Male, Dependent)  -->
+	<dataValue dataElement="V0mNENVblkQ" categoryOptionCombo="CPfb5EpH7bu" value=""/>
+
+	<!-- DE: History Of Diagnosis Of Diabetes (integer) -->
+	<!-- Category: (Female, Member)  -->
+	<dataValue dataElement="V0mNENVblkQ" categoryOptionCombo="UvGPjTHZ9BC" value=""/>
+
+	<!-- DE: History Of Diagnosis Of Diabetes (integer) -->
+	<!-- Category: (Female, Dependent)  -->
+	<dataValue dataElement="V0mNENVblkQ" categoryOptionCombo="LsNCrxHrs2H" value=""/>
+
+
+	<!-- DE: Intake Of Oral Hypoglycemics (integer) -->
+	<!-- Category: (Male, Member)  -->
+	<dataValue dataElement="Mv8vNVM5neg" categoryOptionCombo="JBMEkIpAf0I" value=""/>
+
+	<!-- DE: Intake Of Oral Hypoglycemics (integer) -->
+	<!-- Category: (Male, Dependent)  -->
+	<dataValue dataElement="Mv8vNVM5neg" categoryOptionCombo="CPfb5EpH7bu" value=""/>
+
+	<!-- DE: Intake Of Oral Hypoglycemics (integer) -->
+	<!-- Category: (Female, Member)  -->
+	<dataValue dataElement="Mv8vNVM5neg" categoryOptionCombo="UvGPjTHZ9BC" value=""/>
+
+	<!-- DE: Intake Of Oral Hypoglycemics (integer) -->
+	<!-- Category: (Female, Dependent)  -->
+	<dataValue dataElement="Mv8vNVM5neg" categoryOptionCombo="LsNCrxHrs2H" value=""/>
+
+	
+	<!-- DE: Diabetes Mellitus Cases With Signs And Symptoms Of Polyuria, Polydipsia And Weight Loss (integer) -->
+	<!-- Category: (Male, Member)  -->
+	<dataValue dataElement="NSOch8Lp4T0" categoryOptionCombo="JBMEkIpAf0I" value=""/>
+
+	<!-- DE: Diabetes Mellitus Cases With Signs And Symptoms Of Polyuria, Polydipsia And Weight Loss (integer) -->
+	<!-- Category: (Male, Dependent)  -->
+	<dataValue dataElement="NSOch8Lp4T0" categoryOptionCombo="CPfb5EpH7bu" value=""/>
+
+	<!-- DE: Diabetes Mellitus Cases With Signs And Symptoms Of Polyuria, Polydipsia And Weight Loss (integer) -->
+	<!-- Category: (Female, Member)  -->
+	<dataValue dataElement="NSOch8Lp4T0" categoryOptionCombo="UvGPjTHZ9BC" value=""/>
+
+	<!-- DE: Diabetes Mellitus Cases With Signs And Symptoms Of Polyuria, Polydipsia And Weight Loss (integer) -->
+	<!-- Category: (Female, Dependent)  -->
+	<dataValue dataElement="NSOch8Lp4T0" categoryOptionCombo="LsNCrxHrs2H" value=""/>
+
+	
+	<!-- DE: Cervical Cancer Screening (integer) -->
+	<!-- Category: (Dependent)  -->	
+	<dataValue dataElement="mEbkCXYVNBZ" categoryOptionCombo="nVh4nHYTIPn" value=""/>
+
+	<!-- DE: Cervical Cancer Screening (integer) -->
+	<!-- Category: (Member)  -->	
+	<dataValue dataElement="mEbkCXYVNBZ" categoryOptionCombo="jU2qMGkPJ6p" value=""/>
+
+	
+	<!-- DE: Adult With BP < 140/90 MmHg (integer) -->
+	<!-- Category: (Male, Uncategorized, Member)  -->	
+	<dataValue dataElement="yxoqRQbAWQf" categoryOptionCombo="Gb0BGTbfg19" value=""/>
+
+	<!-- DE: Adult With BP < 140/90 MmHg (integer) -->
+	<!-- Category: (Male, Uncategorized, Dependent)  -->	
+	<dataValue dataElement="yxoqRQbAWQf" categoryOptionCombo="kmAfodCt6AZ" value=""/>
+
+	<!-- DE: Adult With BP < 140/90 MmHg (integer) -->
+	<!-- Category: (Female, Pregnant, Dependent)  -->	
+	<dataValue dataElement="yxoqRQbAWQf" categoryOptionCombo="MUQxq9J7UYH" value=""/>
+
+	<!-- DE: Adult With BP < 140/90 MmHg (integer) -->
+	<!-- Category: (Female, Non-Pregnant, Member)  -->	
+	<dataValue dataElement="yxoqRQbAWQf" categoryOptionCombo="RJCP3pTXPpd" value=""/>
+
+	<!-- DE: Adult With BP < 140/90 MmHg (integer) -->
+	<!-- Category: (Female, Non-Pregnant, Dependent)  -->	
+	<dataValue dataElement="yxoqRQbAWQf" categoryOptionCombo="tF0Ng9gqkUW" value=""/>
+
+	<!-- DE: Adult With BP < 140/90 MmHg (integer) -->
+	<!-- Category: (Female, Pregnant, Member)  -->	
+	<dataValue dataElement="yxoqRQbAWQf" categoryOptionCombo="gfWVfTtytf3" value=""/>
+
+	
+	<!-- DE: Waist Circumference ( >=80 Cm For Female And <=90 Cm For Male) (integer) -->
+	<!-- Category: (Male, Member)  -->	
+	<dataValue dataElement="dQDiSnU4UtT" categoryOptionCombo="JBMEkIpAf0I" value=""/>
+
+	<!-- DE: Waist Circumference ( >=80 Cm For Female And <=90 Cm For Male) (integer) -->
+	<!-- Category: (Male, Dependent)  -->	
+	<dataValue dataElement="dQDiSnU4UtT" categoryOptionCombo="CPfb5EpH7bu" value=""/>
+
+	<!-- DE: Waist Circumference ( >=80 Cm For Female And <=90 Cm For Male) (integer) -->
+	<!-- Category: (Female, Member)  -->	
+	<dataValue dataElement="dQDiSnU4UtT" categoryOptionCombo="UvGPjTHZ9BC" value=""/>
+
+	<!-- DE: Waist Circumference ( >=80 Cm For Female And <=90 Cm For Male) (integer) -->
+	<!-- Category: (Female, Dependent)  -->	
+	<dataValue dataElement="dQDiSnU4UtT" categoryOptionCombo="LsNCrxHrs2H" value=""/>
+
+	
+	<!-- DE: Adult With BP >/= 140/90 But Less Than 180/120 MmHg (integer) -->
+	<!-- Category: (Male, Uncategorized, Member)  -->		
+	<dataValue dataElement="LLPnUoQZH88" categoryOptionCombo="Gb0BGTbfg19" value=""/>
+
+	<!-- DE: Adult With BP >/= 140/90 But Less Than 180/120 MmHg (integer) -->
+	<!-- Category: (Male, Uncategorized, Dependent)  -->		
+	<dataValue dataElement="LLPnUoQZH88" categoryOptionCombo="kmAfodCt6AZ" value=""/>
+
+	<!-- DE: Adult With BP >/= 140/90 But Less Than 180/120 MmHg (integer) -->
+	<!-- Category: (Female, Pregnant, Dependent)  -->		
+	<dataValue dataElement="LLPnUoQZH88" categoryOptionCombo="MUQxq9J7UYH" value=""/>
+
+	<!-- DE: Adult With BP >/= 140/90 But Less Than 180/120 MmHg (integer) -->
+	<!-- Category: (Female, Non-Pregnant, Member)  -->		
+	<dataValue dataElement="LLPnUoQZH88" categoryOptionCombo="RJCP3pTXPpd" value=""/>
+
+	<!-- DE: Adult With BP >/= 140/90 But Less Than 180/120 MmHg (integer) -->
+	<!-- Category: (Female, Non-Pregnant, Dependent)  -->		
+	<dataValue dataElement="LLPnUoQZH88" categoryOptionCombo="tF0Ng9gqkUW" value=""/>
+
+	<!-- DE: Adult With BP >/= 140/90 But Less Than 180/120 MmHg (integer) -->
+	<!-- Category: (Female, Pregnant, Member)  -->		
+	<dataValue dataElement="LLPnUoQZH88" categoryOptionCombo="gfWVfTtytf3" value=""/>
+</dataValueSet>
