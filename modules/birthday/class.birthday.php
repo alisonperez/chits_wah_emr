@@ -95,11 +95,26 @@ class birthday extends module {
                "from game_user where date_format(user_dob, '%m-%d') = date_format(sysdate(), '%m-%d')";
         if ($result = mysql_query($sql)) {
             if (mysql_num_rows($result)) {
-                list($login, $name) = mysql_fetch_array($result);
-                print "Happy Birthday <b>$name</b> ($login)!<br/>";
+                while(list($login, $name) = mysql_fetch_array($result)) {
+                	print "Happy Birthday <b>$name</b> ($login)!<br/>";
+                }
+                print "<br/>";
             } else {
-                print "<font color='red'>No celebrants today.</font><br/>";
-            }
+            	print "<font color='red'>No Staff celebrators for today.</font><br/><br/>";
+            	
+          	}
+        }
+        
+    	$patientSQL = "SELECT CONCAT(patient_firstname, ' ', patient_lastname) name from m_patient WHERE date_format(patient_dob, '%m-%d') = date_format(sysdate(), '%m-%d')";
+        if ($patientResult = mysql_query($patientSQL)) {
+        	if (mysql_num_rows($patientResult)) {
+            	while(list($name) = mysql_fetch_array($patientResult)){
+                	print "Happy Birthday <b>$name</b>!<br/>";
+                }
+           	}
+      		else {
+           		print "<font color='red'>No Patient celebrators for today.</font><br/>";
+           	}
         }
     }
 

@@ -521,7 +521,7 @@ function compute_indicators(){
 									while(list($consult_id,$consult_date,$patient_id,$diarrhea_ort)=mysql_fetch_array($q_ort)){
 										if($this->get_px_brgy($patient_id,$brgy_array)):
 											$month_stat[$this->get_max_month($diarrhea_ort)] += 1;
-											array_push($diarrhea_stat_px[$this->get_max_month($diarrhea_ort)],array($pxid,'No. of Diarrhea Cases Given ORT','epi',$diarrhea_ort));
+											array_push($diarrhea_stat_px[$this->get_max_month($diarrhea_ort)],array($patient_id,'No. of Diarrhea Cases Given ORT','epi',$diarrhea_ort));
 										endif;
 									}
 								endif;
@@ -533,7 +533,7 @@ function compute_indicators(){
 									while(list($consult_id,$consult_date,$patient_id,$diarrhea_ors)=mysql_fetch_array($q_ors)){
 										if($this->get_px_brgy($patient_id,$brgy_array)):
 											$month_stat[$this->get_max_month($diarrhea_ors)] += 1;
-											array_push($diarrhea_stat_px[$this->get_max_month($diarrhea_ors)],array($pxid,'No. of Diarrhea Cases Given ORS','epi',$diarrhea_ors));
+											array_push($diarrhea_stat_px[$this->get_max_month($diarrhea_ors)],array($patient_id,'No. of Diarrhea Cases Given ORS','epi',$diarrhea_ors));
 										endif;
 									}
 								endif;
@@ -545,7 +545,7 @@ function compute_indicators(){
 									while(list($consult_id,$consult_date,$patient_id,$diarrhea_orswz)=mysql_fetch_array($q_orswz)){
 										if($this->get_px_brgy($patient_id,$brgy_array)):
 											$month_stat[$this->get_max_month($diarrhea_orswz)] += 1;
-											array_push($diarrhea_stat_px[$this->get_max_month($diarrhea_orswz)],array($pxid,'No. of Diarrhea Cases Given ORS w/ zinc','epi',$diarrhea_orswz));
+											array_push($diarrhea_stat_px[$this->get_max_month($diarrhea_orswz)],array($patient_id,'No. of Diarrhea Cases Given ORS w/ zinc','epi',$diarrhea_orswz));
 										endif;
 									}
 								endif;
@@ -1423,7 +1423,7 @@ function compute_indicators(){
 
 					if(mysql_num_rows($q_iron)!=0):
 						while(list($patient_id,$service_date,$age)=mysql_fetch_array($q_iron)){
-							if($age >= 6 AND $age < 7): 
+							if($age >= 6 AND $age < 12): 
 								if($this->get_px_brgy($patient_id,$brgy_array)):
 									$month_stat[$this->get_max_month($service_date)] += 1;
 									array_push($iron_stat_px[$this->get_max_month($service_date)],array($patient_id,'Infant 2-5 months received Iron','epi',$service_date));
@@ -1857,20 +1857,44 @@ function determine_vacc_status(){
 			$q_antigen = mysql_query("SELECT round((TO_DAYS('$ant_date') - TO_DAYS(a.patient_dob))/30,2) month_span FROM m_patient a WHERE a.patient_id='$pxid'") or die("Cannot query: 269");
 			list($month_span,$day_span) = mysql_fetch_array($q_antigen);
 
-			if($month_span>12.17 && $month_span<=23):
-				$cic=1;
-			endif;
+			if($cic==0){
+					if($month_span<=12.17){
+						$cic=1;
+					}elseif($month_span>12.17 && $month_span<=23){
+						$cic=2;
+					}else{
+						$cic=3;
+					}
+			}elseif($cic==1){	
+					if($month_span<=12.17){
+						$cic=1;
+					}elseif($month_span>12.17 && $month_span<=23){
+						$cic=2;
+					}else{
+						$cic=3;
+					}
+			}elseif($cic==2){
+					if($month_span>12.17 && $month_span<=23){
+						$cic=2;
+					}else{
+						$cic=3;
+					}
+			}else{
+					$cic=3;
+			}
 		}
 	endif;
 	
 	arsort($antigen_date);
 //	print_r($antigen_date).'<br>';
 	
-	if($cic==1):
-		return 'CIC';
-	else:
+	if($cic==1){
 		return 'FIC';
-	endif;
+	}elseif($cic==2){
+		return 'CIC';
+	}else{
+		return 'NA';
+	}
 }
 
 function get_lbw($ccdev_id){

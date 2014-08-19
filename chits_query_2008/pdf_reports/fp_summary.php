@@ -204,7 +204,7 @@ function show_fp_summary(){
 
                        	$arr_total_quarter = $this->create_qt_gt($arr_row);
 
-						array_push($arr_consolidate,array_merge($arr_method_label,$arr_total_quarter));
+			array_push($arr_consolidate,array_merge($arr_method_label,$arr_total_quarter));
 
                         $this->Row(array_merge($arr_method_label,$arr_total_quarter));
 			
@@ -441,7 +441,7 @@ function get_current_users(){
         $arr_prev_dropout = array();
         $arr_pres_cu = array();
         $arr_pres_dropout = array();
-		$arr_prev_na = array();
+	$arr_prev_na = array();
         
         $firstday_month = strftime("%Y-%m-%d",(mktime(0,0,0,$i,1,$syr)));
         $lastday_month = strftime("%Y-%m-%d",(mktime(0,0,0,$i+1,0,$syr)));

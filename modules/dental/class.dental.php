@@ -1848,13 +1848,15 @@
 	function get_no_of_missing_teeth($c_id, $dentition_status) {
 		if ($dentition_status == "PERMANENT") {
 			$query = "SELECT COUNT(*) AS no_of_missing_teeth ".
-				"FROM m_dental_patient_ohc WHERE consult_id = $c_id ".
-				"AND tooth_condition = 'M' AND ".
+				"FROM m_dental_patient_ohc WHERE ".
+				"(consult_id = $c_id AND tooth_condition = 'M') ".
+				"OR (consult_id = $c_id AND tooth_condition = 'X') AND ".
 				"((tooth_number BETWEEN 10 AND 29) OR (tooth_number BETWEEN 30 AND 49)) ";
 		} elseif ($dentition_status == "TEMPORARY") {
 			$query = "SELECT COUNT(*) AS no_of_missing_teeth ".
-				"FROM m_dental_patient_ohc WHERE consult_id = $c_id ".
-				"AND tooth_condition = 'e' AND ".
+				"FROM m_dental_patient_ohc WHERE ".
+				"(consult_id = $c_id AND tooth_condition = 'e') ".
+				"OR (consult_id = $c_id AND tooth_condition = 'x') AND ".
 				"((tooth_number BETWEEN 50 AND 66) OR (tooth_number BETWEEN 70 AND 86)) ";
 		}
 		$result = mysql_query($query)

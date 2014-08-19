@@ -126,16 +126,16 @@ function Header()
 
 	if($_GET["type"]=='consult'):
 	    
-	    $arr_consults = $_SESSION[arr_consult];
-	    
+	    //$arr_consults = $_SESSION[arr_consult];
+			
     	    $this->Cell(0,5,'PhilHealth Consultations Report - '.$_SESSION[datanode][name],0,1,'C');
     	    $this->SetFont('Arial','',10);
     	    $this->Cell(0,5,$brgy_label .' ('.$_SESSION["sdate2"]. ' to '. $_SESSION["edate2"].') ',0,1,'C');	
     	    
     	    //$_SESSION["w"] = $w = array(18,34,34,29,22,19,29,34,32,30,60);
-	$_SESSION["w"] = $w = array(14,34,34,29,22,19,29,20,32,30,34,34);
-    	$_SESSION["header"] = $header = $arr_consults[0];
-    	        	    
+			$_SESSION["w"] = $w = array(14,34,34,29,22,19,29,20,32,30,34,34);
+			$_SESSION["header"] = $header = array('14','34','34','29','22','19','29','20','32','30','34','34');
+    	    //$_SESSION["header"] = $header = $arr_consults;
 	else:
     	    $this->Cell(0,5,'PhilHealth Enrollees Masterlist - '.$_SESSION[datanode][name],0,1,'C');
     	    $this->SetFont('Arial','',10);
@@ -195,9 +195,10 @@ function show_philhealth_list(){
 }
 
 function show_philhealth_consults(){
-    $arr_consults = $_SESSION[arr_consult];
-
-    foreach($arr_consults[1] as $key=>$value){
+    //$arr_consults = $_SESSION[arr_consult];
+	$arr_consults = array('14','34','34','29','22','19','29','20','32','30','34','34');
+	echo "asdasd";
+    foreach($arr_consults as $key=>$value){
         foreach($value as $key2=>$value2){
 		//echo $value2[0].'<br>';
             $philhealth_id='';

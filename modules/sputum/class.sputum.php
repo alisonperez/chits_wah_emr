@@ -671,8 +671,17 @@ class sputum extends module {
         case "MC":
             return "Mucoid";
             break;
-        case "SL":
+        case "SA":
             return "Saliva";
+            break;
+		case "QNS":
+            return "Inadequate Specimen";
+            break;
+		case "P":
+            return "Purulent";
+            break;
+		case "MS":
+            return "Muco-Salivary";
             break;
         }
     }

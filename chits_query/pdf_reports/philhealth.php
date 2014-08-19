@@ -113,21 +113,20 @@ function NbLines($w,$txt)
 
 function Header()
 {	    
-        	
+     
 	if($_SESSION[brgy]=='all'):
-		$brgy_label = 'All Barangays';
+		$brgy_label = 'All Barangays'; 
 
 	else:
 		$brgy_name = mysql_query("SELECT barangay_name FROM m_lib_barangay WHERE barangay_id='$_SESSION[brgy]'") or die("Cannot query: 124");
 		list($brgy_label) = mysql_fetch_array($brgy_name);
 	endif;
-	
+
 	$this->SetFont('Arial','B',12);
 
 	if($_GET["type"]=='consult'):
-	    
 	    $arr_consults = $_SESSION[arr_consult];
-	    
+
     	    $this->Cell(0,5,'PhilHealth Consultations Report - '.$_SESSION[datanode][name],0,1,'C');
     	    $this->SetFont('Arial','',10);
     	    $this->Cell(0,5,$brgy_label .' ('.$_SESSION["sdate2"]. ' to '. $_SESSION["edate2"].') ',0,1,'C');	
@@ -156,7 +155,7 @@ function show_philhealth_list(){
 	$arr_px =  $_SESSION["px_id"];
 	$arr_philhealth_record = array();
 	//print_r($arr_px);
-	
+
 	for($i=0;$i<count($arr_px);$i++){
 		$arr_philhealth = array();
 
@@ -167,7 +166,7 @@ function show_philhealth_list(){
 		list($px_lastname,$px_firstname,$px_middle,$px_dob) = mysql_fetch_array($q_px);
 
 		//echo $px_lastname.' '.$px_firstname.' '.$px_dob;
-		
+
 		$q_demo = mysql_query("SELECT a.barangay_name,b.address,b.family_id FROM m_lib_barangay a, m_family_address b,m_family_members c WHERE c.patient_id='$arr_px[$i]' AND a.barangay_id=b.barangay_id AND b.family_id=c.family_id") or die("Cannot query 149 ".mysql_error());
 
 		list($brgy_name,$address,$family_id) = mysql_fetch_array($q_demo);
@@ -182,15 +181,15 @@ function show_philhealth_list(){
 		}
 
 		$q_philhealth = mysql_query("SELECT philhealth_id,member_id, date_format(expiry_date,'%m-%d-%Y') as expiration_date FROM m_patient_philhealth WHERE patient_id='$arr_px[$i]' ORDER by expiry_date ASC") or die("Cannot query 165". mysql_error());
-		
+
 		list($philhealth_id,$member_id,$expiration) = mysql_fetch_array($q_philhealth);
 
 		$q_member = mysql_query("SELECT member_label FROM m_lib_philhealth_member_type WHERE member_id='$member_id'") or die("Cannot query: 188".mysql_error());
 		list($member_label) = mysql_fetch_array($q_member);
 
-		
+
 		$arr_philhealth = array($px_lastname.', '.$px_firstname.'  '.$px_middle,$address,$brgy_name,$px_dob,$philhealth_id.' / '.$member_label,$expiration,$relatives);
-	
+
 		$this->Row($arr_philhealth);
 
 		array_push($arr_philhealth_record,$arr_philhealth);
@@ -295,3 +294,4 @@ else:
 	$pdf->Output();
 endif;
 ?>
+Status API Training Shop Blog About © 2014 GitHub, Inc. Terms Privacy Security Contact 

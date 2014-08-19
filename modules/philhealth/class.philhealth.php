@@ -1,4 +1,13 @@
 <?
+/*
+	DATE UPDATED : 3/6/2014
+	UPDATED BY: Mark Santos && Emmanuel Perez
+
+	UPDATE LOG:
+		- ISSUES : Cannot Update Philhealth ID
+		- Update Location : case "Update Card"
+		- Change the $sql to include philhealth_id and added patient_id in the WHERE Clause
+*/
 class philhealth {
 
     // Author: Herman Tolentino MD
@@ -199,6 +208,12 @@ class philhealth {
             }
             $p->form_consult_service($menu_id, $post_vars, $get_vars);
             break;
+        case "INFO":
+            if ($post_vars["submitinfo"]) {
+                $p->process_other_info($menu_id, $post_vars, $get_vars);
+            }
+            $p->form_other_info($menu_id, $post_vars, $get_vars);
+            break;
         }
 
     }
@@ -243,6 +258,82 @@ class philhealth {
         if ($_SESSION["priv_add"]) {
             print "<input type='submit' value = 'Save Data' class='textbox' name='submitservice' style='border: 1px solid #000000'><br> ";
         }
+        print "</td></tr>";
+        print "</form>";
+        print "</table><br>";
+    }
+    
+	function form_other_info() {
+        if (func_num_args()>0) {
+            $arg_list = func_get_args();
+            $menu_id = $arg_list[0];
+            $post_vars = $arg_list[1];
+            $get_vars = $arg_list[2];
+            $validuser = $arg_list[3];
+            $isadmin = $arg_list[4];
+        }
+        print "<table width='300'>";
+        print "<form action = '".$_SERVER["SELF"]."?page=".$get_vars["page"]."&menu_id=".$get_vars["menu_id"]."&consult_id=".$get_vars["consult_id"]."&ptmenu=DETAILS&module=philhealth&philhealth=INFO' name='form_other_info' method='post'>";
+        print "<tr valign='top'><td>";
+        print "<b>PATIENT OTHER INFORMATION</b><br/><br/>";
+        // does member have philhealth id?
+        $patient_id = healthcenter::get_patient_id($get_vars["consult_id"]);
+        $patient_name = patient::get_name($patient_id);
+        $philhealth_id = philhealth::get_philhealth_id($patient_id);
+        if (!$philhealth_id) {
+            // try to see if any family member has a philhealth id
+            $family_id = family::get_family_id($patient_id);
+            $philhealth_info = philhealth::whois_philhealth_member($family_id);
+            $patient_name = $philhealth_info["patient_lastname"].", ".$philhealth_info["patient_firstname"];
+            $philhealth_id = $philhealth_info["philhealth_id"];
+            $patient_id = healthcenter::get_patient_id($get_vars["consult_id"]);;
+        }
+        if ($philhealth_id && $patient_name) {
+            print "BENEFICIARY: <b>$patient_name</b><br/>";
+            print "PHILHEALTH ID: <b>$philhealth_id</b><br/><br/>";
+            print "<input type='hidden' name='philhealth_id' value='$philhealth_id'/>";
+        } else {
+            print "<font color='red'>No PHILHEALTH membership found.</font><br/>";
+        }
+        
+        $sql="SELECT religion_id, status_id, educ_id, occup_id FROM m_patient_philhealth_info WHERE patient_id = '$patient_id'";
+        if ($result = mysql_query($sql)) {
+            if (mysql_num_rows($result)) {
+                list($religion,$status,$educ,$occup) = mysql_fetch_array($result);
+                $button = "<input type='submit' value = 'Update Data' class='textbox' name='submitinfo' style='border: 1px solid #000000'><br> ";	
+                
+            }
+            else {
+            	$button = "<input type='submit' value = 'Save Data' class='textbox' name='submitinfo' style='border: 1px solid #000000'><br> ";
+            }
+        }
+        print "</td></tr>";
+        print "<tr valign='top'><td>";
+        print "<span class='boxtitle'>Religion:</span><br> ";
+        //print philhealth::checkbox_philhealth_services();
+        print philhealth::dropdown_religion($religion);
+        print "<br/><br/></td></tr>";
+        
+        print "<tr valign='top'><td>";
+        print "<span class='boxtitle'>Civil Status:</span><br> ";
+        print philhealth::dropdown_status($status);
+        print "<br/><br/></td></tr>";
+        
+        print "<tr valign='top'><td>";
+        print "<span class='boxtitle'>Highest Completed Educational Attainment:</span><br> ";
+        print philhealth::dropdown_education($educ);
+        print "<br/><br/></td></tr>";
+        
+        print "<tr valign='top'><td>";
+        print "<span class='boxtitle'>Occupation:</span><br> ";
+        print philhealth::dropdown_occupation($occup);
+        print "<br/><br/></td></tr>";
+        
+        print "<tr><td>";
+        //if ($_SESSION["priv_add"]) {
+            //print "<input type='submit' value = 'Save Data' class='textbox' name='submitinfo' style='border: 1px solid #000000'><br> ";
+        //}
+        print $button;
         print "</td></tr>";
         print "</form>";
         print "</table><br>";
@@ -303,9 +394,11 @@ class philhealth {
             $validuser = $arg_list[3];
             $isadmin = $arg_list[4];
         }
+        $patient_id = healthcenter::get_patient_id($get_vars["consult_id"]);
         if ($post_vars["philhealth_id"]) {
             switch($post_vars["submitlab"]) {
             case "Save Data":
+            	mysql_query("ALTER TABLE `m_consult_lab` DROP PRIMARY KEY, ADD PRIMARY KEY(`request_id`)");
                 if ($post_vars["lab_exam"]) {
                     foreach($post_vars["lab_exam"] as $key=>$value) {
                         $sql = "insert into m_consult_philhealth_labs (consult_id, ".
@@ -315,6 +408,9 @@ class philhealth {
                                "'".$post_vars["philhealth_id"]."', '$value', '".$_SESSION["userid"]."', ".
                                "sysdate())";
                         $result = mysql_query($sql);
+                        $sqlLab = "insert into m_consult_lab (consult_id, patient_id, lab_id, request_timestamp, request_user_id)
+                        		values ('".$get_vars["consult_id"]."', '$patient_id', '$value', sysdate(), '".$_SESSION["userid"]."')";
+                        $resultLab = mysql_query($sqlLab);
                     }
                     header("location: ".$_SERVER["PHP_SELF"]."?page=".$get_vars["page"]."&menu_id=".$get_vars["menu_id"]."&consult_id=".$get_vars["consult_id"]."&ptmenu=DETAILS&module=philhealth&philhealth=LABS");
                 }
@@ -353,6 +449,44 @@ class philhealth {
             print "<font color='red'>No PHILHEALTH ID found.</font><br/>";
         }
     }
+    
+	function process_other_info() {
+        if (func_num_args()>0) {
+            $arg_list = func_get_args();
+            $menu_id = $arg_list[0];
+            $post_vars = $arg_list[1];
+            $get_vars = $arg_list[2];
+            $validuser = $arg_list[3];
+            $isadmin = $arg_list[4];
+        }
+        $patient_id = healthcenter::get_patient_id($get_vars["consult_id"]);
+        if ($post_vars["philhealth_id"]) {
+            switch($post_vars["submitinfo"]) {
+            case "Save Data":
+                if ($post_vars["religion"] || $post_vars["civilstatus"] || $post_vars["education"]|| $post_vars["occupation"]) {
+                    $sql = "insert into m_patient_philhealth_info (patient_id, ".
+                           "user_id, religion_id, status_id, educ_id, occup_id, ".
+                           "info_timestamp) ".
+                           "values ('$patient_id', '".$_SESSION["userid"]."', ".
+                           "'".$post_vars["religion"]."', '".$post_vars["civilstatus"]."', '".$post_vars["education"]."', '".$post_vars["occupation"]."', ".
+                           "sysdate())";
+                    $result = mysql_query($sql);
+                	header("location: ".$_SERVER["PHP_SELF"]."?page=".$get_vars["page"]."&menu_id=".$get_vars["menu_id"]."&consult_id=".$get_vars["consult_id"]."&ptmenu=DETAILS&module=philhealth&philhealth=INFO");
+                }
+            case "Update Data":
+            	if ($post_vars["religion"] || $post_vars["civilstatus"] || $post_vars["education"]|| $post_vars["occupation"]) {
+                    $sql = "update m_patient_philhealth_info set user_id = '".$_SESSION["userid"]."', ".
+                           "religion_id = '".$post_vars["religion"]."', status_id = '".$post_vars["civilstatus"]."', educ_id = '".$post_vars["education"]."', occup_id = '".$post_vars["occupation"]."', ".
+                           "info_timestamp = sysdate()  WHERE patient_id = '$patient_id' ";
+                    $result = mysql_query($sql);
+                    header("location: ".$_SERVER["PHP_SELF"]."?page=".$get_vars["page"]."&menu_id=".$get_vars["menu_id"]."&consult_id=".$get_vars["consult_id"]."&ptmenu=DETAILS&module=philhealth&philhealth=INFO");
+                }
+            	
+            }
+        } else {
+            print "<font color='red'>No PHILHEALTH ID found.</font><br/>";
+        }
+    }
 
     function philhealth_menu() {
         if (func_num_args()>0) {
@@ -371,6 +505,7 @@ class philhealth {
         print "<a href='".$_SERVER["PHP_SELF"]."?page=".$get_vars["page"]."&menu_id=".$get_vars["menu_id"]."&consult_id=".$get_vars["consult_id"]."&ptmenu=".$get_vars["ptmenu"]."&module=".$get_vars["module"]."&philhealth=CARD' class='groupmenu'>".strtoupper(($get_vars["philhealth"]=="CARD"?"<b>CARD</b>":"CARD"))."</a>";
         print "<a href='".$_SERVER["PHP_SELF"]."?page=".$get_vars["page"]."&menu_id=".$get_vars["menu_id"]."&consult_id=".$get_vars["consult_id"]."&ptmenu=".$get_vars["ptmenu"]."&module=".$get_vars["module"]."&philhealth=LABS' class='groupmenu'>".strtoupper(($get_vars["philhealth"]=="LABS"?"<b>LABS</b>":"LABS"))."</a>";
         print "<a href='".$_SERVER["PHP_SELF"]."?page=".$get_vars["page"]."&menu_id=".$get_vars["menu_id"]."&consult_id=".$get_vars["consult_id"]."&ptmenu=".$get_vars["ptmenu"]."&module=".$get_vars["module"]."&philhealth=SVC' class='groupmenu'>".strtoupper(($get_vars["philhealth"]=="SVC"?"<b>SERVICES</b>":"SERVICES"))."</a>";
+        print "<a href='".$_SERVER["PHP_SELF"]."?page=".$get_vars["page"]."&menu_id=".$get_vars["menu_id"]."&consult_id=".$get_vars["consult_id"]."&ptmenu=".$get_vars["ptmenu"]."&module=".$get_vars["module"]."&philhealth=INFO' class='groupmenu'>".strtoupper(($get_vars["philhealth"]=="INFO"?"<b>INFO</b>":"INFO"))."</a>";
         print "</td></tr></table><br/>";
     }
 
@@ -440,7 +575,7 @@ class philhealth {
 
         print "<tr><td>";
         if ($get_vars["pid"]||$post_vars["philhealth_id"]) {
-            print "<input type='hidden' name='philhealth_id' value='".$get_vars["pid"]."'>";
+            print "<input type='hidden' name='old_philhealth_id' value='".$get_vars["pid"]."'>";
             print "<input type='submit' value = 'Update Card' class='textbox' name='submitcard' style='border: 1px solid #000000'> ";
             print "<input type='submit' value = 'Delete Card' class='textbox' name='submitcard' style='border: 1px solid #000000'> ";
         } else {
@@ -500,12 +635,14 @@ class philhealth {
                 $sql = "update m_patient_philhealth (philhealth_id, healthcenter_id, patient_id, philhealth_timestamp, expiry_date) ".
                        "values ('".$post_vars["philhealth_id"]."', '".$_SESSION["datanode"]["code"]."', '".$post_vars["patient_id"]."', sysdate(), '$expiry_date')";
 
-				$sql = "update m_patient_philhealth set healthcenter_id='$healthcenter_id',patient_id='$post_vars[patient_id]',philhealth_timestamp=NOW(),expiry_date='$expiry_date',member_id='$post_vars[sel_membership]' WHERE philhealth_id='$post_vars[philhealth_id]'";
-
+				$sql = "update m_patient_philhealth set philhealth_id='$post_vars[philhealth_id]',healthcenter_id='$healthcenter_id',patient_id='$post_vars[patient_id]',philhealth_timestamp=NOW(),expiry_date='$expiry_date',member_id='$post_vars[sel_membership]' WHERE patient_id = '".$post_vars["patient_id"]."' AND philhealth_id='$post_vars[old_philhealth_id]'";
                 $result = mysql_query($sql);
-
+                
+                $sqlDependent = "update m_patient_philhealth set philhealth_id='$post_vars[philhealth_id]',healthcenter_id='$healthcenter_id',philhealth_timestamp=NOW(),expiry_date='$expiry_date' WHERE philhealth_id='$post_vars[old_philhealth_id]' AND member_id = 4";
+                $resultDependent = mysql_query($sqlDependent);
+				
                 // save this any way and refresh page
-                header("location: ".$_SERVER["PHP_SELF"]."?page=".$get_vars["page"]."&menu_id=".$get_vars["menu_id"]."&consult_id=".$get_vars["consult_id"]."&ptmenu=".$get_vars["ptmenu"]."&module=".$get_vars["module"]."&philhealth=CARD");
+                //header("location: ".$_SERVER["PHP_SELF"]."?page=".$get_vars["page"]."&menu_id=".$get_vars["menu_id"]."&consult_id=".$get_vars["consult_id"]."&ptmenu=".$get_vars["ptmenu"]."&module=".$get_vars["module"]."&philhealth=CARD");
             }
             break;
 
@@ -831,6 +968,98 @@ class philhealth {
             } else {
                 $ret_val .= "<font color='red'>No service codes in library.</font><br/>";
             }
+            return $ret_val;
+        }
+    }
+    
+	function dropdown_religion() {
+        if (func_num_args()>0) {
+            $arg_list = func_get_args();
+            $religion_id = $arg_list[0];
+        }
+        $sql = "select religion_code, religion_desc ".
+               "from m_lib_religion ".
+               "order by religion_desc";
+        $ret_val = "<select name='religion'>";
+        $ret_val .= "<option value=''>--Select Religion--</option>";
+       
+        if ($result = mysql_query($sql)) {
+            if (mysql_num_rows($result)) {
+                while (list($id, $name) = mysql_fetch_array($result)) {
+                	$ret_val .= "<option value='$id' ".($religion_id==$id ? 'selected' : '')."> $name</option>";
+                }
+            } else {
+                $ret_val .= "<font color='red'>No religion codes in library.</font><br/>";
+            }
+            $ret_val .= "</select>";
+            return $ret_val;
+        }
+    }
+    
+	function dropdown_education() {
+        if (func_num_args()>0) {
+            $arg_list = func_get_args();
+            $education_id = $arg_list[0];
+        }
+        $sql = "select educ_id, educ_name ".
+               "from m_lib_education ".
+               "order by educ_name";
+        $ret_val = "<select name='education'>";
+        $ret_val .= "<option value=''>--Select Education--</option>";
+        if ($result = mysql_query($sql)) {
+            if (mysql_num_rows($result)) {
+                while (list($id, $name) = mysql_fetch_array($result)) {
+                    $ret_val .= "<option value='$id' ".($education_id==$id ? 'selected' : '')."> $name</option>";
+                }
+            } else {
+                $ret_val .= "<font color='red'>No education codes in library.</font><br/>";
+            }
+            $ret_val .= "</select>";
+            return $ret_val;
+        }
+    }
+    
+	function dropdown_occupation() {
+        if (func_num_args()>0) {
+            $arg_list = func_get_args();
+            $occupation_id = $arg_list[0];
+        }
+        $sql = "select occup_id, occup_name ".
+               "from m_lib_occupation ".
+               "order by occup_name";
+        $ret_val = "<select name='occupation'>";
+        $ret_val .= "<option value=''>--Select Occupation--</option>";
+        if ($result = mysql_query($sql)) {
+            if (mysql_num_rows($result)) {
+                while (list($id, $name) = mysql_fetch_array($result)) {
+                    $ret_val .= "<option value='$id' ".($occupation_id==$id ? 'selected' : '')."> $name</option>";
+                }
+            } else {
+                $ret_val .= "<font color='red'>No occupation codes in library.</font><br/>";
+            }
+            $ret_val .= "</select>";
+            return $ret_val;
+        }
+    }
+    
+	function dropdown_status() {
+        if (func_num_args()>0) {
+            $arg_list = func_get_args();
+            $status_id = $arg_list[0];
+        }
+        $sql = "select status_id, status_name ".
+               "from m_lib_civil_status ";
+        $ret_val = "<select name='civilstatus'>";
+        $ret_val .= "<option value=''>--Select Civil Status--</option>";
+        if ($result = mysql_query($sql)) {
+            if (mysql_num_rows($result)) {
+                while (list($id, $name) = mysql_fetch_array($result)) {
+                    $ret_val .= "<option value='$id' ".($status_id==$id ? 'selected' : '')."> $name</option>";
+                }
+            } else {
+                $ret_val .= "<font color='red'>No civil status codes in library.</font><br/>";
+            }
+            $ret_val .= "</select>";
             return $ret_val;
         }
     }

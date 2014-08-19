@@ -1,4 +1,20 @@
 <?
+/*
+	DATE UPDATED : 11/19/2013 ---------------------------------------------------------
+	UPDATED BY: Emmanuel Perez
+	
+	UPDATE LOG:
+		- Fixed the bug in counting the number of family folders with members
+		
+	
+	DATE UPDATED : 03/28/2014 ---------------------------------------------------------
+	UPDATED BY: Emmanuel Perez
+	
+	UPDATE LOG:
+		- Fixed the slow query of family folders with members
+		
+*/
+
 class family extends module{
 
     // Author: Herman Tolentino MD
@@ -221,10 +237,16 @@ class family extends module{
             $isadmin = $arg_list[4];
             //print_r($arg_list);
         }
-        $sql = "SELECT if(m.patient_id,'Y', 'N') membership, ".
+        /*$sql = "SELECT if(m.patient_id,'Y', 'N') membership, ".
                "count(isnull(m.patient_id)) membercount ".
                "FROM m_family f left join m_family_members m ".
-               "on f.family_id = m.family_id group by isnull(m.patient_id)";
+               "on f.family_id = m.family_id group by isnull(m.patient_id)";*/
+        $sql = "SELECT  if(m.patient_id,'Y', 'N') membership,
+               CASE WHEN isnull(m.patient_id) THEN count(isnull(m.patient_id)) ELSE count(DISTINCT m.family_id) END as membercount
+               FROM m_family_members m right join m_family f 
+               USING (family_id) group by isnull(m.patient_id)";
+        
+  
         if ($result = mysql_query($sql)) {
             $ret_val .= "<table width='250' cellpadding='2' cellspacing='0' style='border: 1px solid black'>";
             if (mysql_num_rows($result)) {

@@ -127,28 +127,40 @@ small { font-family: verdana, sans serif}
 
 <br/>
 <!-- <table border="0" cellspacing="0" bgcolor="#000000" style="border: 4px solid black" width="100%" cellpadding="0"> -->
-<table border="0" cellspacing="0" style="border: 4px solid black" width="100%" cellpadding="0">
+<table border="0" cellspacing="0" style="height: 208px; border: 4px solid black" width="100%" cellpadding="0">
   <tr bgcolor="#006600">
   <tr>
   <tr>
     <?php 
-        if((date('Y-m-d') >= date('Y').'-10-29') && (date('Y-m-d') <= date('Y').'-11-02')):
-            echo "<td valign='top'><img src='../images/halloween.png' border='0' width='100%' height='50%'></td>";
+        if((date('Y-m-d') >= date('Y').'-10-29') && (date('Y-m-d') <= date('Y').'-11-02')):	//halloween
+            echo "<td valign='top'><img src='../images/halloween.png' border='0' width='100%' height='208px'></td>";
             
-        elseif((date('Y-m-d') >= date('Y').'-12-16') && (date('Y-m-d') <= date('Y').'-12-25')):
-            echo "<td valign='top'><img src='../images/christmas.png' border='0' width='100%' height='50%'></td>";
+        elseif((date('Y-m-d') >= date('Y').'-12-16') && (date('Y-m-d') <= date('Y').'-12-25')):	//christmas
+            echo "<td valign='top'><img src='../images/christmas.jpg' border='0' width='100%' height='208px'></td>";
+			
+		elseif((date('Y-m-d') >= date('Y').'-12-26') && (date('Y-m-d') <= date('Y').'-1-5')): //new year
+            echo "<td valign='top'><img src='../images/newyear.jpg' border='0' width='100%' height='208px'></td>";
+			
+		elseif((date('Y-m-d') >= date('Y').'-02-01') && (date('Y-m-d') <= date('Y').'-02-14')):	//valentines
+            echo "<td valign='top'><img src='../images/valentines.jpg' border='0' width='100%' height='208px'></td>";
+		
+		elseif((date('Y-m-d') >= date('Y').'-08-01') && (date('Y-m-d') <= date('Y').'-08-31')):	//ninoy
+            echo "<td valign='top'><img src='../images/ninoy.jpg' border='0' width='100%' height='208px'></td>";
+			
         else:            
-            echo "<td valign='top'><img src='../images/$_SESSION[banner]' border='0' width='100%' height='100%'></td>";
+            echo "<td valign='top'><img src='../images/$_SESSION[banner]' border='0' width='100%' height='208px'></td>";
         endif;
     ?>
     
 <!--    <td valign="top"><img src="../images/banner.6.jpg" border="0" width="100%" height="100%"></td> -->
     
   </tr>
+ 
   <tr>
     <td>
     </td>
   </tr>
+ 
 </table><br>
 <table  bgcolor="#FFCC00" cellpadding="1" style="border: 1px solid black">
   <tr>
@@ -180,7 +192,8 @@ small { font-family: verdana, sans serif}
 		    //alert::check_sms_alert();
                     $site->session_user($user);
                     //$site->record_access($_SESSION["userid"],$HTTP_USER_AGENT,"ASC","login");
-                    header("location: ".$_SERVER["PHP_SELF"]);
+                      //header("location: ".$_SERVER["PHP_SELF"]);
+		      header("location: ?page=CONSULTS&menu_id=1330");
                 } else {
                     // Invalid account
                     header("location: ".$_SERVER["PHP_SELF"]."?errorinfo=001");

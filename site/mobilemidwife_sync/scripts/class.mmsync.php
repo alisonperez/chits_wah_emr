@@ -8,7 +8,7 @@
       $this->date = "2012-11-19";
       $this->desc = "Mobile Midwife Sync is the component that resides in the server. Sync, cleans and validates tablets data";
 
-      $this->arr_program_id = array('Expanded Program for Immunization','FP Service Record');
+      $this->arr_program_id = array('Expanded Program for Immunization');
 	
     }
 
@@ -66,7 +66,7 @@
 		foreach($arr_json_id as $key=>$value){
 			$cmd = "curl -H 'Content-type: application/json' -X GET 'http://$_SESSION[txt_ip]:$_SESSION[txt_port]/coconut/$value'";
 			$str_json_element = shell_exec($cmd);
-			//echo $str_json_element.'<br><br>';
+			//echo $json_element.'<br><br>';
 
 			$arr_json_element = json_decode($str_json_element,TRUE);
 

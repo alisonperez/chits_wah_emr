@@ -187,8 +187,15 @@ class appointment extends module {
                "order by p.patient_lastname, p.patient_firstname";
         if ($result = mysql_query($sql)) {
             print "<br/><table width=600 bgcolor='#FFFFFF' cellpadding='3' cellspacing='0' style='border: 2px solid black'>";
+			
             print "<tr><td>";
-            print "<span class='tinylight'><b>".LBL_EXPECTED_TO_ARRIVE_TODAY." ".$date.":</b></span><br/><br/>";
+			$datetoday = date("Y-m-d");
+            if($date==$datetoday){
+				print "<span class='tinylight'><b>".LBL_EXPECTED_TO_ARRIVE_TODAY."</b></span><br/><br/>";
+			}else{
+				print "<span class='tinylight'><b>THE FOLLOWING PATIENTS ARE EXPECTED ON " .$date.":</b></span><br/><br/>";
+			}
+			
             if (mysql_num_rows($result)) {
                 $i=0;
                 while (list($sid, $pid, $plast, $pfirst, $pdob, $pgender, $appname, $p_age, $actual_date) = mysql_fetch_array($result)) {
@@ -216,7 +223,7 @@ class appointment extends module {
                 }
                 print $this->columnize_list($patient_array);
             } else {
-                print "<font color='red'>No patients scheduled today.</font><br/>";
+                print "<font color='red'>No patients scheduled for today.</font><br/>";
             }
             print "</td></tr>";
             print "</table><br/>";

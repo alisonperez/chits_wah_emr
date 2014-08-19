@@ -3,9 +3,9 @@ session_start();
 ob_start();
 require('./fpdf/fpdf.php');
 
+
 $db_conn = mysql_connect("localhost","$_SESSION[dbuser]","$_SESSION[dbpass]");
 mysql_select_db($_SESSION[dbname]);
-
 
 
 class PDF extends FPDF{
@@ -152,7 +152,7 @@ function show_lab_result($str_lab_result){
 	$arr_lab_result = explode("<br/>",$str_lab_result);
 	
 	foreach($arr_lab_result as $key=>$value){
-		$this->SetFont('Arial','',10);
+		$this->SetFont('Arial','',12);
 		$this->Cell(0,5,$value,0,1,'L');		
 	}
 }
@@ -168,15 +168,6 @@ function Footer(){
 
 }
 
-$q_process = mysql_query("SELECT esign, name_designation_esign FROM game_user WHERE user_id='$_GET[process]'") or die("Cannot query 170: ".mysql_error());
-list($process_esign,$process_designation) = mysql_fetch_array($q_process);
-
-$q_noted = mysql_query("SELECT esign, name_designation_esign FROM game_user WHERE user_id='$_GET[noted]'") or die("Cannot query 170: ".mysql_error());
-list($noted_esign,$noted_designation) = mysql_fetch_array($q_noted);
-
-$process_esign = '../'.$process_esign;
-$noted_esign = '../'.$noted_esign;
-
 $pdf=new PDF('P','mm','Letter');
 $pdf->AliasNbPages();
 $pdf->SetFont('Arial','',10);
@@ -184,34 +175,6 @@ $pdf->AddPage();
 
 $pdf->show_lab_result($_SESSION["lab_print"]);
 
-
-//print_r($_GET);
-switch($_GET["lab_id"]){
-	case 'fecalysis':
-		$h = 165;
-		$h_designation = 35;
-		break;
-	case 'urinalysis':
-		$h = 350;
-		$h_designation = 85;
-		break;
-	case 'hematology':
-		$h = 200;
-		$h_designation = 35;
-		break;
-	default:
-		break;
-
-
-}
-
-$pdf->Image($process_esign,'50',$h,'20','20');
-$pdf->Image($noted_esign,'140',$h,'20','20');
-
-$pdf->Ln($h_designation);
-
-$pdf->SetWidths(array(100,100));
-$pdf->Row(array($process_designation,$noted_designation));
 $pdf->Output();
 
 ?>

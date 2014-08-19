@@ -195,8 +195,8 @@
 		$graph->Add($lineplot);
 		$graph->AddY2($lineplot2);
 
-		$lineplot->SetLegend('Diastolic');
-		$lineplot2->SetLegend('Systolic');
+		$lineplot->SetLegend('Systolic');
+		$lineplot2->SetLegend('Diastolic');
 
 		$graph->legend->SetLayout(LEGEND_HOR);
 		$graph->legend->Pos(0.5,.99,'center','bottom');	

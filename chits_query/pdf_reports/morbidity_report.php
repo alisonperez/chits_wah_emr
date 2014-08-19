@@ -1,5 +1,14 @@
 <?php
+/*
+	DATE UPDATED : 3/20/2014 ---------------------------------------------------------
+	UPDATED BY: Mark Santos
 
+	UPDATE LOG:
+		- ISSUES/BUGS : Adding Total Value at the bottom of the table
+		- UPDATE LOCATION : show_morbidity
+		- Added a for loop to get total for each item in array using array_sum and array_map to get total
+	
+*/
 session_start();
 
 ob_start();
@@ -260,7 +269,7 @@ function show_morbidity(){
     
     $str_brgy = $this->get_brgy();    
 
-    $q_diagnosis = mysql_query("SELECT a.class_id,COUNT(a.class_id) as 'bilang',e.class_name,a.patient_id,e.icd10,COUNT(e.icd10) as 'icd_count' FROM m_consult_notes_dxclass a, m_patient b, m_family_members c, m_family_address d,m_lib_notes_dxclass e,m_consult f WHERE a.consult_id=f.consult_id AND f.consult_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' AND a.patient_id=b.patient_id AND b.patient_id=c.patient_id AND c.family_id=d.family_id AND d.barangay_id IN ($str_brgy) AND a.class_id=e.class_id GROUP by e.icd10 ORDER by icd_count DESC,a.class_id ASC") or die("Cannot query 158: ".mysql_error());
+    $q_diagnosis = mysql_query("SELECT a.class_id,COUNT(a.class_id) as 'bilang',e.class_name,a.patient_id,e.icd10,COUNT(e.icd10) as 'icd_count' FROM m_consult_notes_dxclass a, m_patient b, m_family_members c, m_family_address d,m_lib_notes_dxclass e,m_consult f WHERE a.consult_id=f.consult_id AND f.consult_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' AND a.patient_id=b.patient_id AND b.patient_id=c.patient_id AND c.family_id=d.family_id AND d.barangay_id IN ($str_brgy) AND a.class_id=e.class_id GROUP by e.icd10 ORDER by icd_count DESC,a.class_id") or die("Cannot query 158: ".mysql_error());
 
     //$q_diagnosis = mysql_query("SELECT a.class_id,COUNT(a.class_id) as 'bilang',e.class_name,a.patient_id,e.icd10,COUNT(e.icd10) as 'icd_count' FROM m_consult_notes_dxclass a, m_patient b, m_family_members c, m_family_address d,m_lib_notes_dxclass e WHERE a.diagnosis_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' AND a.patient_id=b.patient_id AND b.patient_id=c.patient_id AND c.family_id=d.family_id AND d.barangay_id IN ($str_brgy) AND a.class_id=e.class_id GROUP by e.icd10 ORDER by icd_count DESC,a.class_id ASC") or die("Cannot query 158: ".mysql_error());
     
@@ -475,8 +484,19 @@ function show_morbidity(){
 
 		  array_push($arr_consolidate,$value_final);
      }
-
-
+		// START OF MORBIDITY TOTAL
+		$value_total = array();
+		array_push($value_total,"TOTAL", " ");
+		
+		for($_SESSION['totalx']=2;$_SESSION['totalx']<=37;$_SESSION['totalx']++){
+			$array_total = array_sum(array_map(function($x){
+				$totalx = $_SESSION['totalx'];
+				return $x[$totalx];
+			},$arr_consolidate));
+			array_push($value_total,$array_total);
+		}
+		array_push($arr_consolidate,$value_total);
+		//END
     else: 
           $this->SetWidths(array('340'));
           $this->SetFont('Arial','','10');     
@@ -484,8 +504,9 @@ function show_morbidity(){
 
 	  array_push($arr_consolidate,array('No recorded morbidity and notifiable disease for this period'));
     endif;
-
+	
     return $arr_consolidate;
+	
 }
 
 function show_morbidity_masterlist(){
@@ -663,8 +684,12 @@ endif;
 if($_GET["type"]=='html'):
 	$html_tab->create_table($_SESSION["w"],$_SESSION["header"],$morb_rec,$_SESSION["w2"],$_SESSION["subheader"]);
 elseif($_GET["type"]=='csv'):
+	$arr_count = count($morb_rec);
+	unset($morb_rec[$arr_count-1]);
 	$csv_creator->create_csv($_SESSION["ques"],$morb_rec,'csv');	
 elseif($_GET["type"]=='efhsis'):
+	$arr_count = count($morb_rec);
+	unset($morb_rec[$arr_count-1]);
 	$csv_creator->create_csv($_SESSION["ques"],$morb_rec,'efhsis');
 else:
 	$pdf->Output();

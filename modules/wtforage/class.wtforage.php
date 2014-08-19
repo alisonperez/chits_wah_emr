@@ -121,14 +121,14 @@ class wtforage extends module {
 				return $wt_class;
   		}
         */
+		
         $sql = "select weight_min, weight_max, wt_class ".
                "from m_lib_wtforage ".
                "where age_month = '$age_month' and gender = '$gender'";
 
-
-
         if ($result = mysql_query($sql)) { 
             if (mysql_num_rows($result)) { 
+				
                 while (list($min, $max, $class) = mysql_fetch_array($result)) {
                     if ($max > $min) {
                         if ($actual_weight >= $min && $actual_weight <= $max) {

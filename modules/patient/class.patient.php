@@ -256,7 +256,7 @@ class patient extends module{
             }
         }
         if ($post_vars["submitpatient"]) {
-            $this->process_patient($menu_id, $post_vars, $get_vars,$patient);
+        	$this->process_patient($menu_id, $post_vars, $get_vars,$patient);
         }                    
         
         print "<table><tr valign='top'><td colspan='2'>";
@@ -381,49 +381,47 @@ class patient extends module{
 
         switch ($post_vars["submitpatient"]) {
         case "Add Patient":
-            if ($post_vars["patient_lastname"] && $post_vars["patient_firstname"] && $post_vars["patient_gender"] && $post_vars["patient_dob"] && $post_vars["patient_mother"]) {
+            if ($post_vars["patient_lastname"] && $post_vars["patient_middle"] && $post_vars["patient_firstname"] && $post_vars["patient_gender"] && $post_vars["patient_dob"] && $post_vars["patient_mother"] && $post_vars['patient_cellphone']==$post_vars['confirm_cellphone']) {
 
                 // check for duplicates
                 $threshold = 93;
                 $sim_index = $this->get_duplicates($post_vars, $threshold);
-                if ($sim_index<$threshold) {
-
-                    /*$sql = "insert into m_patient (patient_lastname, patient_firstname, patient_middle, patient_dob, patient_gender, registration_date, user_id, healthcenter_id, patient_mother,patient_cellphone) ".
-                           "values ('".ucwords($post_vars["patient_lastname"])."', '".ucwords($post_vars["patient_firstname"])."', '".ucwords($post_vars["patient_middle"])."', ".
-                           "'$dob', '".$post_vars["patient_gender"]."', sysdate(), '".$_SESSION["userid"]."', '".$_SESSION["datanode"]["code"]."', '".ucwords($post_vars["patient_mother"])."','".$post_vars["patient_cellphone"]."')"; */ 				
-					
-					//$sql = 'insert into m_patient (patient_lastname,patient_firstname, patient_middle, patient_dob, patient_gender, registration_date, user_id, healthcenter_id, patient_mother,patient_cellphone) values('.ucwords($post_vars["patient_lastname"]).','.ucwords($post_vars["patient_firstname"]).','.ucwords($post_vars["patient_middle"]).','.$dob.','.$post_vars["patient_gender"].','.'sysdate()'.','.$_SESSION["userid"].','.$_SESSION["datanode"]["code"].','.ucwords($post_vars["patient_mother"]).','.$post_vars["patient_cellphone"].')';
-					
-
+                if ($sim_index<$threshold){
                     $get_last = mysql_query("SELECT patient_id FROM m_patient ORDER by patient_id DESC LIMIT 1") or die("Cannot query: 387".mysql_error());
                     list($pxid) = mysql_fetch_array($get_last);
                     $next_id = $pxid + 1;
-                    
-    		    $sql = "insert into m_patient set patient_id='$next_id',patient_lastname='".ucwords($post_vars[patient_lastname])."', patient_firstname='".ucwords($post_vars[patient_firstname])."',patient_middle='".ucwords($post_vars[patient_middle])."',patient_dob='$dob',patient_gender='$post_vars[patient_gender]',registration_date=sysdate(),user_id='$_SESSION[userid]',healthcenter_id='$_SESSION[datanode][code]',patient_mother='".ucwords($post_vars[patient_mother])."',patient_cellphone='$post_vars[patient_cellphone]'";
+					
+				
+                if(in_array('pwd',$post_vars['p_group'])){
+					$pwd = 'Y';
+				}
+				
+				if(in_array('ind',$post_vars['p_group'])){
+					$ind = 'Y';
+				}
+					$sql = "insert into m_patient set patient_id='$next_id',patient_lastname='".ucwords($post_vars[patient_lastname])."', patient_firstname='".ucwords($post_vars[patient_firstname])."',patient_middle='".ucwords($post_vars[patient_middle])."',patient_dob='$dob',patient_gender='$post_vars[patient_gender]',registration_date=sysdate(),user_id='$_SESSION[userid]',healthcenter_id='$_SESSION[datanode][code]',patient_mother='".ucwords($post_vars[patient_mother])."',patient_cellphone='$post_vars[patient_cellphone]',pwd_flag='$pwd',ind_flag='$ind' ";
 							
 					//print_r($post_vars);
                     $result = mysql_query($sql) or die(mysql_error());
-		    $pxid = mysql_insert_id();
-		    if(isset($arr_sms) && !empty($post_vars['patient_cellphone'])):
-			$this->sms_patient_enroll($pxid,$arr_sms);
-		    else:
-			echo "<script language=\"Javascript\">";
-			echo "alert('Patient $post_vars[patient_firstname] $post_vars[patient_lastname] was not enrolled for SMS alert because no cellphone number was recorded.')";
-			//header("location: ".$_SERVER["PHP_SELF"]."?page=".$get_vars["page"]."&menu_id=".$get_vars["menu_id"]);  
-			echo "</script>";
-		    endif;
+					$pxid = mysql_insert_id();
+					if(isset($arr_sms) && !empty($post_vars['patient_cellphone'])):
+					$this->sms_patient_enroll($pxid,$arr_sms);
+					else:
+					echo "<script language=\"Javascript\">";
+					echo "alert('Patient $post_vars[patient_firstname] $post_vars[patient_lastname] was not enrolled for SMS alert.')";
+					//header("location: ".$_SERVER["PHP_SELF"]."?page=".$get_vars["page"]."&menu_id=".$get_vars["menu_id"]);  
+					echo "</script>";
+					endif;
 
-			if ($result) {
-			echo "<script language=\"Javascript\">";
-			echo "if(window.confirm('Patient $post_vars[patient_firstname] $post_vars[patient_lastname] was successfully added! Do you wish to proceed to the creation and assigning of the patient to the Family Folders?')){";
-			echo "window.location = '$_SERVER[PHP_SELF]?page=PATIENTS&menu_id=691'";
-			echo "}";
-			
-			
-			//header("location: ".$_SERVER["PHP_SELF"]."?page=".$get_vars["page"]."&menu_id=".$get_vars["menu_id"]);  
-			echo "</script>";
-                    	}
-                } else {
+				if ($result) {
+					//echo "<script>";
+						echo "<script>alert('Patient $post_vars[patient_firstname] $post_vars[patient_lastname] was successfully added!')</script>";
+						echo "<script>window.location = '$_SERVER[PHP_SELF]?page=PATIENTS&menu_id=691'</script>";
+					//echo "}";
+					//echo "</script>";
+					//header("location: $_SERVER[PHP_SELF]?page=PATIENTS&menu_id=691");  
+                }
+            } else {
 			echo "<script language=\"Javascript\">";
 			echo "alert('Patient was not added due to similarity with existing records!')";
 			echo "</script>";
@@ -438,24 +436,34 @@ class patient extends module{
             }
             break;
         case "Update Patient":
-            if ($post_vars["patient_lastname"] && $post_vars["patient_firstname"] && $post_vars["patient_gender"] && $post_vars["patient_mother"]) {
-                $sql = "update m_patient set ".
-                       "patient_firstname = '".ucwords($post_vars["patient_firstname"])."', ".
-                       "patient_middle = '".ucwords($post_vars["patient_middle"])."', ".
-                       "patient_lastname = '".ucwords($post_vars["patient_lastname"])."', ".
-                       "user_id = '".$_SESSION["userid"]."', ".
-	  	       "patient_gender = '".$post_vars["patient_gender"]."', ".
-		       "patient_mother = '".$post_vars["patient_mother"]."', ".
-		       "patient_cellphone = '".$post_vars["patient_cellphone"]."', ".
-                       "patient_dob = '$dob' ".
-                       "where patient_id = '".$post_vars["patient_id"]."'";
+            if ($post_vars["patient_lastname"] && $post_vars["patient_middle"] && $post_vars["patient_firstname"] && $post_vars["patient_gender"] && $post_vars["patient_mother"] && $post_vars['patient_cellphone']==$post_vars['confirm_cellphone']) {
+				if(in_array('pwd',$post_vars['p_group'])){
+					$pwd = 'Y';
+				}
+				
+				if(in_array('ind',$post_vars['p_group'])){
+					$ind = 'Y';
+				}
+				
+				$sql = "update m_patient set ".
+						"patient_firstname = '".ucwords($post_vars["patient_firstname"])."', ".
+						"patient_middle = '".ucwords($post_vars["patient_middle"])."', ".
+						"patient_lastname = '".ucwords($post_vars["patient_lastname"])."', ".
+						"user_id = '".$_SESSION["userid"]."', ".
+						"patient_gender = '".$post_vars["patient_gender"]."', ".
+						"patient_mother = '".$post_vars["patient_mother"]."', ".
+						"patient_cellphone = '".$post_vars["patient_cellphone"]."', ".
+						"patient_dob = '$dob', ".
+						"pwd_flag='$pwd', ".
+						"ind_flag='$ind' ".
+						"where patient_id = '".$post_vars["patient_id"]."'";
 				$result = mysql_query($sql) or die(mysql_error());
                 if ($result) {
 					if(isset($arr_sms) && !empty($post_vars["patient_cellphone"])):
 						$this->sms_patient_enroll($post_vars["patient_id"],$arr_sms,'');
-					else:
-						$this->sms_patient_enroll($post_vars["patient_id"],$arr_sms,'no');
-		    			endif;
+					//else:
+						//$this->sms_patient_enroll($post_vars["patient_id"],$arr_sms,'no');
+		    		endif;
 
 					echo "<script language=\"Javascript\">";
 					echo "alert('Record of patient $post_vars[patient_firstname] $post_vars[patient_lastname] was successfully been updated.')";
@@ -494,12 +502,16 @@ class patient extends module{
 
 		if(empty($post_vars['patient_firstname']))
 		  $warning .= '- first name'.'<br>';
+		if(empty($post_vars['patient_middle']))
+		  $warning .= '- middle name'.'<br>';
 		if(empty($post_vars['patient_lastname']))
 		  $warning .= '- last name'.'<br>';
 		if(empty($post_vars['patient_dob']))
 		  $warning .= '- birth date'.'<br>';
 		if(empty($post_vars['patient_mother']))
-		  $warning .= '- mother\'s name';		
+		  $warning .= '- mother\'s name'.'<br>';
+		if($post_vars['patient_cellphone']!=$post_vars['confirm_cellphone'])
+		  $warning .= '- cellphone not matched';		//Dinagdag ko
 
 	if(isset($warning)):
 		echo "<font size='2' color='red'><b>Patient not added. Missing fields: <br>";
@@ -547,7 +559,7 @@ class patient extends module{
             //print_r($arg_list);
             if ($get_vars["patient_id"]) {
                 $sql = "select patient_id, healthcenter_id, registration_date, patient_lastname, ".
-                       "patient_firstname, patient_middle, patient_dob, patient_gender, user_id, patient_mother,patient_cellphone ".
+                       "patient_firstname, patient_middle, patient_dob, patient_gender, user_id, patient_mother, patient_cellphone, pwd_flag, ind_flag, blood_type ".
                        "from m_patient where patient_id = '".$get_vars["patient_id"]."'";
                 if ($result = mysql_query($sql)) {
                     if (mysql_num_rows($result)) {
@@ -563,15 +575,17 @@ class patient extends module{
         print "<table width='300'>";
         print "<form action = '".$_SERVER["SELF"]."?page=".$get_vars["page"]."&menu_id=$menu_id' name='form_patient' method='post'>";
         if ($get_vars["patient_id"]) {
-            print "<tr valign='top'><td>";
-            print "<font color='#99CC00' size='5'><b>".FTITLE_EDIT_PATIENT."</b></font>";
-            print "</td></tr>";
+            print "<tr valign='top'>";
+				print "<td>";
+					print "<font color='#99CC00' size='5'><b>".FTITLE_EDIT_PATIENT."</b></font>";
+				print "</td>";
+			print "</tr>";
         } else {
             print "<tr valign='top'><td>";
             print "<font color='#99CC00' size='5'><b>".FTITLE_NEW_PATIENT."</b></font>";
             print "</td></tr>";
             print "<tr valign='top'><td>";
-            print "<b>NOTE: This form is for new patients. Fields with <font style='color:red; font-weight: bold'>*</font> are required.</b><br><br>";
+            print "<b>NOTE: This form is for new patients. All Fields are Required<br><br>";
             print "</td></tr>";
         }
         if ($get_vars["patient_id"]) {
@@ -584,62 +598,74 @@ class patient extends module{
             print user::get_username($patient["user_id"])."<br/>";
             print "</td></tr>";
         }
+		
+		
         print "<tr valign='top'><td>";
-        print "<span class='boxtitle'>".LBL_FIRST_NAME."</span><font style='color:red; font-weight: bold'>&nbsp;*</font><br> ";
-        //print "<input type='text' class='textbox' name='patient_firstname' value='".($patient["patient_firstname"]?$patient["patient_firstname"]:$post_vars["patient_firstname"])."' style='border: 1px solid #000000'><br>";
-		print "<input type='text' class='textbox' name='patient_firstname' value='".($patient["patient_firstname"]?$patient["patient_firstname"]:"")."' style='border: 1px solid #000000'><br>";
+        print "<span class='boxtitle'>".LBL_FIRST_NAME."</span><br> ";
+		print "<input type='text' class='textbox' name='patient_firstname' value='".($patient["patient_firstname"]?$patient["patient_firstname"]:($post_vars["patient_firstname"]?$post_vars["patient_firstname"]:""))."' style='border: 1px solid #000000'><br>";
         print "</td></tr>";
         print "<tr valign='top'><td>";
         print "<span class='boxtitle'>".LBL_MIDDLE_NAME."</span><br> ";
-        //print "<input type='text' class='textbox' name='patient_middle' value='".($patient["patient_middle"]?$patient["patient_middle"]:$post_vars["patient_middle"])."' style='border: 1px solid #000000'><br>";
-		print "<input type='text' class='textbox' name='patient_middle' value='".($patient["patient_middle"]?$patient["patient_middle"]:"")."' style='border: 1px solid #000000'><br>";
+		print "<input type='text' class='textbox' name='patient_middle' value='".($patient["patient_middle"]?$patient["patient_middle"]:($post_vars["patient_middle"]?$post_vars["patient_middle"]:""))."' style='border: 1px solid #000000'><br>";
         print "</td></tr>";
         print "<tr valign='top'><td>";
-        print "<span class='boxtitle'>".LBL_LAST_NAME."</span><font style='color:red; font-weight: bold'>&nbsp;*</font><br> ";
-        //print "<input type='text' class='textbox' name='patient_lastname' value='".($patient["patient_lastname"]?$patient["patient_lastname"]:$post_vars["patient_lastname"])."' style='border: 1px solid #000000'><br>";
-		print "<input type='text' class='textbox' name='patient_lastname' value='".($patient["patient_lastname"]?$patient["patient_lastname"]:"")."' style='border: 1px solid #000000'><br>";
+        print "<span class='boxtitle'>".LBL_LAST_NAME."</span><br> ";
+		print "<input type='text' class='textbox' name='patient_lastname' value='".($patient["patient_lastname"]?$patient["patient_lastname"]:($post_vars["patient_lastname"]?$post_vars["patient_lastname"]:""))."' style='border: 1px solid #000000'><br>";
         print "</td></tr>";
         print "<tr valign='top'><td>";
-        print "<span class='boxtitle'>".LBL_PATIENT_DOB."</span><font style='color:red; font-weight: bold'>&nbsp;*</font><br> ";
+        print "<span class='boxtitle'>".LBL_PATIENT_DOB."</span><br> ";
         if ($patient["patient_dob"]) {
             // convert to external format
             list($year, $month, $day) = explode("-", $patient["patient_dob"]);
             $dob = "$month/$day/$year";
         }
-        //print "<input type='text' size='10' maxlength='10' class='textbox' name='patient_dob' value='".($dob?$dob:$post_vars["patient_dob"])."' style='border: 1px solid #000000'><br>";
-        //print "<input type='text' size='10' maxlength='10' class='textbox' name='patient_dob' value='".($dob?$dob:"")."' style='border: 1px solid #000000'>";
         
-        print "<input type='text' size='10' maxlength='10' class='textbox' name='patient_dob' value='".($dob?$dob:"")."' style='border: 1px solid #000000'>&nbsp;"; 
+        print "<input type='text' size='10' maxlength='10' class='textbox' name='patient_dob' value='".($dob?$dob:($post_vars["patient_dob"]?$post_vars["patient_dob"]:""))."' style='border: 1px solid #000000'>&nbsp;"; 
 
         print "<a href=\"javascript:show_calendar4('document.form_patient.patient_dob', document.form_patient.patient_dob.value);\"><img src='../images/cal.gif' width='16' height='16' border='0' alt='Click Here to Pick up the date'></a></input>";              
         
         print "</td></tr>";
 
-        print "<tr valign='top'><td>";
-        print "<span class='boxtitle'>".LBL_GENDER."</span><font style='color:red; font-weight: bold'>&nbsp;*</font><br> ";
-        print "<select name='patient_gender' ".($get_vars["patient_id"]?'':'')." class='textbox'>";
-        print "<option ".($patient["patient_gender"]=='M'?'selected':'')." value='M'>Male</option>";
-        print "<option ".($patient["patient_gender"]=='F'?'selected':'')." value='F'>Female</option>";
-        print "<option ".($patient["patient_gender"]=='I'?'selected':'')." value='I'>Indeterminate</option>";
-        print "</select>";
+        print "<tr valign='top'>";
+			print "<td>";
+				print "<span class='boxtitle'>".LBL_GENDER."</span><br> ";
+				print "<select name='patient_gender' ".($get_vars["patient_id"]?'':'')." class='textbox'>";
+				print "<option ".($patient["patient_gender"]=='M'?'selected':($post_vars["patient_gender"]=='M'?'selected':''))." value='M'>Male</option>";
+				print "<option ".($patient["patient_gender"]=='F'?'selected':($post_vars["patient_gender"]=='F'?'selected':''))." value='F'>Female</option>";
+				print "</select>";
 
-        print "<tr valign='top'><td>";
-        print "<span class='boxtitle'>".LBL_MOTHERS_NAME."</span><font style='color:red; font-weight: bold'>&nbsp;*</font><br> ";
-        //print "<input type='text' size='30' class='textbox' ".($_SESSION["isadmin"]||!$get_vars["patient_id"]?"":"disabled")." name='patient_mother' value='".($patient["patient_mother"]?$patient["patient_mother"]:$post_vars["patient_mother"])."' style='border: 1px solid #000000'><br>";
-		print "<input type='text' size='30' class='textbox' name='patient_mother' value='".($patient["patient_mother"]?$patient["patient_mother"]:"")."' style='border: 1px solid #000000'><br>";
-        print "</td></tr>";
+				print "<tr valign='top'>";
+					print "<td>";
+						print "<span class='boxtitle'>".LBL_MOTHERS_NAME."</span><br> ";
+						print "<input type='text' size='30' class='textbox' name='patient_mother' value='".($patient["patient_mother"]?$patient["patient_mother"]:($post_vars["patient_mother"]?$post_vars["patient_mother"]:""))."' style='border: 1px solid #000000'><br>";
+					print "</td>";
+				print "</tr>";
 
-        //if ($patient["patient_gender"]) {
-        //    print "<input type='hidden' name='patient_gender' value='".$patient["patient_gender"]."' />";
-        //}
-        print "</td></tr>";
+			print "</td>";
+		print "</tr>";
 
-	print "<tr><td>";
-	print "<span class='boxtitle'>CELLPHONE NUMBER (11-digit,i.e. 09XX1234567)</span><br> ";
+		print "<tr>";
+			print "<td>";
+				print "<span class='boxtitle'>CELLPHONE NUMBER (11-digit,i.e. 09XX1234567)</span><br> ";
+				print "<input type='text' size='12' class='textbox' maxlength='11' name='patient_cellphone' value='".($patient["patient_cellphone"]?$patient["patient_cellphone"]:($post_vars["patient_cellphone"]?$post_vars["patient_cellphone"]:""))."'></input>";
+			print "</td>";
+		print "</tr>";
+		
+		print "<tr>";
+			print "<td>";//Dagdag Hanggang 649
+				print "<span class='boxtitle'>CONFIRM CELLPHONE NUMBER</span><br> ";
+				print "<input type='text' size='12' class='textbox' maxlength='11' name='confirm_cellphone' value='".($patient["patient_cellphone"]?$patient["patient_cellphone"]:($post_vars["confirm_cellphone"]?$post_vars["confirm_cellphone"]:""))."'></input>";
+			print "</td>";
+		print "</tr>";//Hanggang Dito
 
-	print "<input type='text' size='12' class='textbox' maxlength='11' name='patient_cellphone' value='$patient[patient_cellphone]'></input>";
-	print "</td></tr>";
-
+		print "<tr>";
+			print "<td>";
+				print "<span class='boxtitle'>PATIENT GROUP</span><br> ";
+				
+				print "<input type='checkbox' name='p_group[]' value='pwd' ".($patient["pwd_flag"]=='Y'?CHECKED:($post_vars["p_group"][0]?CHECKED:""))." >PWD</input><br />";
+				print "<input type='checkbox' name='p_group[]' value='ind' ".($patient["ind_flag"]=='Y'?CHECKED:($post_vars["p_group"][1]?CHECKED:""))." >Indigenous</input>";
+			print "</td>";
+		print "</tr>";
 	if(mysql_num_rows($q_sms_enroll)!=0):
 		$arr_alert = array();
 		$q_alert = mysql_query("SELECT program_id FROM m_lib_sms_px_enroll WHERE patient_id='$_GET[patient_id]'") or die("Cannot query 634: ".mysql_error());
@@ -771,6 +797,7 @@ class patient extends module{
 
     function sms_patient_enroll($pxid,$arr_sms,$del){
 	$q_px = mysql_query("SELECT enroll_id FROM m_lib_sms_px_enroll WHERE patient_id='$pxid'") or die("Cannot query 747: ".mysql_error());
+	var_dump($arr_sms);
 	if(mysql_num_rows($q_px)==0):
 		foreach($arr_sms as $key=>$value){
 			$insert_sms = mysql_query("INSERT INTO m_lib_sms_px_enroll SET patient_id='$pxid',program_id='$value',last_modified=NOW(),modified_by='$_SESSION[userid]'") or die("Cannot query 757: ".mysql_error());

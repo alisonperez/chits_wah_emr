@@ -1,5 +1,25 @@
 <?php
+/*
+	DATE UPDATED : 3/2/2014 ---------------------------------------------------------
+	UPDATED BY: Mark Santos
 
+	UPDATE LOG:
+		- ISSUES/BUGS : Incorrect number of pregnant woman because it will query only the first visit even if it is with 'seen outside RHU' flag
+		- UPDATE LOCATION : case 12:	//number of pregnant women
+		- $q_pregnant(CHANGED) will query active pregnancy that occurred on the date chosen regardless of visit_sequence
+		- $q_pregseen(NEW) will sort the queried statement from $q_pregnant and order it from oldest to latest date and limit it to only 1 result
+			to get the date when the pregnant woman first visited the RHU (without the seen RHU flag)
+		- $check_date(NEW) will check if the first visit of the pregnant woman falls on the date being queried
+		- Removed $q_prenatal because it is no longer needed
+	
+
+	DATE UPDATED : 3/6/2014 ----------------------------------------------------------
+	UPDATED BY : Mark Santos
+	
+	UPDATE LOG:
+		- ISSUES/BUGS : Cannot Query per barangay
+		- added m_patient_mc.patient_id=m_family_members.patient_id to establish connection between patient and address table
+*/
 session_start();
 
 ob_start();
@@ -787,46 +807,48 @@ function compute_indicator($crit){
 			if(in_array('all',$_SESSION[brgy])):
 				//$q_pregnant = mysql_query("SELECT DISTINCT a.patient_id, a.mc_id, a.patient_edc, a.delivery_date FROM m_patient_mc a, m_patient b WHERE a.patient_id=b.patient_id AND a.patient_lmp <= '$_SESSION[sdate2]' ORDER by a.patient_edc,a.delivery_date ASC") or die("Cannot query 788: ".mysql_error());
 				
-				$q_pregnant = mysql_query("SELECT DISTINCT a.patient_id, a.mc_id, a.patient_edc, a.patient_lmp, date_format(c.prenatal_date,'%Y-%m-%d') FROM m_patient_mc a, m_patient b, m_consult_mc_prenatal c WHERE a.patient_id=b.patient_id AND date_format(c.prenatal_date,'%Y-%m-%d') BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' AND c.visit_sequence='1' AND a.mc_id=c.mc_id ORDER by c.prenatal_date,a.delivery_date ASC") or die("Cannot query 788: ".mysql_error());
+				$q_pregnant = mysql_query("SELECT DISTINCT a.patient_id, a.mc_id, a.patient_edc, a.patient_lmp, date_format(c.prenatal_date,'%Y-%m-%d') FROM m_patient_mc a, m_patient b, m_consult_mc_prenatal c WHERE a.patient_id=b.patient_id AND date_format(c.prenatal_date,'%Y-%m-%d') BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' AND a.mc_id=c.mc_id AND c.flag_private <> 'Y'	ORDER by c.prenatal_date, a.delivery_date ASC") or die("Cannot query 788: ".mysql_error());
 			else:
 				//$q_pregnant = mysql_query("SELECT DISTINCT a.patient_id, a.mc_id, a.patient_edc,a.delivery_date FROM m_patient_mc a,m_family_members b, m_family_address c,m_patient d WHERE a.patient_id=d.patient_id AND a.patient_lmp <= '$_SESSION[sdate2]' AND a.patient_id=d.patient_id AND b.family_id=c.family_id AND c.barangay_id IN ($brgy_array) ORDER by a.patient_edc,a.delivery_date ASC") or die("Cannot query 790: ".mysql_error());
 
-				$q_pregnant = mysql_query("SELECT DISTINCT a.patient_id, a.mc_id, a.patient_edc,a.patient_lmp,date_format(e.prenatal_date,'%Y-%m-%d') FROM m_patient_mc a,m_family_members b, m_family_address c,m_patient d, m_consult_mc_prenatal e WHERE a.patient_id=d.patient_id AND date_format(e.prenatal_date,'%Y-%m-%d') BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' AND a.patient_id=d.patient_id AND b.family_id=c.family_id AND c.barangay_id IN ($brgy_array) AND e.visit_sequence='1' AND a.mc_id=e.mc_id ORDER by e.prenatal_date,a.delivery_date ASC") or die("Cannot query 790: ".mysql_error());
-
+				$q_pregnant = mysql_query("SELECT DISTINCT a.patient_id, a.mc_id, a.patient_edc, a.patient_lmp, date_format(e.prenatal_date,'%Y-%m-%d') FROM m_patient_mc a,m_family_members b, m_family_address c, m_patient d, m_consult_mc_prenatal e WHERE a.patient_id=d.patient_id AND date_format(e.prenatal_date,'%Y-%m-%d') BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' AND a.patient_id=d.patient_id AND a.patient_id=b.patient_id AND b.family_id=c.family_id AND c.barangay_id IN ($brgy_array) AND a.mc_id=e.mc_id AND e.flag_private <> 'Y' ORDER by e.prenatal_date,a.delivery_date ASC") or die("Cannot query 790: ".mysql_error());
+				//$q_pregnant2 = "SELECT DISTINCT a.patient_id, a.mc_id, a.patient_edc, a.patient_lmp, date_format(e.prenatal_date,'%Y-%m-%d') FROM m_patient_mc a,m_family_members b, m_family_address c, m_patient d, m_consult_mc_prenatal e WHERE a.patient_id=d.patient_id AND date_format(e.prenatal_date,'%Y-%m-%d') BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' AND a.patient_id=d.patient_id AND b.family_id=c.family_id AND c.barangay_id IN ($brgy_array) AND a.mc_id=e.mc_id AND e.flag_private <> 'Y' ORDER by e.prenatal_date,a.delivery_date ASC";
 			endif;
 
 			if(mysql_num_rows($q_pregnant)!=0):
-
-
 				while(list($pxid,$mc_id,$edc,$lmp,$first_prenatal)=mysql_fetch_array($q_pregnant)){ 
    				 if(!(in_array($pxid,$arr_px_id))):
-				/*	$end_mc_date = '';
+					$q_pregseen = mysql_query("SELECT DISTINCT patient_id, mc_id, date_format(prenatal_date,'%Y-%m-%d') AS date_seen FROM m_consult_mc_prenatal WHERE patient_id ='$pxid' AND mc_id='$mc_id' AND flag_private <> 'Y' ORDER BY prenatal_date ASC LIMIT 0,1") or die ("Cannot query 813: ".mysql_error());
+					
+					if(mysql_num_rows($q_pregseen) > 0){
+						$r_preg_seen = mysql_fetch_array($q_pregseen);
+						$date_seen = $r_preg_seen['date_seen'];
+						
+						$check_date = mysql_query("SELECT DISTINCT patient_id, mc_id, date_format(prenatal_date,'%Y-%m-%d') AS date_seen FROM m_consult_mc_prenatal WHERE patient_id ='$pxid' AND mc_id='$mc_id' AND date_format(prenatal_date,'%Y-%m-%d') = '$date_seen' AND date_format(prenatal_date,'%Y-%m-%d') BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]'") or die("Cannot query date: ".mysql_error());
+						
+						if(mysql_num_rows($check_date) > 0){
+							$r_check_date = mysql_fetch_array($check_date);
+							$mc_id = $r_check_date['mc_id'];
+							$px_id = $r_check_date['patient_id'];
+						}else{
+							$mc_id = 0;
+							$pxid = 0;
+						}
+					}else{
+						$mc_id = 0;
+						$pxid = 0;
+					}
+				
+					if($px_id != 0):
+					$q_px = mysql_query("SELECT patient_id FROM m_patient WHERE patient_id='$pxid'") or die("Cannot query 806: ".mysql_error());
+						if(mysql_num_rows($q_px)!=0): 
+							array_push($pregnant_name_px[$this->get_max_month($first_prenatal)],array($pxid,'Number of Pregnant Women','mc',$first_prenatal));
+							$month_stat[$this->get_max_month($first_prenatal)]+=1;
+							array_push($arr_px_id,$pxid); 
+						endif;
 
-					if($delivery_date!='0000-00-00'): 
-						$end_mc_date = $delivery_date; 
-					else: 						
-						$end_mc_date = $edc;
 					endif;
 
-					if($end_mc_date >= $_SESSION["edate2"]):
-				*/
-
-				$q_prenatal = mysql_query("SELECT DISTINCT mc_id, prenatal_date FROM m_consult_mc_prenatal WHERE patient_id='$pxid' AND mc_id='$mc_id' AND date_format(prenatal_date,'%Y-%m-%d') < '$first_prenatal'") or die("Cannot query 814: ".mysql_error());
-
-
-						if(mysql_num_rows($q_prenatal)==0):
-
-						$q_px = mysql_query("SELECT patient_id FROM m_patient WHERE patient_id='$pxid'") or die("Cannot query 806: ".mysql_error());
-							if(mysql_num_rows($q_px)!=0): 
-								array_push($pregnant_name_px[$this->get_max_month($first_prenatal)],array($pxid,'Number of Pregnant Women','mc',$first_prenatal));
-								$month_stat[$this->get_max_month($first_prenatal)]+=1;
-								array_push($arr_px_id,$pxid); 
-							endif;
-
-						endif;
-				/*	else:
-
-					endif; */
 				endif; 
 				}
 
@@ -948,6 +970,8 @@ function get_brgy_array(){
 		return $_SESSION[brgy];
 	endif;	
 }
+
+
 
 function get_max_month($date){
 	list($taon,$buwan,$araw) = explode('-',$date);

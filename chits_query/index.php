@@ -75,8 +75,16 @@ if($_SESSION["userid"]!=""):
       echo "<tr valign='top' align='center' style=\"background-color: #666666;color: #FFFF66;text-align: left;font-weight: bold;font-size:13px;\"><td colspan='3'>DIRECTIONS:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1. Select Classification&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2. Select Queries&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3. Set the Filters&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;4. Click SUBMIT and download the REPORT</td></tr>";
 	
 	  echo "<tr valign='top' align='center' style=\"background-color: #666666;color: #FFFF66;text-align: left;font-weight: bold;font-size:13px;\"><td colspan='3'>This version includes FHSIS 2012 new indicators for maternal care, child care and family planning programs. You may access the old QB version <a href='../chits_query_2008/index.php' target='new'>here</a>.</td></tr>";
-
-      echo "<tr valign=\"top\"><td rowspan=\"2\">";
+	  
+	  echo "<tr valign='top' align='center' style=\"background-color: #666666;color: #FFFF66;text-align: left;font-weight: bold;font-size:13px;\"><td colspan='3'>To access SPASMS Data Analytics click <a href='../site/spasmsda/spasmsda.php' target='_blank'>here</a>.</td></tr>";
+      
+	  echo "<tr valign='top' align='center' style=\"background-color: #666666;color: #FFFF66;text-align: left;font-weight: bold;font-size:13px;\"><td colspan='3'>To access Monitoring and Evaluation (Statistics) click <a href='../site/me/' target='_blank'>here</a>.</td></tr>";
+	  
+	  echo "<tr valign='top' align='center' style=\"background-color: #666666;color: #FFFF66;text-align: left;font-weight: bold;font-size:13px;\"><td colspan='3'>You may access the PCB Electronic Forms <a href='../site/philhealth/index.php' target='_blank'>here</a>.</td></tr>";
+	  
+	  echo "<tr valign='top' align='center' style=\"background-color: #666666;color: #FFFF66;text-align: left;font-weight: bold;font-size:13px;\"><td colspan='3'>You may access the Family Folder Master List <a href='../site/familyfolder/familyfolder.php' target='_blank'>here</a>.</td></tr>";
+	  
+	  echo "<tr valign=\"top\"><td rowspan=\"2\">";
       //container of questions
       echo "<td>";
       $widconn->query_class($dbname2,$_SESSION[cat],$_SESSION[ques]);
@@ -100,7 +108,7 @@ if($_SESSION["userid"]!=""):
 	  //upon setting filters, set the necessary sessions here
 
 	  if($_POST[q_submit]):
-			$queryconn->clean_db();
+			//$queryconn->clean_db();
 
 	        // set the session for start date and end date
 		if($_SESSION[filter]==1):

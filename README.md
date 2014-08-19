@@ -70,16 +70,3 @@ Download a 145MB compressed Ubuntu image with chits preinstalled:
 You will also need the virtualbox configuration file:
   http://www.vdomck.org/chits_appliance.xml
 
-<<<<<<< HEAD
-=======
-# Install Method 4
-
-Alternatively, you may download the ISO file located at: 
-
-https://dl.dropboxusercontent.com/u/544609/master_emr.iso
-
-and run it over VirtualBox. 
-
-
-Disclaimer: The ISO installers are tested and simulated using Virtualbox in both Windows and Ubuntu. Any untoward incident that happened in the course of this process is the responsiblity of the end user. 
->>>>>>> 895bc9940a41c7619b4d500f02381ac7ea8613ec

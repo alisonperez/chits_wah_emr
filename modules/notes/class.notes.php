@@ -1,4 +1,5 @@
 <?
+
 class notes extends module {
 
     // Author: Herman Tolentino MD
@@ -195,7 +196,7 @@ class notes extends module {
     }
 
     // --------------- CUSTOM MODULE FUNCTIONS ------------------
-
+		
     function _consult_notes() {
     //
     // main module for notes
@@ -285,7 +286,7 @@ class notes extends module {
 				echo "</script>";
 			endif;
 		endif;
-
+		
 		$patient_id = healthcenter::get_patient_id($_GET["consult_id"]);
 		$q_consult = mysql_query("SELECT * FROM m_consult_notes a, m_consult b WHERE a.consult_id=b.consult_id AND a.patient_id='$patient_id' ORDER by b.consult_date DESC") or die("Cannot query 277: ".mysql_error());
 		
@@ -352,11 +353,6 @@ class notes extends module {
 				header("location: ".$_SERVER["PHP_SELF"]."?page=".$get_vars["page"]."&menu_id=".$get_vars["menu_id"]."&consult_id=".$get_vars["consult_id"]."&ptmenu=NOTES&module=notes&notes=$note_link&notes_id=$insert_id#menu");
             }
             break;
-		
-		case "Create Follow-up Notes":
-			$sql = "insert into m_consult_notes (consult_id, patient_id, user_id, notes_timestamp) "."values ('".$get_vars["consult_id"]."', '$patient_id', '".$_SESSION["userid"]."', sysdate())";
-		
-			break;
         case "Save Complaint":
             if ($post_vars["complaintcat"]) {
                 foreach ($post_vars["complaintcat"] as $key=>$value) {
@@ -371,17 +367,92 @@ class notes extends module {
             break;
             
         case "Save History":
+        	$pastHistory = implode(",", $post_vars["pastmedhistory"]);
+        	$familyHistory = implode(",", $post_vars["familymedhistory"]);
+        	$medintake = implode(",", $post_vars["medintake"]);
+        	$checkSQL = "select * from m_patient_history WHERE patient_id = '$patient_id'";
+        	list($month,$day,$year) = explode("/", $post_vars["lmp"]);
+        	$lmp_date = "$year-".str_pad($month,2,"0",STR_PAD_LEFT)."-".str_pad($day,2,"0",STR_PAD_LEFT); 
+        	if ($result = mysql_query($checkSQL)) {
+           		if (mysql_num_rows($result)) {
+           			$sqlPE = "update m_patient_history set consult_id='".$get_vars["consult_id"]."', user_id='".$_SESSION["userid"]."',
+           					pasthistory_id='$pastHistory', familyhistory_id='$familyHistory', medintake_id='$medintake',
+	        				menarche='".$post_vars["menarche"]."', lmp='$lmp_date', period_duration='".$post_vars["pduration"]."', cycle='".$post_vars["cycle"]."', pads_perday='".$post_vars["pads"]."',
+	        				onset_sexinter='".$post_vars["sexinter"]."', method_id='".$post_vars["controlmethod"]."', menopause='".$post_vars["menopause"]."', meno_age='".$post_vars["menopauseage"]."',
+	        				smoking='".$post_vars["smoking"]."', pack_peryear='".$post_vars["pack"]."', alcohol='".$post_vars["alcohol"]."', bottles_perday='".$post_vars["bottles"]."', ill_drugs='".$post_vars["illdrugs"]."',
+           					history_timestamp=sysdate() WHERE patient_id = '$patient_id'";
+           			$resultPE = mysql_query($sqlPE);
+           		}
+        		else {
+	        		$sqlPE = "insert into m_patient_history (consult_id, patient_id, user_id,
+	        				pasthistory_id, familyhistory_id, medintake_id,
+	        				menarche, lmp, period_duration, cycle, pads_perday,
+	        				onset_sexinter, method_id, menopause, meno_age,
+	        				smoking, pack_peryear, alcohol, bottles_perday, ill_drugs, history_timestamp) 
+	        				values ('".$get_vars["consult_id"]."', '$patient_id', '".$_SESSION["userid"]."',
+	        				'$pastHistory', '$familyHistory', '$medintake',
+	        				'".$post_vars["menarche"]."', '$lmp_date', '".$post_vars["pduration"]."', '".$post_vars["cycle"]."', '".$post_vars["pads"]."',
+	        				'".$post_vars["sexinter"]."','".$post_vars["controlmethod"]."', '".$post_vars["menopause"]."', '".$post_vars["menopauseage"]."',
+	        				'".$post_vars["smoking"]."','".$post_vars["pack"]."', '".$post_vars["alcohol"]."', '".$post_vars["bottles"]."', '".$post_vars["illdrugs"]."',
+	        				sysdate())";
+	        		$resultPE = mysql_query($sqlPE);
+        		}
+        	}
             if ($post_vars["history_text"]) {
                 $sql = "update m_consult_notes set ".
                        "notes_history = '".addslashes($post_vars["history_text"])."' ".
                        "where notes_id = '".$get_vars["notes_id"]."'";
                 if ($result = mysql_query($sql)) {
                     //header("location: ".$_SERVER["PHP_SELF"]."?page=".$get_vars["page"]."&menu_id=".$get_vars["menu_id"]."&consult_id=".$get_vars["consult_id"]."&ptmenu=NOTES&module=notes&notes=HX&notes_id=".$get_vars["notes_id"]."#menu");
-		header("location: ".$_SERVER["PHP_SELF"]."?page=".$get_vars["page"]."&menu_id=".$get_vars["menu_id"]."&consult_id=".$get_vars["consult_id"]."&ptmenu=NOTES&module=notes&notes=$note_link&notes_id=".$get_vars["notes_id"]."#menu");
+					header("location: ".$_SERVER["PHP_SELF"]."?page=".$get_vars["page"]."&menu_id=".$get_vars["menu_id"]."&consult_id=".$get_vars["consult_id"]."&ptmenu=NOTES&module=notes&notes=$note_link&notes_id=".$get_vars["notes_id"]."#menu");
                 }
             }
             break;
         case "Save PE":
+        	if ($post_vars["Skin"] || $post_vars["HEENT"] || $post_vars["Chest/Lungs"] || $post_vars["Heart"] || $post_vars["Abdomen"] || $post_vars["Extremities"])
+        	{
+        		$skin = implode(",", $post_vars["Skin"]);
+        		$heent = implode(",", $post_vars["HEENT"]);
+        		$chest = implode(",", $post_vars["Chest/Lungs"]);
+        		$heart = implode(",", $post_vars["Heart"]);
+        		$abdomen = implode(",", $post_vars["Abdomen"]);
+        		$extremities = implode(",", $post_vars["Extremities"]);
+        		
+        		$checkSQL = "select * from m_consult_notes_pe WHERE notes_id = '".$get_vars["notes_id"]."'";
+        		if ($result = mysql_query($checkSQL)) {
+           			if (mysql_num_rows($result)) {
+           				$sqlPE = "update m_consult_notes_pe set user_id='".$_SESSION["userid"]."',
+           						breast_screen='".$post_vars["breastscreen"]."', breast_remarks='".$post_vars["bcscreenRemarks"]."',
+           						skin_code='$skin', skin_remarks='".$post_vars["SkinRemarks"]."',
+           						heent_code='$heent', heent_remarks='".$post_vars["HEENTRemarks"]."',
+           						chest_code='$chest', chest_remarks='".$post_vars["Chest/LungsRemarks"]."',
+           						heart_code='$heart', heart_remarks='".$post_vars["HeartRemarks"]."',
+           						abdomen_code='$abdomen', abdomen_remarks='".$post_vars["AbdomenRemarks"]."',
+           						extremities_code='$extremities', extremities_remarks='".$post_vars["ExtremitiesRemarks"]."',
+           						pe_timestamp=sysdate() WHERE notes_id = '".$get_vars["notes_id"]."'";
+           				$resultPE = mysql_query($sqlPE);
+           			}
+        			else {
+	        			$sqlPE = "insert into m_consult_notes_pe (patient_id, notes_id, consult_id, user_id,
+	        				breast_screen, breast_remarks,
+	        				skin_code, skin_remarks, heent_code, heent_remarks,
+	        				chest_code, chest_remarks, heart_code, heart_remarks,
+	        				abdomen_code, abdomen_remarks, extremities_code, extremities_remarks,
+	        				pe_timestamp) values ('$patient_id', '".$get_vars["notes_id"]."', '".$get_vars["consult_id"]."', '".$_SESSION["userid"]."',
+	        				'".$post_vars["breastscreen"]."', '".$post_vars["bcscreenRemarks"]."',
+	        				'$skin', '".$post_vars["SkinRemarks"]."',
+	        				'$heent', '".$post_vars["HEENTRemarks"]."',
+	        				'$chest','".$post_vars["Chest/LungsRemarks"]."',
+	        				'$heart','".$post_vars["HeartRemarks"]."',
+	        				'$abdomen','".$post_vars["AbdomenRemarks"]."',
+	        				'$extremities','".$post_vars["ExtremitiesRemarks"]."',
+	        				sysdate())";
+	        			$resultPE = mysql_query($sqlPE);
+        			}
+        		}
+        		        		
+        	}
+        	
             if ($post_vars["pe_text"]) {
                 $sql = "update m_consult_notes set ".
                        "notes_physicalexam = '".addslashes($post_vars["pe_text"])."' ".
@@ -421,7 +492,36 @@ class notes extends module {
                 }
 				
             break;
+            
+        case "Add Surgical History":
+            	list($month,$day,$year) = explode("/", $post_vars["surgicaldate"]);
+        		$date = "$year-".str_pad($month,2,"0",STR_PAD_LEFT)."-".str_pad($day,2,"0",STR_PAD_LEFT);
+        		if($post_vars["surgicalname"]!=null && $post_vars["surgicaldate"]!=null)
+        		{
+	        		$sqlPE = "insert into m_patient_history_surgical (notes_id, consult_id, patient_id, user_id,
+		        				operation, operation_date, operation_timestamp) 
+		        				values ('".$get_vars["notes_id"]."', '".$get_vars["consult_id"]."', '$patient_id', '".$_SESSION["userid"]."',
+		        				'".$post_vars["surgicalname"]."', '$date',
+		        				sysdate())";
+		        	$resultPE = mysql_query($sqlPE);
+        		}
+        		break;
+	    
+	    case "Update Surgical History":
+            	list($month,$day,$year) = explode("/", $post_vars["surgicaldate"]);
+        		$date = "$year-".str_pad($month,2,"0",STR_PAD_LEFT)."-".str_pad($day,2,"0",STR_PAD_LEFT);
+        		if($post_vars["surgicalname"]!=null && $post_vars["surgicaldate"]!=null)
+        		{
+	        		$sqlPE = "update m_patient_history_surgical set notes_id='".$get_vars["notes_id"]."', consult_id='".$get_vars["consult_id"]."',
+	        					patient_id='$patient_id', user_id='".$_SESSION["userid"]."', operation='".$post_vars["surgicalname"]."', 
+	        					operation_date='$date', operation_timestamp=sysdate() WHERE record_id='".$post_vars["recordID"]."'";
+		       	 	$resultPE = mysql_query($sqlPE);
+        		}
+	        	break;
+	        
         } 
+        
+       	
     }
 
     function form_consult_notes() {
@@ -462,37 +562,9 @@ class notes extends module {
 		else:
 			echo "<font color='red' size='2'>Please click the consult date on the right to <br> view details of notes.</font>";
 		endif;
-		
-		notes::form_follow_up();
+
+
     }
-
-	function form_follow_up(){
-
-		$pxid = healthcenter::get_patient_id($_GET["consult_id"]);
-
-		$q_diagnosis = mysql_query("SELECT b.notes_id,a.consult_id, date_format(a.consult_date,'%Y-%m-%d'), d.class_name FROM m_consult a,m_consult_notes b, m_consult_notes_dxclass c, m_lib_notes_dxclass d WHERE a.patient_id='$pxid' AND a.consult_id=c.consult_id AND b.notes_id=c.notes_id AND c.class_id=d.class_id ORDER by a.consult_date ") or die("Cannot query 463: ".mysql_error());
-
-		if(mysql_num_rows($q_diagnosis)!=0):
-			echo 'OR Select a previous diagnosis for FOLLOW-UP consult';
-
-			echo "<table>";
-		
-			echo "<form action='#notes_form' method='POST' name='form_followup'>";
-			while(list($notes_id,$consult_id,$consult_date,$diagnosis)=mysql_fetch_array($q_diagnosis)){
-				//echo "<a href='$_SERVER[PHP_SELF]?page=$_GET[page]&menu_id=$_GET[menu_id]&consult_id=$consult_id&ptmenu=$_GET[ptmenu]&module=$_GET[module]&notes=$_GET[notes]&notes_id=$notes_id'>$diagnosis [$consult_date]</a>";
-				echo "<tr><td>";
-				echo "<input type='radio' name='past_dx' value='$notes_id-$consult_id'>$diagnosis [$consult_date]</input>";
-				echo "</td></tr>";
-			}
-			echo "<tr><td>";
-			echo "<input type='submit' name='submitnotes' value='Create Follow-up Notes' class='textbox' style='border: 1px solid black'/>";
-			echo "</td></tr>";
-			echo "</form>";
-			echo "</table>";
-		else: 
-
-		endif;
-	}
 
     function form_consult_complaint() {
     //
@@ -547,14 +619,69 @@ class notes extends module {
             $isadmin = $arg_list[4];
             //print_r($arg_list);
         }
+        
+        $patient_id = healthcenter::get_patient_id($get_vars["consult_id"]);
+        
         $sql = "select notes_history from m_consult_notes where notes_id = '".$get_vars["notes_id"]."'";
         if ($result = mysql_query($sql)) {
             if (mysql_num_rows($result)) {
                 list($history) = mysql_fetch_array($result);
             }
         }
+                
+    	$checkSQL = "select pasthistory_id, familyhistory_id, medintake_id,
+	        		menarche, date_format(lmp,'%m/%d/%Y'), period_duration, cycle, pads_perday,
+	        		onset_sexinter, method_id, menopause, meno_age,
+	        		smoking, pack_peryear, alcohol, bottles_perday, ill_drugs
+	        		from m_patient_history where patient_id = '$patient_id'";
+    	if ($checkResult = mysql_query($checkSQL)) {
+            if (mysql_num_rows($checkResult)) {
+                list($pasthistory_id, $familyhistory_id, $medintake_id,
+	        		$menarche, $lmp, $period_duration, $cycle, $pads_perday,
+	        		$onset_sexinter, $method_id, $menopause, $meno_age,
+	        		$smoking, $pack_peryear, $alcohol, $bottles_perday, $ill_drugs) = mysql_fetch_array($checkResult);
+            }
+            /*else {
+            	$checkSQL = "SELECT date_format(patient_lmp,'%m/%d/%Y') FROM m_patient_mc WHERE patient_id='$patient_id' ORDER by patient_lmp DESC LIMIT 1";
+		    	if ($checkResult = mysql_query($checkSQL)) {
+		            if (mysql_num_rows($checkResult)) {
+		            	list($lmp) = mysql_fetch_array($checkResult);
+		            }
+		        }
+		    }*/
+        }
+        
+        print "<script type='text/javascript' src='../js/script/jquery-1.10.2.min.js'></script>";
+      	print " <script>
+					$(document).ready(function(){
+						$(function(){
+						    $('.header').nextUntil('tr.header').hide();
+						    $('.header').find('span.clickable').html('+');
+		
+		
+						$('.header').click(function(){
+						   $(this).find('span.clickable').text(function(_, value){return value=='-'?'+':'-'});
+						    $(this).nextUntil('tr#end').slideToggle(100, function(){
+						    });
+						});
+						    
+						});
+					});
+				</script>";
+      	
+      	print "<style type='text/css'>
+					tr#end.header.nopointer td:first-child
+					{
+						cursor:default;
+					}
+			    	tr.header td:first-child, tr.alertheader td:first-child
+					{
+					    cursor:pointer;
+					}
+				</style>";
+      	
         print "<a name='history_form'>";
-        print "<table width='300'>";
+        print "<table width='350px'>";
         print "<form method='post' action='#history_form' name='form_history'>";
         print "<tr><td>";
         print "<b>".FTITLE_CONSULT_HISTORY_FORM."</b><br/>";
@@ -563,7 +690,72 @@ class notes extends module {
         print "<span class='boxtitle'>".LBL_NOTES_ID."</span><br/>";
         print "<font color='red'>".module::pad_zero($get_vars["notes_id"],7)."</font><br/>";
         print "<br/></td></tr>";
+        
+        print "<tr id='end' class='header'><td>";
+        print "<span class='clickable'>-</span> <span class='boxtitle'>PAST MEDICAL HISTORY</span><br/></td></tr>";
         print "<tr><td>";
+        print notes::checkbox_medical_history('past',$pasthistory_id);
+        print "<br/><hr></hr><br/></td></tr>";
+                
+        print "<tr id='end' class='header'><td>";
+        print "<span class='clickable'>-</span> <span class='boxtitle'>FAMILY HISTORY</span><br/></td></tr>";
+        print "<tr><td>";
+        print notes::checkbox_medical_history('family',$familyhistory_id);
+        print "<br/><hr></hr><br/></td></tr>";
+        
+        print "<tr id='end' class='header'><td>";
+        print "<span class='clickable'>-</span> <span class='boxtitle'>MEDICINE INTAKE HISTORY</span><br/></td></tr>";
+        print "<tr><td>";
+        print notes::checkbox_medicine_history($medintake_id);
+        print "<br/><hr></hr><br/></td></tr>";
+                
+        //get menstrual history
+        print notes::get_menstrual_history($menarche, $lmp, $period_duration, $cycle, $pads_perday,$onset_sexinter, $method_id, $menopause, $meno_age);
+        
+        print "<tr id='end' class='header'><td>";
+        print "<span class='clickable'>-</span> <span class='boxtitle'>PERSONAL/SOCIAL HISTORY</span><br/></td></tr>";
+		print "<tr><td>";
+        print "<span style='width: 80px; display:inline-block;'>Smoking: </span>";
+        print "<select name='smoking'>";
+        	print "<option value=''>-Select-</option>";
+        	print "<option value='Y' ".($smoking=='Y'?'selected':'').">Yes</option>";
+        	print "<option value='N' ".($smoking=='N'?'selected':'').">No</option>";
+        	print "<option value='Q' ".($smoking=='Q'?'selected':'').">Quit</option>";
+        print "</select>";
+        print " <span style='width: 130px; display:inline-block;'>No. of Pack/Year: </span>";
+        print "<input type='text' name='pack' style='width:50px;' value='".($smoking=='N'? '0' : $pack_peryear)."'>";
+        print "<span style='width: 80px; display:inline-block;'>Alcohol: </span>";
+        print "<select name='alcohol'>";
+        	print "<option value=''>-Select-</option>";
+        	print "<option value='Y' ".($alcohol=='Y'?'selected':'').">Yes</option>";
+        	print "<option value='N' ".($alcohol=='N'?'selected':'').">No</option>";
+        	print "<option value='Q' ".($alcohol=='Q'?'selected':'').">Quit</option>";
+        print "</select>";
+        print " <span style='width: 130px; display:inline-block;'>No. of Bottles/Day: </span>";
+        print "<input type='text' name='bottles' style='width:50px;' value='".($alcohol=='N'? '0' : $bottles_perday)."'>";
+        print "<span style='width: 80px; display:inline-block;'>Illicit drugs: </span>";
+        print "<select name='illdrugs'>";
+        	print "<option value=''>-Select-</option>";
+        	print "<option value='Y' ".($ill_drugs=='Y'?'selected':'').">Yes</option>";
+        	print "<option value='N' ".($ill_drugs=='N'?'selected':'').">No</option>";
+        	print "<option value='Q' ".($ill_drugs=='Q'?'selected':'').">Quit</option>";
+        print "</select>";
+        print "<br/><br/><hr></hr><br/></td></tr>";
+        
+        print "<tr id='end' class='header'><td id='surgical'>";
+        print "<span class='clickable'>-</span> <span class='boxtitle'>SURGICAL HISTORY</span><br/></tr>";
+        print notes::get_surgical_history();
+        //print "<input type='text' name='surgicalname[]' placeholder='Operation'>";
+        //print "<input type='text' size='7' value='' name='surgicaldate'>";
+        //print "<a href=\"javascript:show_calendar4('document.form_history.surgicaldate', document.form_history.surgicaldate.value);\"><img src='../images/cal.gif' width='16' height='16' border='0' alt='Click Here to Pick up the date'></a>";
+        //print notes::_calendar();
+        
+        
+        /*print "<tr><td>";
+        print "<input type='button' value='Add Surgical History' onclick='addSurgical();'>";
+        print "<br/><br/></td></tr>";*/
+        
+        print "<tr id='end' class='header nopointer'><td><br/>";
         print "<span class='boxtitle'>".LBL_HISTORY_TEMPLATE."</span><br/>";
         notes::show_templates("HX", $post_vars["template"]);
         if ($post_vars["template"]) {
@@ -582,11 +774,11 @@ class notes extends module {
             $history = $post_vars["history_text"].$post_vars["template_text"];
         }
         print "<br/></td></tr>";
-        print "<tr><td>";
+        print "<tr id='end' class='header nopointer'><td>";
         print "<span class='boxtitle'>".LBL_NOTES_HISTORY."</span><br> ";
         print "<textarea rows='15' cols='40' class='tinylight' name='history_text' style='border: 1px solid black'>".($history?$history:$post_vars["history_text"])."</textarea>";
         print "<br/></td></tr>";
-        print "<tr><td>";
+        print "<tr id='end' class='header nopointer'><td>";
         print "<input type='submit' name='submitnotes' value='Save History' class='textbox' style='border: 1px solid black'/> ";
         print "<br/></td></tr>";
         print "</form>";
@@ -603,12 +795,57 @@ class notes extends module {
             $isadmin = $arg_list[4];
             //print_r($arg_list);
         }
+        
+        $patient_id = healthcenter::get_patient_id($get_vars["consult_id"]);
+        
         $sql = "select notes_physicalexam from m_consult_notes where notes_id = '".$get_vars["notes_id"]."'";
         if ($result = mysql_query($sql)) {
             if (mysql_num_rows($result)) {
                 list($pe) = mysql_fetch_array($result);
             }
         }
+        
+        $checkSQL = "select breast_screen,breast_remarks,skin_code, skin_remarks, heent_code, heent_remarks,
+	        		chest_code, chest_remarks, heart_code, heart_remarks,
+	        		abdomen_code, abdomen_remarks, extremities_code, extremities_remarks
+	        		from m_consult_notes_pe where notes_id = '".$get_vars["notes_id"]."'";
+    	if ($checkResult = mysql_query($checkSQL)) {
+            if (mysql_num_rows($checkResult)) {
+                list($breast_screen,$breast_remarks,$skin_code, $skin_remarks, $heent_code, $heent_remarks,
+	        		$chest_code, $chest_remarks, $heart_code, $heart_remarks,
+	        		$abdomen_code, $abdomen_remarks, $extremities_code, $extremities_remarks) = mysql_fetch_array($checkResult);
+            }
+        }
+        
+        print "<script type='text/javascript' src='../js/script/jquery-1.10.2.min.js'></script>";
+      	print " <script>
+					$(document).ready(function(){
+						$(function(){
+						    $('.header').nextUntil('tr.header').hide();
+						    $('.header').find('span.clickable').html('+');
+		
+		
+						$('.header').click(function(){
+						   $(this).find('span.clickable').text(function(_, value){return value=='-'?'+':'-'});
+						    $(this).nextUntil('tr#end').slideToggle(100, function(){
+						    });
+						});
+						    
+						});
+					});
+				</script>";
+      	
+      	print "<style type='text/css'>
+					tr#end.header.nopointer td:first-child
+					{
+						cursor:default;
+					}
+			    	tr.header td:first-child, tr.alertheader td:first-child
+					{
+					    cursor:pointer;
+					}
+				</style>";
+      	
         print "<a name='pe_form'>";
         print "<table width='300'>";
         print "<form method='post' action='#pe_form' name='form_pe'>";
@@ -619,7 +856,47 @@ class notes extends module {
         print "<span class='boxtitle'>".LBL_NOTES_ID."</span><br/>";
         print "<font color='red'>".module::pad_zero($get_vars["notes_id"],7)."</font><br/>";
         print "<br/></td></tr>";
+               
+        print "<tr id='end' class='header'><td>";
+        print "<span class='clickable'>-</span> <span class='boxtitle'>Skin</span><br/></td></tr>";
         print "<tr><td>";
+        print notes::checkbox_pe('Skin',$skin_code,$skin_remarks);
+        print "<br/></td></tr>";
+        
+        print "<tr id='end' class='header'><td>";
+        print "<span class='clickable'>-</span> <span class='boxtitle'>HEENT</span><br/></td></tr>";
+        print "<tr><td>";
+        print notes::checkbox_pe('HEENT',$heent_code,$heent_remarks);
+        print "<br/></td></tr>";
+        
+        print "<tr id='end' class='header'><td>";
+        print "<span class='clickable'>-</span> <span class='boxtitle'>Chest/Lungs</span><br/></td></tr>";
+        print "<tr><td>";
+        print notes::checkbox_pe('Chest/Lungs',$chest_code,$chest_remarks);
+        print "<br/></td></tr>";
+        
+        print "<tr id='end' class='header'><td>";
+        print "<span class='clickable'>-</span> <span class='boxtitle'>Heart</span><br/></td></tr>";
+        print "<tr><td>";
+        print notes::checkbox_pe('Heart',$heart_code,$heart_remarks);
+        print "<br/></td></tr>";
+        
+        print "<tr id='end' class='header'><td>";
+        print "<span class='clickable'>-</span> <span class='boxtitle'>Abdomen</span><br/></td></tr>";
+        print "<tr><td>";
+        print notes::checkbox_pe('Abdomen',$abdomen_code,$abdomen_remarks);
+        print "<br/></td></tr>";
+        
+        print "<tr id='end' class='header'><td>";
+        print "<span class='clickable'>-</span> <span class='boxtitle'>Extremities</span><br/></td></tr>";
+		print "<tr><td>";
+        print notes::checkbox_pe('Extremities',$extremities_code,$extremities_remarks);
+        print "<br/></td></tr><tr id='end' class='header nopointer'><td><br/></td></tr>";
+        
+        //breastcancerscreen
+        print notes::dropdown_breastcancerscreen($breast_screen,$breast_remarks);
+        
+        print "<tr id='end' class='header nopointer'><td><br/>";
         print "<span class='boxtitle'>".LBL_PE_TEMPLATE."</span><br/>";
         notes::show_templates("PE", $post_vars["template"]);
         if ($post_vars["template"]) {
@@ -638,11 +915,11 @@ class notes extends module {
             $pe = $post_vars["pe_text"].$post_vars["template_text"];
         }
         print "<br/></td></tr>";
-        print "<tr><td>";
+        print "<tr id='end' class='header nopointer'><td>";
         print "<span class='boxtitle'>".LBL_NOTES_PE."</span><br> ";
         print "<textarea rows='15' cols='40' class='tinylight' name='pe_text' style='border: 1px solid black'>".($pe?$pe:$post_vars["pe_text"])."</textarea>";
         print "<br/></td></tr>";
-        print "<tr><td>";
+        print "<tr id='end' class='header nopointer'><td>";
         print "<input type='submit' name='submitnotes' value='Save PE' class='textbox' style='border: 1px solid black'/> ";
         print "<br/></td></tr>";
         print "</form>";
@@ -936,7 +1213,7 @@ class notes extends module {
                 print "<b>DATE/TIME:</b> ".$notes["ts"]."<br/>";					
                 print "<b>TAKEN BY:</b> ".user::get_username($notes["user_id"])."<br/>";
                 print "<br><b>VITAL SIGNS:</b><br>".$this->get_vitals($_GET["consult_id"])."<br/>";
-		print "<b>WEIGHT FOR AGE (0-6 yo):</b>".$class."<br/>";
+				print "<b>WEIGHT FOR AGE (0-6 yo):</b>".$class."<br/>";
                 print "<hr size='1'/>";
                 print "<b>COMPLAINTS:</b><br/>";
                 notes::show_complaints($menu_id, $post_vars, $get_vars);
@@ -945,26 +1222,39 @@ class notes extends module {
                 print $this->get_consult_note($get_vars["consult_id"]);
                 print "<hr size='1'/>";
                 print "<b>HISTORY:</b><br/>";
-                if (strlen($notes["notes_history"])>0) {
-                    print stripslashes(nl2br($notes["notes_history"]))."<br/>";
+                if (strlen($notes["notes_physicalexam"])>0 || notes::get_history_list()) {
+                	print notes::get_history_list();
+                	if (strlen($notes["notes_history"])>0) {
+                		print "<b>Notes:</b><br/>";
+                    	print stripslashes(nl2br($notes["notes_history"]))."<br/>";
+                	}
                     if ($_SESSION["priv_update"]) {
                         print "<br/>";
                         print "<input type='submit' name='submitdetail' value='Update History' class='tinylight' style='border: 1px solid black'";
                     }
-                } else {
+                } 
+                else {
                     print "<font color='red'>No recorded history.</font><br/>";
                 }
+                
                 print "<br><br><hr size='1'/>";
                 print "<b>PHYSICAL EXAM:</b><br/>";
-                if (strlen($notes["notes_physicalexam"])>0) {
-                    print stripslashes(nl2br($notes["notes_physicalexam"]))."<br/>";
+               
+                if (strlen($notes["notes_physicalexam"])>0 || notes::get_pe_list($notes["notes_id"])) {
+                	print notes::get_pe_list($notes["notes_id"]);
+                	if (strlen($notes["notes_physicalexam"])>0) {
+               			print "<b>PE Notes:</b><br/>";
+               			print stripslashes(nl2br($notes["notes_physicalexam"]))."<br/>";
+                	}
                     if ($_SESSION["priv_update"]) {
                         print "<br/>";
                         print "<input type='submit' name='submitdetail' value='Update PE' class='tinylight' style='border: 1px solid black'";
                     }
-                } else {
+                }
+                else {
                     print "<font color='red'>No recorded PE.</font><br/>";
                 }
+                
                 print "<br><br><hr size='1'>";
                 print "<b>DIAGNOSIS:</b><br/>";
                 notes::show_diagnosis($menu_id, $post_vars, $get_vars);
@@ -1059,7 +1349,7 @@ class notes extends module {
 			
 			list($r_date) = mysql_fetch_array($q_date);
 			
-			echo "<span class='tinylight'>ACTUAL CONSULT DATE&nbsp;<input type='text' size='7' value='$r_date' name='txt_consult_date' readonly></input></span>";
+			echo "<span class='tinylight'>ACTUAL CONSULT DATE&nbsp;<input type='text' size='8' value='$r_date' name='txt_consult_date'></input></span>";
 			
 			echo "&nbsp;<a href=\"javascript:show_calendar4('document.form_consult_date.txt_consult_date', document.form_consult_date.txt_consult_date.value);\"><img src='../images/cal.gif' width='16' height='16' border='0' alt='Click Here to Pick up the date'></a>";
 
@@ -1603,7 +1893,7 @@ class notes extends module {
 	}
 
 	
-	function form_tx_sickchild(){
+function form_tx_sickchild(){
 		if(func_num_args()>0):
 			$arg_list = func_get_args();
 			$menu_id = $arg_list[0];
@@ -1622,8 +1912,8 @@ class notes extends module {
 
 		if(mysql_num_rows($q_px)!=0):
 
-			$arr_diag_vit = array('measles','severe pneumonia','diarrhea','malnutrition','xerophthalmia','night blindness','bitot','corneal xerosis','corneal ulcerations','keratomalacia');
-			$arr_diag_marker = array(0,0,0,0,0,0,0,0,0,0);
+			$arr_diag_vit = array('measles','severe pneumonia','diarrhea','malnutrition','xerophthalmia','night blindness','bitot','corneal xerosis','corneal ulcerations','keratomalacia','age');
+			$arr_diag_marker = array(0,0,0,0,0,0,0,0,0,0,0);
 
 			for($a=0;$a<count($arr_diag_vit);$a++){ 
 				$q_sakit = "SELECT a.notes_id FROm m_consult_notes_dxclass a,m_lib_notes_dxclass b WHERE a.notes_id='$get_vars[notes_id]' AND a.class_id=b.class_id";
@@ -1631,6 +1921,10 @@ class notes extends module {
 				$arr_sakit = explode(" ",$arr_diag_vit[$a]);
 				
 				for($b=0;$b<count($arr_sakit);$b++){
+					if ($arr_sakit[$b]=='age'){
+						$q_sakit .= " AND b.icd10 = 'A09'";
+					}
+					else
 					$q_sakit .= " AND b.class_name LIKE '%$arr_sakit[$b]%'";
 				}
 				
@@ -1644,15 +1938,27 @@ class notes extends module {
 
 			$this->disp_vita_supplementation($menu_id,$post_vars,$get_vars,$validuser,$isadmin,$arr_diag_marker);
 
-			$arr_diag = array('anemia','diarrhea','pneumonia');
-
+			$arr_diag = array('anemia','diarrhea','pneumonia', 'age');
+			$count = 0;
 			for($i=0;$i<count($arr_diag);$i++){
-				$q_px = mysql_query("SELECT a.notes_id FROM m_consult_notes_dxclass a,m_lib_notes_dxclass b WHERE a.notes_id='$get_vars[notes_id]' AND a.class_id=b.class_id AND b.class_name LIKE '%$arr_diag[$i]%'") or die("cannot query: 1340");
+				$q = "SELECT a.notes_id FROM m_consult_notes_dxclass a,m_lib_notes_dxclass b WHERE a.notes_id='$get_vars[notes_id]' AND a.class_id=b.class_id ";
+				if ($arr_diag[$i]=='age'){
+					$q .= " AND b.icd10 = 'A09'";
+				}
+				else {
+					$q .= " AND b.class_name LIKE '%$arr_diag[$i]%'";
+				}
+				
+				$q_px = mysql_query($q) or die("cannot query: 1340");
 				
 				if(mysql_num_rows($q_px)!=0):
-					$this->disp_form_diag($menu_id,$post_vars,$get_vars,$validuser,$isadmin,$arr_diag[$i]);
+					$count++;
+					if($count==1) {
+						$this->disp_form_diag($menu_id,$post_vars,$get_vars,$validuser,$isadmin,$arr_diag[$i]);
+					}
 				endif;
 			}
+			
 		endif;
 						
 	}
@@ -1694,7 +2000,7 @@ class notes extends module {
 			echo "<span class='boxtitle'>VITAMIN A SUPPLEMENTATION</span>";
 			echo "<table>";
 			
-			echo "<tr><td class='tinylight'><b>DATE VIT A WAS GIVEN</b></td><td><input type='text' size='7' name='txt_vita' value='$vitadate'></input>";
+			echo "<tr><td class='tinylight'><b>DATE VIT A WAS GIVEN</b></td><td><input type='text' size='8' name='txt_vita' value='$vitadate'></input>";
 			echo "&nbsp;<a href=\"javascript:show_calendar4('document.form_vita.txt_vita', document.form_vita.txt_vita.value);\"><img src='../images/cal.gif' width='16' height='16' border='0' alt='Click Here to Pick up the date'></a>";
 			echo "<td></tr>";
 				
@@ -1752,12 +2058,12 @@ class notes extends module {
 				echo "<span class='boxtitle'>ANEMIC CHILDREN GIVEN IRON SUPPLEMENTATION</span>";
 				echo "<table>";
 				
-				echo "<tr><td class='tinylight'><b>DATE STARTED</b></td><td><input type='text' size='7' name='txt_iron_started' value='$anemia_sdate'></input>";
+				echo "<tr><td class='tinylight'><b>DATE STARTED</b></td><td><input type='text' size='8' name='txt_iron_started' value='$anemia_sdate'></input>";
 				echo "&nbsp;<a href=\"javascript:show_calendar4('document.form_anemia.txt_iron_started', document.form_anemia.txt_iron_started.value);\"><img src='../images/cal.gif' width='16' height='16' border='0' alt='Click Here to Pick up the date'></a>";
 				echo "<td></tr>";
 
 				
-				echo "<tr><td class='tinylight'><b>DATE COMPLETED</b></td><td><input type='text' size='7' name='txt_iron_completed' value='$anemia_cdate'></input>";
+				echo "<tr><td class='tinylight'><b>DATE COMPLETED</b></td><td><input type='text' size='8' name='txt_iron_completed' value='$anemia_cdate'></input>";
 				echo "&nbsp;<a href=\"javascript:show_calendar4('document.form_anemia.txt_iron_completed', document.form_anemia.txt_iron_completed.value);\"><img src='../images/cal.gif' width='16' height='16' border='0' alt='Click Here to Pick up the date'></a>";
 				echo "<td></tr>";
 
@@ -1771,7 +2077,7 @@ class notes extends module {
 				echo "</form>";
 				break;
 
-			case "diarrhea":
+			case "diarrhea" || "age":
 				if($post_vars["submit_diagdetails"]=="Save Diarrhea Tx Info"):		
 					$ort = (!empty($post_vars["date_ort_given"]))?$this->convert_date($post_vars["date_ort_given"]):'0000-00-00';
 					$ors = (!empty($post_vars["date_ors_given"]))?$this->convert_date($post_vars["date_ors_given"]):'0000-00-00';
@@ -1797,18 +2103,18 @@ class notes extends module {
 				$date_orswz = ($date_orswz!='0000-00-00')?$this->convert_date_cal($date_orswz):'';							
 
 				echo "<form method='post' name='form_diarrhea'>";
-				echo "<span class='boxtitle'>DIARRHEA TREAMENT INFORMATION</span>";
+				echo "<span class='boxtitle'>DIARRHEA TREATMENT INFORMATION</span>";
 				echo "<table>";
 
-				echo "<tr><td class='tinylight'><b>DATE ORT WAS GIVEN</b></td><td><input type='text' size='11' name='date_ort_given' value='$date_ort'></input>";				
+				echo "<tr><td class='tinylight'><b>DATE ORT WAS GIVEN</b></td><td><input type='text' size='8' name='date_ort_given' value='$date_ort'></input>";				
 				echo "&nbsp;<a href=\"javascript:show_calendar4('document.form_diarrhea.date_ort_given', document.form_diarrhea.date_ort_given.value);\"><img src='../images/cal.gif' width='16' height='16' border='0' alt='Click Here to Pick up the date'></a>";								
 				echo "</td></tr>";
 
-				echo "<tr><td class='tinylight'><b>DATE ORS WAS GIVEN</b></td><td><input type='text' size='11' name='date_ors_given' value='$date_ors'></input>";
+				echo "<tr><td class='tinylight'><b>DATE ORS WAS GIVEN</b></td><td><input type='text' size='8' name='date_ors_given' value='$date_ors'></input>";
 				echo "&nbsp;<a href=\"javascript:show_calendar4('document.form_diarrhea.date_ors_given', document.form_diarrhea.date_ors_given.value);\"><img src='../images/cal.gif' width='16' height='16' border='0' alt='Click Here to Pick up the date'></a>";								
 				echo "</td></tr>";
 
-				echo "<tr><td class='tinylight'><b>DATE ORS WITH ZINC WAS GIVEN</b></td><td><input type='text' size='11' name='date_orswz_given' value='$date_orswz'></input>";
+				echo "<tr><td class='tinylight'><b>DATE ORS WITH ZINC WAS GIVEN</b></td><td><input type='text' size='8' name='date_orswz_given' value='$date_orswz'></input>";
 				echo "&nbsp;<a href=\"javascript:show_calendar4('document.form_diarrhea.date_orswz_given', document.form_diarrhea.date_orswz_given.value);\"><img src='../images/cal.gif' width='16' height='16' border='0' alt='Click Here to Pick up the date'></a>";
 				echo "</td></tr>";
 				
@@ -1843,7 +2149,7 @@ class notes extends module {
 				
 				echo "<span class='boxtitle'>PNEUMONIA TREATMENT INFORMATION</span>";
 				echo "<table>";
-				echo "<tr><td class='tinylight'><b>DATE TREATMENT GIVEN</b></td><td><input type='text' size='7' name='date_pneu_given' value='$pneu_date'></input>";
+				echo "<tr><td class='tinylight'><b>DATE TREATMENT GIVEN</b></td><td><input type='text' size='8' name='date_pneu_given' value='$pneu_date'></input>";
 				echo "&nbsp;<a href=\"javascript:show_calendar4('document.form_pneumonia.date_pneu_given', document.form_pneumonia.date_pneu_given.value);\"><img src='../images/cal.gif' width='16' height='16' border='0' alt='Click Here to Pick up the date'></a>";								
 				echo "</td></tr>";
 				
@@ -1856,10 +2162,6 @@ class notes extends module {
 			default:
 				break;		
 		}
-
-
-
-	
 	}
 
 	function get_age_diff(){
@@ -1966,12 +2268,12 @@ class notes extends module {
             $consult_id = $arg_list[0];
         endif;
         
-        $q_vitals = mysql_query("SELECT vitals_weight,vitals_temp,vitals_systolic,vitals_diastolic,vitals_heartrate,vitals_resprate,vitals_height,vitals_pulse FROM m_consult_vitals WHERE consult_id='$consult_id'") or die("Cannot query: 1696 ".mysql_error());
+        $q_vitals = mysql_query("SELECT vitals_weight,vitals_temp,vitals_systolic,vitals_diastolic,vitals_heartrate,vitals_resprate,vitals_height,vitals_pulse,vitals_waist FROM m_consult_vitals WHERE consult_id='$consult_id'") or die("Cannot query: 1696 ".mysql_error());
         
         if(mysql_num_rows($q_vitals)!=0):
 
-            list($wt,$temp,$systolic,$diastolic,$heart,$resprate,$ht,$pulse) = mysql_fetch_array($q_vitals);
-            $str_vitals = "<b>WT:</b> ".$wt." kg, <b>TEMP:</b> ".$temp.", <b>BP:</b> ".$systolic."/".$diastolic.", <b>HR:</b> ".$heart.", <b>RR:</b> ".$resprate.", <b>PR:</b> ".$pulse.", <b>HT:</b> ".$ht." cm";
+            list($wt,$temp,$systolic,$diastolic,$heart,$resprate,$ht,$pulse,$waist) = mysql_fetch_array($q_vitals);
+            $str_vitals = "<b>WT:</b> ".$wt." kg, <b>TEMP:</b> ".$temp.", <b>BP:</b> ".$systolic."/".$diastolic.", <b>HR:</b> ".$heart.", <b>RR:</b> ".$resprate.", <b>PR:</b> ".$pulse.", <b>HT:</b> ".$ht." cm, <b>WC:</b> ".$waist." cm";
 
 	    $this->compute_bmi($ht,$wt);
         else:
@@ -2096,6 +2398,625 @@ class notes extends module {
 
 
 	}
+	
+	function checkbox_medical_history() {
+        if (func_num_args()>0) {
+            $arg_list = func_get_args();
+            $history_type = $arg_list[0];
+            $history_code = $arg_list[1];
+        }
+        $sql = "select history_id, history_name ".
+               "from m_lib_medical_history ";
+        
+        $arrCode = explode(',', $history_code);
+               
+        if ($result = mysql_query($sql)) {
+            if (mysql_num_rows($result)) {
+                while (list($id, $name) = mysql_fetch_array($result)) {
+                	if($history_type=='past')
+                	{
+                		if($history_code)
+                		{
+                			$x = 0;
+                			foreach ($arrCode as $key => $value)
+                			{
+	                			if($value == $id)
+	                			{	
+	                				$x++;
+                    				$ret_val .= "<input type='checkbox' name='pastmedhistory[]' value='$id' ".($value==$id ? 'checked' : '')."> $name<br>";
+	                			}
+                			}
+                			if ($x==0) 
+                			{
+                				$ret_val .= "<input type='checkbox' name='pastmedhistory[]' value='$id'> $name<br>";
+	                		}
+                		}
+                		else {
+                			$ret_val .= "<input type='checkbox' name='pastmedhistory[]' value='$id'> $name<br>";
+                		}
+                	}
+                	elseif($history_type=='family')
+                	{
+                		if($history_code)
+                		{
+                			$x = 0;
+                			foreach ($arrCode as $key => $value)
+                			{
+	                			if($value == $id)
+	                			{	
+	                				$x++;
+                    				$ret_val .= "<input type='checkbox' name='familymedhistory[]' value='$id' ".($value==$id ? 'checked' : '')."> $name<br>";
+	                			}
+                			}
+                			if ($x==0) 
+                			{
+                				$ret_val .= "<input type='checkbox' name='familymedhistory[]' value='$id'> $name<br>";
+	                		}
+                		}
+                		else {
+                			$ret_val .= "<input type='checkbox' name='familymedhistory[]' value='$id'> $name<br>";
+                		}
+                	}
+                }
+            } else {
+                $ret_val .= "<font color='red'>No medical history codes in library.</font><br/>";
+            }
+            return $ret_val;
+        }
+    }
+    
+	function checkbox_medicine_history() {
+        if (func_num_args()>0) {
+            $arg_list = func_get_args();
+            $history_code = $arg_list[0];
+        }
+        $arrCode = explode(',', $history_code);
+        if($history_code)
+        {
+        	$x = 0;
+	        foreach ($arrCode as $key => $value)
+	        {
+	        	if($value == 'ORALHYPO')
+	            {
+	        		$x++;
+	       			$ret_val .= "<input type='checkbox' name='medintake[]' value='ORALHYPO' ".($value=='ORALHYPO' ? 'checked' : '')."> Intake of oral hypoglycemic agents<br>";
+	       			//$ret_val .= "<input type='checkbox' name='medintake[]' value='HYPERMED' ".($value=='' ? 'HYPERMED' : '')."> Intake of hypertension medicine<br>";
+	            }
+	        }
+        	if ($x==0) 
+            {
+                $ret_val .= "<input type='checkbox' name='medintake[]' value='ORALHYPO'> Intake of oral hypoglycemic agents<br>";
+            }
+            
+        	$x = 0;
+	        foreach ($arrCode as $key => $value)
+	        {
+	        	if($value == 'HYPERMED')
+	            {
+	        		$x++;
+	       			//$ret_val .= "<input type='checkbox' name='medintake[]' value='ORALHYPO' ".($value=='ORALHYPO' ? 'checked' : '')."> Intake of oral hypoglycemic agents<br>";
+	       			$ret_val .= "<input type='checkbox' name='medintake[]' value='HYPERMED' ".($value=='HYPERMED' ? 'checked' : '')."> Intake of hypertension medicine<br>";
+	            }
+	        }
+        	if ($x==0) 
+            {
+                $ret_val .= "<input type='checkbox' name='medintake[]' value='HYPERMED'> Intake of hypertension medicine<br>";
+            }
+        }
+        else {
+        	$ret_val .= "<input type='checkbox' name='medintake[]' value='ORALHYPO'> Intake of oral hypoglycemic agents<br>";
+        	$ret_val .= "<input type='checkbox' name='medintake[]' value='HYPERMED'> Intake of hypertension medicine<br>";
+        }
+       
+       	return $ret_val;
+        
+    }
+    
+	function checkbox_pe() {
+        if (func_num_args()>0) {
+            $arg_list = func_get_args();
+            $pe_type = $arg_list[0];
+            $pe_code = $arg_list[1];
+            $pe_remarks = $arg_list[2];
+        }
+        $sql = "select category_code, category_name ".
+               "from m_lib_pe where category_type = '$pe_type' ";
+       	
+        $arrayCode = explode(',', $pe_code); 
+        
+       	if ($result = mysql_query($sql)) {
+            if (mysql_num_rows($result)) {
+                while (list($id, $name) = mysql_fetch_array($result)) {
+                	if ($pe_code){
+                		$x = 0;
+	                	foreach ($arrayCode as $key => $value) {
+	                		if($value == $id) {	
+	                			$x++;
+	                			$ret_val .= "<input type='checkbox' name='".$pe_type."[]' value='$id' ".($value==$id ? 'checked' : '')."> $name<br>";
+	                		}
+	                		//$ret_val .= "<input type='checkbox' name='".$pe_type."[]' value='$id'> $name<br>";
+	                	}
+	                	if ($x==0) {
+                			$ret_val .= "<input type='checkbox' name='".$pe_type."[]' value='$id'> $name<br>";
+	                	}
+                	}
+                	else {
+                		$ret_val .= "<input type='checkbox' name='".$pe_type."[]' value='$id'> $name<br>";
+                	}	
+                }
+                $ret_val .= "<br/>Remarks: <textarea rows='3' cols='20' class='tinylight' name='".$pe_type."Remarks' style='border: 1px solid black; vertical-align: top;'>$pe_remarks</textarea><br/><br/>";
+                $ret_val .= "<hr></hr>";
+            } else {
+                $ret_val .= "<font color='red'>No $pe_type codes in library.</font><br/>";
+            }
+            return $ret_val;
+        }
+    }
+    
+    function get_menstrual_history()
+    {
+    	if (func_num_args()>0) {
+    		$arg_list = func_get_args();
+    		$menarche = $arg_list[0];
+    		$lmp = $arg_list[1];
+    		$pduration = $arg_list[2];
+    		$cycle = $arg_list[3];
+    		$pads = $arg_list[4];
+    		$sexinter = $arg_list[5];
+    		$controlmethod = $arg_list[6];
+    		$menopause = $arg_list[7];
+    		$menopauseage = $arg_list[8];
+    	}
+    	
+    	$patient_id = healthcenter::get_patient_id($_GET["consult_id"]);
+    	$checkSQL = "SELECT date_format(patient_lmp,'%m/%d/%Y') FROM m_patient_mc WHERE patient_id='$patient_id' ORDER by patient_lmp DESC LIMIT 1";
+		if ($checkResult = mysql_query($checkSQL)) {
+		  	if (mysql_num_rows($checkResult)) {
+		       	list($newLMP) = mysql_fetch_array($checkResult);
+		   	}
+		}
+    	if($lmp!='00/00/0000')
+    	{
+    		//list($year,$month,$day)=explode('-', $lmp);
+    		//$lmp_date = $month.'/'.$day.'/'.$year;
+    		$lmp_date = $lmp;
+    	}
+    	if($lmp==null || $lmp=="" || $lmp=='00/00/0000')
+    	{
+    		$lmp_date = $newLMP;
+    	}
+    	//else 
+    	//{
+    		//$lmp_date = $newLMP;
+    	//}
+    	$gender = notes::get_patient_info();
+    	if ($gender=='F') {
+	    	$ret_val .= "<tr id='end' class='header'><td>";
+	        $ret_val .= "<span class='clickable'>-</span> <span class='boxtitle'>MENSTRUAL HISTORY</span><br/></td></tr>";
+	     	$ret_val .= "<tr><td>";
+	        $ret_val .= "<span style='width: 110px; display:inline-block;'>Menarche: </span><input type='text' name='menarche' style='width:50px' value='$menarche'><br />";
+			$ret_val .= "Last Menstrual Period: <input type='text' name='lmp' style='width:90px' value='$lmp_date'>";
+			$ret_val .= "&nbsp;<a href=\"javascript:show_calendar4('document.form_history.lmp', document.form_history.lmp.value);\"><img src='../images/cal.gif' width='16' height='16' border='0' alt='Click Here to Pick up the date'></a>";
+			$ret_val .= "<span style='width: 110px; display:inline-block;'>Period Duration: </span><input type='text' name='pduration' style='width:50px' value='$pduration'><br />";
+			$ret_val .= "<span style='width: 110px; display:inline-block;'>Interval/Cycle: </span><input type='text' name='cycle' style='width:50px' value='$cycle'><br />";
+			$ret_val .= "No. of pads/day during menstruation: <input type='text' name='pads' style='width:50px' value='$pads'><br />";
+			$ret_val .= "Onset of sexual intercourse: <input type='text' name='sexinter' style='width:50px' value='$sexinter'><br />";
+			
+			$ret_val .= "Birth control method: <select name='controlmethod'>";
+        	$ret_val .= "<option value=''>--Select Method--</option>";
+			$sql = "select method_id, method_name from m_lib_fp_methods where method_gender ='F'";
+			if ($result = mysql_query($sql)) {
+	            if (mysql_num_rows($result)) {
+	                while (list($id, $name) = mysql_fetch_array($result)) {
+					$ret_val .= "<option value='$id' ".($controlmethod==$id ? 'selected' : '')."> $name</option>";
+	                }
+	            }
+			}
+			$ret_val .= "</select>";
+			$ret_val .= "Menopause: <input type='radio' name='menopause' value='Y' ".($menopause=='Y' ? 'checked' : '').">Yes";
+			$ret_val .= "<input type='radio' name='menopause' value='N' ".($menopause=='N' ? 'checked' : '').">No<br />";
+			$ret_val .= "If yes, at what age?: <input type='text' name='menopauseage' style='width:50px' value='$menopauseage'><br />";
+			$ret_val .= "<br/><hr></hr><br/></td></tr>";
+			//$ret_val .= $menopause;
+			return $ret_val;
+    	}
+    	else {
+    		return false;
+    	}
+    }
+    
+	function get_patient_info() {
+    //
+    // frequently called function
+    // in other modules
+    //
+        if (func_num_args()>0) {
+            $arg_list = func_get_args();
+            $info = $arg_list[0];
+        }
+        $patient_id = healthcenter::get_patient_id($_GET["consult_id"]);
+        $sql ="SELECT patient_gender FROM m_patient where patient_id = '$patient_id' and round((TO_DAYS(sysdate()) - TO_DAYS(patient_dob))/365 ,2)>=10";
+        //$sql = "select patient_gender from m_patient where patient_id = '$patient_id'";
+        if ($result = mysql_query($sql)) {
+            if (mysql_num_rows($result)) {
+                list($patient_gender) = mysql_fetch_array($result);
+                return $patient_gender;
+            }
+        }
+    }
+    
+    function get_pe_name() {
+    	if (func_num_args()>0) {
+    		$arg_list = func_get_args();
+    		$pe_code = $arg_list[0];
+    	}
+    	$sql = "select category_name from m_lib_pe where category_code = '$pe_code'";
+    	if ($result = mysql_query($sql)) {
+            if (mysql_num_rows($result)) {
+            	list($name) = mysql_fetch_array($result);
+            	$ret_val = "<li>".$name."</li>";
+            }
+    	}
+    	return $ret_val;
+    }
+    
+    function show_pe_list() {
+    	if (func_num_args()>0) {
+            $arg_list = func_get_args();
+            $code = $arg_list[0];
+            $type = $arg_list[1];
+            $remarks = $arg_list[2];
+        }
+    	if ($code) {
+	    	$arrCode = explode(",", $code);
+	    	$ret_val .= "<span class='boxtitle'>$type:</span> $remarks";
+	    	$ret_val .= "<ul style='margin:0;'>";
+	    	foreach ($arrCode as $key => $value)
+	    	{
+	    		$ret_val .= notes::get_pe_name($value);
+	    	}
+	    	$ret_val .= "</ul><br/>";
+	    }
+        return $ret_val;
+    }
+    
+    function get_pe_list() {
+    	if (func_num_args()>0) {
+            $arg_list = func_get_args();
+            $notes_id = $arg_list[0];
+        }
+        
+        $sql = "select breast_screen, breast_remarks, skin_code, skin_remarks, heent_code, heent_remarks,
+	        	chest_code, chest_remarks, heart_code, heart_remarks,
+	        	abdomen_code, abdomen_remarks, extremities_code, extremities_remarks
+	        	from m_consult_notes_pe where notes_id = '$notes_id'";
+        if ($result = mysql_query($sql)) {
+            if (mysql_num_rows($result)) {
+                list($breast_screen, $breast_remarks, $skin_code, $skin_remarks, $heent_code, $heent_remarks,
+	        		$chest_code, $chest_remarks, $heart_code, $heart_remarks,
+	        		$abdomen_code, $abdomen_remarks, $extremities_code, $extremities_remarks) = mysql_fetch_array($result);
+	        	/*if ($skin_code) {
+	        		$skin = explode(",", $skin_code);
+	        		$ret_val .= "<b>Skin:</b> $skin_remarks";
+	        		$ret_val .= "<ul style='margin:0;'>";
+	        		foreach ($skin as $key => $value)
+	        		{
+	        			$ret_val .= notes::get_pe_name($value);
+	        		}
+	        		$ret_val .= "</ul>";
+	        	}*/
+	        	if ($breast_screen!=null) {
+	        		$ret_val .= "<span class='boxtitle'>BREAST CANCER SCREENING: </span>$breast_screen<br/>";
+	        		$ret_val .= "Remarks: $breast_remarks<br/><br />";
+	        	}
+            	$ret_val .= notes::show_pe_list($skin_code,'Skin',$skin_remarks);
+            	$ret_val .= notes::show_pe_list($heent_code,'HEENT',$heent_remarks);
+            	$ret_val .= notes::show_pe_list($chest_code,'Chest/Lungs',$chest_remarks);
+            	$ret_val .= notes::show_pe_list($heart_code,'Heart',$heart_remarks);
+            	$ret_val .= notes::show_pe_list($abdomen_code,'Abdomen',$abdomen_remarks);
+            	$ret_val .= notes::show_pe_list($extremities_code,'Extremities',$extremities_remarks);
+            }
+        }
+        return $ret_val;
+    }
+    
+	function get_history_name() {
+    	if (func_num_args()>0) {
+    		$arg_list = func_get_args();
+    		$history_code = $arg_list[0];
+    	}
+    	$sql = "select history_id, history_name from m_lib_medical_history where history_id ='$history_code'";
+    	
+    	if ($result = mysql_query($sql)) {
+            if (mysql_num_rows($result)) {
+            	list($id,$name) = mysql_fetch_array($result);
+            	$ret_val = "<li>".$name."</li>";
+            }
+    	}
+    	return $ret_val;
+    }
+    
+	function show_history_list() {
+    	if (func_num_args()>0) {
+            $arg_list = func_get_args();
+            $code = $arg_list[0];
+            $type = $arg_list[1];
+            $remarks = $arg_list[2];
+        }
+    	if ($code) {
+	    	$arrCode = explode(",", $code);
+	    	$ret_val .= "<span class='boxtitle'>$type:</span>";
+	    	$ret_val .= "<ul style='margin:0;'>";
+	    	foreach ($arrCode as $key => $value)
+	    	{
+	    		$ret_val .= notes::get_history_name($value);
+	    	}
+	    	$ret_val .= "</ul><br/>";
+	    }
+        return $ret_val;
+    }
+    
+    function get_history_list() {
+    	if (func_num_args()>0) {
+            $arg_list = func_get_args();
+            $notes_id = $arg_list[0];
+        }
+        $patient_id = healthcenter::get_patient_id($_GET["consult_id"]);
+    	$checkSQL = "select pasthistory_id, familyhistory_id, medintake_id,
+	        		menarche, date_format(lmp,'%m/%d/%Y'), period_duration, cycle, pads_perday,
+	        		onset_sexinter, method_id, menopause, meno_age,
+	        		smoking, pack_peryear, alcohol, bottles_perday, ill_drugs
+	        		from m_patient_history where patient_id = '$patient_id'";
+    	if ($checkResult = mysql_query($checkSQL)) {
+            if (mysql_num_rows($checkResult)) {
+                list($pasthistory_id, $familyhistory_id, $medintake_id,
+	        		$menarche, $lmp, $period_duration, $cycle, $pads_perday,
+	        		$onset_sexinter, $method_id, $menopause, $meno_age,
+	        		$smoking, $pack_peryear, $alcohol, $bottles_perday, $ill_drugs) = mysql_fetch_array($checkResult);
+	        		
+	        	$ret_val .= notes::show_history_list($pasthistory_id,'PAST MEDICAL HISTORY');
+	        	$ret_val .= notes::show_history_list($familyhistory_id,'FAMILY HISTORY');
+	        	$med = explode(',',$medintake_id);
+	        	if ($medintake_id) {
+	        		$ret_val .= "<span class='boxtitle'>MEDICINE INTAKE HISTORY:</span>";
+	    			$ret_val .= "<ul style='margin:0;'>";
+	    			foreach ($med as $key => $value) {
+		    			if ($value=='ORALHYPO') {
+		    				$ret_val .= "<li>Intake of oral hypoglycemic agents</li>";
+		    			}
+		        		if ($value=='HYPERMED') {
+		    				$ret_val .= "<li>Intake of hypertension medicine</li>";
+		    			}
+	    			}
+	    			$ret_val .= "</ul><br/>";
+	        	}
+	        	
+	        	$ret_val .= notes::show_menstrual_list($menarche, $lmp, $period_duration, $cycle, $pads_perday, $onset_sexinter, $method_id, $menopause, $meno_age);
+	        	
+	        	if ($smoking || $pack_peryear || $alcohol || $bottles_perday || $ill_drugs) {
+	        		$ret_val .= "<span class='boxtitle'>PERSONAL/SOCIAL HISTORY:</span><br/>";
+	        		if ($smoking && ($smoking =='Y' || $smoking == 'Q')) {
+	        			if ($smoking == 'Y') {
+	        				$value = 'Yes';
+	        			}
+	        			if ($smoking == 'Q') {
+	        				$value = 'Quit';
+	        			}
+	        			$ret_val .= "<span class='boxtitle'>Smoking: </span>$value<br/>";
+	        			$ret_val .= "<span class='boxtitle'>No. of Pack/Year: </span>$pack_peryear<br/>";
+	        		}
+	        		if ($smoking && $smoking =='N') {
+	        			$ret_val .= "<span class='boxtitle'>Smoking: </span>No<br/>";
+	        		}
+	        		
+	        		if ($alcohol && ($alcohol =='Y' || $alcohol == 'Q')) {
+	        			if ($alcohol == 'Y') {
+	        				$value = 'Yes';
+	        			}
+	        			if ($alcohol == 'Q') {
+	        				$value = 'Quit';
+	        			}
+	        			$ret_val .= "<span class='boxtitle'>Alcohol: </span>$value<br/>";
+	        			$ret_val .= "<span class='boxtitle'>No. of Bottles/Day: </span>$bottles_perday<br/>";
+	        		}
+	        		if ($alcohol && $alcohol =='N') {
+	        			$ret_val .= "<span class='boxtitle'>Smoking: </span>No<br/>";
+	        		}
+	        		
+	        		if ($ill_drugs) {
+	        			if ($ill_drugs == 'Y') {
+	        				$value = 'Yes';
+	        			}
+	        			if ($ill_drugs == 'N') {
+	        				$value = 'No';
+	        			}
+	        			if ($ill_drugs == 'Q') {
+	        				$value = 'Quit';
+	        			}
+	        			
+	        			$ret_val .= "<span class='boxtitle'>Illicit Drugs: </span>$value<br/>";
+	        		}
+	        	}
+	        	$ret_val .= "<br/>";
+            }
+        }
+        $ret_val .= notes::show_surgical_list();
+        return $ret_val;
+    }
+    
+	function dropdown_breastcancerscreen() {
+        if (func_num_args()>0) {
+            $arg_list = func_get_args();
+            $type = $arg_list[0];
+            $remarks = $arg_list[1];
+        }
+        $gender = notes::get_patient_info();
+        if ($gender=='F') {
+        	$ret_val .= "<tr id='end' class='header nopointer'><td>";
+        	$ret_val .= "<span class='boxtitle'>Breast Cancer Screening: </span>";
+        	$ret_val .= "<select name='breastscreen'>";
+	       	$ret_val .= "<option value=''>--Select--</option>";
+	       	$ret_val .= "<option value='Done' ".($type=='Done' ? 'selected' : '').">Done</option>";
+	       	$ret_val .= "<option value='Refuse' ".($type=='Refuse' ? 'selected' : '').">Refuse</option>";
+	        $ret_val .= "</select><br/>";
+	        $ret_val .= "Remarks: <textarea rows='3' cols='20' class='tinylight' name='bcscreenRemarks' style='border: 1px solid black; vertical-align: top;'>$remarks</textarea><br/><br/><br/>";
+	        $ret_val .= "<hr></hr>";
+	        $ret_val .= "<br/></td></tr>";
+	       	return $ret_val;
+        }
+   	}
+    
+   	function show_surgical_list()
+   	{
+   		if (func_num_args()>0) {
+    		$arg_list = func_get_args();
+    	}
+   		
+    	$patient_id = healthcenter::get_patient_id($_GET["consult_id"]);
+        $sql = "select record_id, operation, operation_date from m_patient_history_surgical where patient_id = '$patient_id' order by operation_date desc";
+    	if ($result = mysql_query($sql)) {
+	    	if (mysql_num_rows($result)) {
+	    		$ret_val .= "<span class='boxtitle'>SURGICAL HISTORY:</span><br/>";
+	    		$ret_val .= "<ul style='margin:0;' class='tinylight'>";
+	    		while (list($id, $operation, $operation_date) = mysql_fetch_array($result)) {
+	    			$ret_val .= "<li>$operation_date - $operation</li>";
+	    		}
+	    		$ret_val .= "</ul><br/>";
+	    	}
+    	}
+    	return $ret_val;
+   		
+   	}
+   	
+	function show_menstrual_list()
+    {
+    	if (func_num_args()>0) {
+    		$arg_list = func_get_args();
+    		$menarche = $arg_list[0];
+    		$lmp = $arg_list[1];
+    		$pduration = $arg_list[2];
+    		$cycle = $arg_list[3];
+    		$pads = $arg_list[4];
+    		$sexinter = $arg_list[5];
+    		$controlmethod = $arg_list[6];
+    		$menopause = $arg_list[7];
+    		$menopauseage = $arg_list[8];
+    	}
+    	if($lmp!='00/00/0000')
+    	{
+    		//list($year,$month,$day)=explode('-', $lmp);
+    		//$lmp_date = $month.'/'.$day.'/'.$year;
+    		$lmp_date = $lmp;
+    	}
+    	else 
+    	{
+    		$lmp_date = '';
+    	}
+    	$gender = notes::get_patient_info();
+    	if ($gender=='F') {
+	    	$ret_val .= "<span class='boxtitle'>MENSTRUAL HISTORY</span><br/>";
+	     	$ret_val .= "<span class='boxtitle'>Menarche: </span>$menarche<br />";
+			$ret_val .= "<span class='boxtitle'>Last Menstrual Period: </span>$lmp_date<br/>";
+			$ret_val .= "<span class='boxtitle'>Period Duration: </span>$pduration<br />";
+			$ret_val .= "<span class='boxtitle'>Interval/Cycle: </span>$cycle<br />";
+			$ret_val .= "<span class='boxtitle'>No. of pads/day during menstruation: </span>$pads<br />";
+			$ret_val .= "<span class='boxtitle'>Onset of sexual intercourse: </span>$sexinter<br />";
+			
+			$ret_val .= "<span class='boxtitle'>Birth control method: </span>";
+        	$sql = "select method_id, method_name from m_lib_fp_methods where method_gender ='F' and method_id = '$controlmethod'";
+			if ($result = mysql_query($sql)) {
+	            if (mysql_num_rows($result)) {
+	                while (list($id, $name) = mysql_fetch_array($result)) {
+					$ret_val .= $name."<br/>";
+	                }
+	            }
+			}
+			$ret_val .= "<span class='boxtitle'>Menopause: </span>".($menopause=='Y' ? 'Yes' : 'No')."<br/>";
+			$ret_val .= "<span class='boxtitle'>If yes, at what age?: </span>$menopauseage<br />";
+			$ret_val .= "<br/>";
+			//$ret_val .= $menopause;
+			return $ret_val;
+    	}
+    	else {
+    		return false;
+    	}
+    }
+    
+    function get_surgical_history() {
+    	if (func_num_args()>0) {
+            $arg_list = func_get_args();
+            $type = $arg_list[0];
+            $remarks = $arg_list[1];
+        }
+        print "<tr><td>";
+    	print "<input id='operation' type='text' name='surgicalname' style='width:227px' placeholder='Operation'>";
+        print "&nbsp<input id='operationdate' type='text' style='width:88px' name='surgicaldate' placeholder='mm-dd-yyyy'>";
+        print "&nbsp<a href=\"javascript:show_calendar4('document.form_history.surgicaldate', document.form_history.surgicaldate.value);\"><img src='../images/cal.gif' width='16' height='16' border='0' alt='Click Here to Pick up the date'></a>";
+        print "<span style='margin:0 auto; display:inline-block;'><input id='save' type='submit' name='submitnotes' value='Add Surgical History'></span>";
+        print "<input id='recordID' type='hidden' name='recordID' value=''>";
+        print "<br/><br/><hr></hr><br/>".notes::edit_surgical_history()."</td></tr>";
+        //notes::add_surgical_history($post_vars,$get_vars,$_POST['surgicalname'],$_POST['surgicaldate']);
+        
+    }
+    
+    function edit_surgical_history () {
+    	if (func_num_args()>0) {
+            $arg_list = func_get_args();
+            $post_vars = $arg_list[0];
+            $get_vars = $arg_list[1];
+        }
+        print "<script>
+				function change(value)
+				{
+					document.getElementById(\"operation\").value= value.operation;
+					document.getElementById(\"operationdate\").value= value.date;
+					document.getElementById(\"save\").value= value.text;
+					document.getElementById(\"recordID\").value= value.id;
+				}
+				</script>";
+        
+        $patient_id = healthcenter::get_patient_id($_GET["consult_id"]);
+        $sql = "select record_id, operation, operation_date from m_patient_history_surgical where patient_id = '$patient_id' order by operation_date desc";
+    	if ($result = mysql_query($sql)) {
+	    	if (mysql_num_rows($result)) {
+	    		print "<br/><br/>";
+	    		print "<table width='320px' style='border: 1px solid black;border-collapse:collapse'>";
+	        		print "<tr class='tinylight'>";
+				        print "<th width='170px' style='border: 1px solid black'>Operation</th>";
+				        print "<th width='70px' style='border: 1px solid black'>Date</th>";
+				        print "<th width='50px' style='border: 1px solid black'>Action</th>";
+		        	print "</tr>";
+	           	while (list($id, $operation, $operation_date) = mysql_fetch_array($result)) {
+	           		$date=date("m/d/Y", strtotime($operation_date));
+					print "<tr>";
+						print "<td style='border: 1px solid black'>$operation</td>";
+						print "<td style='border: 1px solid black; text-align:center;'>$operation_date</td>";
+						print "<td style='border: 1px solid black; text-align:center;'><input id='edit' type='button' name='edit' value='Edit' onclick=\"change({operation:'$operation',date:'$date',text:'Update Surgical History',id:'$id'})\"></td>";
+					print "</tr>";	        		
+	        	}
+	        	print "</table>";
+	    	}
+		}
+    }
+    
+    /*function add_surgical_history() {
+    	if (func_num_args()>0) {
+            $arg_list = func_get_args();
+            $post_vars = $arg_list[0];
+            $get_vars = $arg_list[1];
+            $operation = $arg_list[2];
+            $date = $arg_list[3];
+        }
+        if($post_vars["AddHistory"]) {
+        	$sqlPE = "insert into m_patient_history_surgical (notes_id, consult_id, patient_id, user_id,
+	        				operation, operation_date, operation_timestamp) 
+	        				values ('$patient_id', '".$get_vars["notes_id"]."', '".$get_vars["consult_id"]."', '".$_SESSION["userid"]."',
+	        				'$operation', '$date',
+	        				sysdate())";
+	        			$resultPE = mysql_query($sqlPE);
+	        			echo $sqlPE;
+        }
+    }*/
 
 }
 // end of class

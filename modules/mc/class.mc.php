@@ -1,4 +1,14 @@
 <?
+
+/*
+	DATE UPDATED : 4/3/2014 ---------------------------------------------------------
+	UPDATED BY: Mark Santos
+
+	UPDATE LOG:
+		- ISSUES/BUGS : No issues, just updated the form wherein the child can be added directly under MC-Postpartum Module
+		- UPDATE LOCATION : //INSERT new patient if no child patient id found
+		
+*/
 class mc extends module {
 
     // Author: Herman Tolentino MD
@@ -53,6 +63,7 @@ class mc extends module {
         module::set_lang("THEAD_HOSPITAL_FLAG", "english", "HOSPITAL FLAG", "Y");
         module::set_lang("THEAD_MONITOR_FLAG", "english", "MONITOR FLAG", "Y");
         module::set_lang("LBL_LMP_DATE", "english", "LAST MENSTRUAL PERIOD", "Y");
+		module::set_lang("LBL_CONFIRM_LMP_DATE", "english", "CONFIRM LAST MENSTRUAL PERIOD", "Y");
         module::set_lang("LBL_OBSTETRIC_SCORE", "english", "OBSTETRIC SCORE", "Y");
         module::set_lang("LBL_RISK_FACTORS", "english", "RISK FACTORS", "Y");
         module::set_lang("LBL_PATIENT_HEIGHT", "english", "PATIENT HEIGHT (CM)", "Y");
@@ -115,6 +126,7 @@ class mc extends module {
         module::set_lang("LBL_BREASTFEEDING", "english", "IS THIS PATIENT BREASTFEEDING", "Y");
         module::set_lang("LBL_FAMILY_PLANNING", "english", "HAS THIS PATIENT SELECTED FP METHOD", "Y");
         module::set_lang("FTITLE_POSTPARTUM_RECORDS", "english", "POSTPARTUM RECORDS", "Y");
+		
 
     }
 
@@ -811,8 +823,7 @@ class mc extends module {
 						
                         $sql = "insert into m_consult_mc_services (mc_id, consult_id, user_id, patient_id, mc_timestamp, service_id, visit_type) ".
                                "values ('".$post_vars["mc_id"]."', '".$get_vars["consult_id"]."', '".$_SESSION["userid"]."', '$patient_id', sysdate(), '$value', '".$post_vars["visit_type"]."')";
-                        $result = mysql_query($sql) or die("Cannot query 814: ".mysql_error());
-						
+                        $result = mysql_query($sql);
                     }
                 }
                 if ($post_vars["vaccines"]) {
@@ -830,83 +841,43 @@ class mc extends module {
                 header("location: ".$_SERVER["PHP_SELF"]."?page=".$get_vars["page"]."&menu_id=".$get_vars["menu_id"]."&consult_id=".$get_vars["consult_id"]."&ptmenu=DETAILS&module=mc&mc=SVC&mc_id=".$post_vars["mc_id"]);
                 break;
             case "Save Data":
-                if ($post_vars["lmp_date"] && $post_vars["obscore_gp"] && $post_vars["obscore_fpal"] && $post_vars["patient_height"]) {
-		
-		$edc = $this->compute_edc($post_vars["lmp_date"]);
-		
-		//$sql = "INSERT INTO m_patient_mc SET patient_id='$patient_id',consult_id='$get_vars[consult_id]',mc_timestamp=sysdate(),mc_consult_date=sysdate(),patient_lmp='$lmp_date',patient_edc=from_days(to_days('$lmp_date')+280),trimester1_date=from_days(to_days('$lmp_date')+84),trimester2_date=from_days(to_days('$lmp_date')+168),trimester3_date=from_days(to_days('$lmp_date')+280),postpartum_date=from_days(to_days('$lmp_date')+322),obscore_gp='$post_vars[obscore_gp]',obscore_fpal='$post_vars[obscore_fpal]',user_id='$_SESSION[userid]',blood_type='$post_vars[bloodtype]',patient_age='$patient_age',patient_height='$post_vars[patient_height]'";
-
-		$sql = "INSERT INTO m_patient_mc SET patient_id='$patient_id',consult_id='$get_vars[consult_id]',mc_timestamp=sysdate(),mc_consult_date=sysdate(),patient_lmp='$lmp_date',patient_edc='$edc',trimester1_date=from_days(to_days('$lmp_date')+84),trimester2_date=from_days(to_days('$lmp_date')+189),trimester3_date=from_days(to_days('$lmp_date')+280),postpartum_date=from_days(to_days('$lmp_date')+322),obscore_gp='$post_vars[obscore_gp]',obscore_fpal='$post_vars[obscore_fpal]',user_id='$_SESSION[userid]',blood_type='$post_vars[bloodtype]',patient_age='$patient_age',patient_height='$post_vars[patient_height]'";
-
-		$result = mysql_query($sql) or die("Cannot query 845".mysql_error());
-
-                    if ($result) {
-                        $insert_id = mysql_insert_id();
-						/*$tt_vacc = array('TT1','TT2','TT3','TT4','TT5');
+				//include here the LMP checking/verification
+				if($post_vars["lmp_date"] == $post_vars["confirm_lmp_date"]){
+					if ($post_vars["lmp_date"] && $post_vars["obscore_gp"] && $post_vars["obscore_fpal"] && $post_vars["patient_height"]) {
+			
+						$edc = $this->compute_edc($post_vars["lmp_date"]);
 						
-						for($j=0;$j<count($tt_vacc);$j++){
-						
-						$check_TT = mysql_query("SELECT actual_vaccine_date, vaccine_id, consult_id,vaccine_timestamp,adr_flag FROM m_consult_vaccine WHERE patient_id='$patient_id' AND vaccine_id='$tt_vacc[$j]'") or die("Cannot query: 713");
-						
-						if(mysql_num_rows($check_TT)>0):
-							while($r_check_TT=mysql_fetch_array($check_TT))
-							{
-								$q_mc_vacc = mysql_query("SELECT consult_id,patient_id,mc_id FROM m_consult_mc_vaccine WHERE consult_id='$r_check_TT[consult_id]' AND vaccine_timestamp='$r_check_TT[vaccine_timestamp]' AND vaccine_id='$r_check_TT[vaccine_id]'") or die(mysql_error());
+						$sql = "INSERT INTO m_patient_mc SET patient_id='$patient_id',consult_id='$get_vars[consult_id]',mc_timestamp=sysdate(),mc_consult_date=sysdate(),patient_lmp='$lmp_date',patient_edc='$edc',trimester1_date=from_days(to_days('$lmp_date')+84),trimester2_date=from_days(to_days('$lmp_date')+189),trimester3_date=from_days(to_days('$lmp_date')+280),postpartum_date=from_days(to_days('$lmp_date')+322),obscore_gp='$post_vars[obscore_gp]',obscore_fpal='$post_vars[obscore_fpal]',user_id='$_SESSION[userid]',blood_type='$post_vars[bloodtype]',patient_age='$patient_age',patient_height='$post_vars[patient_height]'";
 
-								if(mysql_num_rows($q_mc_vacc)==0):
-									$insert_vacc = mysql_query("INSERT INTO m_consult_mc_vaccine SET mc_id='$insert_id',consult_id='$r_check_TT[consult_id]',patient_id='$patient_id',user_id='$_SESSION[userid]',vaccine_timestamp='$r_check_TT[vaccine_timestamp]',actual_vaccine_date='$r_check_TT[actual_vaccine_date]',adr_flag='$r_check_TT[adr_flag]',vaccine_id='$r_check_TT[vaccine_id]'") or die("Cannot query: 725");
+						$result = mysql_query($sql) or die("Cannot query 845".mysql_error());
 
-									$update_to_mc = mysql_query("UPDATE SET m_consult_vaccine SET source_module='mc' WHERE patient_id='$patient_id' AND consult_id='$r_check_TT[consult_id]' AND vaccine_id='$r_check_TT[vaccine_id]' AND vaccine_timestamp='$r_check_TT[vaccine_timestamp]'") or die(mysql_error());
+						if ($result) {
+							$insert_id = mysql_insert_id();
+							$date_ngayon = date('Y-m-d');
 
-								else:
-									echo 'test1';
-								endif;
+							foreach($post_vars["risk"] as $key=>$value) {
+								$sql_risk = "insert into m_consult_mc_visit_risk (consult_id , ".
+											"patient_id, mc_id, visit_risk_id, risk_timestamp,date_detected ".
+											"user_id) values ('".$get_vars["consult_id"]."', ".
+											"'$patient_id', '$insert_id', '$value', ".
+											"sysdate(),$date_ngayon '".$_SESSION["userid"]."')";
+								$result_risk = mysql_query($sql_risk);
 							}
 
-						else:
-							echo 'test2';
-
-						endif;
-
-						}*/
-
-				$date_ngayon = date('Y-m-d');
-
-                        foreach($post_vars["risk"] as $key=>$value) {
-                            $sql_risk = "insert into m_consult_mc_visit_risk (consult_id , ".
-                                        "patient_id, mc_id, visit_risk_id, risk_timestamp,date_detected ".
-                                        "user_id) values ('".$get_vars["consult_id"]."', ".
-                                        "'$patient_id', '$insert_id', '$value', ".
-                                        "sysdate(),$date_ngayon '".$_SESSION["userid"]."')";
-                            $result_risk = mysql_query($sql_risk);
-                        }
-
-                        header("location: ".$_SERVER["PHP_SELF"]."?page=".$get_vars["page"]."&menu_id=".$get_vars["menu_id"]."&consult_id=".$get_vars["consult_id"]."&ptmenu=DETAILS&module=mc&mc=VISIT1&mc_id=$insert_id");
-                    }
-                } else {
-                    print "<font color='red'>Incomplete entries.</font><br/>";
-                }
+							header("location: ".$_SERVER["PHP_SELF"]."?page=".$get_vars["page"]."&menu_id=".$get_vars["menu_id"]."&consult_id=".$get_vars["consult_id"]."&ptmenu=DETAILS&module=mc&mc=VISIT1&mc_id=$insert_id");
+						}
+					} else {
+						print "<font color='red'>Incomplete entries.</font><br/>";
+					}
+				}else{
+					print "<font color='red'>LMP Date does not match</font><br/>";
+				}
                 break;
             case "Update Data":
                 if ($post_vars["lmp_date"] && $post_vars["obscore_gp"] && $post_vars["obscore_fpal"] && $post_vars["patient_height"]) {
-		    $edc = $this->compute_edc($post_vars["lmp_date"]);
+					$edc = $this->compute_edc($post_vars["lmp_date"]);
 
-                    /*$sql = "update m_patient_mc set ".
-                           "patient_lmp = '$lmp_date', ".
-                           "patient_edc = from_days(to_days('$lmp_date')+280), ".
-                           "trimester1_date = from_days(to_days('$lmp_date')+84), ".
-                           "trimester2_date = from_days(to_days('$lmp_date')+168), ".
-                           "trimester3_date = from_days(to_days('$lmp_date')+280), ".
-                           "postpartum_date = from_days(to_days('$lmp_date')+322), ".
-                           "mc_timestamp = sysdate(), ".
-                           "obscore_gp = '".$post_vars["obscore_gp"]."', ".
-                           "obscore_fpal = '".$post_vars["obscore_fpal"]."', ".
-                           "patient_height = '".$post_vars["patient_height"]."', ".
-                           "blood_type = '".$post_vars["bloodtype"]."' ".
-                           "where mc_id = '".$post_vars["mc_id"]."'";
-		    */
-
-		    $sql = "update m_patient_mc set ".
+					$sql = "update m_patient_mc set ".
                            "patient_lmp = '$lmp_date', ".
                            "patient_edc = '".$edc."', ".
                            "trimester1_date = from_days(to_days('$lmp_date')+84), ".
@@ -1154,23 +1125,59 @@ class mc extends module {
 
 					// NOTE: update postpartum date from delivery date
 					if(empty($get_vars["mc_id"])):
-
-						$patient_id = healthcenter::get_patient_id($_GET[consult_id]);
-
-						$sql = "insert into m_patient_mc SET patient_id='$patient_id',consult_id='$_GET[consult_id]',patient_lmp=from_days(to_days('$delivery_date')-280),trimester1_date=from_days(to_days('$delivery_date')-196),trimester2_date=from_days(to_days('$delivery_date')-91),trimester3_date=from_days(to_days('$delivery_date')),mc_timestamp=sysdate(),mc_consult_date=sysdate(),patient_edc='$delivery_date',delivery_date='$delivery_date',postpartum_date=from_days(to_days('$delivery_date')+42),obscore_gp='$post_vars[obscore_gp]',obscore_fpal='$post_vars[obscore_fpal]',birthweight='$post_vars[birth_weight]',child_patient_id='$post_vars[child_patient_id]',delivery_location='$post_vars[delivery_location]',outcome_id='$post_vars[outcome]',healthy_baby='$health_baby',end_pregnancy_flag='$end_pregnancy',breastfeeding_asap='$breastfeeding',date_breastfed='$bfeed_date',birthmode='$post_vars[attendant]'";
 						
-						//$sql = "insert into m_patient_mc SET patient_id='$patient_id',consult_id='$_GET[consult_id]',patient_lmp=from_days(to_days('$delivery_date')-280),trimester1_date=from_days(to_days('$delivery_date')-186.7),trimester2_date=from_days(to_days('$delivery_date')-93.3),trimester3_date=from_days(to_days('$delivery_date')),mc_timestamp=sysdate(),mc_consult_date=sysdate(),delivery_date='$delivery_date',patient_edc='$date_delivery',postpartum_date=from_days(to_days('$delivery_date')+42),obscore_gp='$post_vars[obscore_gp]',obscore_fpal='$post_vars[obscore_fpal]',birthweight='$post_vars[birth_weight]',child_patient_id='$post_vars[child_patient_id]',delivery_location='$post_vars[delivery_location]',outcome_id='$post_vars[outcome]',healthy_baby='$health_baby',end_pregnancy_flag='$end_pregnancy',breastfeeding_asap='$breastfeeding',date_breastfed='$bfeed_date',birthmode='$post_vars[attendant]'";
-
+						$patient_id = healthcenter::get_patient_id($_GET[consult_id]);
+						
+						
+						if($insert_new_patient):
+							$sql = "insert into m_patient_mc SET patient_id='$patient_id',consult_id='$_GET[consult_id]',patient_lmp=from_days(to_days('$delivery_date')-280),trimester1_date=from_days(to_days('$delivery_date')-196),trimester2_date=from_days(to_days('$delivery_date')-91),trimester3_date=from_days(to_days('$delivery_date')),mc_timestamp=sysdate(),mc_consult_date=sysdate(),patient_edc='$delivery_date',delivery_date='$delivery_date',postpartum_date=from_days(to_days('$delivery_date')+42),obscore_gp='$post_vars[obscore_gp]',obscore_fpal='$post_vars[obscore_fpal]',birthweight='$post_vars[birth_weight]',child_patient_id='$child_id',delivery_location='$post_vars[delivery_location]',outcome_id='$post_vars[outcome]',healthy_baby='$health_baby',end_pregnancy_flag='$end_pregnancy',breastfeeding_asap='$breastfeeding',date_breastfed='$bfeed_date',birthmode='$post_vars[attendant]'";
+							//$sql = "insert into m_patient_mc SET patient_id='$patient_id',consult_id='$_GET[consult_id]',patient_lmp=from_days(to_days('$delivery_date')-280),trimester1_date=from_days(to_days('$delivery_date')-186.7),trimester2_date=from_days(to_days('$delivery_date')-93.3),trimester3_date=from_days(to_days('$delivery_date')),mc_timestamp=sysdate(),mc_consult_date=sysdate(),delivery_date='$delivery_date',patient_edc='$date_delivery',postpartum_date=from_days(to_days('$delivery_date')+42),obscore_gp='$post_vars[obscore_gp]',obscore_fpal='$post_vars[obscore_fpal]',birthweight='$post_vars[birth_weight]',child_patient_id='$post_vars[child_patient_id]',delivery_location='$post_vars[delivery_location]',outcome_id='$post_vars[outcome]',healthy_baby='$health_baby',end_pregnancy_flag='$end_pregnancy',breastfeeding_asap='$breastfeeding',date_breastfed='$bfeed_date',birthmode='$post_vars[attendant]'";
+						endif;
+						
 					else:
-
+						
+						$mothers_name = mysql_query("SELECT patient_lastname, patient_firstname, family_id, child_patient_id FROM m_patient a JOIN m_patient_mc b ON a.patient_id = b.patient_id JOIN m_family_members c ON a.patient_id = c.patient_id WHERE b.mc_id ='".$get_vars["mc_id"]."' AND c.patient_id='$patient_id'") or die("Cannot query 1158: ".mysql_error());
+						$name_result = mysql_fetch_assoc($mothers_name);
+						$lastname = ucwords($post_vars[child_lastname]);
+						$firstname = ucwords($post_vars[child_firstname]);
+						$middlename = ucwords($post_vars[child_middlename]);
+								
+						if($name_result['child_patient_id'] == 0){
+							//INSERT new patient if no child patient id found
+							if ($post_vars[child_lastname]!= null && $post_vars[child_firstname]!= null && $post_vars[child_lastname] != null)
+							{
+								$mom_name = $name_result['patient_firstname'] . " " .$name_result['patient_lastname'];
+								$child_family_id = $name_result['family_id'];
+							
+								$get_pxid = mysql_query("SELECT patient_id FROM m_patient ORDER BY patient_id DESC LIMIT 1") or die("Cannot query 1163: ".mysql_error());
+								$pxid_result = mysql_fetch_assoc($get_pxid);
+								$child_id = $pxid_result['patient_id'] + 1;
+								echo $post_vars[px_gender];
+								
+								$insert_new_patient = mysql_query("INSERT INTO m_patient SET patient_id='$child_id',patient_lastname='$lastname', patient_firstname='$firstname',patient_middle='$middlename',patient_dob='$delivery_date',patient_gender='$post_vars[px_gender]',registration_date=sysdate(),user_id='$_SESSION[userid]',healthcenter_id='$_SESSION[datanode][code]',patient_mother='$mom_name',patient_cellphone=''") or die("Cannot query: 1168 ".mysql_error());
+								
+								if($child_family_id!=0){
+									$check_family = mysql_query("SELECT family_id FROM m_family_members WHERE patient_id ='$child_id'") or die ("Cannot Query 1154: ".mysql_error());
+									if(mysql_num_rows($check_family)==0){
+										$insert_into_family = mysql_query("INSERT INTO m_family_members SET family_id ='$child_family_id',family_role='member', patient_id = '$child_id'") or die("Cannot query 1177: ".mysql_error());
+									}
+								}
+							}
+							
+						}else{
+							//UPDATE child information if child_patient_id value is more than 0
+							$child_id = $name_result['child_patient_id'];
+							$mom_name = $name_result['patient_firstname'] . " " .$name_result['patient_lastname'];
+							$update_patient = mysql_query("UPDATE m_patient SET patient_lastname='$lastname',patient_firstname='$firstname',patient_middle='$middlename',patient_dob='$delivery_date',patient_gender='$post_vars[px_gender]',registration_date=sysdate(),user_id='$_SESSION[userid]',healthcenter_id='$_SESSION[datanode][code]',patient_mother='$mom_name',patient_cellphone='' WHERE patient_id ='$child_id'") or die("Cannot query: 1182 ".mysql_error());
+						}
 						$sql = "update m_patient_mc set ".
 							   "delivery_date = '$delivery_date', ".
 							   "postpartum_date = from_days(to_days('$delivery_date')+42), ".
 							   "obscore_gp = '".$post_vars["obscore_gp"]."', ".
 							   "obscore_fpal = '".$post_vars["obscore_fpal"]."', ".
 							   "birthweight = '".$post_vars["birth_weight"]."', ".
-							   "child_patient_id = '".$post_vars["child_patient_id"]."', ".
 							   "delivery_location = '".$post_vars["delivery_location"]."', ".
+							   "child_patient_id = '$child_id', ".
 							   "outcome_id = '".$post_vars["outcome"]."', ".
 							   "healthy_baby = '$healthy_baby', ".
 							   "end_pregnancy_flag = '$end_pregnancy', ".
@@ -1617,10 +1624,31 @@ class mc extends module {
         if ($mc["patient_lmp"]) {
             list($year, $month, $day) = explode("-", $mc["patient_lmp"]);
             $lmp_date = "$month/$day/$year";
+			$confirm_lmp_date = "$month/$day/$year";
         }
-        print "<span class='boxtitle'>".LBL_LMP_DATE."</span><br> ";
-        print "<input type='text' size='10' maxlength='10' class='textbox' name='lmp_date' value='".($lmp_date?$lmp_date:$post_vars["lmp_date"])."' style='border: 1px solid #000000'> ";
-        print "<a href=\"javascript:show_calendar4('document.form_mc_visit1.lmp_date', document.form_mc_visit1.lmp_date.value);\"><img src='../images/cal.gif' width='16' height='16' border='0' alt='Click Here to Pick up the date'></a><br>";
+		if($lmp_date){
+			print "<span class='boxtitle'>".LBL_LMP_DATE."</span><br> ";
+			print "<input type='text' size='10' maxlength='10' class='textbox' name='lmp_date' value='".($lmp_date?$lmp_date:$post_vars["lmp_date"])."' style='border: 1px solid #000000' ".($_SESSION["isadmin"]?"":readonly)."> ";
+			if($_SESSION["isadmin"]){
+				print "<a href=\"javascript:show_calendar4('document.form_mc_visit1.lmp_date', document.form_mc_visit1.lmp_date.value);\"><img src='../images/cal.gif' width='16' height='16' border='0' alt='Click Here to Pick up the date'></a><br>";
+			}
+			//NEW CONFIRM LMP DATE FEATURE
+			if($_SESSION["isadmin"]){
+				print "<span class='boxtitle'>CONFIRM LMP DATE</span><br> ";
+				print "<input type='text' size='10' maxlength='10' class='textbox' name='confirm_lmp_date' value='".($confirm_lmp_date?$confirm_lmp_date:$post_vars["confirm_lmp_date"])."' style='border: 1px solid #000000'>";
+				print "<a href=\"javascript:show_calendar4('document.form_mc_visit1.confirm_lmp_date', document.form_mc_visit1.confirm_lmp_date.value);\"><img src='../images/cal.gif' width='16' height='16' border='0' alt='Click Here to Pick up the date'></a><br>";
+			}
+		}else{
+			print "<span class='boxtitle'>".LBL_LMP_DATE."</span><br> ";
+			print "<input type='text' size='10' maxlength='10' class='textbox' name='lmp_date' value='".($lmp_date?$lmp_date:$post_vars["lmp_date"])."' style='border: 1px solid #000000'> ";
+			print "<a href=\"javascript:show_calendar4('document.form_mc_visit1.lmp_date', document.form_mc_visit1.lmp_date.value);\"><img src='../images/cal.gif' width='16' height='16' border='0' alt='Click Here to Pick up the date'></a><br>";
+			
+			//NEW CONFIRM LMP DATE FEATURE
+			print "<span class='boxtitle'>CONFIRM LMP DATE</span><br> ";
+			print "<input type='text' size='10' maxlength='10' class='textbox' name='confirm_lmp_date' value='".($confirm_lmp_date?$confirm_lmp_date:$post_vars["confirm_lmp_date"])."' style='border: 1px solid #000000'>";
+			print "<a href=\"javascript:show_calendar4('document.form_mc_visit1.confirm_lmp_date', document.form_mc_visit1.confirm_lmp_date.value);\"><img src='../images/cal.gif' width='16' height='16' border='0' alt='Click Here to Pick up the date'></a><br>";
+			
+		}
         print "<small>Click on the calendar icon to select date. Otherwise use MM/DD/YYYY format.</small><br>";
         print "</td></tr>";
         print "<tr valign='top'><td>";
@@ -1647,7 +1675,9 @@ class mc extends module {
             if ($_SESSION["priv_update"]) {
                 print "<input type='hidden' name='mc_id' value='".$post_vars["mc_id"]."' />";
                 print "<input type='submit' value = 'Update Data' class='textbox' name='submitmc' style='border: 1px solid #000000'> ";
-                print "<input type='submit' value = 'Delete Data' class='textbox' name='submitmc' style='border: 1px solid #000000'> ";
+				if($_SESSION["isadmin"]){
+					print "<input type='submit' value = 'Delete Data' class='textbox' name='submitmc' style='border: 1px solid #000000'> ";
+				}
             }
         } else {
             if ($_SESSION["priv_add"]) {
@@ -1736,7 +1766,7 @@ class mc extends module {
                 print "<span class='boxtitle'>".LBL_PRENATAL_VISIT_DATE."</span><br>";
                 print "<input type='text' size='10' maxlength='10' class='textbox' name='visit_date' value='".($visit_date?$visit_date:$post_vars["visit_date"])."' style='border: 1px solid #000000'> ";
                 print "<a href=\"javascript:show_calendar4('document.form_mc_prenatal.visit_date', document.form_mc_prenatal.visit_date.value);\"><img src='../images/cal.gif' width='16' height='16' border='0' alt='Click Here to Pick up the date'></a><br>";
-                print "<small>Click on the calendar icon to select date. Otherwise use MM/DD/YYYY format.</small><br>";
+			
                 print "</td></tr>";
 
             print "<tr valign='top'><td>";
@@ -2026,14 +2056,18 @@ class mc extends module {
                    "breastfeeding_asap,date_breastfed,healthy_baby ".
                    "from m_patient_mc ".
                    "where mc_id = '".$post_vars["mc_id"]."'";
+			
             if ($result = mysql_query($sql)) {
                 if (mysql_num_rows($result)) {
                     $mc = mysql_fetch_array($result);
-					
-		if($mc["date_breastfed"]!='0000-00-00'):
-			list($byr,$bmonth,$bdate) = explode('-',$mc["date_breastfed"]);
-			$bfeed_date = $bmonth.'/'.$bdate.'/'.$byr;
-		endif;
+					$child_px_id = $mc['child_patient_id'];
+					$get_child_id = mysql_query("SELECT patient_lastname, patient_firstname, patient_middle, patient_gender FROM m_patient WHERE patient_id = '$child_px_id'") or die("Cannot query 2337 : ".mysql_error());
+					$get_child = mysql_fetch_assoc($get_child_id);
+		
+					if($mc["date_breastfed"]!='0000-00-00'):
+						list($byr,$bmonth,$bdate) = explode('-',$mc["date_breastfed"]);
+						$bfeed_date = $bmonth.'/'.$bdate.'/'.$byr;
+					endif;
                 }
             }
         }
@@ -2081,18 +2115,25 @@ class mc extends module {
             print "<small>".INSTR_CHILD_PATIENT_ID."</small><br>";
             print "</td></tr>";*/
 
-	    $child_px_id = $mc["child_patient_id"]?$mc["child_patient_id"]:$post_vars["child_patient_id"];
-	    $child_name = healthcenter::get_patient_name($child_px_id);
+	    //$child_px_id = $mc["child_patient_id"]?$mc["child_patient_id"]:$post_vars["child_patient_id"];
+		//$child_name = healthcenter::get_patient_name($child_px_id);
 
-	    print "<tr valign='top'><td>";
+	    print "<tr valign='top'>";
+		print "<td>";
             print "<span class='boxtitle'>NAME OF CHILD</span><br> ";
-            print "<input type='text' class='tinylight' size='20' name='child_name' value='$child_name' style='border: 1px solid #000000'/ readonly>";
+				print "<span style='width:100px;display:inline-block; margin:0 0 5px 10px'>Last Name</span><input type='text' class='tinylight' size='20' name='child_lastname' value='".($get_child["patient_lastname"]?$get_child["patient_lastname"]:$post_vars["child_lastname"])."' style='border: 1px solid #000000' /><br />";
+				print "<span style='width:100px;display:inline-block; margin:0 0 5px 10px'>First Name</span><input type='text' class='tinylight' size='20' name='child_firstname' value='".($get_child["patient_firstname"]?$get_child["patient_firstname"]:$post_vars["child_firstname"])."' style='border: 1px solid #000000' /><br />";
+				print "<span style='width:100px;display:inline-block; margin:0 0 5px 10px'>Middle Name</span><input type='text' class='tinylight' size='20' name='child_middlename' value='".($get_child["patient_middle"]?$get_child["patient_middle"]:$post_vars["child_middle"])."' style='border: 1px solid #000000' /><br />";
+				print "<span style='width:100px;display:inline-block; margin:0 0 5px 10px'>Gender</span>";
+					print "<input type='radio' name='px_gender' value='M' ".($get_child["patient_gender"]=='M' ? 'checked' : '')." />Male";
+					print "<input type='radio' name='px_gender' value='F' ".($get_child["patient_gender"]=='F' ? 'checked' : '')." />Female";
+				
+	    //print "<input type='hidden' name='child_patient_id'></input>";
 
-	    print "<input type='hidden' name='child_patient_id'></input>";
-
-	    echo "&nbsp;<input type='button' name='btn_search_spouse' value='Search Child' onclick='search_patient(this.form.name,this.form.elements[3].name,this.form.elements[4].name);' style='border: 1px solid #000000'></input><br>";
-	    echo "<small>If patient's child has been registered, click the Search Child button. Otherwise, please register the child.</small><br>";
-            print "</td></tr>";
+	    //echo "&nbsp;<input type='button' name='btn_search_spouse' value='Search Child' onclick='search_patient(this.form.name,this.form.elements[3].name,this.form.elements[4].name);' style='border: 1px solid #000000'></input><br>";
+	    //echo "<small>If patient's child has been registered, click the Search Child button. Otherwise, please register the child.</small><br>";
+        print "</td>";
+		print "</tr>";
 
 	    print "<tr valign='top'><td>";
             print "<span class='boxtitle'>".LBL_DELIVERY_LOCATION."</span><font color='red'> *</font><br> ";
@@ -3054,7 +3095,7 @@ class mc extends module {
         print "<b>".FTITLE_SERVICE_RECORD."</b><br/>";
         $patient_id = healthcenter::get_patient_id($get_vars["consult_id"]);
         $sql = "select mc_id, service_id, date_format(mc_timestamp,'%a %d %b %Y') service_date, mc_timestamp,actual_service_date, date_format(actual_service_date,'%a %d %b %Y') actual_sdate, service_qty, syphilis_result,intake_penicillin "."from m_consult_mc_services "."where patient_id = '$patient_id' order by service_id, actual_service_date desc";
-        if ($result = mysql_query($sql) or die("Cannot query 3057: ".mysql_error())) {
+        if ($result = mysql_query($sql)) {
             if (mysql_num_rows($result)) {
                 while (list($cid, $service, $sdate, $ts, $actual_service_date, $actual_sdate, $qty, $syphilis) = mysql_fetch_array($result)) {
 
@@ -4542,7 +4583,7 @@ class mc extends module {
 	} 
 
 	function compute_edc($lmp){
-		list($m,$d,$y) = explode('/',$lmp);
+		/*list($m,$d,$y) = explode('/',$lmp);
 		$m = ltrim($m,'0');
 		$d = ltrim($d,'0');
 		$last_day_month = cal_days_in_month(CAL_GREGORIAN,$m,$y);
@@ -4559,15 +4600,16 @@ class mc extends module {
 
 		//get the new month value
 		foreach($arr_date_assoc as $key=>$value){ 
-			if($key==$m):  
-				$new_month = $value; 
+			if($key==$m):
+				$new_month = $value;
 			endif;
 		}
 
 		//get the new date value
 		if(($last_day_month - $new_date) >= 0): //value of $d is less than or equal the last month. retain the same month
-			$new_date = $new_date; 
+			$new_date = $new_date;
 		else:  //value exceeded 30 or 31. excess value will be the new_date, increment the new_month 
+			
 			$new_date =  $new_date - $last_day_month;
 			if($new_month!=12):
 				$new_month += 1;
@@ -4575,12 +4617,20 @@ class mc extends module {
 				$new_month = 1;
 				$new_year += 1;
 			endif;
-	
+			
 		endif;
-
+			
 		$new_month = sprintf("%02d",$new_month); 
 		$new_date = sprintf("%02d",$new_date);
-		return $new_year.'-'.$new_month.'-'.$new_date;
+		return $new_year.'-'.$new_month.'-'.$new_date;*/
+		list($m,$d,$y) = explode('/',$lmp);
+		$m = ltrim($m,'0');
+		$d = ltrim($d,'0');
+		$lastMP = mktime (0,0,0, $m, $d, $y) ;
+		$gest = 24192000; //280 days to the first day of the last menstrual cycle  is converted to 24192000 seconds.
+		$edc = $lastMP + $gest;
+		return date("y-m-d", $edc);
+		
 	}
 
 // end of class

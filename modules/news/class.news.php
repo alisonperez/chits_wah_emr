@@ -1,4 +1,14 @@
 <?
+/*
+	DATE UPDATED : 3/25/2014 ---------------------------------------------------------
+	UPDATED BY: Emmanuel Perez
+	
+	UPDATE LOG:
+		- Added Calendar to search specific date of STAT UPDATE News
+		
+*/
+require_once('../site/calendar/classes/tc_calendar.php');
+
 class news extends module {
 
     // Author: Herman Tolentino MD
@@ -99,7 +109,30 @@ class news extends module {
     }
 
     // --------------- CUSTOM MODULE FUNCTIONS ------------------
-
+	function _calendar($date)
+	{
+		$myCalendar = new tc_calendar("date1", true);
+		$myCalendar->setIcon("../site/calendar/images/iconCalendar.gif");
+		//$myCalendar->setDate(date('d'), date('m'), date('Y'));
+		if (isset($date))
+		{
+			$myCalendar->setDate(date('d', strtotime($date))
+					, date('m', strtotime($date))
+					, date('Y', strtotime($date)));
+		}
+		$myCalendar->setPath("../site/calendar/");
+		$myCalendar->setYearInterval(2005, 2045);
+		//$myCalendar->dateAllow('2008-05-13', '2015-03-01');
+		$myCalendar->setDateFormat('Y-m-d');
+		//$myCalendar->setHeight(350);
+		//$myCalendar->autoSubmit(true, "phmembership");
+		$myCalendar->setAlignment('left', 'bottom');
+		//$myCalendar->setSpecificDate(array("2011-04-01", "2011-04-04", "2011-12-25"), 0, 'year');
+		//$myCalendar->setSpecificDate(array("2011-04-10", "2011-04-14"), 0, 'month');
+		// $myCalendar->setSpecificDate(array("2011-06-01"), 0, '');
+		$myCalendar->writeScript();
+	}
+	
     function _news() {
         if (func_num_args()>0) {
             $arg_list = func_get_args();
@@ -116,13 +149,32 @@ class news extends module {
 
 	
 	$n->update_stats();
-
-        print "<table width='300'>";
+		print "<script type='text/javascript' src='../site/calendar/calendar.js'></script>";
+		print "<form action = '".$_SERVER["SELF"]."' name='search_news' method='post'>";
+		//print "<input type='text' name='searchDate'>";
+		$setDate = isset($_REQUEST["date1"]) ? $_REQUEST["date1"] : "";
+   		if($setDate=='0000-00-00')
+		{
+			$setDate = date('Y-m-d');
+		}
+		$n->_calendar($setDate);
+		print "<input type='submit' name='submitDate' value='search' style='margin-left:8px'>";
+		print "</form>";
+		
+		//$sql = "select news_id, date_format(news_timestamp, '%e %b %Y, %l:%i%p'), news_title, news_author, news_lead from m_news where date_format(news_timestamp,'%Y-%m-%d') = '".$_REQUEST["date1"]."'";
+        print "<table width='350'>";
         print "<tr valign='top'><td>";
         print "<span class='library'>".FTITLE_SITE_NEWS."</span><br>";
         print "</td></tr>";
         if ($get_vars["news_id"]) {
-            $sql = "select news_id, date_format(news_timestamp, '%e %b %Y, %l:%i%p'), news_title, news_author, news_lead, news_text from m_news where news_id = '".$get_vars["news_id"]."'";
+        	if(isset($_REQUEST['submitDate']) && $_REQUEST['submitDate']=='search')
+        	{
+        		$sql = "select news_id, date_format(news_timestamp, '%e %b %Y, %l:%i%p'), news_title, news_author, news_lead, news_text from m_news where date_format(news_timestamp,'%Y-%m-%d') = '".$setDate."'";
+        	}
+        	else 
+        	{
+            	$sql = "select news_id, date_format(news_timestamp, '%e %b %Y, %l:%i%p'), news_title, news_author, news_lead, news_text from m_news where news_id = '".$get_vars["news_id"]."'";
+        	}
             if ($result = mysql_query($sql)) {
                 if (mysql_num_rows($result)) {
                     while (list($id, $ts, $title, $author, $lead, $text) = mysql_fetch_array($result)) {
@@ -138,10 +190,22 @@ class news extends module {
                         print "</td></tr>";
                     }
                 }
+	            else 
+	            {
+	            	print "<tr><td><font color='red'>No content. You can post one in <br/><b>CONTENT-&gt;News Archive</b>.</font></tr></td><br/>";
+	            }
             }
+            
         } else {
-            $sql = "select news_id, date_format(news_timestamp, '%e %b %Y, %l:%i%p'), news_title, news_author, news_lead from m_news order by news_timestamp desc";
-            if ($result = mysql_query($sql)) {
+	        if(isset($_REQUEST['submitDate']) && $_REQUEST['submitDate']=='search')
+			{
+				$sql = "select news_id, date_format(news_timestamp, '%e %b %Y, %l:%i%p'), news_title, news_author, news_lead from m_news where date_format(news_timestamp,'%Y-%m-%d') = '".$setDate."'";
+			}
+			else
+			{
+            	$sql = "select news_id, date_format(news_timestamp, '%e %b %Y, %l:%i%p'), news_title, news_author, news_lead from m_news order by news_timestamp desc LIMIT 0,10";
+			}
+			if ($result = mysql_query($sql)) {
                 if (mysql_num_rows($result)) {
                     while (list($id, $ts, $title, $author, $lead) = mysql_fetch_array($result)) {
                         print "<tr valign='top'><td>";
@@ -155,7 +219,7 @@ class news extends module {
                         print "</td></tr>";
                     }
                 } else {
-                    print "<font color='red'>No content. You can post one in <b>CONTENT-&gt;News Archive</b>.</font><br/>";
+                    print "<tr><td><font color='red'>No content. You can post one in <br/><b>CONTENT-&gt;News Archive</b>.</font></tr><td></br/>";
                 }
             }
         }
@@ -274,7 +338,7 @@ class news extends module {
             $validuser = $arg_list[3];
             $isadmin = $arg_list[4];
         }
-        print "<table width='300'>";
+        print "<table width='350'>";
         print "<tr valign='top'><td colspan='3'>";
         print "<span class='library'>".FTITLE_NEWS_ARCHIVE."</span><br>";
         print "</td></tr>";
@@ -313,7 +377,7 @@ class news extends module {
                 }
             }
         }
-        print "<table width='300'>";
+        print "<table width='350'>";
         print "<form action = '".$_SERVER["SELF"]."?page=".$get_vars["page"]."&menu_id=".$get_vars["menu_id"]."' name='form_news' method='post'>";
         print "<tr valign='top'><td>";
         print "<span class='library'>".FTITLE_NEWS_FORM."</span><br><br>";
