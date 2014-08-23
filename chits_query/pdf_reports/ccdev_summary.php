@@ -528,7 +528,7 @@ function compute_indicators(){
 									while(list($consult_id,$consult_date,$patient_id,$diarrhea_ort)=mysql_fetch_array($q_ort)){
 										if($this->get_px_brgy($patient_id,$brgy_array)):
 											$month_stat[$this->get_max_month($diarrhea_ort)] += 1;
-											array_push($diarrhea_stat_px[$this->get_max_month($diarrhea_ort)],array($pxid,'No. of Diarrhea Cases Given ORT','epi',$diarrhea_ort));
+											array_push($diarrhea_stat_px[$this->get_max_month($diarrhea_ort)],array($patient_id,'No. of Diarrhea Cases Given ORT','epi',$diarrhea_ort));
 										endif;
 									}
 								endif;
@@ -540,7 +540,7 @@ function compute_indicators(){
 									while(list($consult_id,$consult_date,$patient_id,$diarrhea_ors)=mysql_fetch_array($q_ors)){
 										if($this->get_px_brgy($patient_id,$brgy_array)):
 											$month_stat[$this->get_max_month($diarrhea_ors)] += 1;
-											array_push($diarrhea_stat_px[$this->get_max_month($diarrhea_ors)],array($pxid,'No. of Diarrhea Cases Given ORS','epi',$diarrhea_ors));
+											array_push($diarrhea_stat_px[$this->get_max_month($diarrhea_ors)],array($patient_id,'No. of Diarrhea Cases Given ORS','epi',$diarrhea_ors));
 										endif;
 									}
 								endif;
@@ -552,7 +552,7 @@ function compute_indicators(){
 									while(list($consult_id,$consult_date,$patient_id,$diarrhea_orswz)=mysql_fetch_array($q_orswz)){
 										if($this->get_px_brgy($patient_id,$brgy_array)):
 											$month_stat[$this->get_max_month($diarrhea_orswz)] += 1;
-											array_push($diarrhea_stat_px[$this->get_max_month($diarrhea_orswz)],array($pxid,'No. of Diarrhea Cases Given ORS w/ zinc','epi',$diarrhea_orswz));
+											array_push($diarrhea_stat_px[$this->get_max_month($diarrhea_orswz)],array($patient_id,'No. of Diarrhea Cases Given ORS w/ zinc','epi',$diarrhea_orswz));
 										endif;
 									}
 								endif;

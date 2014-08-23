@@ -1,24 +1,24 @@
 <?xml version="1.0"?>
 <config>
     <node>
-        <name>Calasiao RHU 1</name>
-        <code>015517000</code>
+        <name>Generic RHU</name>
+        <code></code>
         <telephone>2444284</telephone>
         <level>self</level>
-        <hfid>DOH000000000006749</hfid>
+        <hfid></hfid>
     </node>
     <node>
-        <name>Calasiao RHU 1</name>
-	<code>015517000</code>
+        <name>Generic RHU</name>
+	<code></code>
         <telephone>2444284</telephone>
         <level>parent</level>        
-        <hfid>DOH000000000006749</hfid>
+        <hfid></hfid>
     </node>
     <node>
-        <name>Calasiao RHU 1</name>
-	<code>015517000</code>
+        <name>Generic RHU</name>
+	<code></code>
         <telephone>2444284</telephone>
         <level>child</level>
-        <hfid>DOH000000000006749</hfid>
+        <hfid></hfid>
     </node>
 </config>
