@@ -56,13 +56,13 @@ if (!isset($banner)) {
 }
 */
 if(isset($_SESSION["banner"])){
-	$arr_banner = array('1','2');
+	$arr_banner = array('0','1','2');
     $_SESSION["banner"] = 'banner.'.array_rand($arr_banner).'.jpg';
 }
 
 if (!isset($_SESSION["banner"])) {
     session_register("banner");
-    $arr_banner = array('1','2');
+    $arr_banner = array('0','1','2');
     $_SESSION["banner"] = 'banner.'.array_rand($arr_banner).'.jpg';
 }
 

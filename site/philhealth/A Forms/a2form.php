@@ -96,69 +96,69 @@
 								echo "<script>alert('Start Month is Greater Than End Month')</script>";
 							}
 							
-							$arrValue = array($dbase->_history('11', 'Member', 'M', '' , $newSDate, $newEDate),
-												$dbase->_history('11', 'Dependent', 'M', '' , $newSDate, $newEDate),
-												$dbase->_history('11', 'Dependent', 'F', 'Y' , $newSDate, $newEDate),
-												$dbase->_history('11', 'Member', 'F', 'N' , $newSDate, $newEDate),
-												$dbase->_history('11', 'Dependent', 'F', 'N' , $newSDate, $newEDate),
-												$dbase->_history('11', 'Member', 'F', 'Y' , $newSDate, $newEDate),
-												$dbase->_countTotalMemDep('M',$newSDate, $newEDate, 60),
-												$dbase->_countTotalMemDep('M',$newSDate, $newEDate, 25, 59),
-												$dbase->_countTotalMemDep('F',$newSDate, $newEDate, 60),
-												$dbase->_countTotalMemDep('F',$newSDate, $newEDate, 25, 59),
-												$dbase->_countTotalMemDep('F',$newSDate, $newEDate, 2, 5),
-												$dbase->_countTotalMemDep('F',$newSDate, $newEDate, 16, 24),
-												$dbase->_countTotalMemDep('M',$newSDate, $newEDate, 6, 15),
-												$dbase->_countTotalMemDep('F',$newSDate, $newEDate, 1),
-												$dbase->_countTotalMemDep('F',$newSDate, $newEDate, 6, 15),
-												$dbase->_countTotalMemDep('M',$newSDate, $newEDate, 1),
-												$dbase->_countTotalMemDep('M',$newSDate, $newEDate, 2, 5),
-												$dbase->_countTotalMemDep('M',$newSDate, $newEDate, 16, 24),
-												$dbase->_breastCancerScreening('Dependent', $newSDate, $newEDate),
-												$dbase->_breastCancerScreening('Member', $newSDate, $newEDate),
-												$dbase->_history('HYPERMED', 'Member', 'M', '' , $newSDate, $newEDate),
-												$dbase->_history('HYPERMED', 'Dependent', 'M', '' , $newSDate, $newEDate),
-												$dbase->_history('HYPERMED', 'Dependent', 'F', 'Y' , $newSDate, $newEDate),
-												$dbase->_history('HYPERMED', 'Member', 'F', 'N' , $newSDate, $newEDate),
-												$dbase->_history('HYPERMED', 'Dependent', 'F', 'N' , $newSDate, $newEDate),
-												$dbase->_history('HYPERMED', 'Member', 'F', 'Y' , $newSDate, $newEDate),
-												($dbase->_countHypertension('Hypertension Stage 2', 'Member', 'M', '', $newSDate, $newEDate)==null ? 0 : $dbase->_countHypertension('Hypertension Stage 2', 'Member', 'M', '', $newSDate, $newEDate)),
-												($dbase->_countHypertension('Hypertension Stage 2', 'Dependent', 'M', '', $newSDate, $newEDate)==null ? 0 : $dbase->_countHypertension('Hypertension Stage 2', 'Dependent', 'M', '', $newSDate, $newEDate)),
-												($dbase->_countHypertension('Hypertension Stage 2', 'Dependent', 'F', 'Y', $newSDate, $newEDate)==null ? 0 : $dbase->_countHypertension('Hypertension Stage 2', 'Dependent', 'F', 'Y', $newSDate, $newEDate)),
-												($dbase->_countHypertension('Hypertension Stage 2', 'Member', 'F', 'N', $newSDate, $newEDate)==null ? 0 : $dbase->_countHypertension('Hypertension Stage 2', 'Member', 'F', 'N', $newSDate, $newEDate)),
-												($dbase->_countHypertension('Hypertension Stage 2', 'Dependent', 'F', 'N', $newSDate, $newEDate)==null ? 0 : $dbase->_countHypertension('Hypertension Stage 2', 'Dependent', 'F', 'N', $newSDate, $newEDate)),
-												($dbase->_countHypertension('Hypertension Stage 2', 'Member', 'F', 'Y', $newSDate, $newEDate)==null ? 0 : $dbase->_countHypertension('Hypertension Stage 2', 'Member', 'F', 'Y', $newSDate, $newEDate)),
-												$dbase->_history('6', 'Member', 'M', '' , $newSDate, $newEDate),
-												$dbase->_history('6', 'Dependent', 'M', '' , $newSDate, $newEDate),
-												$dbase->_history('6', 'Member', 'F', '' , $newSDate, $newEDate),
-												$dbase->_history('6', 'Dependent', 'F', '' , $newSDate, $newEDate),
-												$dbase->_history('ORALHYPO', 'Member', 'M', '' , $newSDate, $newEDate),
-												$dbase->_history('ORALHYPO', 'Dependent', 'M', '' , $newSDate, $newEDate),
-												$dbase->_history('ORALHYPO', 'Member', 'F', '' , $newSDate, $newEDate),
-												$dbase->_history('ORALHYPO', 'Dependent', 'F', '' , $newSDate, $newEDate),
-												0,
-												0,
-												0,
-												0,
-												$dbase->_ppsScreening('CCS', 'Dependent', $newSDate, $newEDate),
-												$dbase->_ppsScreening('CCS', 'Member', $newSDate, $newEDate),
-												($dbase->_countHypertension('Prehypertension', 'Member', 'M', '', $newSDate, $newEDate)==null ? 0 : $dbase->_countHypertension('Prehypertension', 'Member', 'M', '', $newSDate, $newEDate)),
-												($dbase->_countHypertension('Prehypertension', 'Dependent', 'M', '', $newSDate, $newEDate)==null ? 0 : $dbase->_countHypertension('Prehypertension', 'Dependent', 'M', '', $newSDate, $newEDate)),
-												($dbase->_countHypertension('Prehypertension', 'Dependent', 'F', 'Y', $newSDate, $newEDate)==null ? 0 : $dbase->_countHypertension('Prehypertension', 'Dependent', 'F', 'Y', $newSDate, $newEDate)),
-												($dbase->_countHypertension('Prehypertension', 'Member', 'F', 'N', $newSDate, $newEDate)==null ? 0 : $dbase->_countHypertension('Prehypertension', 'Member', 'F', 'N', $newSDate, $newEDate)),
-												($dbase->_countHypertension('Prehypertension', 'Dependent', 'F', 'N', $newSDate, $newEDate)==null ? 0 : $dbase->_countHypertension('Prehypertension', 'Dependent', 'F', 'N', $newSDate, $newEDate)),
-												($dbase->_countHypertension('Prehypertension', 'Member', 'F', 'Y', $newSDate, $newEDate)==null ? 0 : $dbase->_countHypertension('Prehypertension', 'Member', 'F', 'Y', $newSDate, $newEDate)),
-												$dbase->_waist('M', 'Member', $newSDate, $newEDate),
-												$dbase->_waist('M', 'Dependent', $newSDate, $newEDate),
-												$dbase->_waist('F', 'Member', $newSDate, $newEDate),
-												$dbase->_waist('F', 'Dependent', $newSDate, $newEDate),
-												($dbase->_countHypertension('Hypertension Stage 1', 'Member', 'M', '', $newSDate, $newEDate)==null ? 0 : $dbase->_countHypertension('Hypertension Stage 1', 'Member', 'M', '', $newSDate, $newEDate)),
-												($dbase->_countHypertension('Hypertension Stage 1', 'Dependent', 'M', '', $newSDate, $newEDate)==null ? 0 : $dbase->_countHypertension('Hypertension Stage 1', 'Dependent', 'M', '', $newSDate, $newEDate)),
-												($dbase->_countHypertension('Hypertension Stage 1', 'Dependent', 'F', 'Y', $newSDate, $newEDate)==null ? 0 : $dbase->_countHypertension('Hypertension Stage 1', 'Dependent', 'F', 'Y', $newSDate, $newEDate)),
-												($dbase->_countHypertension('Hypertension Stage 1', 'Member', 'F', 'N', $newSDate, $newEDate)==null ? 0 : $dbase->_countHypertension('Hypertension Stage 1', 'Member', 'F', 'N', $newSDate, $newEDate)),
-												($dbase->_countHypertension('Hypertension Stage 1', 'Dependent', 'F', 'N', $newSDate, $newEDate)==null ? 0 : $dbase->_countHypertension('Hypertension Stage 1', 'Dependent', 'F', 'N', $newSDate, $newEDate)),
-												($dbase->_countHypertension('Hypertension Stage 1', 'Member', 'F', 'Y', $newSDate, $newEDate)==null ? 0 : $dbase->_countHypertension('Hypertension Stage 1', 'Member', 'F', 'Y', $newSDate, $newEDate)));
-							unlink('../xml/A2.xml');
+							$arrValue = array(1,
+												2,
+												3,
+												4,
+												5,
+												6,
+												7,
+												8,
+												9,
+												10,
+												11,
+												12,
+												13,
+												14,
+												15,
+												16,
+												17,
+												18,
+												19,
+												20,
+												21,
+												22,
+												23,
+												24,
+												25,
+												26,
+												27,
+												28,
+												29,
+												30,
+												31,
+												32,
+												33,
+												34,
+												35,
+												36,
+												37,
+												38,
+												39,
+												40,
+												41,
+												42,
+												43,
+												44,
+												45,
+												46,
+												47,
+												48,
+												49,
+												50,
+												51,
+												52,
+												53,
+												54,
+												55,
+												56,
+												57,
+												58,
+												59,
+												60,
+												61,
+												62);
+							
 							_generateXML('A2', 'm_consult_philhealth_a2', $arrValue);
 						
 						}
@@ -193,10 +193,10 @@
 						<h4>No. of Assigned Families:</h4><br />
 						<p class='columns2 indent90'>						
 						<span class='width110'><label>SP-NHTS: </label></span><input type='text' name='nhts' size=5 value=".($dbase->_countMemberByType('SP-NHTS',$newSDate, $newEDate)==null ? 0 : $dbase->_countMemberByType('SP-NHTS',$newSDate, $newEDate))."><br />
-						<span class='width110'><label>SP-LGU: </label></span><input type='text' name='lgu' size=5 value=".($dbase->_countMemberByType('SP-LGU',$newSDate, $newEDate)==null ? 0 : $dbase->_countMemberByType('SP-LGU',$newSDate, $newEDate))."><br />
-						<span class='width110'><label>SP-NGA: </label></span><input type='text' name='nga' size=5 value=".($dbase->_countMemberByType('SP-NGA',$newSDate, $newEDate)==null ? 0 : $dbase->_countMemberByType('SP-NGA',$newSDate, $newEDate))."><br />
-						<span class='width110'><label>SP-Private: </label></span><input type='text' name='private' size=5 value=".($dbase->_countMemberByType('SP-Private',$newSDate, $newEDate)==null ? 0 : $dbase->_countMemberByType('SP-Private',$newSDate, $newEDate))."><br />
-						<span class='width110'><label>IPP-OG: </label></span><input type='text' name='og' size=5 value=".($dbase->_countMemberByType('IPP-OG',$newSDate, $newEDate)==null ? 0 : $dbase->_countMemberByType('IPP-OG',$newSDate, $newEDate))."><br />
+						<span class='width110'><label>SP-LGU: </label></span><input type='text' name='lgu' size=5 value=0><br />
+						<span class='width110'><label>SP-NGA: </label></span><input type='text' name='nga' size=5 value=0><br />
+						<span class='width110'><label>SP-Private: </label></span><input type='text' name='private' size=5 value=0><br />
+						<span class='width110'><label>IPP-OG: </label></span><input type='text' name='og' size=5 value=0><br />
 						<span class='width110'><label>IPP-OFW: </label></span><input type='text' name='ofw' size=5 value=".($dbase->_countMemberByType('IPP-OFW',$newSDate, $newEDate)==null ? 0 : $dbase->_countMemberByType('IPP-OFW',$newSDate, $newEDate))."><br />
 						</p>
 						<br />
@@ -282,8 +282,8 @@
 							</tr>
 							<tr>
 								<th>Breast Cancer Screening<br />Female, 25 yearls old and above</th>
-								<td><input type='text' name='breastMember' size=4 value=".$dbase->_breastCancerScreening('Member', $newSDate, $newEDate)."></td>
-								<td><input type='text' name='breastDependent' size=4 value=".$dbase->_breastCancerScreening('Dependent', $newSDate, $newEDate)."></td>
+								<td><input type='text' name='breastMember' size=4 value=0></td>
+								<td><input type='text' name='breastDependent' size=4 value=0></td>
 							</tr>
 							<tr>
 								<th>Cervical Cancer Screening<br />Female, 25 to 55 years old with intact uterus</th>
@@ -331,38 +331,38 @@
 							<tr class='border'>
 								<td><span class='indent70'>&ge;80cm (female)</span></td>
 								<td></td>
-								<td class='center inputWidth'><input type='text' name='80memFemale' size=2 value=".$dbase->_waist('F', 'Member', $newSDate, $newEDate)."></td>
+								<td class='center inputWidth'><input type='text' name='80memFemale' size=2 value=0></td>
 								<td></td>
-								<td class='center inputWidth'><input type='text' name='80depFemale' size=2 value=".$dbase->_waist('F', 'Dependent', $newSDate, $newEDate)."></td>
+								<td class='center inputWidth'><input type='text' name='80depFemale' size=2 value=0></td>
 								<td></td>
-								<td class='center inputWidth'><input type='text' name='80totFemale' size=2 value=".$dbase->_waist('F', 'Total', $newSDate, $newEDate)."></td>
+								<td class='center inputWidth'><input type='text' name='80totFemale' size=2 value=0></td>
 							</tr>
 							<tr class='border'>
 								<td><span class='indent70'>&ge;90cm (male)</span></td>
-								<td class='center inputWidth'><input type='text' name='90memMale' size=2 value=".$dbase->_waist('M', 'Member', $newSDate, $newEDate)."></td>
+								<td class='center inputWidth'><input type='text' name='90memMale' size=2 value=0></td>
 								<td></td>
-								<td class='center inputWidth'><input type='text' name='90depMale' size=2 value=".$dbase->_waist('M', 'Dependent', $newSDate, $newEDate)."></td>
+								<td class='center inputWidth'><input type='text' name='90depMale' size=2 value=0></td>
 								<td></td>
-								<td class='center inputWidth'><input type='text' name='90totMale' size=2 value=".$dbase->_waist('M', 'Total', $newSDate, $newEDate)."></td>
+								<td class='center inputWidth'><input type='text' name='90totMale' size=2 value=0></td>
 								<td></td>
 							</tr>
 							<tr class='border'>
 								<td><h4>History of diagnosis of diabetes</h4></td>
-								<td class='center inputWidth'><input type='text' name='historymemMale' size=2 value=".$dbase->_history('6', 'Member', 'M', '' , $newSDate, $newEDate)."></td>
-								<td class='center inputWidth'><input type='text' name='historymemFemale' size=2 value=".$dbase->_history('6', 'Member', 'F', '' , $newSDate, $newEDate)."></td>
-								<td class='center inputWidth'><input type='text' name='historydepMale' size=2 value=".$dbase->_history('6', 'Dependent', 'M', '' , $newSDate, $newEDate)."></td>
-								<td class='center inputWidth'><input type='text' name='historydepFemale' size=2 value=".$dbase->_history('6', 'Dependent', 'F', '' , $newSDate, $newEDate)."></td>
-								<td class='center inputWidth'><input type='text' name='historytotMale' size=2 value=".$dbase->_history('6', 'Total', 'M', '' , $newSDate, $newEDate)."></td>
-								<td class='center inputWidth'><input type='text' name='historytotFemale' size=2 value=".$dbase->_history('6', 'Total', 'F', '' , $newSDate, $newEDate)."></td>
+								<td class='center inputWidth'><input type='text' name='historymemMale' size=2 value=".$dbase->_history('diabe', 'Member', 'M', '' , $newSDate, $newEDate)."></td>
+								<td class='center inputWidth'><input type='text' name='historymemFemale' size=2 value=".$dbase->_history('diabe', 'Member', 'F', '' , $newSDate, $newEDate)."></td>
+								<td class='center inputWidth'><input type='text' name='historydepMale' size=2 value=".$dbase->_history('diabe', 'Dependent', 'M', '' , $newSDate, $newEDate)."></td>
+								<td class='center inputWidth'><input type='text' name='historydepFemale' size=2 value=".$dbase->_history('diabe', 'Dependent', 'F', '' , $newSDate, $newEDate)."></td>
+								<td class='center inputWidth'><input type='text' name='historytotMale' size=2 value=".$dbase->_history('diabe', '', 'M', '' , $newSDate, $newEDate)."></td>
+								<td class='center inputWidth'><input type='text' name='historytotFemale' size=2 value=".$dbase->_history('diabe', '', 'F', '' , $newSDate, $newEDate)."></td>
 							</tr>
 							<tr class='border'>
 								<td><h4>Intake of oral hypoglycemic agents</h4></td>
-								<td class='center inputWidth'><input type='text' name='intakememMale' size=2 value=".$dbase->_history('ORALHYPO', 'Member', 'M', '' , $newSDate, $newEDate)."></td>
-								<td class='center inputWidth'><input type='text' name='intakememFemale' size=2 value=".$dbase->_history('ORALHYPO', 'Member', 'F', '' , $newSDate, $newEDate)."></td>
-								<td class='center inputWidth'><input type='text' name='intakedepMale' size=2 value=".$dbase->_history('ORALHYPO', 'Dependent', 'M', '' , $newSDate, $newEDate)."></td>
-								<td class='center inputWidth'><input type='text' name='intakedepFemale' size=2 value=".$dbase->_history('ORALHYPO', 'Dependent', 'F', '' , $newSDate, $newEDate)."></td>
-								<td class='center inputWidth'><input type='text' name='intaketotMale' size=2 value=".$dbase->_history('ORALHYPO', 'Total', 'M', '' , $newSDate, $newEDate)."></td>
-								<td class='center inputWidth'><input type='text' name='intaketotFemale' size=2 value=".$dbase->_history('ORALHYPO', 'Total', 'F', '' , $newSDate, $newEDate)."></td>
+								<td class='center inputWidth'><input type='text' name='intakememMale' size=2 value=0></td>
+								<td class='center inputWidth'><input type='text' name='intakememFemale' size=2 value=0></td>
+								<td class='center inputWidth'><input type='text' name='intakedepMale' size=2 value=0></td>
+								<td class='center inputWidth'><input type='text' name='intakedepFemale' size=2 value=0></td>
+								<td class='center inputWidth'><input type='text' name='intaketotMale' size=2 value=0></td>
+								<td class='center inputWidth'><input type='text' name='intaketotFemale' size=2 value=0></td>
 							</tr>
 						</table>
 						<br /><br />
@@ -425,23 +425,23 @@
 							</tr>
 							<tr class='border'>
 								<td><h4>History of diagnosis of hypertension</h4></td>
-								<td class='center inputWidth'><input type='text' name='c4memMale' size=4 value=".$dbase->_history('11', 'Member', 'M', '' , $newSDate, $newEDate)."></td>
-								<td class='center inputWidth'><input type='text' name='c4memnpFemale' size=4 value=".$dbase->_history('11', 'Member', 'F', 'N' , $newSDate, $newEDate)."></td>
-								<td class='center inputWidth'><input type='text' name='c4mempFemale' size=4 value=".$dbase->_history('11', 'Member', 'F', 'Y' , $newSDate, $newEDate)."></td>
-								<td class='center inputWidth'><input type='text' name='c4depMale' size=4 value=".$dbase->_history('11', 'Dependent', 'M', '' , $newSDate, $newEDate)."></td>
-								<td class='center inputWidth'><input type='text' name='c4depnpFemale' size=4 value=".$dbase->_history('11', 'Dependent', 'F', 'N' , $newSDate, $newEDate)."></td>
-								<td class='center inputWidth'><input type='text' name='c4deppFemale' size=4 value=".$dbase->_history('11', 'Dependent', 'F', 'Y' , $newSDate, $newEDate)."></td>
-								<td class='center inputWidth'><input type='text' name='c4sTotal' size=4 value=".$dbase->_history('11', 'Total', '', '' , $newSDate, $newEDate)."></td>
+								<td class='center inputWidth'><input type='text' name='c4memMale' size=4 value=".$dbase->_history('hypert', 'Member', 'M', '' , $newSDate, $newEDate)."></td>
+								<td class='center inputWidth'><input type='text' name='c4memnpFemale' size=4 value=".$dbase->_history('hypert', 'Member', 'F', 'N' , $newSDate, $newEDate)."></td>
+								<td class='center inputWidth'><input type='text' name='c4mempFemale' size=4 value=".$dbase->_history('hypert', 'Member', 'F', 'Y' , $newSDate, $newEDate)."></td>
+								<td class='center inputWidth'><input type='text' name='c4depMale' size=4 value=".$dbase->_history('hypert', 'Dependent', 'M', '' , $newSDate, $newEDate)."></td>
+								<td class='center inputWidth'><input type='text' name='c4depnpFemale' size=4 value=".$dbase->_history('hypert', 'Dependent', 'F', 'N' , $newSDate, $newEDate)."></td>
+								<td class='center inputWidth'><input type='text' name='c4deppFemale' size=4 value=".$dbase->_history('hypert', 'Dependent', 'F', 'Y' , $newSDate, $newEDate)."></td>
+								<td class='center inputWidth'><input type='text' name='c4sTotal' size=4 value=".$dbase->_history('hypert', 'Total', '', '' , $newSDate, $newEDate)."></td>
 							</tr> 
 							<tr class='border'>
 								<td><h4>Intake of hypertension medicine</h4></td>
-								<td class='center inputWidth'><input type='text' name='c5memMale' size=4 value=".$dbase->_history('HYPERMED', 'Member', 'M', '' , $newSDate, $newEDate)."></td>
-								<td class='center inputWidth'><input type='text' name='c5memnpFemale' size=4 value=".$dbase->_history('HYPERMED', 'Member', 'F', 'N' , $newSDate, $newEDate)."></td>
-								<td class='center inputWidth'><input type='text' name='c5mempFemale' size=4 value=".$dbase->_history('HYPERMED', 'Member', 'F', 'Y' , $newSDate, $newEDate)."></td>
-								<td class='center inputWidth'><input type='text' name='c5depMale' size=4 value=".$dbase->_history('HYPERMED', 'Dependent', 'M', '' , $newSDate, $newEDate)."></td>
-								<td class='center inputWidth'><input type='text' name='c5depnpFemale' size=4 value=".$dbase->_history('HYPERMED', 'Dependent', 'F', 'N' , $newSDate, $newEDate)."></td>
-								<td class='center inputWidth'><input type='text' name='c5deppFemale' size=4 value=".$dbase->_history('HYPERMED', 'Dependent', 'F', 'Y' , $newSDate, $newEDate)."></td>
-								<td class='center inputWidth'><input type='text' name='c5ssTotal' size=4 value=".$dbase->_history('HYPERMED', 'Total', '', '' , $newSDate, $newEDate)."></td>
+								<td class='center inputWidth'><input type='text' name='c5memMale' size=4 value=0></td>
+								<td class='center inputWidth'><input type='text' name='c5memnpFemale' size=4 value=0></td>
+								<td class='center inputWidth'><input type='text' name='c5mempFemale' size=4 value=0></td>
+								<td class='center inputWidth'><input type='text' name='c5depMale' size=4 value=0></td>
+								<td class='center inputWidth'><input type='text' name='c5depnpFemale' size=4 value=0></td>
+								<td class='center inputWidth'><input type='text' name='c5deppFemale' size=4 value=0></td>
+								<td class='center inputWidth'><input type='text' name='c5ssTotal' size=4 value=0></td>
 							</tr>
 						</table>
 						<br /><br />

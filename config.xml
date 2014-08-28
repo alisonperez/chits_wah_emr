@@ -1,24 +1,24 @@
 <?xml version="1.0"?>
 <config>
-    <node>
-        <name>Moncada Rural Health Unit 1</name>
-        <code>036906000</code>
-        <telephone>2444284</telephone>
-        <level>self</level>
-        <hfid>DOH000000000001802</hfid>
-    </node>
-    <node>
-        <name>Moncada Rural Health Unit 1</name>
-	<code>036906000</code>
-        <telephone>2444284</telephone>
-        <level>parent</level>        
-        <hfid>DOH000000000001802</hfid>
-    </node>
-    <node>
-        <name>Moncada Rural Health Unit 1</name>
-	<code>036906000</code>
-        <telephone>015380000</telephone>
-        <level>child</level>
-        <hfid>DOH000000000001802</hfid>
-    </node>
+	<node>
+		<name>Matuguinao Rural Health Unit</name>
+		<code>036917000</code>
+		<telephone></telephone>
+		<level>self</level>
+		<hfid>DOH000000000007868</hfid>
+	</node>
+	<node>
+		<name>Matuguinao Rural Health Unit</name>
+		<code>036917000</code>
+		<telephone></telephone>
+		<level>parent</level>
+		<hfid>DOH000000000007868</hfid>
+	</node>
+	<node>
+		<name>Matuguinao Rural Health Unit</name>
+		<code>036917000</code>
+		<telephone></telephone>
+		<level>child</level>
+		<hfid>DOH000000000007868</hfid>
+	</node>
 </config>

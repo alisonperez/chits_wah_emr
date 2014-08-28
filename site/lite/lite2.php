@@ -106,8 +106,7 @@
 		if($new_entry_array!=NULL || $new_consult_array!=''){
 			ehr_connect();
 			$array_m_push_update = array();
-			print_r($new_entry_array);
-			echo "<br />";
+			
 			foreach($new_entry_array as $entry_array => $new_entry){
 				if($new_entry[4]=='m_patient_fp_pelvic' || $new_entry[4]=='m_patient_fp_pe' || $new_entry[4]=='m_patient_fp_hx' || $new_entry[4]=='m_patient_fp_method_service'){
 					//START OF DELETE RECORDS 
@@ -218,26 +217,20 @@
 				$new_id = '';
 				$insert_text = insert_values($new_entry, $new_id);
 				if($new_entry[4]=='m_consult_notes_complaint' || $new_entry[4]=='m_consult_notes_dxclass'){
-					$get_dx_cc_sql = mysql_query("SELECT * FROM $new_entry[4] WHERE notes_id = '$new_entry[7]' AND consult_id = '$new_entry[8]'") or die("Error 220 :".mysql_error());
-					while($dx_cc_result = mysql_fetch_array($get_dx_cc_sql)){
-						if($new_entry[4]=='m_consult_notes_complaint'){
-							$check_sql = mysql_query("SELECT * FROM $new_entry[4] WHERE notes_id = '$new_entry[7]' AND consult_id = '$new_entry[8]' AND complaint_id ='$dx_cc_result[complaint_id]'") or die("Error 229 : ".mysql_error());
-							$insert_text = "'".$new_entry[7]."','".$new_entry[8]."','".$new_entry[9]."','".$dx_cc_result[complaint_id]."','".$new_entry[11]."','".$new_entry[12]."','".$new_entry[13]."'";
-						}else{
-							$check_sql = mysql_query("SELECT * FROM $new_entry[4] WHERE notes_id = '$new_entry[7]' AND consult_id = '$new_entry[8]' AND class_id ='$dx_cc_result[class_id]'") or die("Error 229 : ".mysql_error());
-							$insert_text = "'".$new_entry[7]."','".$new_entry[8]."','".$new_entry[9]."','".$dx_cc_result[class_id]."','".$new_entry[11]."','".$new_entry[12]."','".$new_entry[13]."'";
-						}
+					if($new_entry[4]=='m_consult_notes_complaint'){
+						$check_sql = mysql_query("SELECT * FROM $new_entry[4] WHERE notes_id = '$new_entry[7]' AND consult_id = '$new_entry[7]' AND complaint_id ='$new_entry[10]'") or die("Error 229 : ".mysql_error());
+						$insert_text = "'".$new_entry[7]."','".$new_entry[8]."','".$new_entry[9]."','".$new_entry[10]."','".$new_entry[11]."','".$new_entry[12]."','".$new_entry[13]."'";
+					}else{
 					
-						if(mysql_num_rows($check_sql)==0){
-							insert_query($insert_text, $new_entry[4]);
-						}
+						$check_sql = mysql_query("SELECT * FROM $new_entry[4] WHERE notes_id = '$new_entry[7]' AND consult_id = '$new_entry[7]' AND class_id ='$new_entry[10]'") or die("Error 229 : ".mysql_error());
+						$insert_text = "'".$new_entry[7]."','".$new_entry[8]."','".$new_entry[9]."','".$new_entry[10]."','".$new_entry[11]."','".$new_entry[12]."','".$new_entry[13]."'";
+					}
+					
+					if(mysql_num_rows($check_sql)==0){
+						insert_query($insert_text, $new_entry[4]);
 					}
 	
-				}elseif($new_entry[4]=='m_consult_ptgroup'){
-					echo "PTGROUP : ";
-					print_r($new_entry);
-				
-				}elseif($new_entry[4]=='m_consult_ccdev_services' || $new_entry[4]=='m_patient_fp_method_service' || $new_entry[4]=='m_patient_fp_pelvic' || $new_entry[4]=='m_patient_fp_pe' || $new_entry[4]=='m_patient_fp_obgyn' || $new_entry[4]=='m_patient_fp_hx' || $new_entry[4]=='m_consult_mc_prenatal' || $new_entry[4]=='m_consult_mc_postpartum' || $new_entry[4]=='m_consult_mc_services' || $new_entry[4]=='m_consult_ccdev_vaccine' || $new_entry[4]=='m_consult_mc_vaccine' || $new_entry[4]=='m_consult_vaccine'){
+				}elseif($new_entry[4]=='m_patient_fp_method_service' || $new_entry[4]=='m_patient_fp_pelvic' || $new_entry[4]=='m_patient_fp_pe' || $new_entry[4]=='m_patient_fp_obgyn' || $new_entry[4]=='m_patient_fp_hx' || $new_entry[4]=='m_consult_mc_prenatal' || $new_entry[4]=='m_consult_mc_postpartum' || $new_entry[4]=='m_consult_mc_services' || $new_entry[4]=='m_consult_ccdev_vaccine' || $new_entry[4]=='m_consult_mc_vaccine' || $new_entry[4]=='m_consult_vaccine'){
 					//echo "BAD".$new_entry[4];			
 					$insert_text = '';
 					lite_connect($_POST['sync_user']);
@@ -247,9 +240,6 @@
 							break;
 						case 'm_consult_vaccine':
 							$where_field = 'consult_id';
-							break;
-						case 'm_consult_ccdev_services';
-							$where_field = 'ccdev_id';
 							break;
 						case 'm_patient_fp_hx':
 							$where_field = 'fp_id';
@@ -286,7 +276,6 @@
 									$patient_id = $new_entry[10];
 									$field_to_find = 'visit_sequence';
 									break;
-								
 								case 'm_consult_mc_postpartum':
 									$mc_id = $new_entry[7];
 									$consult_id = $new_entry[8];
@@ -355,12 +344,6 @@
 									$patient_id = $new_entry[8];
 									$field_to_find = 'obshx_id';
 									break;
-								case 'm_consult_ccdev_services':
-									$ccdev_id = $new_entry[7];
-									$consult_id = $new_entry[8];
-									$patient_id = $new_entry[10];
-									$field_to_find = 'service_id';
-									break;
 								default:
 								
 									break;
@@ -368,21 +351,14 @@
 						
 						if($new_entry[4]=="m_consult_vaccine"){
 							$check_mc_date = mysql_query("SELECT * FROM $new_entry[4] WHERE $spc_field = '$consult_id' AND patient_id = '$patient_id' AND $field_to_find = '$get_mc_lite_result[$field_to_find]'")or die("Error 156 : ".mysql_error());
-						
 						}elseif($new_entry[4]=="m_consult_ccdev_vaccine"){
 							$check_mc_date = mysql_query("SELECT * FROM $new_entry[4] WHERE $spc_field = '$ccdev_id' AND patient_id = '$patient_id' AND $field_to_find = '$get_mc_lite_result[$field_to_find]'")or die("Error 156 : ".mysql_error());
-						
 						}elseif($new_entry[4]=="m_patient_fp_method_service" || $new_entry[4]=="m_patient_fp_hx" || $new_entry[4]=="m_patient_fp_pe" || $new_entry[4]=="m_patient_fp_pelvic" || $new_entry[4]=="m_patient_fp_obgyn"){
 							$check_mc_date = mysql_query("SELECT * FROM $new_entry[4] WHERE $spc_field = '$fp_id' AND patient_id = '$patient_id' AND $field_to_find = '".$get_mc_lite_result[$field_to_find]."'")or die("Error 156 : ".mysql_error());
-						
 						}elseif($new_entry[4]=="m_consult_mc_services"){
 							$check_mc_date = mysql_query("SELECT * FROM $new_entry[4] WHERE mc_id = '$mc_id' AND consult_id = '$consult_id' AND patient_id = '$patient_id' AND $field_to_find = '$get_mc_lite_result[$field_to_find]' AND mc_timestamp='$mc_timestamp'")or die("Error 158 : ".mysql_error());
-						
-						}elseif($new_entry[4]=="m_consult_ccdev_services"){
-							$check_mc_date = mysql_query("SELECT * FROM $new_entry[4] WHERE ccdev_id = '$ccdev_id' AND consult_id = '$consult_id' AND patient_id = '$patient_id' AND $field_to_find = '$get_mc_lite_result[$field_to_find]'")or die("Error 382 : ".mysql_error());
-						
 						}else{
-							$check_mc_date = mysql_query("SELECT * FROM $new_entry[4] WHERE mc_id = '$mc_id' AND consult_id = '$consult_id' AND patient_id = '$patient_id' AND $field_to_find = '$get_mc_lite_result[$field_to_find]'")or die("Error 385 : ".mysql_error());
+							$check_mc_date = mysql_query("SELECT * FROM $new_entry[4] WHERE mc_id = '$mc_id' AND consult_id = '$consult_id' AND patient_id = '$patient_id' AND $field_to_find = '$get_mc_lite_result[$field_to_find]'")or die("Error 158 : ".mysql_error());
 						}
 						
 						if(mysql_num_rows($check_mc_date)==0){
@@ -451,33 +427,10 @@
 						lite_connect($_POST['sync_user']);
 					}
 				}else{
-					if($new_entry[4]=='m_family_address' || $new_entry[4]=='m_family_members'){
-						lite_connect($_POST['sync_user']);
-							$get_fam_id = mysql_query("SELECT emr_specific_id, address_year FROM m_push_status JOIN m_family_address ON family_id = lite_specific_id WHERE lite_specific_id = '$new_entry[2]' AND table_name ='m_family' LIMIT 1") or die("Error 66 : ".mysql_error());
-							$result_fam_id = mysql_fetch_array($get_fam_id);
-						
-							$fam_id = $result_fam_id['emr_specific_id'];
-							$add_year = $result_fam_id['address_year'];
-							
-			
-						ehr_connect();
-							echo "QUERY FOR FAMILY SELECT * FROM m_family_address WHERE family_id = '$fam_id' AND address_year='$add_year'";
-							$check_for_dup_sql = mysql_query("SELECT * FROM m_family_address WHERE family_id = '$fam_id' AND address_year='$add_year'") or die("Error 461 : ".mysql_error());
-							
-							if(mysql_num_rows($check_for_dup_sql)<=0){
-								insert_query($insert_text, $new_entry[4]);
-								$push_data_array = array($new_entry[0], $new_entry[1], $new_entry[2],$fam_id,$new_entry[4],$new_entry[5],'N', $new_entry[6]);
-							}else{
-								$push_data_array = array($new_entry[0], $new_entry[1], $new_entry[2],$fam_id,$new_entry[4],$new_entry[5],'N', $new_entry[6]);
-							}
-					}else{
-						ehr_connect();
-						insert_query($insert_text, $new_entry[4]);
-						$push_data_array = array($new_entry[0], $new_entry[1], $new_entry[2],$new_entry[3],$new_entry[4],$new_entry[5],'N', $new_entry[6]);
-					}
-					
+					ehr_connect();
+					insert_query($insert_text, $new_entry[4]);
 				}
-				/*
+				
 				if($new_entry[4]=='m_family_address' || $new_entry[4]=='m_family_members'){
 					lite_connect($_POST['sync_user']);
 					$get_fam_id = mysql_query("SELECT lite_specific_id FROM m_push_status WHERE lite_specific_id = '$new_entry[2]' AND table_name ='m_family' LIMIT 1") or die("Error 66 : ".mysql_error());
@@ -489,7 +442,7 @@
 				}else{
 					$push_data_array = array($new_entry[0], $new_entry[1], $new_entry[2],$new_entry[3],$new_entry[4],$new_entry[5],'N', $new_entry[6]);
 				}
-				*/
+				
 				array_push($array_m_push_update,$push_data_array);
 				unset($push_data_array);
 				$new_record_count += 1;
@@ -558,9 +511,9 @@
 						$update_ccdev_sql = "UPDATE $update_value[4] SET $update_text $add_update WHERE $where_text $add_where";
 						update_ccdev($update_ccdev_sql);
 					}
-					lite_connect($_POST['sync_user']);	
-				
-				}elseif($update_value[4]=='m_consult_mc_services' || $update_value[4]=='m_patient_fp_method' || $update_value[4]=='m_patient_fp_method_service' || $update_value[4]=='m_patient_fp_obgyn' || $update_value[4]=='m_patient_fp_hx' || $update_value[4]=='m_patient_fp_pe' || $update_value[4]=='m_patient_fp_pelvic' || $update_value[4]=='m_consult_mc_prenatal' || $update_value[4]=='m_consult_mc_postpartum' || $update_value[4]=='m_consult_mc_vaccine'){
+					lite_connect($_POST['sync_user']);
+					
+				}elseif($update_value[4]=='m_patient_fp_method' || $update_value[4]=='m_patient_fp_method_service' || $update_value[4]=='m_patient_fp_obgyn' || $update_value[4]=='m_patient_fp_hx' || $update_value[4]=='m_patient_fp_pe' || $update_value[4]=='m_patient_fp_pelvic' || $update_value[4]=='m_consult_mc_prenatal' || $update_value[4]=='m_consult_mc_postpartum' || $update_value[4]=='m_consult_mc_services' || $update_value[4]=='m_consult_mc_vaccine'){
 					$insert_text = '';
 					lite_connect($_POST['sync_user']);
 				
@@ -610,15 +563,13 @@
 									$field_to_find = 'visit_sequence';
 									$visit_sequence = $get_mc_lite_result[$field_to_find];
 									break;
-								case 'm_consult_mc_services':	
-									$mc_id = $new_entry[7];
-									$consult_id = $new_entry[8];
-									$patient_id = $new_entry[10];
-									$service_id = $get_mc_lite_result['service_id'];
-									$mc_timestamp = $get_mc_lite_result['mc_timestamp'];
+								case 'm_consult_mc_services':
+									$mc_id = $update_value[7];
+									$consult_id = $update_value[8];
+									$patient_id = $update_value[10];
 									$field_to_find = 'service_id';
+									$service_id = $get_mc_lite_result[$field_to_find];
 									break;
-								
 								case 'm_patient_fp_hx':
 									$mc_id = $update_value[7];
 									$consult_id = $update_value[8];
@@ -685,8 +636,6 @@
 							$check_mc_date = mysql_query("SELECT * FROM $update_value[4] WHERE $spc_field = '$mc_id' AND patient_id = '$patient_id' AND $field_to_find = '$get_mc_lite_result[$field_to_find]'")or die("Error 156 : ".mysql_error());
 						}elseif($update_value[4]=="m_patient_fp_method"){
 							$check_mc_date = mysql_query("SELECT * FROM $update_value[4] WHERE $spc_field = '$mc_id' AND patient_id = '$patient_id' AND consult_id = '$consult_id'")or die("Error 156 : ".mysql_error());
-						}elseif($update_value[4]=="m_consult_mc_services"){
-							$check_mc_date = mysql_query("SELECT * FROM $new_entry[4] WHERE mc_id = '$mc_id' AND consult_id = '$consult_id' AND patient_id = '$patient_id' AND $field_to_find = '$get_mc_lite_result[$field_to_find]' AND mc_timestamp='$mc_timestamp'")or die("Error 158 : ".mysql_error());
 						}else{
 							$check_mc_date = mysql_query("SELECT * FROM $update_value[4] WHERE mc_id = '$mc_id' AND consult_id = '$consult_id' AND patient_id = '$patient_id' AND $field_to_find = '$get_mc_lite_result[$field_to_find]'")or die("Error 158 : ".mysql_error());
 						}
@@ -717,7 +666,7 @@
 							
 							$update_ccdev_sql = "UPDATE $update_value[4] SET $insert_text WHERE $update_where";
 							echo $update_ccdev_sql;
-							update_ccdev($update_ccdev_sql);
+							//update_ccdev($update_ccdev_sql);
 						}
 						lite_connect($_POST['sync_user']);
 					}
@@ -732,7 +681,7 @@
 				$update_record_count += 1;
 				
 			}
-			update_m_push($array_m_push_update, 'update');
+			//update_m_push($array_m_push_update, 'update');
 			unset($array_m_push_update);
 		
 		}
@@ -938,7 +887,6 @@
 					}elseif($value[4]=='m_consult_ptgroup'){
 						$update_sql = "UPDATE m_push_status SET emr_specific_id='$value[3]', push_flag='N' WHERE lite_specific_id='$value[2]' AND table_name='$value[4]' AND entry_date='$value[5]' AND sync_type='N'";
 					}else{
-						echo "UPDATE m_push_status SET emr_specific_id='$value[3]', push_flag='N' WHERE lite_patient_id = '$value[0]' AND emr_patient_id = '$value[1]' AND lite_specific_id='$value[2]' AND table_name='$value[4]' AND entry_date='$value[5]' AND sync_type='N'";
 						$update_sql = "UPDATE m_push_status SET emr_specific_id='$value[3]', push_flag='N' WHERE lite_patient_id = '$value[0]' AND emr_patient_id = '$value[1]' AND lite_specific_id='$value[2]' AND table_name='$value[4]' AND entry_date='$value[5]' AND sync_type='N'";
 					}
 					break;
@@ -1641,7 +1589,7 @@
 		
 	function ehr_connect(){
 		$dbconn = mysql_connect('localhost',$_SESSION['dbuser'],$_SESSION['dbpass']) or die(mysql_error());
-		mysql_select_db('wah_live',$dbconn);
+		mysql_select_db('server',$dbconn);
 	}
 	
 	

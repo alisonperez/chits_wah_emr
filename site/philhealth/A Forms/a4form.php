@@ -232,7 +232,6 @@
 												$dbase->_countBloodPressure('Hypertension',$newSDate,$newEDate)==null ? 0 : $dbase->_countBloodPressure('Hypertension',$newSDate,$newEDate));
 
 							//print_r($arrValue);
-							unlink('../xml/A4.xml');
 							_generateXML('A4', 'm_consult_philhealth_a4', $arrValue);
 						}
 						else 
@@ -375,72 +374,72 @@
 								<td><span class='indent'>1. Consultation</span></td>
 								<td class='center inputWidth'><input type='text' name='pp1memGiven' size=1 value=".$dbase->_countConsultation('MEMBER', $newSDate, $newEDate)."></td>
 								<td class='center inputWidth'><input type='text' name='pp1depGiven' size=1 value=".$dbase->_countConsultation('DEPENDENT', $newSDate, $newEDate)."></td>
-								<td class='center inputWidth'><input type='hidden' name='pp1memReferred' size=1 value=0></td>
-								<td class='center inputWidth'><input type='hidden' name='pp1depReferred' size=1 value=0></td>
+								<td class='center inputWidth'><input type='text' name='pp1memReferred' size=1 value=0></td>
+								<td class='center inputWidth'><input type='text' name='pp1depReferred' size=1 value=0></td>
 							</tr>
 						
 							<tr >
 								<td><span class='indent'>2. Visual inspection with acetic acid</span></td>
 								<td class='center inputWidth'><input type='text' name='pp2memGiven' size=1 value=".$dbase->_countPPServices('ACETIC', 'MEMBER', $newSDate, $newEDate)."></td>
 								<td class='center inputWidth'><input type='text' name='pp2depGiven' size=1 value=".$dbase->_countPPServices('ACETIC', 'DEPENDENT', $newSDate, $newEDate)."></td>
-								<td class='center inputWidth'><input type='hidden' name='pp2memReferred' size=1 value=0></td>
-								<td class='center inputWidth'><input type='hidden' name='pp2depReferred' size=1 value=0></td>
+								<td class='center inputWidth'><input type='text' name='pp2memReferred' size=1 value=0></td>
+								<td class='center inputWidth'><input type='text' name='pp2depReferred' size=1 value=0></td>
 							</tr>
 						
 							<tr>
 								<td><span class='indent'>3. Regular BP measurements</span></td>
 								<td class='center inputWidth'><input type='text' name='pp3memGiven' size=1 value=".$dbase->_countPPServices('BPMEAS', 'MEMBER', $newSDate, $newEDate)."></td>
 								<td class='center inputWidth'><input type='text' name='pp3depGiven' size=1 value=".$dbase->_countPPServices('BPMEAS', 'DEPENDENT', $newSDate, $newEDate)."></td>
-								<td class='center inputWidth'><input type='hidden' name='pp3memReferred' size=1 value=0></td>
-								<td class='center inputWidth'><input type='hidden' name='pp3depReferred' size=1 value=0></td>
+								<td class='center inputWidth'><input type='text' name='pp3memReferred' size=1 value=0></td>
+								<td class='center inputWidth'><input type='text' name='pp3depReferred' size=1 value=0></td>
 							</tr>
 						
 							<tr>
 								<td><span class='indent'>4. Breastfeeding program education</span></td>
 								<td class='center inputWidth'><input type='text' name='pp4memGiven' size=1 value=".$dbase->_countPPServices('BREASTFEED', 'MEMBER', $newSDate, $newEDate)."></td>
 								<td class='center inputWidth'><input type='text' name='pp4depGiven' size=1 value=".$dbase->_countPPServices('BREASTFEED', 'DEPENDENT', $newSDate, $newEDate)."></td>
-								<td class='center inputWidth'><input type='hidden' name='pp4memReferred' size=1 value=0></td>
-								<td class='center inputWidth'><input type='hidden' name='pp4depReferred' size=1 value=0></td>
+								<td class='center inputWidth'><input type='text' name='pp4memReferred' size=1 value=0></td>
+								<td class='center inputWidth'><input type='text' name='pp4depReferred' size=1 value=0></td>
 							</tr>
 						
 							<tr>
 								<td><span class='indent'>5. Periodic clinical breast examinations</span></td>
 								<td class='center inputWidth'><input type='text' name='pp5memGiven' size=1 value=".$dbase->_countPPServices('BREASTX', 'MEMBER', $newSDate, $newEDate)."></td>
 								<td class='center inputWidth'><input type='text' name='pp5depGiven' size=1 value=".$dbase->_countPPServices('BREASTX', 'DEPENDENT', $newSDate, $newEDate)."></td>
-								<td class='center inputWidth'><input type='hidden' name='pp5memReferred' size=1 value=0></td>
-								<td class='center inputWidth'><input type='hidden' name='pp5depReferred' size=1 value=0></td>
+								<td class='center inputWidth'><input type='text' name='pp5memReferred' size=1 value=0></td>
+								<td class='center inputWidth'><input type='text' name='pp5depReferred' size=1 value=0></td>
 							</tr>
 						
 							<tr>
 								<td><span class='indent'>6. Counselling for lifestyle modification</span></td>
 								<td class='center inputWidth'><input type='text' name='pp6memGiven' size=1 value=".$dbase->_countPPServices('LIFEST', 'MEMBER', $newSDate, $newEDate)."></td>
 								<td class='center inputWidth'><input type='text' name='pp6depGiven' size=1 value=".$dbase->_countPPServices('LIFEST', 'DEPENDENT', $newSDate, $newEDate)."></td>
-								<td class='center inputWidth'><input type='hidden' name='pp6memReferred' size=1 value=0></td>
-								<td class='center inputWidth'><input type='hidden' name='pp6depReferred' size=1 value=0></td>
+								<td class='center inputWidth'><input type='text' name='pp6memReferred' size=1 value=0></td>
+								<td class='center inputWidth'><input type='text' name='pp6depReferred' size=1 value=0></td>
 							</tr>
 						
 							<tr>
 								<td><span class='indent'>7. Counselling for smoking cessation</span></td>
 								<td class='center inputWidth'><input type='text' name='pp7memGiven' size=1 value=".$dbase->_countPPServices('SMOKEC', 'MEMBER', $newSDate, $newEDate)."></td>
 								<td class='center inputWidth'><input type='text' name='pp7depGiven' size=1 value=".$dbase->_countPPServices('SMOKEC', 'DEPENDENT', $newSDate, $newEDate)."></td>
-								<td class='center inputWidth'><input type='hidden' name='pp7memReferred' size=1 value=0></td>
-								<td class='center inputWidth'><input type='hidden' name='pp7depReferred' size=1 value=0></td>
+								<td class='center inputWidth'><input type='text' name='pp7memReferred' size=1 value=0></td>
+								<td class='center inputWidth'><input type='text' name='pp7depReferred' size=1 value=0></td>
 							</tr>
 						
 							<tr>
 								<td><span class='indent'>8. Body measurements</span></td>
 								<td class='center inputWidth'><input type='text' name='pp8memGiven' size=1 value=".$dbase->_countPPServices('BODYM', 'MEMBER', $newSDate, $newEDate)."></td>
 								<td class='center inputWidth'><input type='text' name='pp8depGiven' size=1 value=".$dbase->_countPPServices('BODYM', 'DEPENDENT', $newSDate, $newEDate)."></td>
-								<td class='center inputWidth'><input type='hidden' name='pp8memReferred' size=1 value=0></td>
-								<td class='center inputWidth'><input type='hidden' name='pp8depReferred' size=1 value=0></td>
+								<td class='center inputWidth'><input type='text' name='pp8memReferred' size=1 value=0></td>
+								<td class='center inputWidth'><input type='text' name='pp8depReferred' size=1 value=0></td>
 							</tr>
 						
 							<tr>
 								<td><span class='indent'>9. Digital rectal examination</span></td>
 								<td class='center inputWidth'><input type='text' name='pp9memGiven' size=1 value=".$dbase->_countPPServices('RECTAL', 'MEMBER', $newSDate, $newEDate)."></td>
 								<td class='center inputWidth'><input type='text' name='pp9depGiven' size=1 value=".$dbase->_countPPServices('RECTAL', 'DEPENDENT', $newSDate, $newEDate)."></td>
-								<td class='center inputWidth'><input type='hidden' name='pp9memReferred' size=1 value=0></td>
-								<td class='center inputWidth'><input type='hidden' name='pp9depReferred' size=1 value=0></td>
+								<td class='center inputWidth'><input type='text' name='pp9memReferred' size=1 value=0></td>
+								<td class='center inputWidth'><input type='text' name='pp9depReferred' size=1 value=0></td>
 							</tr>
 						
 							<tr>
@@ -521,18 +520,14 @@
 								<th width='100px'>D</th>
 							</tr>
 						</table>";
-				
-					echo "<table id='asthmed'>";
-						$dbase->_genericDrugs('Asthma',$newSDate, $newEDate,'asthmed');
-					echo "</table>";
 						
-					/*echo "<table id='asthmed'>
+					echo "<table id='asthmed'>
 							<tr>
 								<th width='350px'><span>Med 1 </span><input style='width:190px' type='text' name='asthmed1'></th>
 								<th width='100px'><input style='width:70px; text-align:right;' type='text' name='asthmed1Mem'></th>
 								<th width='100px'><input style='width:70px; text-align:right;' type='text' name='asthmed1Dep'></th>
 							</tr>
-						</table>";*/
+						</table>";
 												
 					echo "<br />
 						<table class='addMed'>
@@ -543,7 +538,7 @@
 						<br />";							
 						
 						
-					/*echo "<table id='dehydmed'>
+					echo "<table id='dehydmed'>
 							<tr>
 								<td colspan='3'><h4>II. AGE with no or mild dehydration</h4></td>
 							</tr>
@@ -553,14 +548,7 @@
 								<th width='100px'><input style='width:70px; text-align:right;' type='text' name='dehydmed1Mem'></th>
 								<th width='100px'><input style='width:70px; text-align:right;' type='text' name='dehydmed1Dep'></th>
 							</tr>
-						</table>";*/
-					
-					echo "<table id='dehydmed'>";
-					echo "<tr>
-								<td colspan='3'><h4>II. AGE with no or mild dehydration</h4></td>
-						</tr>";
-						$dbase->_genericDrugs('AGE',$newSDate, $newEDate,'dehydmed');
-					echo "</table>";
+						</table>";
 					
 					echo "<br />
 						<table class='addMed'>
@@ -569,8 +557,10 @@
 							</tr>
 						</table>
 						<br />";
-												
-					/*echo "<table id='urtidmed'>
+						
+							
+						
+					echo "<table id='urtidmed'>
 							<tr>
 								<td colspan='3'><h4>III. URTI/Pneumonia (minimal & low risk)</h4></td>
 							</tr>
@@ -580,24 +570,18 @@
 								<th width='100px'><input style='width:70px; text-align:right;' type='text' name='urtidmed1Mem'></th>
 								<th width='100px'><input style='width:70px; text-align:right;' type='text' name='urtidmed1Dep'></th>
 							</tr>
-						</table>";*/
-					
-					echo "<table id='urtimed'>";
-					echo "<tr>
-								<td colspan='3'><h4>III. URTI/Pneumonia (minimal & low risk)</h4></td>
-						</tr>";
-						$dbase->_genericDrugs('URTI',$newSDate, $newEDate,'urtimed');
-					echo "</table>";
+						</table>";
 					
 					echo "<br />
 						<table class='addMed'>
 							<tr>
-								<th colspan=3><input type='button' value='Add Medicine' onclick='addTR(\"urtimed\");'></th>
+								<th colspan=3><input type='button' value='Add Medicine' onclick='addTR(\"urtidmed\");'></th>
 							</tr>
 						</table>
 						<br />";
 					
-					/*echo "<table id='utidmed'>
+						
+					echo "<table id='utidmed'>
 							<tr>
 								<td colspan='3'><h4>IV. UTI</h4></td>
 							</tr>
@@ -607,19 +591,12 @@
 								<th width='100px'><input style='width:70px; text-align:right;' type='text' name='utidmed1Mem'></th>
 								<th width='100px'><input style='width:70px; text-align:right;' type='text' name='utidmed1Dep'></th>
 							</tr>
-						</table>";*/
-					
-					echo "<table id='utimed'>";
-					echo "<tr>
-								<td colspan='3'><h4>IV. UTI</h4></td>
-						</tr>";
-						$dbase->_genericDrugs('UTI',$newSDate, $newEDate,'utimed');
-					echo "</table>";
+						</table>";
 					
 					echo "<br />
 						<table class='addMed'>
 							<tr>
-								<th colspan=3><input type='button' value='Add Medicine' onclick='addTR(\"utimed\");'></th>
+								<th colspan=3><input type='button' value='Add Medicine' onclick='addTR(\"utidmed\");'></th>
 							</tr>
 						</table>
 						<br />";

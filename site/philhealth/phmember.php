@@ -43,17 +43,6 @@
 						<option value=2 <?php if ($_POST['type']==2) { echo 'selected';} else echo '';?>>Dependents</option>
 						<option value=3 <?php if ($_POST['type']==3) { echo 'selected';} else echo '';?>>Undefined Membership</option>
 					</select>
-					<?php 
-						$sql = "SELECT barangay_id, barangay_name FROM m_lib_barangay ORDER BY barangay_name ASC";
-						$query = $dbase->_dbQuery($sql);
-						echo "<select name='bgy' style='text-align:center;' onchange='submit()'>";
-						echo "<option value=0 ".($_POST['bgy']==0 ? 'selected':'').">Select Barangay</option>";
-						while($result = $dbase->_dbFetchArr($query))
-						{
-							echo "<option value='".$result['barangay_id']."' ".($_POST['bgy']==$result['barangay_id'] ? 'selected':'').">".$result['barangay_name']."</option>";
-						}
-						echo "</select>";
-					?>
 					<hr />
 					<br />
 					</div>	
@@ -77,44 +66,16 @@
 								switch($_POST['type'])
 								{
 									case 0:
-										if(isset($_POST['bgy']) && $_POST['bgy']!=0)
-										{
-											$sql .= " WHERE e.barangay_id = '".$_POST['bgy']."' ORDER BY patient_lastname, patient_firstname ASC";
-										}
-										else
-										{
-											$sql .= " ORDER BY patient_lastname, patient_firstname ASC";
-										}
+										$sql .= " ORDER BY patient_lastname, patient_firstname ASC";
 										break;
 									case 1:
-										if(isset($_POST['bgy']) && $_POST['bgy']!=0)
-										{
-											$sql .= " WHERE member_id IN (1,2,3,5,7,8,9,10,11,12,13) AND e.barangay_id = '".$_POST['bgy']."' ORDER BY patient_lastname, patient_firstname ASC";
-										}
-										else
-										{
-											$sql .= " WHERE member_id IN (1,2,3,5,7,8,9,10,11,12,13) ORDER BY patient_lastname, patient_firstname ASC";
-										}
+										$sql .= " WHERE member_id IN (1,2,3,5) ORDER BY patient_lastname, patient_firstname ASC";
 										break;
 									case 2:
-										if(isset($_POST['bgy']) && $_POST['bgy']!=0)
-										{
-											$sql .= " WHERE member_id = 4 AND e.barangay_id = '".$_POST['bgy']."' ORDER BY patient_lastname, patient_firstname ASC";
-										}
-										else
-										{
-											$sql .= " WHERE member_id = 4 ORDER BY patient_lastname, patient_firstname ASC";
-										}
+										$sql .= " WHERE member_id = 4 ORDER BY patient_lastname, patient_firstname ASC";
 										break;
 									case 3:
-										if(isset($_POST['bgy']) && $_POST['bgy']!=0)
-										{
-											$sql .= " WHERE member_id IN (0,6) AND e.barangay_id = '".$_POST['bgy']."' ORDER BY patient_lastname, patient_firstname ASC";
-										}
-										else
-										{
-											$sql .= " WHERE member_id IN (0,6) ORDER BY patient_lastname, patient_firstname ASC";
-										}
+										$sql .= " WHERE member_id IN (0,6) ORDER BY patient_lastname, patient_firstname ASC";
 										break;
 									default:
 										break;
@@ -127,7 +88,7 @@
 								while($result = $dbase->_dbFetchArr($query))
 								{
 									$count++;
-									$memberSQL = "SELECT member_id, member_label FROM `m_lib_philhealth_member_type` LIMIT 0,13";
+									$memberSQL = "SELECT member_id, member_label FROM `m_lib_philhealth_member_type` LIMIT 0,6";
 									$memberQUERY = $dbase->_dbQuery($memberSQL);
 									//$memberResult = $dbase->_dbFetchArr($memberQUERY);
 									echo "<tr class='mouseover'>";
@@ -155,7 +116,7 @@
 											{
 												if ($result['member_id']==$memberResult['member_id'])
 												{
-													if ($memberResult['member_id']==1 || $memberResult['member_id']==2 || $memberResult['member_id']==3 || $memberResult['member_id']==5 || $memberResult["member_id"]==7 || $memberResult["member_id"]==8 || $memberResult["member_id"]==9 || $memberResult["member_id"]==10 || $memberResult["member_id"]==11 || $memberResult["member_id"]==12 || $memberResult["member_id"]==13)
+													if ($memberResult['member_id']==1 || $memberResult['member_id']==2 || $memberResult['member_id']==3 || $memberResult['member_id']==5)
 													{
 														echo "<a href='phmembership.php?id=".$result['patient_id']."'>Member</a>";
 													}

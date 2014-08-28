@@ -1,6 +1,6 @@
 <?php
 //SELECT * FROM (SELECT consult_id AS consultID, service_id AS serviceID, service_timestamp AS serviceDATE FROM m_consult_philhealth_services UNION ALL SELECT  consult_id AS consultID, lab_id AS labID, lab_timestamp AS labDATE FROM m_consult_philhealth_labs) AS philhealthConsult JOIN m_consult a ON philhealthConsult.consultID=a.consult_id WHERE consultID=14780 AND serviceID='LIFEST' GROUP BY consultID
-	$con = mysqli_connect("localhost",$_SESSION["dbuser"],$_SESSION["dbpass"],$_SESSION["dbname"]);
+	$con = mysqli_connect("localhost","root","root","victoria2");
 	if (!(isset($pagenum))) 
 	{ 
 		$pagenum = 1; 
@@ -94,32 +94,6 @@
 		$result = mysqli_fetch_array($query);
 		
 		return $result['serviceID'];
-	}
-	
-	function _diagnosis($con, $patientID)
-	{
-		$sql = "SELECT class_name FROM m_consult_notes_dxclass a JOIN m_lib_notes_dxclass b ON a.class_id = b.class_id WHERE patient_id = '$patientID'";
-		$query = mysqli_query($con, $sql) or die(mysql_error());
-		$diag = array();
-		while (list($diagnosis)= mysqli_fetch_array($query))
-		{
-			$diag[] = $diagnosis;
-		}
-		$diag = implode(", ", $diag);
-		return $diag;
-	}
-	
-	function _medicine($con, $patientID)
-	{
-		$sql = "SELECT generic_name FROM m_consult_pcb_drugs a JOIN m_lib_pcb_drugs b ON a.generic_id = b.record_id WHERE patient_id = '$patientID'";
-		$query = mysqli_query($con, $sql) or die(mysql_error());
-		$med = array();
-		while (list($medicine)= mysqli_fetch_array($query))
-		{
-			$med[] = $medicine;
-		}
-		$med = implode(", ", $med);
-		return $med;
 	}
 	//echo _getAge($result['patient_dob'],$result['serviceDATE']);
 	//echo _benefitsGiven($con, $result['consultID'], 'BODYM');
@@ -257,7 +231,7 @@
 							<span class='width285'><input type='radio' name='gender' value='Male' <?php echo ($result['patient_gender']=='M' ? "checked" : "");?>>Male
 							<input type='radio' name='gender' value='Female' <?php echo ($result['patient_gender']=='F' ? "checked" : "");?>>Female</span>
 							
-							<span class='width150'><label>Membership:</label></span><input type='radio' name='membership' value='Member' <?php if ($result['member_id'] == 1 || $result['member_id'] == 2 || $result['member_id'] == 3 || $result['member_id'] == 5 || $result['member_id'] == 7 || $result['member_id'] == 8 || $result['member_id'] == 9 || $result['member_id'] == 10 || $result['member_id'] == 11 || $result['member_id'] == 12 || $result['member_id'] == 13){ echo "checked"; }?>>Member
+							<span class='width150'><label>Membership:</label></span><input type='radio' name='membership' value='Member' <?php if ($result['member_id'] == 1 || $result['member_id'] == 2 || $result['member_id'] == 3 || $result['member_id'] == 5){ echo "checked"; }?>>Member
 							<input type='radio' name='membership' value='Dependent' <?php if ($result['member_id'] == 4){ echo "checked"; }?>>Dependent
 						
 						</div>
@@ -267,7 +241,7 @@
 							<hr /><h4 class='center'>Other Information</h4><hr />
 							<br />
 							<p class='center'><label>Diagnosis</label><br />
-							<textarea class='center' style='vertical-align: top' name='diagnosis' rows='2' cols='50'><?php echo _diagnosis($con, $result["patient_id"])?></textarea></p>
+							<textarea style='vertical-align: top' name='diagnosis' rows='2' cols='50'></textarea></p>
 						
 							<br /><br />
 							<h4>BENEFITS GIVEN</h4>(Number of Times Benefit Given)
@@ -323,12 +297,12 @@
 
 							<p class='center'>
 							<br /><br /><label>Medicines Given</label><br />
-							<textarea style='vertical-align: top' name='medicines' rows='2' cols='50'><?php echo _medicine($con, $result["patient_id"])?></textarea>
+							<textarea style='vertical-align: top' name='medicines' rows='2' cols='50'></textarea>
 							<br /><br /><br /></p>
 
 						</div>
 						
-						<!--<div class='width750 center'>
+						<div class='width750 center'>
 							<hr />
 							<label>Select Existing Form: </label>
 							<select name='existform'>
@@ -373,7 +347,7 @@
 								<input type='submit' name='submit' value='Submit'></span>
 							<input type='reset' name='submit' value='Reset'>
 							<hr /><br />
-						</div>-->
+						</div>
 
 					</form>
 		

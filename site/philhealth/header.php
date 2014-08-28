@@ -21,7 +21,7 @@
 	<body>
 		<div id='container'>
 			<div id='head' class='center'>
-				<img alt="" src="styles/images/PCB.jpg" style="width:898px; height:150px">
+				<img alt="" src="styles/images/PCB banner.jpg" style='width:898px; height:150px'>
 				<ul id="menu-bar">
 					<li class='active'><a href="A Forms/a1form.php" target="body">A1 Form</a></li>
 					<li><a href="A Forms/a2form.php" target="body">A2 Form</a></li>
@@ -29,7 +29,6 @@
 					<li><a href="A Forms/a4form.php" target="body">A4 Form</a></li>
 					<li><a href="A Forms/a5form.php" target="body">A5 Form</a></li>
 					<li><a href="phmember.php" target="body">Philhealth Membership</a></li>
-					<li><a href="/philhealth_verification/index.php" target="body">Philhealth Verification</a></li>
 				</ul>
 			</div>
 		</div>

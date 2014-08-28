@@ -41,132 +41,9 @@
 	
 	Class sqlStatement extends dbConnect
 	{
-		public function _genericDrugs($type='', $sDate='', $eDate='', $inputName='')
-		{
-			switch ($type)
-			{
-				case 'Asthma':
-					$icd10 = "J45";
-					break;
-				case 'AGE':
-					$icd10 = "A09";
-					break;
-				case 'URTI':
-					$icd10 = "J06|J18";
-					break;
-				case 'UTI':
-					$icd10 = "N39";
-					break;
-				default:
-					break;
-			}
-			$sql = "SELECT generic_id, generic_name FROM `m_consult_pcb_drugs` a JOIN m_patient_philhealth b ON a.patient_id=b.patient_id JOIN m_lib_pcb_drugs c ON a.generic_id= c.record_id JOIN m_lib_notes_dxclass d ON a.class_id=d.class_id JOIN m_consult_pcb_dispense e ON a.dispense_id=e.dispense_id WHERE icd10 REGEXP '$icd10' AND date_format(dispense_date, '%Y-%m-%d') BETWEEN '$sDate' AND '$eDate' GROUP BY generic_id ORDER BY generic_name ASC";
-			//"SELECT COUNT(drug_id), generic_id, generic_name FROM `m_consult_pcb_drugs` a JOIN m_patient_philhealth b ON a.patient_id=b.patient_id JOIN m_lib_pcb_drugs c ON a.generic_id= c.record_id GROUP BY cat_id";
-			if ($query = $this->_dbQuery($sql))
-			{
-				$count=0;
-				if (mysqli_num_rows($query))
-				{				
-					while ($result = $this->_dbFetchArr($query))
-					{
-						$count++;
-						$sql_member = "SELECT COUNT(generic_id) AS countDrug FROM `m_consult_pcb_drugs` a JOIN m_patient_philhealth b ON a.patient_id=b.patient_id JOIN m_lib_pcb_drugs c ON a.generic_id= c.record_id JOIN m_lib_notes_dxclass d ON a.class_id=d.class_id JOIN m_consult_pcb_dispense e ON a.dispense_id=e.dispense_id WHERE icd10 REGEXP '$icd10' AND b.member_id IN (1,2,3,5,7,8,9,10,11,12,13) AND date_format(dispense_date, '%Y-%m-%d') BETWEEN '$sDate' AND '$eDate' GROUP BY generic_id HAVING generic_id = '".$result["generic_id"]."'";
-						$result_member = $this->_sqlConnect($sql_member);
-						$sql_dependent = "SELECT COUNT(generic_id) AS countDrug FROM `m_consult_pcb_drugs` a JOIN m_patient_philhealth b ON a.patient_id=b.patient_id JOIN m_lib_pcb_drugs c ON a.generic_id= c.record_id JOIN m_lib_notes_dxclass d ON a.class_id=d.class_id JOIN m_consult_pcb_dispense e ON a.dispense_id=e.dispense_id WHERE icd10 REGEXP '$icd10' AND b.member_id IN (4) AND date_format(dispense_date, '%Y-%m-%d') BETWEEN '$sDate' AND '$eDate' GROUP BY generic_id HAVING generic_id = '".$result["generic_id"]."'";
-						$result_dependent = $this->_sqlConnect($sql_dependent);
-						echo "<tr>";
-							echo "<th width='350px'><span>Med $count </span><input style='width:190px' type='text' name='".$inputName.$count."' value='".$result["generic_name"]."'></th>";
-							echo "<th width='100px'><input style='width:70px; text-align:right;' type='text' name='".$inputName.$count."Mem' value='".($result_member["countDrug"]==null ?'0' : $result_member["countDrug"])."'></th>";
-							echo "<th width='100px'><input style='width:70px; text-align:right;' type='text' name='".$inputName.$count."Dep' value='".($result_dependent["countDrug"]==null ?'0' : $result_dependent["countDrug"])."'></th>";
-						echo "</tr>";
-					}
-				}
-				else 
-				{
-					echo "<tr>";
-						echo "<th width='350px'><span>Med 1 </span><input style='width:190px' type='text' name='".$inputName.$count."' value=''></th>";
-						echo "<th width='100px'><input style='width:70px; text-align:right;' type='text' name='".$inputName.$count."Mem' value=''></th>";
-						echo "<th width='100px'><input style='width:70px; text-align:right;' type='text' name='".$inputName.$count."Dep' value=''></th>";
-					echo "</tr>";
-				}
-			}
-		}
-		
-		public function _breastCancerScreening($type='' , $sDate='', $eDate='')
-		{
-			$sql = "SELECT COUNT(DISTINCT consult_id) FROM m_consult_notes_pe a JOIN m_patient b ON a.patient_id = b.patient_id JOIN (SELECT * FROM m_patient_philhealth GROUP BY patient_id HAVING count(patient_id)>=1) c ON a.patient_id = c.patient_id WHERE breast_screen != '' ";
-			switch ($type)
-			{
-				case 'Member':
-					$sql .= " AND c.member_id IN (1,2,3,5,7,8,9,10,11,12,13) ";
-					break;
-				case 'Dependent':
-					$sql .= " AND c.member_id = 4 ";
-					break;
-				case 'Total':
-					$sql .= " AND c.member_id IN (1,2,3,4,5,7,8,9,10,11,12,13) ";
-					 
-					break;
-				default:
-					break;
-			}
-			$sql .= " AND date_format(pe_timestamp, '%Y-%m-%d') BETWEEN '$sDate' AND '$eDate' ";
-			$sql .= " AND round((to_days(pe_timestamp)-to_days(patient_dob))/365,1) >= 25 AND patient_gender = 'F'";
-			
-			$result = $this->_sqlConnect($sql);
-			return $result["COUNT(DISTINCT consult_id)"];
-		}
-		
-		public function _waist($gender='', $type='' , $sDate='', $eDate='')
-		{
-			$sql = "SELECT COUNT(DISTINCT consult_id) FROM `m_consult_vitals` a JOIN m_patient b ON a.patient_id = b.patient_id JOIN (SELECT * FROM m_patient_philhealth GROUP BY patient_id HAVING count(patient_id)>=1) c ON a.patient_id = c.patient_id ";
-			switch ($gender) {
-				case 'M':
-					$sql .= " WHERE patient_gender = 'M' AND vitals_waist >= 90 ";
-					break;
-					
-				case 'F':
-					$sql .= " WHERE patient_gender = 'F' AND vitals_waist >= 80 ";
-					break;
-				
-				default:
-					break;
-			}
-			
-			switch ($type)
-			{
-				case 'Member':
-					$sql .= " AND c.member_id IN (1,2,3,5,7,8,9,10,11,12,13) ";
-					break;
-				case 'Dependent':
-					$sql .= " AND c.member_id = 4 ";
-					break;
-				case 'Total':
-					$sql .= " AND c.member_id IN (1,2,3,4,5,7,8,9,10,11,12,13) ";
-					 
-					break;
-				default:
-					break;
-			}
-			
-			$sql .= " AND date_format(vitals_timestamp, '%Y-%m-%d') BETWEEN '$sDate' AND '$eDate' ";
-			
-			$result = $this->_sqlConnect($sql);
-			return $result['COUNT(DISTINCT consult_id)'];
-		}
-		
 		public function _history($history='',  $type='', $gender='', $pregnant='', $sDate='', $eDate='')
 		{
-			//$sql = "SELECT COUNT(a.notes_id) FROM `m_consult_notes` a JOIN m_patient b ON a.patient_id = b.patient_id JOIN m_patient_philhealth c ON a.patient_id = c.patient_id WHERE notes_history LIKE '%$history%'";
-			$sql = "SELECT COUNT(record_id) FROM `m_patient_history` a JOIN m_patient b ON a.patient_id = b.patient_id JOIN m_patient_philhealth c ON a.patient_id = c.patient_id ";
-			if ($history == '6' || $history == '11')
-			{
-				$sql .= "WHERE pasthistory_id LIKE '%$history%'";
-			}
-			if ($history == 'ORALHYPO' || $history =='HYPERMED')
-			{
-				$sql .= "WHERE medintake_id LIKE '%$history%'";
-			}
+			$sql = "SELECT COUNT(a.notes_id) FROM `m_consult_notes` a JOIN m_patient b ON a.patient_id = b.patient_id JOIN m_patient_philhealth c ON a.patient_id = c.patient_id WHERE notes_history LIKE '%$history%'";
 			
 			switch ($gender)
 			{
@@ -178,7 +55,7 @@
 					
 			}
 							
-			$sql .= " AND date_format(history_timestamp, '%Y-%m-%d') BETWEEN '$sDate' AND '$eDate' ";
+			$sql .= " AND date_format(a.notes_timestamp, '%Y-%m-%d') BETWEEN '$sDate' AND '$eDate' ";
 			
 			switch($pregnant)
 			{
@@ -196,13 +73,13 @@
 			switch ($type)
 			{
 				case 'Member':
-					$sql .= " AND c.member_id IN (1,2,3,5,7,8,9,10,11,12,13) ";
+					$sql .= " AND c.member_id IN (1,2,3,5) ";
 					break;
 				case 'Dependent':
 					$sql .= " AND c.member_id = 4 ";
 					break;
 				case 'Total':
-					$sql .= " AND c.member_id IN (1,2,3,4,5,7,8,9,10,11,12,13) ";
+					$sql .= " AND c.member_id IN (1,2,3,4,5) ";
 					 
 					break;
 				default:
@@ -210,7 +87,7 @@
 			}
 			//echo $sql . "<br />";
 			$result = $this->_sqlConnect($sql);
-			return $result['COUNT(record_id)'];
+			return $result['COUNT(a.notes_id)'];
 		}
 		
 		public function _ppsScreening($service='', $type='', $sDate='', $eDate='')
@@ -226,7 +103,7 @@
 			}
 			if ($type=='Member')
 			{
-				$sql .= " AND member_id IN (1,2,3,5,7,8,9,10,11,12,13) ";
+				$sql .= " AND member_id IN (1,2,3,5) ";
 			}
 			elseif ($type=='Dependent')
 			{
@@ -293,7 +170,7 @@
           				WHEN vitals_systolic BETWEEN '140' AND '179' OR vitals_diastolic BETWEEN '90' AND '119' THEN 'Hypertension Stage 1'
           				WHEN vitals_systolic BETWEEN '120' AND '139' OR vitals_diastolic BETWEEN '80' AND '89' THEN 'Prehypertension'
           				WHEN vitals_systolic < '120' AND vitals_diastolic < '80' THEN 'Normal'
-        			END AS BP 
+        			END AS Pregnant 
         			FROM `m_consult_vitals` a
 					JOIN m_patient b ON b.patient_id = a.patient_id
 					JOIN m_patient_philhealth c ON c.patient_id = b.patient_id";
@@ -337,13 +214,13 @@
 			switch ($type)
 			{
 				case 'Member':
-					$sql .= " AND c.member_id IN (1,2,3,5,7,8,9,10,11,12,13) ";
+					$sql .= " AND c.member_id IN (1,2,3,5) ";
 					break;
 				case 'Dependent':
 					$sql .= " AND c.member_id = 4 ";
 					break;
 				case 'Total':
-					$sql .= " AND c.member_id IN (1,2,3,4,5,7,8,9,10,11,12,13) ";
+					$sql .= " AND c.member_id IN (1,2,3,4,5) ";
 					 
 					break;
 				default:
@@ -352,7 +229,7 @@
 			
 			if($case!='' || $case!=null)
 			{
-				$sql .= " GROUP BY BP Having BP = '$case'";
+				$sql .= " GROUP BY Pregnant Having Pregnant = '$case'";
 			}
 			
 			//echo "<br />" . $sql . "<br />";
@@ -372,48 +249,15 @@
 					/*$sql = "SELECT COUNT(DISTINCT a.family_id) FROM `m_family_members` a
 					JOIN m_family_cct_member b ON a.family_id = b.family_id
 					JOIN m_consult c ON a.patient_id = c.patient_id WHERE date_format(c.consult_date, '%Y-%m-%d') BETWEEN '$sDate' AND '$eDate'";*/
-					$sql2 = "SELECT COUNT(DISTINCT philhealth_id) FROM `m_patient_philhealth` a 
-							JOIN m_consult b ON a.patient_id = b.patient_id LEFT JOIN `m_family_members` c ON a.patient_id = c.patient_id 
-							WHERE member_id = 7 AND consult_date BETWEEN '$sDate' AND '$eDate'";
 					$countID = "COUNT(DISTINCT a.family_id)";
 					//echo "<br />" . $sql;
 					break;
-								
-				case 'SP-LGU':
-					$sql = "SELECT COUNT(DISTINCT philhealth_id) FROM `m_patient_philhealth` a 
-							JOIN m_consult b ON a.patient_id = b.patient_id 
-							WHERE member_id = 9 AND consult_date BETWEEN '$sDate' AND '$eDate'";
-					$countID = "COUNT(DISTINCT philhealth_id)";
-					break;
-					
-				case 'SP-NGA':
-					$sql = "SELECT COUNT(DISTINCT philhealth_id) FROM `m_patient_philhealth` a 
-							JOIN m_consult b ON a.patient_id = b.patient_id 
-							WHERE member_id = 8 AND consult_date BETWEEN '$sDate' AND '$eDate'";
-					$countID = "COUNT(DISTINCT philhealth_id)";
-					break;
-					
-				case 'SP-Private':
-					$sql = "SELECT COUNT(DISTINCT philhealth_id) FROM `m_patient_philhealth` a 
-							JOIN m_consult b ON a.patient_id = b.patient_id 
-							WHERE member_id = 10 AND consult_date BETWEEN '$sDate' AND '$eDate'";
-					$countID = "COUNT(DISTINCT philhealth_id)";
-					break;
-					
 				case 'IPP-OFW':
 					$sql = "SELECT COUNT(DISTINCT philhealth_id) FROM `m_patient_philhealth` a 
 							JOIN m_consult b ON a.patient_id = b.patient_id 
 							WHERE member_id = 3 AND consult_date BETWEEN '$sDate' AND '$eDate'";
 					$countID = "COUNT(DISTINCT philhealth_id)";
 					break;
-				
-				case 'IPP-OG':
-					$sql = "SELECT COUNT(DISTINCT philhealth_id) FROM `m_patient_philhealth` a 
-							JOIN m_consult b ON a.patient_id = b.patient_id 
-							WHERE member_id = 11 AND consult_date BETWEEN '$sDate' AND '$eDate'";
-					$countID = "COUNT(DISTINCT philhealth_id)";
-					break;
-					
 				case 'NON-PHIC':
 					/*$sql = "SELECT COUNT(a.patient_id) FROM `m_patient` a 
 							WHERE a.patient_id NOT IN 
@@ -427,13 +271,10 @@
 							WHERE a.patient_id NOT IN (SELECT a.patient_id FROM m_patient_philhealth a JOIN (SELECT * FROM m_consult GROUP BY patient_id HAVING count(patient_id)>=1) b ON b.patient_id = a.patient_id)
 							AND date_format(b.consult_date, '%Y-%m-%d') BETWEEN '$sDate' AND '$eDate'";*/
 					
-					/*$sql = "SELECT COUNT(DISTINCT family_id) FROM `m_family_members` a 
-							JOIN (SELECT * FROM m_consult GROUP BY patient_id HAVING count(patient_id)>=1) b ON a.patient_id = b.patient_id 
-							WHERE a.patient_id NOT IN (SELECT a.patient_id FROM m_patient_philhealth a JOIN m_consult b ON b.patient_id = a.patient_id GROUP BY a.patient_id HAVING count(a.patient_id)>=1) 
-							AND date_format(b.consult_date, '%Y-%m-%d') BETWEEN '$sDate' AND '$eDate'";*/
 					$sql = "SELECT COUNT(DISTINCT family_id) FROM `m_family_members` a 
 							JOIN (SELECT * FROM m_consult GROUP BY patient_id HAVING count(patient_id)>=1) b ON a.patient_id = b.patient_id 
-							LEFT JOIN m_patient_philhealth c ON a.patient_id = c.patient_id WHERE date_format(b.consult_date, '%Y-%m-%d') BETWEEN '$sDate' AND '$eDate' group by c.patient_id having isnull(c.patient_id)";
+							WHERE a.patient_id NOT IN (SELECT a.patient_id FROM m_patient_philhealth a JOIN m_consult b ON b.patient_id = a.patient_id GROUP BY a.patient_id HAVING count(a.patient_id)>=1) 
+							AND date_format(b.consult_date, '%Y-%m-%d') BETWEEN '$sDate' AND '$eDate'";
 					$countID = "COUNT(DISTINCT family_id)";
 					//echo $sql;
 					break;
@@ -460,23 +301,17 @@
 		
 		public function _countBloodPressure($bp='',$sDate='',$eDate='')
 		{
-			/*$sql = "SELECT COUNT(DISTINCT a.consult_id),
-					CASE
-						WHEN vitals_systolic >= '160' OR vitals_diastolic >= '100' OR vitals_systolic BETWEEN '140' AND '159' OR vitals_diastolic BETWEEN '90' AND '99' THEN 'Hypertension'
-						WHEN vitals_systolic BETWEEN '120' AND '139' OR vitals_diastolic BETWEEN '80' AND '89' OR vitals_systolic < '120' AND vitals_diastolic < '80' THEN 'Normal'
-					END AS blood_pressure
-					FROM `m_consult_vitals` a, `m_consult_philhealth_services` b
-					WHERE a.consult_id = b.consult_id";*/
 			$sql = "SELECT COUNT(DISTINCT a.consult_id),
 					CASE
 						WHEN vitals_systolic >= '160' OR vitals_diastolic >= '100' OR vitals_systolic BETWEEN '140' AND '159' OR vitals_diastolic BETWEEN '90' AND '99' THEN 'Hypertension'
 						WHEN vitals_systolic BETWEEN '120' AND '139' OR vitals_diastolic BETWEEN '80' AND '89' OR vitals_systolic < '120' AND vitals_diastolic < '80' THEN 'Normal'
 					END AS blood_pressure
-					FROM `m_consult_vitals` a JOIN `m_patient_philhealth` b ON a.patient_id = b.patient_id ";
+					FROM `m_consult_vitals` a, `m_consult_philhealth_services` b
+					WHERE a.consult_id = b.consult_id";
 			
 			if (($sDate!='' || $sDate!=null) && ($eDate!='' || $eDate!=null))
 			{
-				$sql .= " AND date_format(a.vitals_timestamp, '%Y-%m-%d') BETWEEN '$sDate' AND '$eDate'";
+				$sql .= " AND date_format(b.service_timestamp, '%Y-%m-%d') BETWEEN '$sDate' AND '$eDate'";
 			}
 			
 			
@@ -484,7 +319,7 @@
 			{
 				$sql .= " GROUP BY blood_pressure HAVING blood_pressure = '$bp'";
 			}
-			//echo $sql;
+			
 			$result = $this->_sqlConnect($sql);
 			return $result['COUNT(DISTINCT a.consult_id)'];
 		}
@@ -498,7 +333,7 @@
 					JOIN `m_patient` b ON a.patient_id = b.patient_id 
 					JOIN (SELECT * FROM `m_consult` GROUP BY patient_id HAVING count(patient_id)>=1) c 
 					ON a.patient_id = c.patient_id 
-					WHERE date_format(c.consult_date, '%Y-%m-%d') BETWEEN '$sDate' AND '$eDate' AND a.member_id IN (1,2,3,5,7,8,9,10,11,12,13)";
+					WHERE date_format(c.consult_date, '%Y-%m-%d') BETWEEN '$sDate' AND '$eDate' AND a.member_id IN (1,2,3,5)";
 			if ($gender!="" || $gender!=null)
 			{
 				$sql .= " AND b.patient_gender = '$gender'";
@@ -557,7 +392,7 @@
 					JOIN `m_patient` b ON a.patient_id = b.patient_id 
 					JOIN (SELECT * FROM `m_consult` GROUP BY patient_id HAVING count(patient_id)>=1) c 
 					ON a.patient_id = c.patient_id 
-					WHERE date_format(c.consult_date, '%Y-%m-%d') BETWEEN '$sDate' AND '$eDate' AND a.member_id IN (1,2,3,4,5,7,8,9,10,11,12,13)";
+					WHERE date_format(c.consult_date, '%Y-%m-%d') BETWEEN '$sDate' AND '$eDate' AND a.member_id IN (1,2,3,4,5)";
 			if ($gender!="" || $gender!=null)
 			{
 				$sql .= " AND b.patient_gender = '$gender'";
@@ -594,7 +429,7 @@
 			}
 			if ($membership !='' && $membership == "MEMBER")
 			{
-				$sql .= " AND member_id IN (1,2,3,5,7,8,9,10,11,12,13)";
+				$sql .= " AND member_id IN (1,2,3,5)";
 			}
 			else if ($membership !='' && $membership == "DEPENDENT")
 			{
@@ -622,7 +457,7 @@
 			
 			if ($membership !='' && $membership == "MEMBER")
 			{
-				$sql .= " AND member_id IN (1,2,3,5,7,8,9,10,11,12,13)";
+				$sql .= " AND member_id IN (1,2,3,5)";
 			}
 			else if ($membership !='' && $membership == "DEPENDENT")
 			{
@@ -646,7 +481,7 @@
 			}
 			if ($membership !='' && $membership == "MEMBER")
 			{
-				$sql .= " AND member_id IN (1,2,3,5,7,8,9,10,11,12,13)";
+				$sql .= " AND member_id IN (1,2,3,5)";
 			}
 			else if ($membership !='' && $membership == "DEPENDENT")
 			{
@@ -777,8 +612,8 @@
 	function _generateXML ($form='', $table='', $arrValue)
 	{
 		$host = "localhost";
-		$user = $_SESSION["dbuser"];
-		$pass = $_SESSION["dbpass"];
+		$user = "root";
+		$pass = "root";
 		$dbname = "philhealth";
 		$con = mysqli_connect($host,$user,$pass,$dbname);
 		

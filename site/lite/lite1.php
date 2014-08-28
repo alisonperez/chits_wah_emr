@@ -162,6 +162,9 @@ function get_family_folders(){
 		$handle = fopen($_SESSION["tmp_directory"].'/'.$_SESSION["file_name"],'a') or die("Cannot open file 124");
 
 		while($r_family=mysql_fetch_array($q_family_address)){
+			$r_family['address'] = addslashes($r_family['address']);
+
+
 			$insert_family_address = "REPLACE INTO m_family_address (family_id,address_year,address,barangay_id) VALUES ('$r_family[family_id]','$r_family[address_year]','$r_family[address]','$r_family[barangay_id]');";
 			array_push($family_arr,$r_family["family_id"]);
 			fwrite($handle,$insert_family_address."\n"); 
@@ -269,7 +272,7 @@ function get_patient_records($patient_arr){
 
 						$insert_records = "REPLACE INTO $table_name ($str_fields) VALUES (";
 						foreach($arr_fields as $key=>$field_name){
-							array_push($arr_fields_result,"'".$r_records[$field_name]."'");
+							array_push($arr_fields_result,"'".addslashes($r_records[$field_name])."'");
 						} 
 						$str_fields_results = implode(",",$arr_fields_result);
 

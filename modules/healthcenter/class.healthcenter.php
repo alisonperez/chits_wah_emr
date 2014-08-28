@@ -155,7 +155,6 @@ class healthcenter extends module{
             "`vitals_heartrate` int(11) NOT NULL default '0',".
 			"`vitals_height` int(11) NOT NULL default '0',".
             "`vitals_resprate` int(11) NOT NULL default '0',".
-			"`vitals_waist` int(11) NOT NULL default '0',".
             "PRIMARY KEY  (`consult_id`,`vitals_timestamp`),".
             "KEY `key_patient` (`patient_id`),".
             "FOREIGN KEY (`patient_id`) REFERENCES `m_patient`(`patient_id`) ".
@@ -746,14 +745,14 @@ class healthcenter extends module{
             
         }
 
-        $sql = "select user_id, vitals_weight, vitals_temp, vitals_systolic, vitals_diastolic, vitals_heartrate, vitals_resprate,vitals_height,vitals_pulse,vitals_waist ".
+        $sql = "select user_id, vitals_weight, vitals_temp, vitals_systolic, vitals_diastolic, vitals_heartrate, vitals_resprate,vitals_height,vitals_pulse ".
                "from m_consult_vitals where consult_id = '".$get_vars["consult_id"]."' and vitals_timestamp = '".$get_vars["timestamp"]."'";
 
 	$edad  = healthcenter::get_patient_age($get_vars["consult_id"]);				
 
         if ($result = mysql_query($sql)) {
             if (mysql_num_rows($result)) {
-                list($uid, $wt, $temp, $syst, $diast, $hrate, $rrate,$ht,$pulse,$waist) = mysql_fetch_array($result);
+                list($uid, $wt, $temp, $syst, $diast, $hrate, $rrate,$ht,$pulse) = mysql_fetch_array($result);
                 print "<a name='detail'>";
                 print "<form method='post' action='".$_SERVER["PHP_SELF"]."?page=".$get_vars["page"]."&menu_id=".$get_vars["menu_id"]."&consult_id=".$get_vars["consult_id"]."&ptmenu=VITALS&timestamp=".$get_vars["timestamp"]."' name='form_vitals_detail'>";
                 print "<table width='250' style='border: 1px dotted black'><tr><td colspan='2'>";
@@ -768,7 +767,6 @@ class healthcenter extends module{
                 print "Weight (kg): $wt<br/>";
                 print "Temp deg C: $temp<br/>";
                 print "Height: $ht cms<br/>";
-				print "Waist Circumference: $waist cms<br/>";
                 print "</td></tr>";
                 print "<tr><td colspan='2'>";
                 //print "HPN STAGE: ".healthcenter::hypertension_stage($syst, $diast, $edad)."<br/>";
@@ -815,7 +813,7 @@ class healthcenter extends module{
 			
 			$pxid = healthcenter::get_patient_id($_GET[consult_id]);
 
-			$sql = "insert into m_consult_vitals set consult_id='$get_vars[consult_id]',patient_id='$pxid',user_id='$_SESSION[userid]',vitals_weight='$post_vars[bodyweight]',vitals_temp='$post_vars[bodytemp]',vitals_systolic='$systolic',vitals_diastolic='$diastolic',vitals_heartrate='$post_vars[heartrate]',vitals_resprate='$post_vars[resprate]',vitals_height='$post_vars[pxheight]',vitals_pulse='$post_vars[pxpulse]',vitals_waist='$post_vars[pxwaist]'";
+			$sql = "insert into m_consult_vitals set consult_id='$get_vars[consult_id]',patient_id='$pxid',user_id='$_SESSION[userid]',vitals_weight='$post_vars[bodyweight]',vitals_temp='$post_vars[bodytemp]',vitals_systolic='$systolic',vitals_diastolic='$diastolic',vitals_heartrate='$post_vars[heartrate]',vitals_resprate='$post_vars[resprate]',vitals_height='$post_vars[pxheight]',vitals_pulse='$post_vars[pxpulse]'";
 			//$sql = "insert into m_consult_vitals (consult_id, user_id, vitals_weight, vitals_temp, vitals_systolic, vitals_diastolic, vitals_heartrate, vitals_resprate,) "."values ('".$get_vars["consult_id"]."', '".$_SESSION["userid"]."', '".$post_vars["bodyweight"]."', '".$post_vars["bodytemp"]."', '$systolic', '$diastolic', '".$post_vars["heartrate"]."', '".$post_vars["resprate"]."')";
 
 			if ($result = mysql_query($sql) or die(mysql_error())) {
@@ -830,7 +828,7 @@ class healthcenter extends module{
             
             $pxid = healthcenter::get_patient_id($_GET[consult_id]);
             
-            $update_vitals = mysql_query("UPDATE m_consult_vitals SET vitals_weight='$post_vars[bodyweight]',vitals_temp='$post_vars[bodytemp]',vitals_systolic='$systolic',vitals_diastolic='$diastolic',vitals_heartrate='$post_vars[heartrate]',vitals_resprate='$post_vars[resprate]',vitals_height='$post_vars[pxheight]',vitals_pulse='$post_vars[pxpulse]',vitals_waist='$post_vars[pxwaist]' WHERE consult_id='$get_vars[consult_id]'") or die("Cannot query: 802 ".mysql_error());
+            $update_vitals = mysql_query("UPDATE m_consult_vitals SET vitals_weight='$post_vars[bodyweight]',vitals_temp='$post_vars[bodytemp]',vitals_systolic='$systolic',vitals_diastolic='$diastolic',vitals_heartrate='$post_vars[heartrate]',vitals_resprate='$post_vars[resprate]',vitals_height='$post_vars[pxheight]',vitals_pulse='$post_vars[pxpulse]' WHERE consult_id='$get_vars[consult_id]'") or die("Cannot query: 802 ".mysql_error());
             
             if($update_vitals):
                 header("location: ".$_SERVER["PHP_SELF"]."?page=".$get_vars["page"]."&menu_id=".$get_vars["menu_id"]."&consult_id=".$get_vars["consult_id"]."&ptmenu=VITALS");                            
@@ -853,8 +851,8 @@ class healthcenter extends module{
         }
         
         if($post_vars["submitvitals"]=="Update"):
-                $q_vitals = mysql_query("SELECT vitals_weight,vitals_temp,vitals_systolic,vitals_diastolic,vitals_heartrate,vitals_resprate,vitals_height,vitals_pulse,vitals_waist FROM m_consult_vitals WHERE consult_id='$get_vars[consult_id]' AND vitals_timestamp='$get_vars[timestamp]'") or die("Cannot query 724 ".mysql_error());                
-                list($wt,$temp,$sys,$dias,$heart,$resp,$ht,$pulse,$waist) = mysql_fetch_array($q_vitals);            
+                $q_vitals = mysql_query("SELECT vitals_weight,vitals_temp,vitals_systolic,vitals_diastolic,vitals_heartrate,vitals_resprate,vitals_height,vitals_pulse FROM m_consult_vitals WHERE consult_id='$get_vars[consult_id]' AND vitals_timestamp='$get_vars[timestamp]'") or die("Cannot query 724 ".mysql_error());                
+                list($wt,$temp,$sys,$dias,$heart,$resp,$ht,$pulse) = mysql_fetch_array($q_vitals);            
                 $bp = $sys.'/'.$dias;
         endif;                
         
@@ -890,12 +888,7 @@ class healthcenter extends module{
         print "<span class='boxtitle'>HEIGHT (CM)</span><br> ";
         print "<input type='text' class='textbox' size='10' maxlength='7' name='pxheight' value='$ht' style='border: 1px solid #000000'><br>";
         print "</td></tr>";
-		
-		print "<tr valign='top'><td>";
-        print "<span class='boxtitle'>WAIST CIRCUMFERENCE (CM)</span><br> ";
-        print "<input type='text' class='textbox' size='10' maxlength='7' name='pxwaist' value='$waist' style='border: 1px solid #000000'><br>";
-        print "</td></tr>";
-		
+
         print "<tr valign='top'><td>";
         print "<span class='boxtitle'>".LBL_BODYTEMP."</span><br> ";
         print "<input type='text' class='textbox' size='10' maxlength='7' name='bodytemp' value='$temp' style='border: 1px solid #000000'><br>";
