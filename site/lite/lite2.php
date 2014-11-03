@@ -6,7 +6,9 @@
 		$new_record_count = 0;
 		$check_status_sql = "SELECT lite_patient_id, emr_patient_id, lite_specific_id, emr_specific_id, table_name, entry_date, sync_type FROM m_push_status WHERE push_flag ='Y' AND table_name='m_patient' AND sync_type='N'";
 		$new_patient_array = get_data_array($check_status_sql);
-		
+		//echo "NEW PATIENT<br />";
+		//print_r($new_patient_array);
+		//echo "<br />";
 		if($new_patient_array!=NULL || $new_patient_array!=''){
 			ehr_connect();
 			$array_m_push_update = array();
@@ -33,7 +35,6 @@
 							'm_patient_fp',						//fp_id
 							'm_patient_ccdev',					//ccdev_id
 							'm_consult_notes',					//notes_id
-							'm_patient_fp_method_service',		//fp_servcice_id
 							'm_patient_fp_dropout',				//dropout_id
 							'm_family',							//family_id
 							'm_consult_lab',					//request_id
@@ -43,6 +44,7 @@
 							'm_patient_ntp_report',				//report_id
 							'm_consult_reminder',				//reminder_id
 							'm_patient_fp_method',				//fp_px_id
+							'm_patient_fp_method_service',		//fp_servcice_id
 							'm_consult_appointments');			//schedule_id
 							
 							//list of secondary table with foreign key
@@ -51,7 +53,9 @@
 			lite_connect($_POST['sync_user']);
 			$check_status_sql = "SELECT lite_patient_id, emr_patient_id, lite_specific_id, emr_specific_id, table_name, entry_date, sync_type FROM m_push_status WHERE push_flag ='Y' AND table_name='$tablename' AND sync_type='N'";
 			$new_consult_array = get_data_array($check_status_sql);
+			//echo "NEW ENTRY(P)<br />";
 			//print_r($new_consult_array);
+			//echo "<br />";
 			if($new_consult_array!=NULL || $new_consult_array!=''){
 				ehr_connect();
 				$array_m_push_update = array();
@@ -76,7 +80,7 @@
 								$latest_id = $get_latest_id_result['fp_service_id'] + 1;
 								
 								$insert_text = "'".$latest_id."', '".$new_consult[8]."', '".$new_consult[9]."', '".$new_consult[10]."', '".$new_consult[11]."', '".$get_all_result[date_service]."', '".$get_all_result[source_id]."', '".$get_all_result[quantity]."', '".$get_all_result[remarks]."', '".$get_all_result[date_encoded]."', '".$get_all_result[user_id]."', '".$get_all_result[next_service_date]."' ";
-								echo $insert_text;
+								//echo $insert_text;
 								insert_query($insert_text, $new_consult[4]);
 								
 							}
@@ -85,7 +89,7 @@
 						$push_data_array = array($new_consult[0], $new_consult[1], $new_consult[2],$new_consult[9],$new_consult[4],$new_consult[5],'N', $new_consult[6]);
 						
 					}else{
-						//insert_query($insert_text, $new_consult[4]);
+						insert_query($insert_text, $new_consult[4]);
 						$push_data_array = array($new_consult[0], $new_consult[1], $new_consult[2],$new_id,$new_consult[4],$new_consult[5],'N', $new_consult[6]);
 					}
 					
@@ -103,18 +107,24 @@
 		lite_connect($_POST['sync_user']);
 		$check_status_sql = "SELECT lite_patient_id, emr_patient_id, lite_specific_id, emr_specific_id, table_name, entry_date, sync_type FROM m_push_status WHERE push_flag ='Y' AND sync_type='N'";
 		$new_entry_array = get_data_array($check_status_sql);
+		//echo "NEW ENTRY<br />";
+		//print_r($new_entry_array);
+		//echo "<br />";
 		if($new_entry_array!=NULL || $new_consult_array!=''){
 			ehr_connect();
 			$array_m_push_update = array();
 			
 			foreach($new_entry_array as $entry_array => $new_entry){
-				if($new_entry[4]=='m_patient_fp_pelvic' || $new_entry[4]=='m_patient_fp_pe' || $new_entry[4]=='m_patient_fp_hx' || $new_entry[4]=='m_patient_fp_method_service'){
+				if($new_entry[4]=='m_patient_fp_pelvic' || $new_entry[4]=='m_consult_notes_dxclass' || $new_entry[4]=='m_patient_fp_pe' || $new_entry[4]=='m_patient_fp_hx' || $new_entry[4]=='m_patient_fp_method_service'){
 					//START OF DELETE RECORDS 
 					$delete_record_count = 0;
 					lite_connect($_POST['sync_user']);
+					
 					$check_status_sql = "SELECT lite_patient_id, emr_patient_id, lite_specific_id, emr_specific_id, table_name, entry_date, sync_type FROM m_push_status WHERE push_flag ='Y' AND sync_type='D'";
 					$delete_array = get_data_array($check_status_sql);
-					
+					//echo "<br />DELETE";
+					//print_r($delete_array);
+					//echo "<br /><br />";
 					if($delete_array!=NULL || $delete_array!=''){
 						ehr_connect();
 						$array_m_push_update = array();
@@ -123,6 +133,7 @@
 							$delete_text = where_clause($delete_value);
 							
 							if($delete_value[4]=='m_patient_fp_obgyn' || $delete_value[4]=='m_patient_fp_hx' || $delete_value[4]=='m_consult_mc_postpartum' || $delete_value[4]=='m_consult_mc_prenatal' || $delete_value[4]=='m_consult_mc_services' || $delete_value[4]=='m_consult_mc_vaccine' || $delete_value[4]=='m_consult_ccdev_vaccine' || $delete_value[4]=='m_consult_ccdev_services' || $delete_value[4]=='m_consult_vaccine' || $delete_value[4]=='m_consult_notes_complaint' || $delete_value[4]=='m_consult_notes_dxclass'){
+								//echo "SELECT * FROM $delete_value[4] WHERE $delete_text";
 								$get_all_compare = mysql_query("SELECT * FROM $delete_value[4] WHERE $delete_text") or die("Error 200 : " .mysql_error());
 								
 								while($get_all_result = mysql_fetch_array($get_all_compare)){
@@ -186,10 +197,12 @@
 											$value_to_find = '';
 											break;
 									endswitch;
+									
 									$missing = find_missing($delete_value[0],$delete_value[2],$field_to_find, $value_to_find, $spc_field, $delete_value[4]);
 									
 									if($missing!=NULL || $missing!=''){
-										ehr_connect();						
+										ehr_connect();	
+										//echo "DELETE FROM $delete_value[4] WHERE $delete_text $missing";
 										$delete_query = mysql_query("DELETE FROM $delete_value[4] WHERE $delete_text $missing") or die("Error 227 : ".mysql_error());
 									}
 								}
@@ -213,23 +226,56 @@
 					}
 					ehr_connect();
 				}//end of delete fp_pe
-				
-				$new_id = '';
+				if($new_entry[4]=='m_patient_fp_method_service'){
+					$new_id = 'na';
+				}else{
+					$new_id = '';
+				}
 				$insert_text = insert_values($new_entry, $new_id);
+				//echo "INSERT TEXT for : $insert_text";
 				if($new_entry[4]=='m_consult_notes_complaint' || $new_entry[4]=='m_consult_notes_dxclass'){
-					if($new_entry[4]=='m_consult_notes_complaint'){
-						$check_sql = mysql_query("SELECT * FROM $new_entry[4] WHERE notes_id = '$new_entry[7]' AND consult_id = '$new_entry[7]' AND complaint_id ='$new_entry[10]'") or die("Error 229 : ".mysql_error());
-						$insert_text = "'".$new_entry[7]."','".$new_entry[8]."','".$new_entry[9]."','".$new_entry[10]."','".$new_entry[11]."','".$new_entry[12]."','".$new_entry[13]."'";
-					}else{
-					
-						$check_sql = mysql_query("SELECT * FROM $new_entry[4] WHERE notes_id = '$new_entry[7]' AND consult_id = '$new_entry[7]' AND class_id ='$new_entry[10]'") or die("Error 229 : ".mysql_error());
-						$insert_text = "'".$new_entry[7]."','".$new_entry[8]."','".$new_entry[9]."','".$new_entry[10]."','".$new_entry[11]."','".$new_entry[12]."','".$new_entry[13]."'";
-					}
-					
-					if(mysql_num_rows($check_sql)==0){
-						insert_query($insert_text, $new_entry[4]);
-					}
-	
+					lite_connect($_POST['sync_user']);
+					//echo "NEW AFTER DELETE <br />";
+					//print_r($new_entry);
+					//echo "<br /><br /><br />";
+					$get_all_cc_dx_sql = mysql_query("SELECT * FROM $new_entry[4] WHERE notes_id = '$new_entry[2]'") or die("Error 220 : " .mysql_error());
+						while($dx_cc_result = mysql_fetch_array($get_all_cc_dx_sql)){
+							
+							if($new_entry[4]=='m_consult_notes_complaint'){
+								$insert_text = "'".$new_entry[7]."','".$new_entry[8]."','".$new_entry[9]."','".$dx_cc_result[complaint_id]."','".$new_entry[11]."','".$new_entry[12]."','".$new_entry[13]."'";
+								ehr_connect();
+								$check_sql = mysql_query("SELECT * FROM $new_entry[4] WHERE notes_id = '$new_entry[7]' AND consult_id = '$new_entry[8]' AND complaint_id ='$dx_cc_result[complaint_id]'") or die("Error 229 : ".mysql_error());
+								//echo $insert_text;
+							}else{
+								$insert_text = "'".$new_entry[7]."','".$new_entry[8]."','".$new_entry[9]."','".$dx_cc_result[class_id]."','".$new_entry[11]."','".$new_entry[12]."','".$new_entry[13]."'";
+								ehr_connect();
+								$check_sql = mysql_query("SELECT * FROM $new_entry[4] WHERE notes_id = '$new_entry[7]' AND consult_id = '$new_entry[8]' AND class_id ='$dx_cc_result[class_id]'") or die("Error 229 : ".mysql_error());
+							}
+							
+							if(mysql_num_rows($check_sql)==0){
+								insert_query($insert_text, $new_entry[4]);
+							}
+							lite_connect($_POST['sync_user']);
+						}
+						ehr_connect();
+				}elseif($new_entry[4]=='m_consult_ptgroup'){
+					lite_connect($_POST['sync_user']);
+					//print_r($new_entry);
+					//get consult id from lite_connect
+					//$get_consult_id = mysql_query("SELECT m_consult");
+					$get_all_ptgroup_sql = mysql_query("SELECT * FROM $new_entry[4] WHERE consult_id = '$new_entry[2]'") or die("Error 220 : " .mysql_error());
+						while($ptgroup_result = mysql_fetch_array($get_all_ptgroup_sql)){
+							ehr_connect();
+													
+							$check_sql = mysql_query("SELECT * FROM $new_entry[4] WHERE consult_id = '$new_entry[7]' AND ptgroup_id ='$ptgroup_result[ptgroup_id]'") or die("Error 229 : ".mysql_error());
+							$insert_text = "'".$new_entry[7]."','".$new_entry[8]."','".$new_entry[9]."','".$new_entry[10]."'";
+							
+							if(mysql_num_rows($check_sql)==0){					
+								$insert_text = "'".$new_entry[7]."','".$new_entry[8]."','".$new_entry[9]."','".$new_entry[10]."'";
+								insert_query($insert_text, $new_entry[4]);
+							}
+						}
+				
 				}elseif($new_entry[4]=='m_patient_fp_method_service' || $new_entry[4]=='m_patient_fp_pelvic' || $new_entry[4]=='m_patient_fp_pe' || $new_entry[4]=='m_patient_fp_obgyn' || $new_entry[4]=='m_patient_fp_hx' || $new_entry[4]=='m_consult_mc_prenatal' || $new_entry[4]=='m_consult_mc_postpartum' || $new_entry[4]=='m_consult_mc_services' || $new_entry[4]=='m_consult_ccdev_vaccine' || $new_entry[4]=='m_consult_mc_vaccine' || $new_entry[4]=='m_consult_vaccine'){
 					//echo "BAD".$new_entry[4];			
 					$insert_text = '';
@@ -261,7 +307,8 @@
 							break;
 					endswitch;
 					
-					if($new_entry[4]=='m_patient_fp_pe' || $new_entry[4]=='m_patient_fp_pelvic'){
+					//echo "SELECT * FROM $new_entry[4] WHERE patient_id = '$new_entry[0]' AND $where_field = '$new_entry[2]'";
+					if($new_entry[4]=='m_patient_fp_pe' || $new_entry[4]=='m_patient_fp_pelvic' || $new_entry[4]=='m_patient_fp_method_service'){
 						$get_mc_lite_date = mysql_query("SELECT * FROM $new_entry[4] WHERE patient_id = '$new_entry[0]' AND $where_field = '$new_entry[2]'")or die("Error 113 : ".mysql_error());
 					}else{
 						$get_mc_lite_date = mysql_query("SELECT * FROM $new_entry[4] WHERE patient_id = '$new_entry[0]' AND $where_field = '$new_entry[2]'")or die("Error 113 : ".mysql_error());
@@ -457,6 +504,9 @@
 		lite_connect($_POST['sync_user']);
 		$check_status_sql = "SELECT lite_patient_id, emr_patient_id, lite_specific_id, emr_specific_id, table_name, entry_date, sync_type FROM m_push_status WHERE push_flag ='Y' AND sync_type='U'";
 		$update_array = get_data_array($check_status_sql);
+		//echo "UPDATE<br />";
+		//print_r($update_array);
+		//echo "<br />";
 		if($update_array!=NULL || $update_array!=''){
 			ehr_connect();
 			$array_m_push_update = array();
@@ -567,6 +617,7 @@
 									$mc_id = $update_value[7];
 									$consult_id = $update_value[8];
 									$patient_id = $update_value[10];
+									$mc_timestamp = $update_value[11];
 									$field_to_find = 'service_id';
 									$service_id = $get_mc_lite_result[$field_to_find];
 									break;
@@ -616,9 +667,14 @@
 									$patient_id = $update_value[10];
 									$field_to_find = 'date_service';
 									$date_service = $get_mc_lite_result[$field_to_find];
-									echo $update_value[7];
+									//echo $update_value[7];
 									break;
 								case 'm_consult_mc_vaccine':
+									$mc_id = $update_value[7];
+									$patient_id = $update_value[9];
+									$field_to_find = 'vaccine_id';
+									$vaccine_id = $get_mc_lite_result[$field_to_find];
+								case 'm_consult_ccdev_vaccine':
 									$mc_id = $update_value[7];
 									$patient_id = $update_value[9];
 									$field_to_find = 'vaccine_id';
@@ -647,7 +703,7 @@
 							for($i=0;$i<$field_count;$i++){
 								$field_name = mysql_field_name($check_mc_date, $i);
 								
-								if($field_name=='fp_id' || $field_name=='fp_px_id' || $field_name=='date_service' || $field_name=='mc_id' || $field_name=='consult_id' || $field_name=='ccdev_id' || $field_name=='patient_id' || $field_name==$field_to_find){
+								if($field_name=='vacine_id' || $field_name=='mc_timestamp' || $field_name=='service_id' || $field_name=='fp_id' || $field_name=='fp_px_id' || $field_name=='date_service' || $field_name=='mc_id' || $field_name=='consult_id' || $field_name=='ccdev_id' || $field_name=='patient_id' || $field_name==$field_to_find){
 									$value = $$field_name;
 									if($update_where=='' || $update_where==NULL){
 										$update_where = "$field_name = '$value'";
@@ -665,8 +721,8 @@
 							}
 							
 							$update_ccdev_sql = "UPDATE $update_value[4] SET $insert_text WHERE $update_where";
-							echo $update_ccdev_sql;
-							//update_ccdev($update_ccdev_sql);
+							//echo $update_ccdev_sql;
+							update_ccdev($update_ccdev_sql);
 						}
 						lite_connect($_POST['sync_user']);
 					}
@@ -681,7 +737,7 @@
 				$update_record_count += 1;
 				
 			}
-			//update_m_push($array_m_push_update, 'update');
+			update_m_push($array_m_push_update, 'update');
 			unset($array_m_push_update);
 		
 		}
@@ -691,6 +747,10 @@
 		lite_connect($_POST['sync_user']);
 		$check_status_sql = "SELECT lite_patient_id, emr_patient_id, lite_specific_id, emr_specific_id, table_name, entry_date, sync_type FROM m_push_status WHERE push_flag ='Y' AND sync_type='D'";
 		$delete_array = get_data_array($check_status_sql);
+		//echo "DELETE<br />";
+		//print_r($delete_array);
+		//echo "<br />";
+		//echo "ITO DELETE<br />";
 		//print_r($delete_array);
 		if($delete_array!=NULL || $delete_array!=''){
 			ehr_connect();
@@ -793,6 +853,9 @@
 			
 		}
 		
+		//SET all remaining table in m_push_satus to N because of 0 specific_id
+		update_m_push('reset','reset');
+		
 		echo "<table width='30%' align='center' style='background-color: #FFFFFF;font-family: verdana,arial;font-size:20;'>";
 		echo "<tr><td colspan='2' style='background-color:#0000FF;text-align:center;color:white;'>EHR Server Data Sync Results</td></tr>";
 		//echo "You have successfully Synced : <br />";
@@ -817,7 +880,7 @@
 	
 	function update_ccdev($update_ccdev_sql){
 		ehr_connect();
-		echo $update_ccdev_sql;
+		//echo $update_ccdev_sql;
 		$update_query = mysql_query($update_ccdev_sql) or die("Error 196 : " .mysql_error());
 		
 	}
@@ -826,11 +889,12 @@
 		
 		lite_connect($_POST['sync_user']);
 		$compare_lite_sql = mysql_query("SELECT * FROM $table WHERE $spc_field = '$spc_id' AND patient_id = '$px_id' AND $field_to_find = '$value_to_find'") or die("Error 261 : " .mysql_error());
-		
+		//echo $compare_lite_sql;
 		if(($compare_lite_count = mysql_num_rows($compare_lite_sql))<=0){
 			$delete_where = " AND $field_to_find = '$value_to_find'";
 			return $delete_where;
 		}
+		
 		
 	}
 	
@@ -840,8 +904,9 @@
 			$list = $arg_list[0];
 			$table_name = $arg_list[1];
 		}
-		echo "INSERT INTO $table_name VALUES($list)";
+		//echo "INSERT INTO $table_name VALUES($list)";
 		$insert_sql = mysql_query("INSERT INTO $table_name VALUES($list)") or die("Error 21 : ".mysql_error());	
+		//echo "MARK";
 	}
 		
 	function get_new_id(){
@@ -872,26 +937,37 @@
 			$list = $arg_list[0];
 			$type = $arg_list[1];
 		}
-		foreach($list as $key => $value){
-			switch ($type){
-				case 'newpatient':
-					$update_patient_id = mysql_query("UPDATE m_push_status SET emr_patient_id='$value[1]' WHERE lite_patient_id='$value[0]' AND emr_patient_id='0'") or die("Error 213 : " .mysql_error());
-					$update_sql = "UPDATE m_push_status SET push_flag='N' WHERE lite_patient_id='$value[0]' AND lite_specific_id ='0'";
-					break;
-				case 'update':
-					$update_sql = "UPDATE m_push_status SET push_flag='N' WHERE lite_patient_id = '$value[0]' AND emr_patient_id = '$value[1]' AND lite_specific_id='$value[2]' AND table_name='$value[4]' AND entry_date='$value[5]'";
-					break;
-				default:
-					if($value[4]=='m_patient_philhealth'){
-						$update_sql = "UPDATE m_push_status SET emr_specific_id='$value[3]', push_flag='N' WHERE lite_patient_id = '$value[0]' AND emr_patient_id = '$value[1]' AND table_name='$value[4]' AND entry_date='$value[5]' AND sync_type='N'";
-					}elseif($value[4]=='m_consult_ptgroup'){
-						$update_sql = "UPDATE m_push_status SET emr_specific_id='$value[3]', push_flag='N' WHERE lite_specific_id='$value[2]' AND table_name='$value[4]' AND entry_date='$value[5]' AND sync_type='N'";
-					}else{
-						$update_sql = "UPDATE m_push_status SET emr_specific_id='$value[3]', push_flag='N' WHERE lite_patient_id = '$value[0]' AND emr_patient_id = '$value[1]' AND lite_specific_id='$value[2]' AND table_name='$value[4]' AND entry_date='$value[5]' AND sync_type='N'";
-					}
-					break;
+		
+		if($type=='reset'){
+			$update_sql = "UPDATE m_push_status SET push_flag='N' WHERE push_flag='Y'";
+			$update_status = mysql_query($update_sql) or die("Error 938 : ".mysql_error());
+		}else{	
+			foreach($list as $key => $value){
+				switch ($type){
+					case 'newpatient':
+						$update_patient_id = mysql_query("UPDATE m_push_status SET emr_patient_id='$value[1]' WHERE lite_patient_id='$value[0]' AND emr_patient_id='0'") or die("Error 213 : " .mysql_error());
+						$update_sql = "UPDATE m_push_status SET push_flag='N' WHERE lite_patient_id='$value[0]' AND lite_specific_id ='0'";
+						break;
+					case 'update':
+						//echo "<br />UPDATE $value[7]<br />";
+						if($value[7]=='D'){
+							$update_sql = "UPDATE m_push_status SET push_flag='N' WHERE lite_patient_id = '$value[0]' AND emr_patient_id = '$value[1]' AND lite_specific_id='$value[2]' AND table_name='$value[4]' AND entry_date='$value[5]' AND sync_type='D'";
+						}else{
+							$update_sql = "UPDATE m_push_status SET push_flag='N' WHERE lite_patient_id = '$value[0]' AND emr_patient_id = '$value[1]' AND lite_specific_id='$value[2]' AND table_name='$value[4]' AND entry_date='$value[5]' AND sync_type='$value[7]'";
+						}
+						break;
+					default:
+						if($value[4]=='m_patient_philhealth'){
+							$update_sql = "UPDATE m_push_status SET emr_specific_id='$value[3]', push_flag='N' WHERE lite_patient_id = '$value[0]' AND emr_patient_id = '$value[1]' AND table_name='$value[4]' AND entry_date='$value[5]' AND sync_type='N'";
+						}elseif($value[4]=='m_consult_ptgroup' || $value[4]=='m_consult_ptgroup'){
+							$update_sql = "UPDATE m_push_status SET emr_specific_id='$value[3]', push_flag='N' WHERE lite_specific_id='$value[2]' AND table_name='$value[4]' AND entry_date='$value[5]' AND sync_type='N'";
+						}else{
+							$update_sql = "UPDATE m_push_status SET emr_specific_id='$value[3]', push_flag='N' WHERE lite_patient_id = '$value[0]' AND emr_patient_id = '$value[1]' AND lite_specific_id='$value[2]' AND table_name='$value[4]' AND entry_date='$value[5]' AND sync_type='N'";
+						}
+						break;
+				}
+				$update_status = mysql_query($update_sql) or die("Error 964 : ".mysql_error());
 			}
-			$update_status = mysql_query($update_sql) or die("Error 45 : ".mysql_error());
 		}
 	}
 		
@@ -1016,11 +1092,14 @@
 							if($sync_type=='D'){
 								$emr_id = $emr_specific_id;
 							}else{
+								//echo "PUMASOK";
 								if($get_data_result[$field_name]){
 									$lite_specific_id = $get_data_result[$field_name];
+									//echo "lite_id". $lite_specific_id;
 								}
 								
 								$emr_id = get_existing_id('m_consult_notes', $field_name, $lite_specific_id); 
+								//echo "NOTES_ID".$emr_id;
 							}
 							array_push($data_array, $emr_id);
 							break;
@@ -1231,8 +1310,10 @@
 							break;
 								
 							case 'notes_id':
+								//echo "PUMASOK";!
 								if($get_ids[$field_name]){
 									$lite_specific_id = $get_ids[$field_name];
+									//echo "ITO YATA!";
 								}
 							
 								$emr_id = get_existing_id('m_consult_notes', $field_name, $lite_specific_id); 
@@ -1367,6 +1448,8 @@
 		return($partner_id);
 	}
 	function get_existing_id($table_name, $field_id_name, $lite_id){
+		//lite_connect($_POST['sync_user']);
+		//echo "SELECT emr_specific_id AS id FROM $table_name AS a JOIN m_push_status b ON a.$field_id_name=b.lite_specific_id WHERE table_name='$table_name' AND b.lite_specific_id='$lite_id'";
 		$get_id_sql = mysql_query("SELECT emr_specific_id AS id FROM $table_name AS a JOIN m_push_status b ON a.$field_id_name=b.lite_specific_id WHERE table_name='$table_name' AND b.lite_specific_id='$lite_id'") or die("Error 231 : ".mysql_error());
 		$get_id_result = mysql_fetch_array($get_id_sql);
 		$exist_id = $get_id_result['id'];
@@ -1505,10 +1588,6 @@
 					$value = $i + 7;
 					$where_text = where_text($field_name, $list[$value], $where_text);
 					break;
-				case 'fp_px_id':
-					$value = $i + 7;
-					$where_text = where_text($field_name, $list[$value], $where_text);
-					break;
 				case 'schedule_id':
 					$value = $i + 7;
 					$where_text = where_text($field_name, $list[$value], $where_text);
@@ -1589,7 +1668,7 @@
 		
 	function ehr_connect(){
 		$dbconn = mysql_connect('localhost',$_SESSION['dbuser'],$_SESSION['dbpass']) or die(mysql_error());
-		mysql_select_db('server',$dbconn);
+		mysql_select_db($_SESSION['dbname'],$dbconn);
 	}
 	
 	

@@ -239,7 +239,6 @@ function show_philhealth_consults(){
 function get_member_type($pxid){
     $q_philhealth = mysql_query("SELECT DISTINCT(a.patient_id) FROM m_patient_philhealth a, m_family_address b, m_family_members c,m_lib_barangay d, m_patient e WHERE a.patient_id='$pxid' AND a.patient_id=c.patient_id AND c.family_id=b.family_id AND b.barangay_id=d.barangay_id AND a.patient_id=e.patient_id") or die("Cannot query 199 ".mysql_error());                
     if(mysql_num_rows($q_philhealth)!=0):
-        
         return 'M';    //return M for member
     else:
         //check if there a co-member that is a philhealth member
