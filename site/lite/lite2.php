@@ -674,11 +674,6 @@
 									$patient_id = $update_value[9];
 									$field_to_find = 'vaccine_id';
 									$vaccine_id = $get_mc_lite_result[$field_to_find];
-								case 'm_consult_ccdev_vaccine':
-									$mc_id = $update_value[7];
-									$patient_id = $update_value[9];
-									$field_to_find = 'vaccine_id';
-									$vaccine_id = $get_mc_lite_result[$field_to_find];
 								default:
 								
 									break;
@@ -703,7 +698,7 @@
 							for($i=0;$i<$field_count;$i++){
 								$field_name = mysql_field_name($check_mc_date, $i);
 								
-								if($field_name=='vacine_id' || $field_name=='mc_timestamp' || $field_name=='service_id' || $field_name=='fp_id' || $field_name=='fp_px_id' || $field_name=='date_service' || $field_name=='mc_id' || $field_name=='consult_id' || $field_name=='ccdev_id' || $field_name=='patient_id' || $field_name==$field_to_find){
+								if($field_name=='mc_timestamp' || $field_name=='service_id' || $field_name=='fp_id' || $field_name=='fp_px_id' || $field_name=='date_service' || $field_name=='mc_id' || $field_name=='consult_id' || $field_name=='ccdev_id' || $field_name=='patient_id' || $field_name==$field_to_find){
 									$value = $$field_name;
 									if($update_where=='' || $update_where==NULL){
 										$update_where = "$field_name = '$value'";

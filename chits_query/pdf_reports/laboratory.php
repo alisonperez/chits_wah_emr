@@ -232,9 +232,9 @@ function show_lab_service(){
 		list($sputum) = mysql_fetch_array($get_sputum);
 		
 		$gt = $fecalysis + $urinalysis + $hematology + $sputum;
-		
-		$arr_lab = array($brgy_name,$fecalysis,$hematology,$sputum,$urinalysis,$gt); //updated 10-27-2014 as reported by F. Gamboa. Reorder the lab result listed
-		
+
+		$arr_lab = array($brgy_name,$fecalysis,$urinalysis,$hematology,$sputum,$gt);
+
 		$this->Row($arr_lab);
 
 		//echo $brgy_id.'/'.$fecalysis.'/'.$urinalysis.'/'.$hematology.'/'.$sputum.'/'.$gt.'<br>';
