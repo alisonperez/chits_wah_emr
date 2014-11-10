@@ -527,7 +527,7 @@ class consult_report extends module {
 		
 		    //for displaying the vitals signs
 		    $selvitals = mysql_query("SELECT vitals_weight,vitals_temp,vitals_systolic,vitals_diastolic,vitals_heartrate,
-		    vitals_resprate, a.consult_id FROM m_consult a, m_consult_vitals b WHERE a.patient_id='$pid' AND a.consult_date BETWEEN '$report_date' AND '$end_report_date' AND  a.consult_id=b.consult_id") 
+		    vitals_resprate, a.consult_id FROM m_consult a, m_consult_vitals b WHERE a.patient_id='$pid' AND a.consult_date BETWEEN '$report_date 00:00:00' AND '$end_report_date 23:59:59' AND  a.consult_id=b.consult_id") 
 		    or die(mysql_error());
 
 		    $sel_elapsed = mysql_query("SELECT date_format(consult_date,'%m/%d/%Y %h:%i %p') as consult_start,date_format(consult_end,'%m/%d/%Y %h:%i %p') as consult_end, round((unix_timestamp(consult_end)-unix_timestamp(consult_date))/60,2) as consult_minutes FROM m_consult WHERE consult_id='$consult_id'") or die("Cannot query 531 ".mysql_error());

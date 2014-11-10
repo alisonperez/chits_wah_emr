@@ -112,7 +112,7 @@ function NbLines($w,$txt)
 
 function Header()
 {	
-
+	
 	$q_name = mysql_query("SELECT a.patient_lastname, a.patient_firstname,a.patient_id,date_format(b.notes_timestamp,'%Y-%m-%d') FROM m_patient a, m_consult_notes b WHERE a.patient_id=b.patient_id AND b.notes_id='$_GET[notes]'") or die("Cannot query 114: ".mysql_error());
 	list($lname,$fname,$pxid,$date_consult) = mysql_fetch_array($q_name);
 	
@@ -125,23 +125,11 @@ function Header()
 		$str_brgy = '';
 	endif;
 
-
+	$this->SetFont('Arial','B',13);
 
 	$w = array(120);
 	$this->SetWidths($w);
-	//$this->Row(array($_SESSION["datanode"]["name"]."\n".$_SESSION["lgu"].", ".$_SESSION["province"]));
-
-	$this->SetFont('Arial','BI',17);
-	$this->Cell(0,5,'Rx',0,1,'L');
-	$this->Cell(0,5,'',0,1,'L');
-
-	$this->SetFont('Arial','B',14);
-	
-	$this->Row(array($_SESSION["datanode"]["name"]."\n".$_SESSION["barangay_loc"].", ".$_SESSION["lgu"].", ".$_SESSION["province"]));
-
-	$this->Cell(0,5,'',0,1,'L');
-
-	$this->SetFont('Arial','',13);
+	$this->Row(array($_SESSION["datanode"]["name"]."\n".$_SESSION["lgu"].", ".$_SESSION["province"]));
 
 	$this->Cell(0,5,'Name of Patient: '.$lname.', '.$fname.' '.$str_brgy,0,1,'L');
 	$this->Cell(0,5,'Date Prescribed: '.$date_consult,0,1,'L');

@@ -1555,6 +1555,25 @@ Class Module {
         }
     }
 
+	function display_todays_consult(){
+		//new consults today style
+		if (func_num_args()>0) {
+            $arg_list = func_get_args();
+            $list = $arg_list[0];
+        }
+		
+		$retval .= "<table width='100%' cellpadding='2' cellspacing='1' style='border:1px solid black'>";
+		$retval .= "<tr style='font:normal 12px arial'><th>Patient Name</th><th>Visit<br />Count</th><th>Birthdate</th><th>Patient<br />Services/Programs</th><th>Elapsed<br />Time</th>";
+        $retval .= "<tr bgcolor='white' valign='top'>";
+			for ($i=0; $i<count($list);$i++) {
+				$pxlist .= $list[$i];
+			}
+        //$retval .= "<td>$pxlist</td>";
+		$retval .= $pxlist;
+        $retval .= "</tr></table>";
+        return $retval;
+	
+	}
     function columnize_list() {
     //
     // convert vertical list of array elements into

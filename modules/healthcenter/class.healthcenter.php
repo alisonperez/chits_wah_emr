@@ -515,7 +515,16 @@ class healthcenter extends module{
                 $this->process_search($menu_id, $post_vars, $get_vars);
             }
             print "<table width='600'>";
-            if ($get_vars["consult_id"]) {
+			
+				if ($get_vars["consult_id"]) {
+				$c_id = $get_vars["consult_id"];
+				$get_patient_sql = mysql_query("SELECT patient_id AS px_id FROM m_consult WHERE consult_id = $c_id") or die("Error 518 : ".mysql_error());
+				$get_patient_result = mysql_fetch_assoc($get_patient_sql);
+			
+				$px_id = $get_patient_result["px_id"];
+			}
+            //if ($get_vars["consult_id"]) {
+			if ($px_id>=1) {
                 print "<tr valign='top'><td colspan='2'>";
                 $this->patient_info($menu_id, $post_vars, $get_vars);
                 print "</td></tr>";
@@ -900,9 +909,8 @@ class healthcenter extends module{
     }
 	
 	function compute_bmi($height,$weight){
-		//BASIS: http://apps.who.int/bmi/index.jsp?introPage=intro_3.html
 
-		echo "<a href='#' onclick=\"javascript:alert('BMI Formula: kg/(meters * meters). If BMI is < 18.5, UNDERWEIGHT. If BMI is >=18.5 and <25, NORMAL. If BMI is >=25 and <30, OVERWEIGHT. If BMI >=30, OBESE'); return false; \" alt='Click to view BMI range'>Body Mass Index:</a>";
+		echo "Body Mass Index: ";
 		$ht_cm = $height / 100;			
 		
 		if($ht_cm!=0):		
@@ -1257,7 +1265,7 @@ class healthcenter extends module{
 
 
 	if(empty($arr_facility)):
-        	$result = mysql_query("select c.consult_id, p.patient_id, p.patient_lastname, p.patient_firstname, see_doctor_flag from m_consult c, m_patient p where c.patient_id = p.patient_id and consult_end = '0000-00-00 00:00:00' order by c.consult_date asc") or die("Cannot query 1241 ".mysql_error());
+        	$result = mysql_query("select c.consult_id, p.patient_id, p.patient_lastname, p.patient_firstname, see_doctor_flag, date_format(p.patient_dob, '%Y-%m-%d'), round((to_days(c.consult_date)-to_days(p.patient_dob))/365,1) from m_consult c, m_patient p where c.patient_id = p.patient_id and consult_end = '0000-00-00 00:00:00' order by c.consult_date asc") or die("Cannot query 1241 ".mysql_error());
 	else:
 		if(!empty($_GET["facid"])):
 				
@@ -1270,7 +1278,7 @@ class healthcenter extends module{
 				}
 			$str_brgy = implode(",",$arr_brgy);
 
-			$result = mysql_query("select c.consult_id, p.patient_id, p.patient_lastname, p.patient_firstname, see_doctor_flag from m_consult c, m_patient p, m_family_members x, m_family_address y, m_lib_barangay z where c.patient_id = p.patient_id and consult_end = '0000-00-00 00:00:00' AND p.patient_id=x.patient_id AND x.family_id=y.family_id AND y.barangay_id IN ($str_brgy) AND y.barangay_id=z.barangay_id order by c.consult_date asc") or die("Cannot query 1258 ".mysql_error());
+			$result = mysql_query("select c.consult_id, p.patient_id, p.patient_lastname, p.patient_firstname, see_doctor_flag, date_format(p.patient_dob, '%Y-%m-%d'), round((to_days(c.consult_date)-to_days(p.patient_dob))/365,1) from m_consult c, m_patient p, m_family_members x, m_family_address y, m_lib_barangay z where c.patient_id = p.patient_id and consult_end = '0000-00-00 00:00:00' AND p.patient_id=x.patient_id AND x.family_id=y.family_id AND y.barangay_id IN ($str_brgy) AND y.barangay_id=z.barangay_id order by c.consult_date asc") or die("Cannot query 1258 ".mysql_error());
 			
 			else:	
 				echo "<script language='Javascript'>";
@@ -1279,88 +1287,109 @@ class healthcenter extends module{
 			endif;
 
 		else:
-			$result = mysql_query("select c.consult_id, p.patient_id, p.patient_lastname, p.patient_firstname, see_doctor_flag from m_consult c, m_patient p where c.patient_id = p.patient_id and consult_end = '0000-00-00 00:00:00' order by c.consult_date asc") or die("Cannot query 1271 ".mysql_error());	
+			$result = mysql_query("select c.consult_id, p.patient_id, p.patient_lastname, p.patient_firstname, see_doctor_flag, date_format(p.patient_dob, '%Y-%m-%d'), round((to_days(c.consult_date)-to_days(p.patient_dob))/365,1) from m_consult c, m_patient p where c.patient_id = p.patient_id and consult_end = '0000-00-00 00:00:00' order by c.consult_date asc") or die("Cannot query 1271 ".mysql_error());	
 		endif;
 	endif;
 
 	
         if ($result) {
 	    print "<a name='consults'></a>";
+		
+            print "<span class='patient'>".FTITLE_CONSULTS_TODAY."</span>";
 
-        print "<span class='patient'>".FTITLE_CONSULTS_TODAY."</span><br>";
-
-	    healthcenter::show_tab_headers($arr_facility);
+			healthcenter::show_tab_headers($arr_facility);
 
             print "<table width=600 bgcolor='#FFFFFF' cellpadding='3' cellspacing='0' style='border: 2px solid black'>";
-            print "<tr><td>";
-            print "<span class='tinylight'>NAMES IN <font style='color:#FFFF33;background-color:black;'><b>YELLOW</b></font> OR THOSE MARKED WITH <img src='../images/star.gif' border='0'/> WILL SEE PHYSICIAN. NAMES IN <font style='color:#33FFFF;background-color:black;'><b>CYAN</b></font> ARE THOSE PRESCRIBED WITH MEDICINES AFTER THE CONSULTATION.</span><br/>";
-            if (mysql_num_rows($result)) {
-                // initialize array index
-                $i=0;
-                // have to return always to consult page
-                // wherever this is shown
-                $consult_menu_id = module::get_menu_id("_consult");
-                while (list($cid, $pid, $plast, $pfirst, $see_doctor) = mysql_fetch_array($result)) {
+            print "<tr>";
+				print "<td>";
+					print "<span class='tinylight'><b><span style='background-color:#FFFF00'>NAME</span> </b> - WILL SEE PHYSICIAN.</span>";
+	         
+					if (mysql_num_rows($result)) {
+						// initialize array index
+						$i=0;
+						// have to return always to consult page
+						// wherever this is shown
+						$consult_menu_id = module::get_menu_id("_consult");
+						$patient_count=0;
+						while (list($cid, $pid, $plast, $pfirst, $see_doctor, $patient_dobx, $age) = mysql_fetch_array($result)) {
 
-                    $q_lab = mysql_query("SELECT request_id,request_done FROM m_consult_lab WHERE patient_id='$pid' AND consult_id='$cid'") or die("Cannot query 1224".mysql_error());
+							$q_lab = mysql_query("SELECT request_id,request_done FROM m_consult_lab WHERE patient_id='$pid' AND consult_id='$cid'") or die("Cannot query 1224".mysql_error());
 
-					$q_treatment = mysql_query("SELECT notes_plan FROM m_consult_notes WHERE patient_id='$pid' AND consult_id='$cid'") or die("Cannot query 1306: ".mysql_error());
+							if(mysql_num_rows($q_lab)!=0):
+								$arr_done = array();
+								$arr_id = array();
+								while(list($req_id,$done_status) = mysql_fetch_array($q_lab)){
+									array_push($arr_id,$req_id);
+									array_push($arr_done,$done_status);
+								}
 
-					list($notes_plan) = mysql_fetch_array($q_treatment);
-					
-					$notes_plan = trim($notes_plan);
+								$done = (in_array("N",$arr_done)?"N":"Y");
+								$request_id = $arr_id[0];
+								$url = "page=CONSULTS&menu_id=1327&consult_id=$cid&ptmenu=LABS";
+							else:
+								$request_id = $done = "";
+							endif;
 
-					if(mysql_num_rows($q_lab)!=0):
-                        $arr_done = array();
-                        $arr_id = array();
-                        while(list($req_id,$done_status) = mysql_fetch_array($q_lab)){
-                            array_push($arr_id,$req_id);
-                            array_push($arr_done,$done_status);
-                        }
-
-                        $done = (in_array("N",$arr_done)?"N":"Y");
-                        $request_id = $arr_id[0];
-                        $url = "page=CONSULTS&menu_id=1327&consult_id=$cid&ptmenu=LABS#consults";
-                    else:
-                        $request_id = $done = "";
-                    endif;
-
-                    $visits = healthcenter::get_total_visits($pid);
-                    $consult_array[$i] = "<a href='".$_SERVER["PHP_SELF"]."?page=CONSULTS&menu_id=$consult_menu_id&consult_id=$cid&ptmenu=DETAILS' title='".INSTR_CLICK_TO_VIEW_RECORD."' ".
-					
-					//($see_doctor=="Y"?"style='background-color: #FFFF33'":"").
-					(($notes_plan!="")?"style='background-color: #33FFFF'":($see_doctor=="Y"?"style='background-color: #FFFF33'":"")).
-					
-					">"."<b>$plast, $pfirst</b></a> [$visits] ".($see_doctor=="Y"?"<img src='../images/star.gif' border='0'/>":"").(($request_id!="")?(($done=="Y")?"<a href='$_SERVER[PHP_SELF]?$url' title='lab completed'><img src='../images/lab.png' width='15px' height='15px' border='0' alt='lab completed' /></a>":"<a href='$_SERVER[PHP_SELF]?$url' title='lab pending'><img src='../images/lab_untested.png' width='15px' height='15px' border='0' alt='lab pending' /></a>"):"");
-					
-				    $consult_array[$i] = $consult_array[$i].$this->check_icons($pid,$cid,$consult_menu_id);
-			
-                    $i++;
-                }
-                // pass on patient list to be columnized
-                print $this->columnize_list($consult_array);
-            } else {
-                print "<font color='red'>No consults available.</font>";
-            }
-            $sql_time = "select round(avg(unix_timestamp(consult_end)-unix_timestamp(consult_date))/60,2) consult_minutes from m_consult where consult_end>0 and to_days(consult_date) = to_days(sysdate());";
-            if ($result_time = mysql_query($sql_time)) {
-                if (mysql_num_rows($result_time)) {
-                    list($mean_consult_time) = mysql_fetch_array($result_time);
-                }
-                if ($mean_consult_time) {
-                    print "<tr><td class='tinylight'>";
-                    if ($mean_consult_time>60) {
-                        $unit_time = "hour(s)";
-                    } elseif ($meantime>1440) {
-                        $unit_time = "day(s)";
-                    } else {
-                        $unit_time = "minute(s)";
-                    }
-                    print "AVERAGE CONSULT TIME: <font color='red'>$mean_consult_time $unit_time</font><br/>";
-                    print "</td></tr>";
-                }
-            }
-            print "</td></tr>";
+							$visits = healthcenter::get_total_visits($pid);
+							$ptgroup = healthcenter::check_icons($pid,$cid,$consult_menu_id);
+							
+							/*
+							if($age>=60){
+								$prio_color = '#006600';
+							}else{
+								if($_SESSION['mc_tag']>=1){
+									$prio_color= '#CC0033';
+								}else{
+									$prio_color ='#000000';
+								}
+							}
+							*/
+							if($see_doctor=="Y"){
+								$style = "style='background-color:#FFFF00'";
+							}else{
+								$style = '';
+							}
+							
+							$patient_elapsed = healthcenter::get_elapsedtime($cid);
+							$consult_array[$i] = "<tr><td $style><a style='text-decoration:none' href='".$_SERVER["PHP_SELF"]."?page=CONSULTS&menu_id=$consult_menu_id&consult_id=$cid&ptmenu=DETAILS' title='".INSTR_CLICK_TO_VIEW_RECORD."' ".($see_doctor=="Y"?"style='text-color: #FFFF33'":"").">".
+							"<b>$plast, $pfirst</b></td></a><td style='text-align:center'>[$visits]</td><td style='text-align:center'>".$patient_dobx."</td><td align='center'>" .(($request_id!="")?(($done=="Y")?"<a href='$_SERVER[PHP_SELF]?$url' title='lab completed' ><img src='../images/lab.png' width='15px' height='15px' border='0' alt='lab completed' /></a>$ptgroup":"<a href='$_SERVER[PHP_SELF]?$url' title='lab pending'><img src='../images/lab_untested.png' width='15px' height='15px' border='0' alt='lab pending' /></a>".($age>=60?"<img src='../images/senior.jpg' width='20' height='20' />":'')."$ptgroup"):"".($age>=60?"<img src='../images/senior.jpg' width='20' height='20' />":'')." $ptgroup")."</td><td>$patient_elapsed</td>";
+							$i++;
+							$patient_count += 1;
+						}
+						// pass on patient list to be columnized
+						
+						print healthcenter::display_todays_consult($consult_array);
+						
+					} else {
+						print "<font color='red'>No consults available.</font>";
+					}
+					print "<tr>";
+						print "<td>";
+							print "Number of patients waiting: <b>".$patient_count."</b>";
+						print "</td>";
+					print "</tr>";
+				/*
+				$sql_time = "select round(avg(unix_timestamp(consult_end)-unix_timestamp(consult_date))/60,2) consult_minutes from m_consult where consult_end>0 and to_days(consult_date) = to_days(sysdate());";
+				if ($result_time = mysql_query($sql_time)) {
+					if (mysql_num_rows($result_time)) {
+						list($mean_consult_time) = mysql_fetch_array($result_time);
+					}
+					if ($mean_consult_time) {
+						print "<tr><td class='tinylight'>";
+						if ($mean_consult_time>60) {
+							$unit_time = "hour(s)";
+						} elseif ($meantime>1440) {
+							$unit_time = "day(s)";
+						} else {
+							$unit_time = "minute(s)";
+						}
+						print "AVERAGE CONSULT TIME: <font color='red'>$mean_consult_time $unit_time</font>";
+						print "</td></tr>";
+					}
+				}
+				*/
+				print "</td>";
+			print "</tr>";
             print "</table>";
         }
     }
@@ -1389,7 +1418,8 @@ class healthcenter extends module{
         //   patient id to avoid possible duplicate consults
         // limitation of this software enforced constraint
         //   is if consult exceeds one day (not possible in health centers)
-        if (healthcenter::is_patient_in_consult($patient_id)) {
+        if ($consult_id = healthcenter::is_patient_in_consult($patient_id)) {
+			/*
             $post_vars["patient_id"] = $patient_id;
             if (healthcenter::confirm_add_consult($menu_id, $post_vars, $get_vars)) {
                 $sql = "insert into m_consult (patient_id, user_id, healthcenter_id, consult_date) ".
@@ -1411,11 +1441,11 @@ class healthcenter extends module{
                     }
                 }
             } else {
-                if ($post_vars["confirm_add_consult"]=="No") {
-					echo 'nosilazerep';
-                    header("location: ".$_SERVER["PHP_SELF"]."?page=CONSULTS&menu_id=".$get_vars["menu_id"]."&consult_id=$insert_id&ptmenu=DETAILS");
-                }
-            }
+			*/
+                //if ($post_vars["confirm_add_consult"]=="No") {
+					header("location: ".$_SERVER["PHP_SELF"]."?page=CONSULTS&menu_id=".$get_vars["menu_id"]."&consult_id=$consult_id&ptmenu=DETAILS");
+               // }
+            
         } else {
 
             // insert into consult table if there are no
@@ -1550,16 +1580,11 @@ function hypertension_code() {
             } elseif ($post_vars["consult_patient_id"]) {
                 $patient_id = $post_vars["consult_patient_id"];
             }
-            /* print "<font color='red' size='5'><b>You are attempting to load a patient that is already in today's consult. Are you sure you want to load this patient's records again?</b></font><br />";
+            print "<font color='red' size='5'><b>You are attempting to load a patient that is already in today's consult. Are you sure you want to load this patient's records again?</b></font><br />";
             print "<input type='hidden' name='patient_id' value='$patient_id'/> ";
             print "<input type='hidden' name='sked_id' value='".$get_vars["sked_id"]."'/> ";
             print "<input type='submit' name='confirm_add_consult' value='Yes' class='textbox' style='font-weight: bold; font-size:14pt; background-color: #FFFF33; border: 2px solid black' /> ";
-            print "<input type='submit' name='confirm_add_consult' value='No' class='textbox' style='font-weight: bold; font-size:14pt; background-color: #FFCC33; border: 2px solid black' /> "; */
-
-			print "<font color='red' size='5'><b>The patient you are trying to search is already on active consultation. Please check the CONSULTS TODAY box and click the patient's name to load the individual treatment record.</b></font><br />";
-            print "<input type='hidden' name='patient_id' value='$patient_id'/> ";
-            print "<input type='hidden' name='sked_id' value='".$get_vars["sked_id"]."'/> ";
-  
+            print "<input type='submit' name='confirm_add_consult' value='No' class='textbox' style='font-weight: bold; font-size:14pt; background-color: #FFCC33; border: 2px solid black' /> ";
             print "</td></tr>";
             print "</form>";
             print "</table>";
@@ -1574,13 +1599,10 @@ function hypertension_code() {
         }
 
         $date = date("Y-m-d");
-        /*$sql = "select patient_id from m_consult ".
+        $sql = "select consult_id from m_consult ".
              "where consult_end = '0000-00-00 00:00:00' and ".
-             "patient_id = '$patient_id' and to_days(consult_date) = to_days('$date')"; */
-		
-		$sql = "SELECT patient_id FROM m_consult WHERE consult_end = '0000-00-00 00:00:00' AND patient_id='$patient_id'";
-
-        if ($result = mysql_query($sql)) { 
+             "patient_id = '$patient_id'";
+        if ($result = mysql_query($sql)) {
             if (mysql_num_rows($result)) {
                 list($pt_in_consult) = mysql_fetch_array($result);
                 return $pt_in_consult;
@@ -1677,7 +1699,9 @@ function hypertension_code() {
         if ($result = mysql_query($sql)) {
             if (mysql_num_rows($result)) {
                 list($date, $elapsed) = mysql_fetch_array($result);
-                return "$date $elapsed"."H elapsed";
+				$hours = floor($elapsed);
+				$minutes = floor(($elapsed - $hours)*60);
+                return "$hours H, $minutes min";
             }
         }
     }
@@ -1872,41 +1896,92 @@ function hypertension_code() {
         	return $ret_val;
 	}
 
+	/*
 	function check_icons($pid,$cid,$consult_menu_id){
 		//displays icons for mc, epi, fp, dental clients
 		$str_icon = '';
-
+		$str_icon .= "<td align='center'>";
 		$q_mc = mysql_query("SELECT consult_id FROM m_consult_ptgroup WHERE consult_id='$cid' AND ptgroup_id='MATERNAL'") or die("Cannot query 1850: ".mysql_error());
 		if(mysql_num_rows($q_mc)!=0):
 			list($consult_id) = mysql_fetch_array($q_mc);
-			$str_icon .= "<img src='../images/mc_alert.png' width='15' height='15' title='CLICK TO GO TO MC RECORD'></img>";
+			$str_icon .= "<img src='../images/mc_alert.png' width='15' height='15' title='CLICK TO GO TO MC RECORD' />";
 		else:
 		endif;
 
 		$q_dent = mysql_query("SELECT consult_id FROM m_consult_ptgroup WHERE consult_id='$cid' AND ptgroup_id='DENTAL'") or die("Cannot query 1849: ".mysql_error());
 		if(mysql_num_rows($q_dent)!=0):
-			$str_icon .= "<img src='../images/dental_alert.png' width='10%' height='10%' title='CLICK TO GO TO MC RECORD'></img>";
+			$str_icon .= "<img src='../images/dental_alert.png' width='20' height='20' title='CLICK TO GO TO MC RECORD' />";
 		endif;
 
 
 		$q_child = mysql_query("SELECT consult_id FROM m_consult_ptgroup WHERE consult_id='$cid' AND ptgroup_id='CHILD'") or die("Cannot query: 1863");
 		if(mysql_num_rows($q_child)!=0):
-			$str_icon .= "<img src='../images/epi_alert.jpeg' width='10%' height='10%' title='CLICK TO GO TO EPI RECORD'></img>";
+			$str_icon .= "<img src='../images/epi_alert.jpeg' width='20' height='20' title='CLICK TO GO TO EPI RECORD' />";
 		endif;
 
 		$q_fp = mysql_query("SELECT consult_id FROM m_consult_ptgroup WHERE consult_id='$cid' AND ptgroup_id='FP'") or die("Cannot query: 1863");
 		if(mysql_num_rows($q_fp)!=0):
-			$str_icon .= "<img src='../images/fp_alert.jpeg' width='10%' height='10%' title='CLICK TO GO TO FP RECORD'></img>";
+			$str_icon .= "<img src='../images/fp_alert.jpeg' width='20' height='20' title='CLICK TO GO TO FP RECORD' />";
 		endif;
 		
 		$q_ntp = mysql_query("SELECT consult_id FROM m_consult_ptgroup WHERE consult_id='$cid' AND ptgroup_id='NTP'") or die("Cannot query: 1863");
 		if(mysql_num_rows($q_ntp)!=0):
-			$str_icon .= "<img src='../images/tb_alert.jpg' width='10%' height='10%' title='CLICK TO GO TO NTP RECORD'></img>";
+			$str_icon .= "<img src='../images/tb_alert.jpg' width='20' height='20' title='CLICK TO GO TO NTP RECORD' />";
 		endif;
-
+		$str_icon .= "</td>";
+		
 		return $str_icon;
 	}
+	*/
+	
+	function check_icons($pid,$cid,$consult_menu_id){
+		//displays icons for mc, epi, fp, dental clients
+		$url_part = "$_SERVER[PHP_SELF]?page=CONSULTS&menu_id=1327&consult_id=$cid&ptmenu=DETAILS&";
 
+		$str_icon = '';
+		$_SESSION['mc_tag'] = 0;
+		$q_mc = mysql_query("SELECT consult_id FROM m_consult_ptgroup WHERE consult_id='$cid' AND ptgroup_id='MATERNAL'") or die("Cannot query 1850: ".mysql_error());
+		if(mysql_num_rows($q_mc)!=0):
+			list($consult_id) = mysql_fetch_array($q_mc);
+			$str_icon .= "<a href='$url_part"."module=mc&mc=VISIT1'>";
+			$str_icon .= "<img src='../images/mc.jpg' width='20' height='20' title='CLICK TO GO TO MC RECORD' />";
+			$str_icon .= "</a>";
+			$_SESSION['mc_tag'] = 1;
+		endif;
+
+		$q_dent = mysql_query("SELECT consult_id FROM m_consult_ptgroup WHERE consult_id='$cid' AND ptgroup_id='DENTAL'") or die("Cannot query 1849: ".mysql_error());
+		if(mysql_num_rows($q_dent)!=0):
+			$str_icon .= "<a href='$url_part"."module=dental'>";
+			$str_icon .= "<img src='../images/dental.jpg' width='20' height='20' title='CLICK TO GO TO DENTAL RECORD' />";
+			$str_icon .= "</a>";
+		endif;
+
+		$q_child = mysql_query("SELECT consult_id FROM m_consult_ptgroup WHERE consult_id='$cid' AND ptgroup_id='CHILD'") or die("Cannot query: 1863");
+		if(mysql_num_rows($q_child)!=0):
+			$str_icon .= "<a href='$url_part"."module=ccdev&ccdev=VISIT1'>";
+			$str_icon .= "<img src='../images/ccdev.jpg' width='20' height='20' title='CLICK TO GO TO EPI RECORD' />";
+			$str_icon .= "</a>";
+		endif;
+
+		$q_fp = mysql_query("SELECT consult_id FROM m_consult_ptgroup WHERE consult_id='$cid' AND ptgroup_id='FP'") or die("Cannot query: 1863");
+		if(mysql_num_rows($q_fp)!=0):
+			$str_icon .= "<a href='$url_part"."module=family_planning'>";
+			$str_icon .= "<img src='../images/fp.jpg' width='20' height='20' title='CLICK TO GO TO FP RECORD' />";
+			$str_icon .= "</a>";
+		endif;
+		
+		$q_ntp = mysql_query("SELECT consult_id FROM m_consult_ptgroup WHERE consult_id='$cid' AND ptgroup_id='NTP'") or die("Cannot query: 1863");
+		if(mysql_num_rows($q_ntp)!=0):
+			$str_icon .= "<img src='../images/tb_alert.jpg' width='20' height='20' title='CLICK TO GO TO NTP RECORD' />";
+		endif;
+		
+		$q_pwd = mysql_query("SELECT patient_id FROM m_patient WHERE patient_id = '$pid' AND pwd_flag='Y'") or die("Cannot query: 1950".mysql_error());
+		if(mysql_num_rows($q_pwd)!=0):
+			$str_icon .= "<img src='../images/pwd.jpg' width='20' height='20' />";
+		endif;
+		return $str_icon;
+	}
+	
 	function get_philhealth_member_type($pxid){ 
 		$q_member = mysql_query("SELECT a.member_label FROM m_lib_philhealth_member_type a, m_patient_philhealth b WHERE b.patient_id='$pxid' AND b.member_id=a.member_id");
 		list($member_label) = mysql_fetch_array($q_member);

@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Form: PCB Form A4-->
+<dataValueSet xmlns="http://dhis2.org/schema/dxf/2.0" dataSet="oHOA3f6lU1a" period="PERIOD" orgUnit="ORGUNIT">
+  <!-- DE: Breastfeeding Program Education (integer)  -->
+  <!-- Category: (Given, Dependent)  -->
+  <dataValue dataElement="HAAmlK8a8Kz" categoryOptionCombo="myfBUBEhsTM" value="0"/>
+  <!-- DE: Breastfeeding Program Education (integer)  -->
+  <!-- Category: (Given, Member)  -->
+  <dataValue dataElement="HAAmlK8a8Kz" categoryOptionCombo="MATQcQq5AV3" value="1"/>
+  <!-- DE: Counselling For Lifestyle Modification (integer)  -->
+  <!-- Category: (Given, Dependent)  -->
+  <dataValue dataElement="RTl5mPvpksT" categoryOptionCombo="myfBUBEhsTM" value="2"/>
+  <!-- DE: Counselling For Lifestyle Modification (integer)  -->
+  <!-- Category: (Given, Member)  -->
+  <dataValue dataElement="RTl5mPvpksT" categoryOptionCombo="MATQcQq5AV3" value="0"/>
+  <!-- DE: Counselling For Smoking Cessation (integer)  -->
+  <!-- Category: (Given, Dependent)  -->
+  <dataValue dataElement="PuT0ufKGINQ" categoryOptionCombo="myfBUBEhsTM" value="0"/>
+  <!-- DE: Counselling For Smoking Cessation (integer)  -->
+  <!-- Category: (Given, Member)  -->
+  <dataValue dataElement="PuT0ufKGINQ" categoryOptionCombo="MATQcQq5AV3" value="1"/>
+  <!-- DE: Body Measurements (integer)  -->
+  <!-- Category: (Given, Dependent)  -->
+  <dataValue dataElement="nuIxJr4vLpY" categoryOptionCombo="myfBUBEhsTM" value="82"/>
+  <!-- DE: Body Measurements (integer)  -->
+  <!-- Category: (Given, Member)  -->
+  <dataValue dataElement="nuIxJr4vLpY" categoryOptionCombo="MATQcQq5AV3" value="38"/>
+  <!-- DE: Digital Rectal Examination (integer)  -->
+  <!-- Category: (Given, Dependent)  -->
+  <dataValue dataElement="w1vhtqyBm9P" categoryOptionCombo="myfBUBEhsTM" value="0"/>
+  <!-- DE: Digital Rectal Examination (integer)  -->
+  <!-- Category: (Given, Member)  -->
+  <dataValue dataElement="w1vhtqyBm9P" categoryOptionCombo="MATQcQq5AV3" value="1"/>
+  <!-- DE: Complete Blood Count (integer)  -->
+  <!-- Category: (Given, Dependent)  -->
+  <dataValue dataElement="t4G5Vy61EAT" categoryOptionCombo="myfBUBEhsTM" value="0"/>
+  <!-- DE: Complete Blood Count (integer)  -->
+  <!-- Category: (Referred, Member)  -->
+  <dataValue dataElement="t4G5Vy61EAT" categoryOptionCombo="NaXjTi9CCC6" value="0"/>
+  <!-- DE: Complete Blood Count (integer)  -->
+  <!-- Category: (Given, Member)  -->
+  <dataValue dataElement="t4G5Vy61EAT" categoryOptionCombo="MATQcQq5AV3" value="1"/>
+  <!-- DE: Complete Blood Count (integer)  -->
+  <!-- Category: (Referred, Dependent)  -->
+  <dataValue dataElement="t4G5Vy61EAT" categoryOptionCombo="ieraUcKsaLc" value="0"/>
+  <!-- DE: Fecalysis (integer)  -->
+  <!-- Category: (Given, Dependent)  -->
+  <dataValue dataElement="a5P1EQa8K0h" categoryOptionCombo="myfBUBEhsTM" value="2"/>
+  <!-- DE: Fecalysis (integer)  -->
+  <!-- Category: (Referred, Member)  -->
+  <dataValue dataElement="a5P1EQa8K0h" categoryOptionCombo="NaXjTi9CCC6" value="0"/>
+  <!-- DE: Fecalysis (integer)  -->
+  <!-- Category: (Given, Member)  -->
+  <dataValue dataElement="a5P1EQa8K0h" categoryOptionCombo="MATQcQq5AV3" value="0"/>
+  <!-- DE: Fecalysis (integer)  -->
+  <!-- Category: (Referred, Dependent)  -->
+  <dataValue dataElement="a5P1EQa8K0h" categoryOptionCombo="ieraUcKsaLc" value="0"/>
+  <!-- DE: Sputum Microscopy (integer)  -->
+  <!-- Category: (Given, Dependent)  -->
+  <dataValue dataElement="L6QO1We0kZn" categoryOptionCombo="myfBUBEhsTM" value="1"/>
+  <!-- DE: Sputum Microscopy (integer)  -->
+  <!-- Category: (Referred, Member)  -->
+  <dataValue dataElement="L6QO1We0kZn" categoryOptionCombo="NaXjTi9CCC6" value="0"/>
+  <!-- DE: Sputum Microscopy (integer)  -->
+  <!-- Category: (Given, Member)  -->
+  <dataValue dataElement="L6QO1We0kZn" categoryOptionCombo="MATQcQq5AV3" value="0"/>
+  <!-- DE: Sputum Microscopy (integer)  -->
+  <!-- Category: (Referred, Dependent)  -->
+  <dataValue dataElement="L6QO1We0kZn" categoryOptionCombo="ieraUcKsaLc" value="0"/>
+  <!-- DE: Fasting Blood Sugar (integer)  -->
+  <!-- Category: (Given, Dependent)  -->
+  <dataValue dataElement="QEsqit8TEFb" categoryOptionCombo="myfBUBEhsTM" value="0"/>
+  <!-- DE: Fasting Blood Sugar (integer)  -->
+  <!-- Category: (Referred, Member)  -->
+  <dataValue dataElement="QEsqit8TEFb" categoryOptionCombo="NaXjTi9CCC6" value="0"/>
+  <!-- DE: Fasting Blood Sugar (integer)  -->
+  <!-- Category: (Given, Member)  -->
+  <dataValue dataElement="QEsqit8TEFb" categoryOptionCombo="MATQcQq5AV3" value="0"/>
+  <!-- DE: Fasting Blood Sugar (integer)  -->
+  <!-- Category: (Referred, Dependent)  -->
+  <dataValue dataElement="QEsqit8TEFb" categoryOptionCombo="ieraUcKsaLc" value="0"/>
+  <!-- DE: Lipid Profile (integer)  -->
+  <!-- Category: (Given, Dependent)  -->
+  <dataValue dataElement="kR3CKnUI51F" categoryOptionCombo="myfBUBEhsTM" value="0"/>
+  <!-- DE: Lipid Profile (integer)  -->
+  <!-- Category: (Referred, Member)  -->
+  <dataValue dataElement="kR3CKnUI51F" categoryOptionCombo="NaXjTi9CCC6" value="0"/>
+  <!-- DE: Lipid Profile (integer)  -->
+  <!-- Category: (Given, Member)  -->
+  <dataValue dataElement="kR3CKnUI51F" categoryOptionCombo="MATQcQq5AV3" value="0"/>
+  <!-- DE: Lipid Profile (integer)  -->
+  <!-- Category: (Referred, Dependent)  -->
+  <dataValue dataElement="kR3CKnUI51F" categoryOptionCombo="ieraUcKsaLc" value="0"/>
+  <!-- DE: Chest X-Ray (integer)  -->
+  <!-- Category: (Given, Dependent)  -->
+  <dataValue dataElement="Lbet2CYNK36" categoryOptionCombo="myfBUBEhsTM" value="1"/>
+  <!-- DE: Chest X-Ray (integer)  -->
+  <!-- Category: (Referred, Member)  -->
+  <dataValue dataElement="Lbet2CYNK36" categoryOptionCombo="NaXjTi9CCC6" value="0"/>
+  <!-- DE: Chest X-Ray (integer)  -->
+  <!-- Category: (Given, Member)  -->
+  <dataValue dataElement="Lbet2CYNK36" categoryOptionCombo="MATQcQq5AV3" value="0"/>
+  <!-- DE: Chest X-Ray (integer)  -->
+  <!-- Category: (Referred, Dependent)  -->
+  <dataValue dataElement="Lbet2CYNK36" categoryOptionCombo="ieraUcKsaLc" value="0"/>
+  <!-- DE: Members (integer)  -->
+  <!-- Category: (Male)  -->
+  <dataValue dataElement="L98ovMQnYdT" categoryOptionCombo="HrYigPmbhB0" value="33"/>
+  <!-- DE: Members (integer)  -->
+  <!-- Category: (Female)  -->
+  <dataValue dataElement="L98ovMQnYdT" categoryOptionCombo="cQBIzjRpaWQ" value="12"/>
+  <!-- DE: Consultation (integer)  -->
+  <!-- Category: (Given, Dependent)  -->
+  <dataValue dataElement="e53GxHPT4Kh" categoryOptionCombo="myfBUBEhsTM" value="141"/>
+  <!-- DE: Consultation (integer)  -->
+  <!-- Category: (Given, Member)  -->
+  <dataValue dataElement="e53GxHPT4Kh" categoryOptionCombo="MATQcQq5AV3" value="21"/>
+  <!-- DE: Urinalysis (integer)  -->
+  <!-- Category: (Given, Dependent)  -->
+  <dataValue dataElement="nqaYpMZqNDy" categoryOptionCombo="myfBUBEhsTM" value="1"/>
+  <!-- DE: Urinalysis (integer)  -->
+  <!-- Category: (Referred, Member)  -->
+  <dataValue dataElement="nqaYpMZqNDy" categoryOptionCombo="NaXjTi9CCC6" value="0"/>
+  <!-- DE: Urinalysis (integer)  -->
+  <!-- Category: (Given, Member)  -->
+  <dataValue dataElement="nqaYpMZqNDy" categoryOptionCombo="MATQcQq5AV3" value="0"/>
+  <!-- DE: Urinalysis (integer)  -->
+  <!-- Category: (Referred, Dependent)  -->
+  <dataValue dataElement="nqaYpMZqNDy" categoryOptionCombo="ieraUcKsaLc" value="0"/>
+  <!-- DE: Dependents (integer)  -->
+  <!-- Category: (Male)  -->
+  <dataValue dataElement="DBtghZ7PNV4" categoryOptionCombo="HrYigPmbhB0" value="72"/>
+  <!-- DE: Dependents (integer)  -->
+  <!-- Category: (Female)  -->
+  <dataValue dataElement="DBtghZ7PNV4" categoryOptionCombo="cQBIzjRpaWQ" value="86"/>
+  <!-- DE: Periodic Clinical Breast Examination (integer)  -->
+  <!-- Category: (Given, Dependent)  -->
+  <dataValue dataElement="lete0wu7xDK" categoryOptionCombo="myfBUBEhsTM" value="0"/>
+  <!-- DE: Periodic Clinical Breast Examination (integer)  -->
+  <!-- Category: (Given, Member)  -->
+  <dataValue dataElement="lete0wu7xDK" categoryOptionCombo="MATQcQq5AV3" value="1"/>
+  <!-- DE: Visual Inspection With Acetic Acid (integer)  -->
+  <!-- Category: (Given, Dependent)  -->
+  <dataValue dataElement="bkeKrklaWli" categoryOptionCombo="myfBUBEhsTM" value="0"/>
+  <!-- DE: Visual Inspection With Acetic Acid (integer)  -->
+  <!-- Category: (Given, Member)  -->
+  <dataValue dataElement="bkeKrklaWli" categoryOptionCombo="MATQcQq5AV3" value="1"/>
+  <!-- DE: Obligated Target Hypertensive BP Measurement (integer)  -->
+  <!-- Category: (Default)  -->
+  <dataValue dataElement="l7DHoJcQoQS" categoryOptionCombo="beBubnoFLUo" value="0"/>
+  <!-- DE: Regular BP Measurement (integer)  -->
+  <!-- Category: (Given, Dependent)  -->
+  <dataValue dataElement="FdXvwwJgqJg" categoryOptionCombo="myfBUBEhsTM" value="28"/>
+  <!-- DE: Regular BP Measurement (integer)  -->
+  <!-- Category: (Given, Member)  -->
+  <dataValue dataElement="FdXvwwJgqJg" categoryOptionCombo="MATQcQq5AV3" value="12"/>
+  <!-- DE: Obligated Target Periodic Clinical Breast Examination (integer)  -->
+  <!-- Category: (Default)  -->
+  <dataValue dataElement="mNHn69WbUuK" categoryOptionCombo="beBubnoFLUo" value="0"/>
+  <!-- DE: Obligated Target Visual Inspection With Acetic Acid (integer)  -->
+  <!-- Category: (Default)  -->
+  <dataValue dataElement="b1zdv5AOYJ7" categoryOptionCombo="beBubnoFLUo" value="0"/>
+  <!-- DE: Obligated Target Non-Hypertensive BP Measurement (integer)  -->
+  <!-- Category: (Default)  -->
+  <dataValue dataElement="TBUeG5Fk6rQ" categoryOptionCombo="beBubnoFLUo" value="0"/>
+  <!-- DE: Obligated Accomplishment Visual Inspection With Acetic Acid (integer)  -->
+  <!-- Category: (Default)  -->
+  <dataValue dataElement="sppufBew1g2" categoryOptionCombo="beBubnoFLUo" value="1"/>
+  <!-- DE: Obligated Accomplishment Periodic Clinical Breast Examination (integer)  -->
+  <!-- Category: (Default)  -->
+  <dataValue dataElement="paZqkLNSRmi" categoryOptionCombo="beBubnoFLUo" value="1"/>
+  <!-- DE: Obligated Accomplishment Non-Hypertensive BP Measurement (integer)  -->
+  <!-- Category: (Default)  -->
+  <dataValue dataElement="VU2FxpChAGB" categoryOptionCombo="beBubnoFLUo" value="96"/>
+  <!-- DE: Obligated Accomplishment Hypertensive BP Measurement (integer)  -->
+  <!-- Category: (Default)  -->
+  <dataValue dataElement="f2R7BDsMIB4" categoryOptionCombo="beBubnoFLUo" value="14"/>
+</dataValueSet>

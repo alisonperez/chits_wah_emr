@@ -1,24 +1,21 @@
 <?xml version="1.0"?>
 <config>
     <node>
-        <name>Victoria RHU 2</name>
-        <code>036917009</code>
+        <name>PANIQUI RHU 1</name>
+        <code>036910000</code>
         <telephone>2444284</telephone>
         <level>self</level>
-        <hfid>DOH000000000002522</hfid>
     </node>
     <node>
-        <name>Victoria RHU 2</name>
-	<code>036900000</code>
+        <name>PHO</name>
+        <code>030810000</code>
         <telephone>2444284</telephone>
-        <level>parent</level>        
-        <hfid>DOH000000000002522</hfid>
+        <level>parent</level>
     </node>
     <node>
-        <name>Victoria RHU 2</name>
-	<code>036915000</code>
+        <name>PANIQUI RHU 1</name>
+        <code>030810000</code>
         <telephone>2444284</telephone>
         <level>child</level>
-        <hfid>DOH000000000002522</hfid>
     </node>
 </config>

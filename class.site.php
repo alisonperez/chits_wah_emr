@@ -5,7 +5,7 @@ class Site {
 // Type: internal
 // Author: Herman Tolentino MD
 //
-
+//-->EHR-LITE Button Disabled at row 588 and 602<--
     var $sql;
 
     function Site () {
@@ -584,7 +584,8 @@ class Site {
                     print "<a href='../chits_query/' target='new' class='topmenu'>QUERY BROWSER</a>";               
                 }                
             }
-			print "<a href='../site/mobilemidwife_sync/' target='new' class='topmenu'>MOBILE MIDWIFE SYNC</a>";                                                
+			//print "<a href='../site/mobilemidwife_sync/' target='new' class='topmenu'>MOBILE MIDWIFE SYNC</a>";                            
+			print "<a href='../site/lite/' target='new' class='topmenu'>EHR-LITE SYNC</a>";                                                                    
             print "<a href='".$_SERVER["PHP_SELF"]."?page=HOWTO' class='topmenu'>".MENU_HOWTO."</a>";
             print "<a href='".$_SERVER["PHP_SELF"]."?page=ABOUT' class='topmenu'>".MENU_ABOUT."</a>";
             print "<a href='".$_SERVER["PHP_SELF"]."?page=CREDITS' class='topmenu'>".MENU_CREDITS."</a>";
@@ -597,7 +598,8 @@ class Site {
             print "<b>".LBL_NAVIGATION." > </b>";
             print "<a href='".$_SERVER["PHP_SELF"]."' class='topmenu'>".LBL_HOME."</a>";
             print "<a href='../chits_query/' target='new' class='topmenu'>QUERY BROWSER</a>";                       
-			print "<a href='../site/mobilemidwife_sync/' target='new' class='topmenu'>MOBILE MIDWIFE SYNC</a>";
+			//print "<a href='../site/mobilemidwife_sync/' target='new' class='topmenu'>MOBILE MIDWIFE SYNC</a>";
+			//print "<a href='../site/lite/' target='new' class='topmenu'>EHR-LITE SYNC</a>";                    	
 
             $sql = "select menu_id, menu_cat, module_id, menu_title from module_menu order by menu_rank";
             if ($result = mysql_query($sql)) {

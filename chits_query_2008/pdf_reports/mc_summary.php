@@ -203,7 +203,7 @@ function show_mc_summary(){
 	$arr_csv = array();
 	$arr_consolidate = array();
 	
-	$criteria = array('Pregnant Women with 4 or more prenatal visits','Pregnant Women given 2 doses of TT','Pregnant Women given TT2 plus','Pregnant given complete iron with folic acid','Pregnant given Vit. A','Postpartum women with at least 2 PPV','Postpartum women given complete iron','Postpartum women given Vit. A','Postpartum women initiated breastfeeding','Women 10-49 years old women given iron supplementation','Number of deliveries','Number of pregnant women','Number of pregnant women tested for syphilis','Number of pregnant women positive for syphilis','Number of pregnant women given penicillin');
+	$criteria = array('Pregnant Women with 4 or more prenatal visits','Pregnant Women given 2 doses of TT','Pregnant Women given TT2 plus','Pregnant given complete iron with folic acid','Pregnant given Vit. A','Postpartum women with at least 2 PPV','Postpartum women given complete iron','Postpartum women given Vit. A','Postpartum women initiated breastfeeding');			
     	
 	$q_brgy = mysql_query("SELECT barangay_name from m_lib_barangay LIMIT 1") or die("Cannot query: 202");
 	list($csv_brgy) = mysql_fetch_array($q_brgy);
@@ -235,7 +235,7 @@ function show_mc_summary(){
 		$q_array = $this->get_quarterly_total($mstat,$target);
 		$gt = array_sum($mstat);
 
-			array_push($arr_csv,$q_array[$_SESSION["quarter"]]);
+		array_push($arr_csv,$q_array[$_SESSION["quarter"]]);
 
                 if($_SESSION[ques]==36):
                     $w = array(30,18,18,18,18,15,18,18,18,15,18,18,18,15,18,18,18,15,18); //340
@@ -273,7 +273,7 @@ function show_mc_summary(){
 
                     array_push($arr_disp,$criteria[$i],$target,$q_array[$_SESSION[quarter]],$this->compute_mc_rate($target,$q_array[$_SESSION[quarter]]).'%',' ',' ');
 
-				    array_push($arr_consolidate,$arr_disp);
+		    array_push($arr_consolidate,$arr_disp);
 
                     for($x=0;$x<count($arr_disp);$x++){
                         if($x==0):
@@ -303,7 +303,7 @@ function compute_indicator($crit){
 	$brgy_array = $this->get_brgy_array();
 	$brgy_array = implode(',',$brgy_array);
 	
-	
+
 	//print_r($brgy_array);
 
 		switch($crit){
@@ -320,8 +320,7 @@ function compute_indicator($crit){
 //				endif;
 
 			if(mysql_num_rows($get_visits)!=0):
-				$arr_px_id = array();
-			
+		
 			while(list($mcid,$pxid,$predate)=mysql_fetch_array($get_visits)){ 
 				$banat = 0;
 				if(in_array('all',$_SESSION[brgy])):
@@ -342,17 +341,14 @@ function compute_indicator($crit){
 					
 				for($j=1;$j<=3;$j++){   //traverse for checking the trimester format 1-1-2
 					$get_tri = mysql_query("SELECT consult_id, prenatal_date FROM m_consult_mc_prenatal WHERE trimester='$j' AND mc_id='$mcid' ORDER by prenatal_date DESC") or die("Cannot query: 186");
-
+									
 					$num = mysql_num_rows($get_tri);
-	
-
-
 
 					if($num!=0):
 					   if($j==3):
 
 						$q_min_date = mysql_query("SELECT MIN(prenatal_date) FROM m_consult_mc_prenatal WHERE mc_id='$mcid' AND trimester='$j' AND prenatal_date!=(SELECT MIN(prenatal_date) FROM m_consult_mc_prenatal WHERE mc_id='$mcid' AND trimester='$j')") or die("cannot query: 204");
-
+						
 						  if(mysql_num_rows($q_min_date)!=0):
 
 							list($sec_date) = mysql_fetch_array($q_min_date);						
@@ -362,25 +358,19 @@ function compute_indicator($crit){
 							$max_date = date("n",mktime(0,0,0,$latestm,$latestd,$yr)); //get the unix timestamp then return month without trailing 0
 							$arr[$j] = ($num>=2)?1:0; //check if the third trimester has at least 2 visits
 							
-						  endif; 
+						  endif;
 					   else:
 						  $arr[$j] = 1; //marked trimester 1 and 2 with 1's if $num!=0
-					   endif; 
-					else: 
-						  $arr[$j] = 0;
+					   endif;
 					endif;
 					
 				} //exit 1-1-4 format checking
 
 				
 				if($arr[1]==1 && $arr[2]==1 && $arr[3]==1):
-
-					if(!(in_array($pxid,$arr_px_id))):
-						array_push($anc_name_px[$max_date],array($pxid,'Pregnant women with 4 or more prenatal visits','mc',$latestdate));
-						//array_push($anc_name_px,$pxid,'Pregnant women with 4 or more prenatal visits','mc');
-						$month_stat[$max_date]+=1;
-						array_push($arr_px_id,$pxid);
-					endif;
+					array_push($anc_name_px[$max_date],array($pxid,'Pregnant women with 4 or more prenatal visits','mc',$latestdate));
+					//array_push($anc_name_px,$pxid,'Pregnant women with 4 or more prenatal visits','mc');
+					$month_stat[$max_date]+=1;
 				endif;				
 				
 			
@@ -405,7 +395,7 @@ function compute_indicator($crit){
 			endif;
 			
 			if(mysql_num_rows($q_px_tt)!=0):
-				$arr_px_id = array();
+
 			while(list($pxid,$vacc_date)=mysql_fetch_array($q_px_tt)){			
 				//condition 1: prenatal is the base date
 				//$q_t2 = mysql_query("SELECT a.patient_id,a.actual_vaccine_date FROM m_consult_mc_vaccine a,m_consult_mc_prenatal b WHERE a.vaccine_id='TT2' AND a.patient_id='$pxid' AND a.patient_id=b.patient_id AND b.prenatal_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' AND b.visit_sequence='1'") or die(mysql_error());
@@ -428,11 +418,8 @@ function compute_indicator($crit){
 							//$month_stat[$this->get_max_month($vacc_date)]+=1;
 							$month_stat[$i]+=1;
 						}*/
-						if(!(in_array($pxid,$arr_px_id))):
-							array_push($tt2_name_px[$this->get_max_month($vacc_date)],array($pxid,'Pregnant Women given 2 doses of TT','mc',$vacc_date));
-							$month_stat[$this->get_max_month($vacc_date)]+=1;
-							array_push($arr_px_id,$pxid);
-						endif;
+						array_push($tt2_name_px[$this->get_max_month($vacc_date)],array($pxid,'Pregnant Women given 2 doses of TT','mc',$vacc_date));
+						$month_stat[$this->get_max_month($vacc_date)]+=1;
 					}
 				endif;
 			}
@@ -455,17 +442,16 @@ function compute_indicator($crit){
 			
 			$ttplus_name_px = array(1=>array(),2=>array(),3=>array(),4=>array(),5=>array(),6=>array(),7=>array(),8=>array(),9=>array(),10=>array(),11=>array(),12=>array());
 
-			if(in_array('all',$_SESSION[brgy])):				
+			if(in_array('all',$_SESSION[brgy])):
+				//$get_px_tt = mysql_query("SELECT distinct patient_id, max(vaccine_id), actual_vaccine_date FROM m_consult_mc_vaccine WHERE vaccine_id IN ('TT1','TT2','TT3','TT4','TT5') GROUP by patient_id") or die(mysql_error());
 				$get_px_tt = mysql_query("SELECT distinct patient_id, max(vaccine_id), actual_vaccine_date FROM m_consult_mc_vaccine WHERE vaccine_id IN ('TT2','TT3','TT4','TT5') AND actual_vaccine_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' GROUP by patient_id") or die(mysql_error());
 
 			else:
-				$get_px_tt = mysql_query("SELECT distinct a.patient_id, max(a.vaccine_id), a.actual_vaccine_date FROM m_consult_mc_vaccine a, m_family_members b, m_family_address c WHERE a.vaccine_id IN ('TT2','TT3','TT4','TT5') AND a.patient_id=b.patient_id AND b.family_id=c.family_id AND c.barangay_id IN ($brgy_array) AND a.actual_vaccine_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' GROUP by a.patient_id") or die(mysql_error());
+				//$get_px_tt = mysql_query("SELECT distinct a.patient_id, max(a.vaccine_id), a.actual_vaccine_date FROM m_consult_mc_vaccine a, m_family_members b, m_family_address c WHERE a.vaccine_id IN ('TT1','TT2','TT3','TT4','TT5') AND a.patient_id=b.patient_id AND b.family_id=c.family_id AND c.barangay_id IN ($brgy_array) GROUP by a.patient_id") or die(mysql_error());
+				$get_px_tt = mysql_query("SELECT distinct a.patient_id, max(a.vaccine_id), a.actual_vaccine_date FROM m_consult_mc_vaccine a, m_family_members b, m_family_address c WHERE a.vaccine_id IN ('TT3','TT4','TT5') AND a.patient_id=b.patient_id AND b.family_id=c.family_id AND c.barangay_id IN ($brgy_array) AND a.actual_vaccine_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' GROUP by a.patient_id") or die(mysql_error());
 			endif;
 			
 			if(mysql_num_rows($get_px_tt)!=0):
-			
-				$arr_px_id = array();
-
 			while(list($pxid,$vacc_id,$vacc_date)=mysql_fetch_array($get_px_tt)){ 
 				//check if the patient is in the active maternal cases for the time span
 				//echo $pxid.'/'.$vacc_id.'/'.$vacc_date.'<br>';
@@ -485,12 +471,8 @@ function compute_indicator($crit){
 				/*	endif;
 					
 				endif; */
-
-				if(!(in_array($pxid,$arr_px_id))):
-					array_push($ttplus_name_px[$this->get_max_month($vacc_date)],array($pxid,'Pregnant Women given TT2 plus','mc',$vacc_date));
-					$month_stat[$this->get_max_month($vacc_date)]+=1;
-					array_push($arr_px_id,$pxid);
-				endif;
+				array_push($ttplus_name_px[$this->get_max_month($vacc_date)],array($pxid,'Pregnant Women given TT2 plus','mc',$vacc_date));
+				$month_stat[$this->get_max_month($vacc_date)]+=1;
 			}
 
 			endif;
@@ -510,13 +492,9 @@ function compute_indicator($crit){
 			endif;
 
 			if(mysql_num_rows($get_iron_mc)!=0): 
-					$arr_px_id = array();
 				while(list($mcid,$pxid)=mysql_fetch_array($get_iron_mc)){
 					$iron_total = 0;
 					$target_reach = 0; //reset the flag target reach for every mc_id
-
-xxx					$q_get_edc_delivery = mysql_query("SELECT patient_edc, ") or die("Cannot query 518: ")
-					
 
 					$q_mc = mysql_query("SELECT a.service_qty, a.actual_service_date, b.delivery_date FROM m_consult_mc_services a,m_patient_mc b,m_patient c WHERE a.mc_id=b.mc_id AND a.mc_id='$mcid' AND a.service_id='IRON' AND a.actual_service_date BETWEEN b.patient_lmp AND '$_SESSION[edate2]' AND a.actual_service_date<=b.patient_edc AND a.patient_id=c.patient_id ORDER by a.actual_service_date ASC") or die("Cannot query; 277");
 
@@ -524,24 +502,21 @@ xxx					$q_get_edc_delivery = mysql_query("SELECT patient_edc, ") or die("Cannot
 					while(list($qty,$serv_date,$delivery_date)=mysql_fetch_array($q_mc)){
 
 						if($delivery_date=='0000-00-00' || ((strtotime($delivery_date) - strtotime($serv_date)) > 0)):
-							echo (strtotime($delivery_date)-strtotime($serv_date)).'/'. $mcid.'/'.$pxid.'/'.$qty.'/'.$serv_date.'<br>';
-
+						//echo $mcid.'/'.$pxid.'/'.$qty.'/'.$serv_date.'<br>';
 							$iron_total+=$qty;
 							$s_serv_date = strtotime($serv_date) - strtotime($_SESSION["sdate2"]); //from date of service - minus start date of range
 							$e_serv_date = strtotime($_SESSION["edate2"]) - strtotime($serv_date); //from end date minus date of service
 
 							if($iron_total == 180 && $target_reach==0 && $s_serv_date>=0 && $e_serv_date>=0):
+							
+								$target_reach = 1;
+								list($taon,$buwan,$araw) = explode('-',$serv_date);
+								$max_date = date("n",mktime(0,0,0,$buwan,$araw,$taon)); //get the unix timestamp then return month without trailing 0
 
-								if(!(in_array($pxid,$arr_px_id))):
-									$target_reach = 1;
-									list($taon,$buwan,$araw) = explode('-',$serv_date);
-									$max_date = date("n",mktime(0,0,0,$buwan,$araw,$taon)); //get the unix timestamp then return month without trailing 0
+								array_push($iron_name_px[$this->get_max_month($serv_date)],array($pxid,'Pregnant given complete iron with folic acid','mc',$serv_date));
 
-									array_push($iron_name_px[$this->get_max_month($serv_date)],array($pxid,'Pregnant given complete iron with folic acid','mc',$serv_date));
-
-									$month_stat[$max_date]+=1;
-								endif;
-			
+								$month_stat[$max_date]+=1;
+								//echo $max_date.'<br>'.$mcid;
 							endif;
 						endif;
 					}
@@ -567,8 +542,6 @@ xxx					$q_get_edc_delivery = mysql_query("SELECT patient_edc, ") or die("Cannot
 			$vita_name_px = array(1=>array(),2=>array(),3=>array(),4=>array(),5=>array(),6=>array(),7=>array(),8=>array(),9=>array(),10=>array(),11=>array(),12=>array());
 
 			if(mysql_num_rows($get_vita)!=0):
-				$arr_px_id = array();
-
 				while(list($mcid,$pxid)=mysql_fetch_array($get_vita)){
 					$vit_total = 0;
 					$target_reach = 0;
@@ -584,13 +557,12 @@ xxx					$q_get_edc_delivery = mysql_query("SELECT patient_edc, ") or die("Cannot
 							$e_serv_date = strtotime($_SESSION["edate2"]) - strtotime($serv_date); //from end date minus date of service
 
 							if($vita_total == 200000 && $target_reach==0 && $s_serv_date>=0 && $e_serv_date>=0):
+								$target_reach = 1;
+					echo 'zerep';
+								array_push($vita_name_px[$this->get_max_month($serv_date)],array($pxid,'Pregnant given Vit. A','mc',$serv_date));
 
-								if(!(in_array($pxid,$arr_px_id))):
-									$target_reach = 1;
-									array_push($vita_name_px[$this->get_max_month($serv_date)],array($pxid,'Pregnant given Vit. A','mc',$serv_date));
-									$month_stat[$this->get_max_month($serv_date)]+=1;
-									array_push($arr_px_id,$pxid);
-								endif;
+								$month_stat[$this->get_max_month($serv_date)]+=1;
+								//echo $max_date.'<br>'.$mcid;
 							endif;
 						endif;
 					}
@@ -612,7 +584,6 @@ xxx					$q_get_edc_delivery = mysql_query("SELECT patient_edc, ") or die("Cannot
 			$ppv2_name_px = array(1=>array(),2=>array(),3=>array(),4=>array(),5=>array(),6=>array(),7=>array(),8=>array(),9=>array(),10=>array(),11=>array(),12=>array());
 
 			if(mysql_num_rows($q_post)!=0):
-				$arr_px_id = array();
 
 			while(list($mcid,$post_date,$del_date,$pxid)=mysql_fetch_array($q_post)){ //check if the mcid(24-hrs) has 1-week (+3/-3) visit
 			   $q_wk = mysql_query("SELECT a.postpartum_date FROM m_consult_mc_postpartum a, m_patient_mc b WHERE a.mc_id='$mcid' AND (TO_DAYS(a.postpartum_date)-TO_DAYS(b.delivery_date)) BETWEEN 4 AND 10 AND a.postpartum_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' AND a.postpartum_date!='$post_date' ORDER by a.postpartum_date ASC") or die(mysql_error());
@@ -621,11 +592,9 @@ xxx					$q_get_edc_delivery = mysql_query("SELECT patient_edc, ") or die("Cannot
 				if(mysql_num_rows($q_wk)!=0):
 					list($postdate) = mysql_fetch_array($q_wk);
 
-					if(!(in_array($pxid,$arr_px_id))):
-						array_push($ppv2_name_px[$this->get_max_month($postdate)],array($pxid,'Postpartum women with at least 2 PPV','mc',$postdate));					
-						$month_stat[$this->get_max_month($postdate)]+=1;
-						array_push($arr_px_id,$pxid);
-					endif;
+					array_push($ppv2_name_px[$this->get_max_month($postdate)],array($pxid,'Postpartum women with at least 2 PPV','mc',$postdate));
+					
+					$month_stat[$this->get_max_month($postdate)]+=1;
 				else:
 
 				endif;
@@ -649,14 +618,12 @@ xxx					$q_get_edc_delivery = mysql_query("SELECT patient_edc, ") or die("Cannot
 			$iron_name_px = array(1=>array(),2=>array(),3=>array(),4=>array(),5=>array(),6=>array(),7=>array(),8=>array(),9=>array(),10=>array(),11=>array(),12=>array());
 
 			if(mysql_num_rows($get_iron_mc)):
-				$arr_px_id = array();
-
 				while(list($mcid,$pxid)=mysql_fetch_array($get_iron_mc)){
 
 					$iron_total = 0;
 					$target_reach = 0;
 
-				$q_mc = mysql_query("SELECT a.service_qty, a.actual_service_date, b.delivery_date FROM m_consult_mc_services a,m_patient_mc b WHERE a.mc_id=b.mc_id AND a.mc_id='$mcid' AND a.service_id='IRON' AND a.actual_service_date BETWEEN b.delivery_date AND '$_SESSION[edate2]' AND (TO_DAYS(a.actual_service_date)-TO_DAYS(b.delivery_date)) BETWEEN 0 AND 93 AND b.delivery_date!='0000-00-00' ORDER by a.actual_service_date ASC") or die("Cannot query; 277 ".mysql_error());
+				$q_mc = mysql_query("SELECT a.service_qty, a.actual_service_date, b.delivery_date FROM m_consult_mc_services a,m_patient_mc b WHERE a.mc_id=b.mc_id AND a.mc_id='$mcid' AND a.service_id='IRON' AND a.actual_service_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' AND (TO_DAYS(a.actual_service_date)-TO_DAYS(b.delivery_date)) BETWEEN 0 AND 93 AND b.delivery_date!='0000-00-00' ORDER by a.actual_service_date ASC") or die("Cannot query; 277 ".mysql_error());
 					
 					while(list($qty,$serv_date,$delivery_date)=mysql_fetch_array($q_mc)){
 						//echo $mcid.'/'.$qty.'/'.$serv_date.'<br>';
@@ -664,14 +631,12 @@ xxx					$q_get_edc_delivery = mysql_query("SELECT patient_edc, ") or die("Cannot
 							$iron_total+=$qty;
 							if($iron_total >= 90 && $target_reach==0):	
 								//echo $pxid.'/'.$delivery_date.'/'.$serv_date.'/'.$_SESSION["edate2"].'<br>';
-
-							if(!(in_array($pxid,$arr_px_id))):
 								$target_reach = 1;
-								array_push($iron_name_px[$this->get_max_month($serv_date)],array($pxid,'Postpartum mothers wih complete iron w/ folic acid intake','mc',$serv_date));
-								$month_stat[$this->get_max_month($serv_date)]+=1;
-								array_push($arr_px_id,$px_id);
-							endif;
 
+								array_push($iron_name_px[$this->get_max_month($serv_date)],array($pxid,'Postpartum women given complete iron','mc',$serv_date));
+
+								$month_stat[$this->get_max_month($serv_date)]+=1;
+							//echo $max_date.'<br>'.$mcid;
 							endif;
 						endif;
 					}
@@ -695,9 +660,6 @@ xxx					$q_get_edc_delivery = mysql_query("SELECT patient_edc, ") or die("Cannot
 			$vita_name_px = array(1=>array(),2=>array(),3=>array(),4=>array(),5=>array(),6=>array(),7=>array(),8=>array(),9=>array(),10=>array(),11=>array(),12=>array());
 
 			if(mysql_num_rows($get_vita)!=0):
-			
-				$arr_px_id = array();
-
 				while(list($mcid,$pxid)=mysql_fetch_array($get_vita)){
 					$vit_total = 0;
 					$target_reach = 0;
@@ -708,12 +670,10 @@ xxx					$q_get_edc_delivery = mysql_query("SELECT patient_edc, ") or die("Cannot
 
 						if($vita_total >= 200000 && $target_reach==0): 
 							$target_reach = 1;
-							
-							if(!(in_array($pxid,$arr_px_id))):
-								array_push($vita_name_px[$this->get_max_month($serv_date)],array($pxid,'Postpartum women given Vit. A','mc',$serv_date));
-								$month_stat[$this->get_max_month($serv_date)]+=1;
-								array_push($arr_px_id,$pxid);
-							endif;
+
+							array_push($vita_name_px[$this->get_max_month($serv_date)],array($pxid,'Postpartum women given Vit. A','mc',$serv_date));
+
+							$month_stat[$this->get_max_month($serv_date)]+=1;
 							//echo $max_date.'<br>'.$mcid;
 						endif;
 					}
@@ -726,22 +686,17 @@ xxx					$q_get_edc_delivery = mysql_query("SELECT patient_edc, ") or die("Cannot
 
 		case 9: //postpartum women initiated breadstfeeding after giving birth
 			if(in_array('all',$_SESSION[brgy])):
-				$get_post_bfeed = mysql_query("SELECT a.mc_id, a.delivery_date, a.patient_id FROM m_patient_mc a WHERE a.breastfeeding_asap='Y' AND a.delivery_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' AND a.delivery_date=a.date_breastfed ORDER by a.delivery_date") or die("cannot query: 350");
+				$get_post_bfeed = mysql_query("SELECT mc_id, delivery_date, patient_id FROM m_patient_mc WHERE breastfeeding_asap='Y' AND delivery_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' AND delivery_date=date_breastfed ORDER by delivery_date") or die("cannot query: 350");
 			else:
-				$get_post_bfeed = mysql_query("SELECT a.mc_id, a.delivery_date, a.patient_id FROM m_patient_mc a,m_family_members b, m_family_address c WHERE a.breastfeeding_asap='Y' AND  a.patient_id=b.patient_id AND b.family_id=c.family_id AND c.barangay_id IN ($brgy_array) AND a.delivery_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' AND a.delivery_date=a.date_breastfed ORDER by a.delivery_date") or die(mysql_error());
+				$get_post_bfeed = mysql_query("SELECT a.mc_id, a.delivery_date, a.patient_id FROM m_patient_mc a,m_family_members b, m_family_address c WHERE a.breastfeeding_asap='Y' AND  a.patient_id=b.patient_id AND b.family_id=c.family_id AND c.barangay_id IN ($brgy_array) AND a.delivery_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' AND a.delivery_date=a.date_breastfed ORDER by a.delivery_date") or die(mysql_error());			
 			endif;
 
 			$bfed_name_px = array(1=>array(),2=>array(),3=>array(),4=>array(),5=>array(),6=>array(),7=>array(),8=>array(),9=>array(),10=>array(),11=>array(),12=>array());
 
 			if(mysql_num_rows($get_post_bfeed)!=0):
-				$arr_px_id = array();
 				while(list($mcid,$deldate,$pxid)=mysql_fetch_array($get_post_bfeed)){ //echo $deldate;
-						
-						if(!(in_array($pxid,$arr_px_id))):
-							array_push($bfed_name_px[$this->get_max_month($deldate)],array($pxid,'Postpartum women initiated breastfeeding','mc',$deldate));
-							$month_stat[$this->get_max_month($deldate)]+=1;
-							array_push($arr_px_id,$pxid);
-						endif;
+					array_push($bfed_name_px[$this->get_max_month($deldate)],array($pxid,'Postpartum women initiated breastfeeding','mc',$deldate));
+					$month_stat[$this->get_max_month($deldate)]+=1;
 				}
 
 			endif;
@@ -749,188 +704,8 @@ xxx					$q_get_edc_delivery = mysql_query("SELECT patient_edc, ") or die("Cannot
 			array_push($_SESSION["arr_px_labels"]["mc"],$bfed_name_px); 
 
 			break;
-
-		case 10: //10-49 year old women given vitamin A supplementation. As of per aggrement with Ms. Pinky, 0 this
-
-			$vita_name_px = array(1=>array(),2=>array(),3=>array(),4=>array(),5=>array(),6=>array(),7=>array(),8=>array(),9=>array(),10=>array(),11=>array(),12=>array());
-
-			array_push($_SESSION["arr_px_labels"]["mc"],$vita_name_px);			
-
-			break;
-
-		case 11:   //number of deliveries, all types
-			
-			if(in_array('all',$_SESSION[brgy])):
-				$q_delivery = mysql_query("SELECT mc_id,patient_id,delivery_date,outcome_id FROM m_patient_mc WHERE delivery_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' ORDER by delivery_date ASC") or die("Cannot query 434: ".mysql_error());
-			else:
-				$q_delivery = mysql_query("SELECT a.mc_id, a.patient_id,a.delivery_date,a.outcome_id FROM m_patient_mc a,m_family_members b, m_family_address c WHERE a.delivery_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' AND a.patient_id=b.patient_id AND b.family_id=c.family_id AND c.barangay_id IN ($brgy_array) ORDER by delivery_date ASC") or die("Cannot query 436: ".mysql_error());
-			endif;
-
-			$delivery_name_px = array(1=>array(),2=>array(),3=>array(),4=>array(),5=>array(),6=>array(),7=>array(),8=>array(),9=>array(),10=>array(),11=>array(),12=>array());
-
-			if(mysql_num_rows($q_delivery)!=0): 
-				$arr_px_id = array();
-
-				while(list($mc_id,$pxid,$delivery_date,$outcome_id)=mysql_fetch_array($q_delivery)){
-					if(!(in_array($pxid,$arr_px_id))):
-						array_push($delivery_name_px[$this->get_max_month($delivery_date)],array($pxid,'Number of Deliveries','mc',$delivery_date));
-						$month_stat[$this->get_max_month($delivery_date)]+=1;					
-						array_push($arr_px_id,$pxid);
-					endif;
-				}
-			endif;
-
-			array_push($_SESSION["arr_px_labels"]["mc"],$delivery_name_px); 
-			
-			break;
-
-		case 12:	//number of pregnant women
-			$pregnant_name_px = array(1=>array(),2=>array(),3=>array(),4=>array(),5=>array(),6=>array(),7=>array(),8=>array(),9=>array(),10=>array(),11=>array(),12=>array());
-			$arr_px_id = array();
-
-			if(in_array('all',$_SESSION[brgy])):
-				//$q_pregnant = mysql_query("SELECT DISTINCT a.patient_id, a.mc_id, a.patient_edc, a.delivery_date FROM m_patient_mc a, m_patient b WHERE a.patient_id=b.patient_id AND a.patient_lmp <= '$_SESSION[sdate2]' ORDER by a.patient_edc,a.delivery_date ASC") or die("Cannot query 788: ".mysql_error());
-				
-				$q_pregnant = mysql_query("SELECT DISTINCT a.patient_id, a.mc_id, a.patient_edc, a.patient_lmp, date_format(c.prenatal_date,'%Y-%m-%d') FROM m_patient_mc a, m_patient b, m_consult_mc_prenatal c WHERE a.patient_id=b.patient_id AND date_format(c.prenatal_date,'%Y-%m-%d') BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' AND c.visit_sequence='1' AND a.mc_id=c.mc_id ORDER by c.prenatal_date,a.delivery_date ASC") or die("Cannot query 788: ".mysql_error());
-			else:
-				//$q_pregnant = mysql_query("SELECT DISTINCT a.patient_id, a.mc_id, a.patient_edc,a.delivery_date FROM m_patient_mc a,m_family_members b, m_family_address c,m_patient d WHERE a.patient_id=d.patient_id AND a.patient_lmp <= '$_SESSION[sdate2]' AND a.patient_id=d.patient_id AND b.family_id=c.family_id AND c.barangay_id IN ($brgy_array) ORDER by a.patient_edc,a.delivery_date ASC") or die("Cannot query 790: ".mysql_error());
-
-				$q_pregnant = mysql_query("SELECT DISTINCT a.patient_id, a.mc_id, a.patient_edc,a.patient_lmp,date_format(e.prenatal_date,'%Y-%m-%d') FROM m_patient_mc a,m_family_members b, m_family_address c,m_patient d, m_consult_mc_prenatal e WHERE a.patient_id=d.patient_id AND date_format(e.prenatal_date,'%Y-%m-%d') BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' AND a.patient_id=d.patient_id AND b.family_id=c.family_id AND c.barangay_id IN ($brgy_array) AND e.visit_sequence='1' AND a.mc_id=e.mc_id ORDER by e.prenatal_date,a.delivery_date ASC") or die("Cannot query 790: ".mysql_error());
-
-			endif;
-
-			if(mysql_num_rows($q_pregnant)!=0):
-
-
-				while(list($pxid,$mc_id,$edc,$lmp,$first_prenatal)=mysql_fetch_array($q_pregnant)){ 
-   				 if(!(in_array($pxid,$arr_px_id))):
-				/*	$end_mc_date = '';
-
-					if($delivery_date!='0000-00-00'): 
-						$end_mc_date = $delivery_date; 
-					else: 						
-						$end_mc_date = $edc;
-					endif;
-
-					if($end_mc_date >= $_SESSION["edate2"]):
-				*/
-
-				$q_prenatal = mysql_query("SELECT DISTINCT mc_id, prenatal_date FROM m_consult_mc_prenatal WHERE patient_id='$pxid' AND mc_id='$mc_id' AND date_format(prenatal_date,'%Y-%m-%d') < '$first_prenatal'") or die("Cannot query 814: ".mysql_error());
-
-
-						if(mysql_num_rows($q_prenatal)==0):
-
-						$q_px = mysql_query("SELECT patient_id FROM m_patient WHERE patient_id='$pxid'") or die("Cannot query 806: ".mysql_error());
-							if(mysql_num_rows($q_px)!=0): 
-								array_push($pregnant_name_px[$this->get_max_month($first_prenatal)],array($pxid,'Number of Pregnant Women','mc',$first_prenatal));
-								$month_stat[$this->get_max_month($first_prenatal)]+=1;
-								array_push($arr_px_id,$pxid); 
-							endif;
-
-						endif;
-				/*	else:
-
-					endif; */
-				endif; 
-				}
-
-			endif; 
-
-			//$_SESSION["preggy"] = $arr_px_id;
-			array_push($_SESSION["arr_px_labels"]["mc"],$pregnant_name_px);
-
-			break;
-
-		case 13:	//number of pregnant women tested for syphilis
-			$syphilis_test_name_px = array(1=>array(),2=>array(),3=>array(),4=>array(),5=>array(),6=>array(),7=>array(),8=>array(),9=>array(),10=>array(),11=>array(),12=>array());
-			$arr_preg_syp_test = array();
-
-
-			/*if(count($_SESSION["preggy"])!=0):
-				$arr_px_preg = $_SESSION["preggy"];
-				$str_px_preg = implode(',',$arr_px_preg);
-
-
-			if(in_array('all',$_SESSION[brgy])):
-				$q_pregnant = mysql_query("SELECT mc_id, patient_id, patient_edc, delivery_date FROM m_patient_mc WHERE patient_id IN ($str_px_preg) ORDER by patient_edc, delivery_date ASC") or die("Cannot query 835: ".mysql_error());
-			else:
-				$q_pregnant = mysql_query("SELECT a.mc_id, a.patient_id,a.patient_edc,a.delivery_date FROM m_patient_mc a,m_family_members b, m_family_address c WHERE a.patient_id=b.patient_id AND a.patient_id IN ($str_px_preg) AND b.family_id=c.family_id AND c.barangay_id IN ($brgy_array) ORDER by a.patient_edc, a.delivery_date ASC") or die("Cannot query 436: ".mysql_error());
-
-			endif;
-			*/
-
-			//if(mysql_num_rows($q_pregnant)!=0): 
-
-			//	while(list($mc_id,$pxid,$edc,$delivery_date)=mysql_fetch_array($q_pregnant)){ 
-					//$q_syphilis = mysql_query("SELECT actual_service_date FROM m_consult_mc_services WHERE patient_id='$pxid' AND service_id='SYP' AND actual_service_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]'") or die("Cannot query 839: ".mysql_error());
-
-					$q_syphilis = mysql_query("SELECT DISTINCT patient_id, actual_service_date FROM m_consult_mc_services WHERE service_id='SYP' AND actual_service_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]'") or die("Cannot query 839: ".mysql_error());
-					
-					if(mysql_num_rows($q_syphilis)!=0):
-						while(list($pxid,$actual_service_date) = mysql_fetch_array($q_syphilis)){
-							array_push($syphilis_test_name_px[$this->get_max_month($actual_service_date)],array($pxid,'Number of Pregnant Women Tested for Syphilis','mc',$actual_service_date));
-							$month_stat[$this->get_max_month($actual_service_date)]+=1;
-							array_push($arr_preg_syp_test,$pxid);
-						}
-					endif;
-
-			/*	}
-
-			endif; 
-			
-			endif;
-			*/
-			$_SESSION["preg_syp_test"] = $arr_preg_syp_test; 
-			
-
-			array_push($_SESSION["arr_px_labels"]["mc"],$syphilis_test_name_px);
-	
-			break;
-
-		case 14:	//number of pregnant women positive for syphillis 
-			$syphilis_positive_name_px = array(1=>array(),2=>array(),3=>array(),4=>array(),5=>array(),6=>array(),7=>array(),8=>array(),9=>array(),10=>array(),11=>array(),12=>array());
-
-			$arr_preg_syp_test = $_SESSION["preg_syp_test"];
-			$str_preg_syp_test = implode(',',$arr_preg_syp_test); 
-			
-			
-			foreach($arr_preg_syp_test as $key=>$value){
-					$q_syphilis_positive = mysql_query("SELECT actual_service_date FROM m_consult_mc_services WHERE patient_id='$value' AND service_id='SYP' AND actual_service_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]' AND syphilis_result='Y'") or die("Cannot query 875: ".mysql_error());	
-
-					if(mysql_num_rows($q_syphilis_positive)!=0):
-						list($actual_service_date) = mysql_fetch_array($q_syphilis_positive);
-						array_push($syphilis_positive_name_px[$this->get_max_month($actual_service_date)],array($value,'Number of Pregnant Women Positive for Syphilis','mc',$actual_service_date));
-						$month_stat[$this->get_max_month($actual_service_date)]+=1;
-					endif;
-			}
-
-			array_push($_SESSION["arr_px_labels"]["mc"],$syphilis_positive_name_px);
-
-			break;
-
-		case 15:	//number of pregnant women given penicillin
-			/*$penicillin_name_px = array(1=>array(),2=>array(),3=>array(),4=>array(),5=>array(),6=>array(),7=>array(),8=>array(),9=>array(),10=>array(),11=>array(),12=>array());
-
-			//$arr_preg = $_SESSION["preggy"];
-
-			//foreach($arr_preg as $key=>$value){
-				$q_penicillin = mysql_query("SELECT patient_id, actual_service_date FROM m_consult_mc_services WHERE service_id='SYP' AND intake_penicillin='Y' AND actual_service_date BETWEEN '$_SESSION[sdate2]' AND '$_SESSION[edate2]'") or die("Cannot query 839: ".mysql_error());
-
-				if(mysql_num_rows($q_penicillin)!=0):
-					while(list($pxid,$actual_service_date) = mysql_fetch_array($q_penicillin)){
-						array_push($penicillin_name_px[$this->get_max_month($actual_service_date)],array($pxid,'Number of pregnant women given penicillin','mc',$actual_service_date));
-						$month_stat[$this->get_max_month($actual_service_date)]+=1;
-					}
-				endif;
-									
-			//}
-
-			array_push($_SESSION["arr_px_labels"]["mc"],$penicillin_name_px);
-			*/
-			break;
-
 		default:
-
+			//echo 'hohohoh';		
 			break;
 
 		} // end <switch>
@@ -1148,12 +923,9 @@ endif; */
 $_SESSION["arr_px_labels"] = array('mc'=>array());
 $mc_content = $pdf->show_mc_summary();
 
-if($_GET["type"]=='html'):
+if($_GET["type"]=='html'): 
 	$html_tab->create_table($_SESSION["w"],$_SESSION["header"],$mc_content);
 elseif($_GET["type"]=='csv'):
-	$arr_csv = array(); //
-
-
 	$csv_creator->create_csv($_SESSION["ques"],$mc_content,'csv');
 elseif($_GET["type"]=='efhsis'):
 	$csv_creator->create_csv($_SESSION["ques"],$mc_content,'efhsis');

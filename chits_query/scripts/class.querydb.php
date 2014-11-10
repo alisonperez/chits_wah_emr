@@ -1,4 +1,12 @@
 <?
+/*
+	DATE UPDATED : 3/20/2014 ---------------------------------------------------------
+	UPDATED BY: Emmanuel Perez
+	
+	UPDATE LOG:
+		- Added diagnosis question
+		
+*/
 
 session_start();
 
@@ -310,8 +318,10 @@ class querydb{
 			$ret_file = $this->process_natality($quesno);
 		elseif($quesno>=150 && $quesno<=155):
 			$ret_file = $this->process_alert($quesno);
-		elseif($quesno>=156 && $quesno<=160):
+		elseif($quesno>=156 && $quesno<=157):
 			$ret_file = $this->process_labs($quesno);
+		elseif($quesno==158):
+			$ret_file = $this->total_diagnosis($quesno);
 		else:
 			echo "No available query for this indicator.";
 		endif;
@@ -920,6 +930,15 @@ class querydb{
 			echo "<a href='./pdf_reports/morbidity_report.php'>Show $ques_label</a>";
 		endif;*/
 		return 'morbidity_report.php';
+	}
+	
+	function total_diagnosis($quesno){		
+		/*$q_morb = mysql_query("SELECT ques_label FROM question WHERE ques_id=$quesno");
+		if(mysql_num_rows($q_morb)!=0):
+			list($ques_label) = mysql_fetch_array($q_morb);
+			echo "<a href='./pdf_reports/morbidity_report.php'>Show $ques_label</a>";
+		endif;*/
+		return 'diagnosis_report.php';
 	}
 	
 	function process_tb($quesno){			

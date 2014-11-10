@@ -1,4 +1,13 @@
 <?
+/*
+	DATE UPDATED : 3/6/2014
+	UPDATED BY: Mark Santos && Emmanuel Perez
+
+	UPDATE LOG:
+		- ISSUES : Cannot Update Philhealth ID
+		- Update Location : case "Update Card"
+		- Change the $sql to include philhealth_id and added patient_id in the WHERE Clause
+*/
 class philhealth {
 
     // Author: Herman Tolentino MD
@@ -397,6 +406,7 @@ class philhealth {
                 }
             }
         }
+        
         print "<table width='300'>";
         print "<form action = '".$_SERVER["SELF"]."?page=".$get_vars["page"]."&menu_id=".$get_vars["menu_id"]."&consult_id=".$get_vars["consult_id"]."&ptmenu=DETAILS&module=philhealth&philhealth=CARD' name='form_philhealth_card' method='post'>";
         print "<tr valign='top'><td>";
@@ -440,7 +450,7 @@ class philhealth {
 
         print "<tr><td>";
         if ($get_vars["pid"]||$post_vars["philhealth_id"]) {
-            print "<input type='hidden' name='philhealth_id' value='".$get_vars["pid"]."'>";
+            print "<input type='hidden' name='old_philhealth_id' value='".$get_vars["pid"]."'>";
             print "<input type='submit' value = 'Update Card' class='textbox' name='submitcard' style='border: 1px solid #000000'> ";
             print "<input type='submit' value = 'Delete Card' class='textbox' name='submitcard' style='border: 1px solid #000000'> ";
         } else {
@@ -462,54 +472,57 @@ class philhealth {
 			$healthcenter_id = $_SESSION["datanode"]["code"];
             //print_r($arg_list);
         } 
-        switch ($post_vars["submitcard"]) {
-        case "Add Card":
+        
+        switch ($post_vars["submitcard"]){
+        	case "Add Card":
             //if ($post_vars["philhealth_id"] && $post_vars["expiry_date"] && $post_vars["patient_id"]) {
-	    if ($post_vars["philhealth_id"] && $post_vars["patient_id"]) {
-                list($month,$day,$year) = explode("/", $post_vars["expiry_date"]);
-                $expiry_date = $year."-".str_pad($month, 2, "0", STR_PAD_LEFT)."-".str_pad($day, 2, "0", STR_PAD_LEFT);
+	    		if ($post_vars["philhealth_id"] && $post_vars["patient_id"]) {
+                	list($month,$day,$year) = explode("/", $post_vars["expiry_date"]);
+                	$expiry_date = $year."-".str_pad($month, 2, "0", STR_PAD_LEFT)."-".str_pad($day, 2, "0", STR_PAD_LEFT);
                 
-				/*$sql = "insert into m_patient_philhealth (philhealth_id, healthcenter_id, patient_id, philhealth_timestamp, expiry_date, member_id) ".
+					/*$sql = "insert into m_patient_philhealth (philhealth_id, healthcenter_id, patient_id, philhealth_timestamp, expiry_date, member_id) ".
                        "values ('".$post_vars["philhealth_id"]."', '".$_SESSION["datanode"]["code"]."', '".$post_vars["patient_id"]."', sysdate(), '$expiry_date')";
-				*/
+					*/
 
-				$result = mysql_query("INSERT INTO m_patient_philhealth SET philhealth_id='$post_vars[philhealth_id]',healthcenter_id='$healthcenter_id',patient_id='$post_vars[patient_id]',philhealth_timestamp=NOW(),expiry_date='$expiry_date',member_id='$post_vars[sel_membership]'") or die("Cannot query 469: ".mysql_error());
+					$result = mysql_query("INSERT INTO m_patient_philhealth SET philhealth_id='$post_vars[philhealth_id]',healthcenter_id='$healthcenter_id',patient_id='$post_vars[patient_id]',philhealth_timestamp=NOW(),expiry_date='$expiry_date',member_id='$post_vars[sel_membership]'") or die("Cannot query 469: ".mysql_error());
 
                 
-                // save this any way and refresh page
-                header("location: ".$_SERVER["PHP_SELF"]."?page=".$get_vars["page"]."&menu_id=".$get_vars["menu_id"]."&consult_id=".$get_vars["consult_id"]."&ptmenu=".$get_vars["ptmenu"]."&module=".$get_vars["module"]."&philhealth=CARD");
-            }
-            break;
-        case "Delete Card":
-            if (module::confirm_delete($menu_id, $post_vars, $get_vars)) {
-                $sql = "delete from m_patient_philhealth where philhealth_id = '".$post_vars["philhealth_id"]."'";
-                if ($result = mysql_query($sql)) {
-                    header("location: ".$_SERVER["PHP_SELF"]."?page=".$get_vars["page"]."&menu_id=".$get_vars["menu_id"]."&consult_id=".$get_vars["consult_id"]."&ptmenu=".$get_vars["ptmenu"]."&module=".$get_vars["module"]."&philhealth=CARD");
-                }
-            } else {
-                if ($post_vars["confirm_delete"]=="No") {
-                    header("location: ".$_SERVER["PHP_SELF"]."?page=".$get_vars["page"]."&menu_id=".$get_vars["menu_id"]."&consult_id=".$get_vars["consult_id"]."&ptmenu=".$get_vars["ptmenu"]."&module=".$get_vars["module"]."&philhealth=CARD");
-                }
-            }
-            break;
+               		// save this any way and refresh page
+                	header("location: ".$_SERVER["PHP_SELF"]."?page=".$get_vars["page"]."&menu_id=".$get_vars["menu_id"]."&consult_id=".$get_vars["consult_id"]."&ptmenu=".$get_vars["ptmenu"]."&module=".$get_vars["module"]."&philhealth=CARD");
+            	}
+            	break;
+        
+            case "Delete Card":
+            	if (module::confirm_delete($menu_id, $post_vars, $get_vars)) {
+                	$sql = "delete from m_patient_philhealth where philhealth_id = '".$post_vars["philhealth_id"]."'";
+                	if ($result = mysql_query($sql)) {
+                    	header("location: ".$_SERVER["PHP_SELF"]."?page=".$get_vars["page"]."&menu_id=".$get_vars["menu_id"]."&consult_id=".$get_vars["consult_id"]."&ptmenu=".$get_vars["ptmenu"]."&module=".$get_vars["module"]."&philhealth=CARD");
+                	}
+            	}else{
+                	if ($post_vars["confirm_delete"]=="No") {
+                   		header("location: ".$_SERVER["PHP_SELF"]."?page=".$get_vars["page"]."&menu_id=".$get_vars["menu_id"]."&consult_id=".$get_vars["consult_id"]."&ptmenu=".$get_vars["ptmenu"]."&module=".$get_vars["module"]."&philhealth=CARD");
+                	}
+            	}
+            	break;
 
-	case "Update Card": 
-	    if ($post_vars["philhealth_id"] && $post_vars["patient_id"]) {
-                list($month,$day,$year) = explode("/", $post_vars["expiry_date"]);
-                $expiry_date = $year."-".str_pad($month, 2, "0", STR_PAD_LEFT)."-".str_pad($day, 2, "0", STR_PAD_LEFT);
-                $sql = "update m_patient_philhealth (philhealth_id, healthcenter_id, patient_id, philhealth_timestamp, expiry_date) ".
-                       "values ('".$post_vars["philhealth_id"]."', '".$_SESSION["datanode"]["code"]."', '".$post_vars["patient_id"]."', sysdate(), '$expiry_date')";
+			case "Update Card": 
+	    		if ($post_vars["philhealth_id"] && $post_vars["patient_id"]) {
+                	list($month,$day,$year) = explode("/", $post_vars["expiry_date"]);
+                	$expiry_date = $year."-".str_pad($month, 2, "0", STR_PAD_LEFT)."-".str_pad($day, 2, "0", STR_PAD_LEFT);
+                	//$sql = "update m_patient_philhealth (philhealth_id, healthcenter_id, patient_id, philhealth_timestamp, expiry_date) ".
+                	//      "values ('".$post_vars["philhealth_id"]."', '".$_SESSION["datanode"]["code"]."', '".$post_vars["patient_id"]."', sysdate(), '$expiry_date')";
 
-				$sql = "update m_patient_philhealth set healthcenter_id='$healthcenter_id',patient_id='$post_vars[patient_id]',philhealth_timestamp=NOW(),expiry_date='$expiry_date',member_id='$post_vars[sel_membership]' WHERE philhealth_id='$post_vars[philhealth_id]'";
+					$sql = "update m_patient_philhealth set philhealth_id='$post_vars[philhealth_id]',healthcenter_id='$healthcenter_id',patient_id='$post_vars[patient_id]',philhealth_timestamp=NOW(),expiry_date='$expiry_date',member_id='$post_vars[sel_membership]' WHERE patient_id = '$post_vars[patient_id]' AND philhealth_id='$post_vars[old_philhealth_id]'";
 
-                $result = mysql_query($sql);
+                	$result = mysql_query($sql);
 
-                // save this any way and refresh page
-                header("location: ".$_SERVER["PHP_SELF"]."?page=".$get_vars["page"]."&menu_id=".$get_vars["menu_id"]."&consult_id=".$get_vars["consult_id"]."&ptmenu=".$get_vars["ptmenu"]."&module=".$get_vars["module"]."&philhealth=CARD");
-            }
-            break;
-
-	    break;
+                	// save this any way and refresh page
+                	header("location: ".$_SERVER["PHP_SELF"]."?page=".$get_vars["page"]."&menu_id=".$get_vars["menu_id"]."&consult_id=".$get_vars["consult_id"]."&ptmenu=".$get_vars["ptmenu"]."&module=".$get_vars["module"]."&philhealth=CARD");
+            	}
+            	break;
+            	
+			default:
+				break;
         }
     }
 

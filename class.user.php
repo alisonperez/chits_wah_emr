@@ -30,13 +30,9 @@ class User {
             $get_vars = $arg_list[2];
             //print_r($arg_list);
         }
-
-	
-
-        if ($post_vars["submituser"]) {		
+        if ($post_vars["submituser"]) {
             user::process_user($menu_id, $post_vars, $get_vars);
         }
-
         print "<table width='600' cellpadding='2'><tr valign='top'><td>";
         user::form_user($menu_id, $post_vars, $get_vars);
         print "</td><td>";
@@ -95,50 +91,27 @@ class User {
         } else {
             $errorinfo = $this->validate_user($post_vars);
         }
-
         if (strlen($errorinfo)>0) {
             print "<ol>$errorinfo</ol>";
         } else {
             list($month, $day, $year) = explode("/", $post_vars["user_dob"]);
             $dob = $year."-".str_pad($month, 2, "0", STR_PAD_LEFT)."-".str_pad($day, 2, "0", STR_PAD_LEFT);
-
-	    if($_POST["chk_sms_report"]=='on' && !empty($_POST["user_cellular"])): 
-		$receive_sms = 'Y';
-	    else:
-		$receive_sms = '';
-	    endif;
-
-
             switch ($post_vars["submituser"]) {
             case "Add User":
                 $active = ($post_vars["isactive"]?"Y":"N");
                 $admin = ($post_vars["isadmin"]?"Y":"N");
-				                
-				$sql = "insert into game_user (user_firstname, user_lastname, user_middle, user_lang, ".
+                $sql = "insert into game_user (user_firstname, user_lastname, user_middle, user_lang, ".
                        "user_email, user_cellular, user_login, user_password, user_pin, user_dob, user_gender, ".
-                       "user_active, user_admin, user_role, user_receive_sms) ".
+                       "user_active, user_admin, user_role) ".
                        "values ('".ucwords($post_vars["user_firstname"])."', '".ucwords($post_vars["user_lastname"])."', '".ucwords($post_vars["user_middle"])."', ".
                        "'".$post_vars["lang_id"]."', '".strtolower($post_vars["user_email"])."', '".$post_vars["user_cellular"]."', ".
                        "'".strtolower($post_vars["user_login"])."', old_password('".$post_vars["user_password"]."'), '".$post_vars["user_pin"]."', '$dob', '".$post_vars["user_gender"]."', ".
-                       "'$active', '$admin', '".$post_vars["role_id"]."','".$receive_sms."')";
-
-				
-
-				if ($result = mysql_query($sql)) {									
-
-					$user_id = mysql_insert_id();
-
-					$update_user = mysql_query("UPDATE game_user SET name_designation_esign='$_POST[txt_name_designation]' WHERE user_id='$user_id'") or die("Cannot query 128: ".mysql_error());
-
-					$pic = $this->move_image($_FILES["user_pic"],$post_vars["user_login"],'pic');
-					$esign = $this->move_image($_FILES["user_esign"],$post_vars["user_login"],'esign');
-
-					$update_user = mysql_query("UPDATE game_user SET picture_file='$pic', esign='$esign' WHERE user_id='$user_id'") or die("Cannot query 131: ".mysql_error());
-
+                       "'$active', '$admin', '".$post_vars["role_id"]."')";
+                if ($result = mysql_query($sql)) {
                     header("location: ".$_SERVER["PHP_SELF"]."?page=ADMIN&method=USER");
                 }
                 break;
-            case "Update User": 
+            case "Update User":
                 $active = ($post_vars["isactive"]?"Y":"N");
                 $admin = ($post_vars["isadmin"]?"Y":"N");
                 list($month, $day, $year) = explode("/", $post_vars["user_dob"]);
@@ -157,8 +130,7 @@ class User {
                            "user_gender = '".$post_vars["user_gender"]."', ".
                            "user_password = old_password('".$post_vars["user_password"]."'), ".
                            "user_active = '$active', ".
-                           "user_admin = '$admin', ".
-                           "user_receive_sms = '$receive_sms' ".
+                           "user_admin = '$admin' ".
                            "where user_id = '".$post_vars["user_id"]."'";
                 } else {
                     print $sql = "update game_user set ".
@@ -175,25 +147,10 @@ class User {
                            "user_gender = '".$post_vars["user_gender"]."', ".
                            "user_password = old_password('".$post_vars["user_password"]."'), ".
                            "user_active = '$active', ".
-                           "user_admin = '$admin', ".
-						   "user_receive_sms = '$receive_sms' ".
+                           "user_admin = '$admin' ".
                            "where user_id = '".$post_vars["user_id"]."'";
                 }
-		
                 if ($result = mysql_query($sql)) {
-
-					$update_user = mysql_query("UPDATE game_user SET name_designation_esign='$_POST[txt_name_designation]' WHERE user_id='$post_vars[user_id]'") or die("Cannot query 128: ".mysql_error());
-
-					if(!empty($_FILES["user_pic"]["tmp_name"])):
-						$pic = $this->move_image($_FILES["user_pic"],$post_vars["user_login"],'pic'); echo $pic;
-						$q_update = mysql_query("UPDATE game_user SET picture_file='$pic' WHERE user_id='$post_vars[user_id]'") or die("Cannot query 180: ".mysql_error());
-					endif;
-
-					if(!empty($_FILES["user_esign"]["tmp_name"])): 
-						$esign = $this->move_image($_FILES["user_esign"],$post_vars["user_login"],'esign');
-						$q_update = mysql_query("UPDATE game_user SET esign='$esign' WHERE user_id='$post_vars[user_id]'") or die("Cannot query 184: ".mysql_error());
-					endif;
-
                     header("location: ".$_SERVER["PHP_SELF"]."?page=ADMIN&method=USER");
                 }
                 break;
@@ -202,8 +159,6 @@ class User {
     }
 
     function validate_user() {
-		$allowed_image_format = array('image/png','image/jpg','image/gif','image/jpeg');
-
         if (func_num_args()) {
             $arg_list = func_get_args();
             $post_vars = $arg_list[0];
@@ -243,14 +198,6 @@ class User {
                     }
                 }
             }
-
-	    /*
-	    if($_FILES["profile_pic"]["size"]!=0){
-	    if((!in_array($_FILES["profile_pic"]["type"],$allowed_image_format)) || ($_FILES["profile_pic"]["size"] > 200000)){
-		$retval.= "<li class='error'>Uploaded photo should be in png, jpeg or gif and size < 200 KB.</li>";
-	    }
-	    })*/
-
             return $retval;
         }
     }
@@ -290,7 +237,7 @@ class User {
             $post_vars = $arg_list[1];
             $get_vars = $arg_list[2];
             if ($get_vars["user_id"]) {
-                $sql = "select user_id, user_lastname, user_firstname, user_lang, user_dob, user_gender, user_email, user_pin, user_login, user_admin, user_active, user_cellular, user_role, user_receive_sms,picture_file,esign,name_designation_esign ".
+                $sql = "select user_id, user_lastname, user_firstname, user_lang, user_dob, user_gender, user_email, user_pin, user_login, user_admin, user_active, user_cellular, user_role ".
                        "from game_user where user_id = '".$get_vars["user_id"]."'";
                 if ($result = mysql_query($sql)) {
                     if (mysql_num_rows($result)) {
@@ -300,11 +247,11 @@ class User {
                 }
             }
         }
-        print "<table width='300'>";
+        print "<table wifth='300'>";
         print "<tr valign='top'><td>";
         print "<span class='admin'>".FTITLE_SITE_USER_FORM."</span><br><br>";
         print "</td></tr>";
-        print "<form action = '".$_SERVER["SELF"]."?page=ADMIN&method=USER&user_id=".$get_vars["user_id"]."' name='form_user' method='post' enctype='multipart/form-data'>";
+        print "<form action = '".$_SERVER["SELF"]."?page=ADMIN&method=USER&user_id=".$get_vars["user_id"]."' name='form_user' method='post'>";
         print "<tr><td colspan='2'><b>NOTE: Fields marked with <font color='red'>*</font> are required.</b><br><br></td></tr>";
         print "<tr valign='top'><td>";
         print "<span class='boxtitle'>".LBL_FIRST_NAME."</span><br> ";
@@ -318,14 +265,6 @@ class User {
         print "<span class='boxtitle'>".LBL_LAST_NAME."</span><br> ";
         print "<input type='text' maxlength='50' class='textbox' name='user_lastname' value='".($user["user_lastname"]?$user["user_lastname"]:$post_vars["user_lastname"])."' style='border: 1px solid #000000'> <font color='red'>*</font><br>";
         print "</td></tr>";
-
-	/*echo "<tr valign='top'><td>";
-	echo "<input type='hidden' name='MAXSIZE' value='200000' />";
-	echo "<span class='boxtitle'>UPLOAD PHOTO (less than 200KB)</span><br>";
-	echo "<input type='file' name='profile_pic'></input>";
-	
-	echo "</td></tr>";*/
-
         print "<tr valign='top'><td>";
         print "<span class='boxtitle'>".LBL_DATE_OF_BIRTH."</span><br> ";
         if ($user["user_dob"]) {
@@ -347,7 +286,7 @@ class User {
         print "<input type='text' size='15' maxlength='15' class='textbox' name='user_pin' value='".($user["user_pin"]?$user["user_pin"]:$post_vars["user_pin"])."' style='border: 1px solid #000000'> <font color='red'>*</font><br>";
         print "</td></tr>";
         print "<tr valign='top'><td>";
-        print "<span class='boxtitle'>".LBL_ROLE."</span><br> "; 
+        print "<span class='boxtitle'>".LBL_ROLE."</span><br> ";
         print $this->show_roles($user["user_role"]?$user["user_role"]:$post_vars["role_id"]);
         print "</td></tr>";
         print "<tr valign='top'><td>";
@@ -382,32 +321,6 @@ class User {
         print "<span class='boxtitle'>".LBL_CELLULAR."</span><br> ";
         print "<input type='text' maxlength='20' class='textbox' name='user_cellular' value='".($user["user_cellular"]?$user["user_cellular"]:$post_vars["user_cellular"])."' style='border: 1px solid #000000'><br>";
         print "</td></tr>";
-
-		print"<tr><td valign='top'>Upload Picture&nbsp;&nbsp;";
-		if(!empty($user["picture_file"])):
-			echo "<img src='$user[picture_file]' width='50' height='50' />";
-		endif;
-		print "<input type='file' name='user_pic' size='6' />";
-			
-
-		print "</td></tr>";
-
-		print"<tr><td>Upload E-Signature (optional)&nbsp;&nbsp;";
-		if(!empty($user["esign"])):
-			echo "<img src='$user[esign]' width='50' height='50' />";
-		endif;
-		print "<input type='file' name='user_esign' size='6' />";
-		print "</td></tr>";
-
-		print"<tr><td>Name and Designation (for e-signing)";
-		print "<textarea name='txt_name_designation' cols='30'>$user[name_designation_esign]</textarea>";
-		print "</td></tr>";
-
-
-		print "<tr valign='top'><td>";
-        print "<input type='checkbox' name='chk_sms_report' ". (($user["user_receive_sms"]=='Y')?'CHECKED':'')."><span class='boxtitle'>Yes, I want to receive SMS on basic statistics (FOR LCE's and MHO's ONLY)!</span></input>";
-        print "</td></tr>";
-			
         print "<tr><td><br>";
         if ($get_vars["user_id"]) {
             print "<input type='hidden' name='user_id' value='".$get_vars["user_id"]."'>";
@@ -423,8 +336,6 @@ class User {
             }
         }
         print "</td></tr>";
-
-
         print "</form>";
         print "</table><br>";
     }
@@ -447,9 +358,9 @@ class User {
         if (func_num_args()) {
             $arg_list = func_get_args();
             $role_id = $arg_list[0];
-        } 
+        }
         $sql = "select role_id, role_name from role order by role_name";
-        if ($result = mysql_query($sql)) { 
+        if ($result = mysql_query($sql)) {
             if (mysql_num_rows($result)) {
                 $retval .= "<select name='role_id' class='textbox'>";
                     $retval .= "<option value='0'>Select Role</option>";
@@ -924,27 +835,5 @@ class User {
         }
    }
 
-   function move_image($file_array,$login_name,$image_type){
-
-	   if(!empty($file_array)):
-
-		//print_r($file_array);
-		//echo $login_name.'*'.$image_type;
-		
-		$directory = '../images/';
-		$sub_dir = ($image_type=='pic')?'pics':'signature';
-
-
-		if(move_uploaded_file($file_array["tmp_name"],$directory.$sub_dir.'/'.$login_name.'_'.$image_type.'.jpeg')): 
-		
-			echo $directory.$sub_dir.'/'.$login_name.'_'.$image_type.'.jpeg';
-
-			return $directory.$sub_dir.'/'.$login_name.'_'.$image_type.'.jpeg';			
-		endif;
-	   else:
-			return '';
-	   endif;
-		
-   }
 }
 ?>

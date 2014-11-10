@@ -612,7 +612,7 @@ class family_planning extends module{
 
 	        echo "<a href='$_SERVER[PHP_SELF]?page=$_GET[page]&menu_id=$_GET[menu_id]&consult_id=$_GET[consult_id]&ptmenu=$_GET[ptmenu]&module=$_GET[module]&fp=HX#hx' class='fpmenu'>".$this->menu_highlight($_GET["fp"],'HX','FP HX')."</a>";
 
-	        echo "<a href='$_SERVER[PHP_SELF]?page=$_GET[page]&menu_id=$_GET[menu_id]&consult_id=$_GET[consult_id]&ptmenu=$_GET[ptmenu]&module=$_GET[module]&fp=OBS#obs' class='fpmenu'>".$this->menu_highlight($_GET["fp"],'OBS','OSTETRICAL HX')."</a>";
+	        echo "<a href='$_SERVER[PHP_SELF]?page=$_GET[page]&menu_id=$_GET[menu_id]&consult_id=$_GET[consult_id]&ptmenu=$_GET[ptmenu]&module=$_GET[module]&fp=OBS#obs' class='fpmenu'>".$this->menu_highlight($_GET["fp"],'OBS','OBSTETRICAL HX')."</a>";
 
 	        echo "<a href='$_SERVER[PHP_SELF]?page=$_GET[page]&menu_id=$_GET[menu_id]&consult_id=$_GET[consult_id]&ptmenu=$_GET[ptmenu]&module=$_GET[module]&fp=PE#pe' class='fpmenu'>".$this->menu_highlight($_GET["fp"],'PE','FP PE')."</a>";
 

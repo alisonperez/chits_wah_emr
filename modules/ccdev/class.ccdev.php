@@ -1,6 +1,13 @@
 <?
 class ccdev extends module {
+/*
+	DATE UPDATED : 3/27/2014 ---------------------------------------------------------
+	UPDATED BY: Mark Santos
 
+	UPDATE LOG:
+		- ISSUES/BUGS : When the child is more than 23 months it should not be counted as FIC nor CIC
+		- added condition to select latest vaccine date
+*/
     // Author: Herman Tolentino MD
     // CHITS Project 2004
 
@@ -490,7 +497,7 @@ class ccdev extends module {
 		if($_POST["update_ccdev_remark"]):
 			echo "<tr><td><textarea name='ccdev_remarks' cols='35' rows='4'>";		
 		else:
-			echo "<tr><td><textarea name='ccdev_remarks' cols='35' rows='4' readonly>";
+			echo "<tr><td><textarea name='ccdev_remarks' cols='35' rows='4' >";
 		endif;
 		
 		
@@ -1147,7 +1154,7 @@ class ccdev extends module {
 
 	print "<tr><td>";
 	print "<span class='boxtitle'>DATE REGISTERED</span><br>";
-	print "<input type='text' size='11' class='textbox' name='ccdev_date_reg' value='$ccdev_reg_date' readonly></input>&nbsp;";
+	print "<input type='text' size='11' class='textbox' name='ccdev_date_reg' value='$ccdev_reg_date' ></input>&nbsp;";
 	echo "<a href=\"javascript:show_calendar4('document.form_consult_ccdev.ccdev_date_reg', document.form_consult_ccdev.ccdev_date_reg.value);\"><img src='../images/cal.gif' width='16' height='16' border='0' alt='Click Here to Pick up the date'></a>";
 	print "</td></tr>";
 	
@@ -1158,10 +1165,19 @@ class ccdev extends module {
         }
 
         print "<span class='boxtitle'>".LBL_MOTHERS_NAME." (Click Search Mother button. The mother should be in the database.)</span><br> ";
-        print "<input type='text' size='20' class='textbox' ".($_SESSION["isadmin"]||!$get_vars["patient_id"]?"":"disabled")." name='mother_name' value='".($ccdev["mother_name"]?$ccdev["mother_name"]:$post_vars["mother_name"])."' style='border: 1px solid #000000' readonly>";
-
-	echo "<input name='mother_px_id' type='hidden' size='20' value='$ccdev[mother_px_id]'></input>";
-
+        
+		//$mother_id = ccdev::get_mother();
+		
+		if(empty($ccdev['mother_px_id'])){
+			$get_mother_id = mysql_query("SELECT a.birthweight as child_birthweight, a.delivery_location as location, a.patient_id AS mother_id, c.patient_firstname AS fname, c.patient_lastname AS lname FROM m_patient_mc a JOIN m_consult b ON a.child_patient_id = b.patient_id JOIN m_patient c ON c.patient_id = a.patient_id WHERE b.consult_id = '$get_vars[consult_id]'") or die("Cannot Query 1171: " . mysql_error());
+			if($result_mother_id = mysql_fetch_assoc($get_mother_id)){
+				$mother_id = $result_mother_id['mother_id'];
+				$mother_name = $result_mother_id['fname']. " ". $result_mother_id['lname'];
+			}
+		}
+		print "<input type='text' size='20' class='textbox' ".($_SESSION["isadmin"]||!$get_vars["patient_id"]?"":"disabled")." name='mother_name' value='".($ccdev["mother_name"]?$ccdev["mother_name"]:($mother_name!=''?$mother_name:$post_vars["mother_name"]))."' style='border: 1px solid #000000' >";
+		echo "<input name='mother_px_id' type='hidden' size='20' value='".($mother_id!=0?$mother_id:$ccdev[mother_px_id])."'></input>";
+	
 	echo "&nbsp;<input type='button' name='btn_search_spouse' value='Search Mother' onclick='search_patient(this.form.name,this.form.elements[1].name,this.form.elements[2].name);' style='border: 1px solid #000000'></input>";
 
         print "</td></tr>";
@@ -1263,6 +1279,18 @@ class ccdev extends module {
         print "</table><br>";
     }
 
+	function get_mother(){
+		if (func_num_args()>0) {
+            $arg_list = func_get_args();
+            $list = $arg_list[0];
+        }
+		$patient_id = healthcenter::get_patient_id($get_vars["consult_id"]);
+		$sql = mysql_query("SELECT patient_id FROM m_patient_mc WHERE child_patient_id = $patient_id") or die("ERROR 1287 : ". mysql_error());
+		$sql_result = mysql_fetch_assoc($sql);
+		
+		$mother_id = $sql_result['patient_id'];
+		return $mother_id;
+	}
     function _details_ccdev() {
     //
     // main submodule for ccdev consults
@@ -1903,6 +1931,7 @@ function determine_vacc_status(){
 		//enable if HEPB1 is not part of FIC
 		$antigens = array('BCG','PENTA1','PENTA2','PENTA3','MSL','OPV1','OPV2','OPV3');
 		$antigen_stat = array('BCG'=>0,'PENTA1'=>0,'PENTA2'=>0,'PENTA3'=>0,'MSL'=>0,'OPV1'=>0,'OPV2'=>0,'OPV3'=>0);
+		
 	else:
 		$antigens = array('BCG','DPT1','DPT2','DPT3','HEPB1','HEPB2','HEPB3','MSL','OPV1','OPV2','OPV3');
 		$antigen_stat = array('BCG'=>0,'DPT1'=>0,'DPT2'=>0,'DPT3'=>0,'HEPB1'=>0,'HEPB2'=>0,'HEPB3'=>0,'MSL'=>0,'OPV1'=>0,'OPV2'=>0,'OPV3'=>0);
@@ -1930,23 +1959,58 @@ function determine_vacc_status(){
 		for($j=0;$j<count($antigens);$j++){
 			$ant_date = $antigen_date[$antigens[$j]];
 								
-			$q_antigen = mysql_query("SELECT round((TO_DAYS('$ant_date') - TO_DAYS(a.patient_dob))/7,2) week_span FROM m_patient a WHERE a.patient_id='$pxid'") or die("Cannot query: 269");
+			$q_antigen = mysql_query("SELECT round((TO_DAYS('$ant_date') - TO_DAYS(a.patient_dob))/30,2) week_span FROM m_patient a WHERE a.patient_id='$pxid'") or die("Cannot query: 269");
 			list($wk_age) = mysql_fetch_array($q_antigen);
 
+			/*
 			if($wk_age>52):	
 				$cic=1;
 			endif;
+			*/
+			if($cic==0){
+					if($wk_age<=12.17){
+						$cic=1;
+					}elseif($wk_age>12.17 && $wk_age<=23){
+						$cic=2;
+					}else{
+						$cic=3;
+					}
+			}elseif($cic==1){	
+					if($wk_age<=12.17){
+						$cic=1;
+					}elseif($wk_age>12.17 && $wk_age<=23){
+						$cic=2;
+					}else{
+						$cic=3;
+					}
+			}elseif($cic==2){
+					if($wk_age>12.17 && $wk_age<=23){
+						$cic=2;
+					}else{
+						$cic=3;
+					}
+			}else{
+					$cic=3;
+			}
 		}
 	endif;
 	
 	arsort($antigen_date);
 //	print_r($antigen_date).'<br>';
-	
+	/*
 	if($cic==1):
 		return current($antigen_date)."\n".'(CIC)';
 	else:
 		return current($antigen_date)."\n".'(FIC)';
 	endif;
+	*/
+		if($cic==1){
+			return current($antigen_date)."\n".'(FIC)';
+		}elseif($cic==2){
+			return current($antigen_date)."\n".'(CIC)';
+		}else{
+			return current($antigen_date)."\n".'(Vaccine was completed when the child was more than 23 months old)';
+		}
 	}
 
 	function check_vacc_entry(){
